@@ -43,6 +43,7 @@ export class UnpublishArticle implements UseCase<UnpublishArticleInput, Transiti
           occurredAt: this.deps.clock.now(),
         },
         input.reason,
+        pulled.locale,
       ),
     )
 

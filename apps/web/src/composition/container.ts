@@ -30,6 +30,7 @@ import type {
 import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { mongoDb } from './mongo'
+import { registerSubscribers } from './subscribers'
 
 /**
  * The composition root.
@@ -107,11 +108,16 @@ let instance: Container | undefined
 
 /** The production graph. Built once per process, reused across requests. */
 export function container(): Container {
-  instance ??= buildContainer({
+  if (instance !== undefined) return instance
+
+  const events = new InProcessEventBus()
+  registerSubscribers(events)
+
+  instance = buildContainer({
     db: mongoDb(),
     clock: systemClock,
     ids: cryptoIds,
-    events: new InProcessEventBus(),
+    events,
     ai: new AnthropicAiAdapter(anthropicModels()),
   })
 

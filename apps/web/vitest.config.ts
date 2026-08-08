@@ -13,4 +13,9 @@ export default baseConfig(COVERAGE_FLOORS.web, [
   // next/headers only resolves inside a request. The branch that matters —
   // roles resolving to an Actor — is tested in the application layer.
   'src/composition/actor.ts',
+  // Server Actions and the subscriber wiring only run inside Next. The logic
+  // they carry lives in schemas.ts, result.ts and cache-invalidation.ts, each
+  // fully covered here.
+  'src/actions/editorial.ts',
+  'src/composition/subscribers.ts',
 ])

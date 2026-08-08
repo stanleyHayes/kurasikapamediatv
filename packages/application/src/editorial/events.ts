@@ -25,6 +25,12 @@ export interface ArticleUnpublished extends ArticleEvent {
   readonly name: 'article.unpublished'
   /** Why it was pulled. Corrections must stay traceable. */
   readonly reason: string
+  /**
+   * Carried for the same reason as on `article.published`: the cache
+   * subscriber must drop the article from its locale's listings, and a pulled
+   * article that lingers on the homepage is the visible half of the mistake.
+   */
+  readonly locale: string
 }
 export interface ArticleApproved extends ArticleEvent {
   readonly name: 'article.approved'
@@ -56,11 +62,11 @@ export const articleRejected = (at: Occurrence, note: string): ArticleRejected =
   note,
 })
 
-export const articleUnpublished = (at: Occurrence, reason: string): ArticleUnpublished => ({
-  name: 'article.unpublished',
-  ...at,
-  reason,
-})
+export const articleUnpublished = (
+  at: Occurrence,
+  reason: string,
+  locale: string,
+): ArticleUnpublished => ({ name: 'article.unpublished', ...at, reason, locale })
 
 export const articleApproved = (at: Occurrence, revisionId: RevisionId): ArticleApproved => ({
   name: 'article.approved',
