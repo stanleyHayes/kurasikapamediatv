@@ -120,6 +120,18 @@ Publishing an article calls `updateTag('article-{id}')` and `revalidateTag('home
 
 `use cache` may never contain `cookies()`, `headers()` or `searchParams`. Reader-specific values are extracted in the dynamic shell and passed as arguments.
 
+### Known limitation: soft 404s
+
+Cache Components flushes the prerendered shell before a Suspense child can call `notFound()`, so a missing article answers **200 with not-found markup**, not 404. Both escapes fail: `connection()` does not stop the prerender pass, and `export const dynamic` is rejected outright as incompatible with `cacheComponents`.
+
+The harm from a soft 404 is crawlers indexing "not found" pages, so that is defended directly:
+
+- `app/[locale]/not-found.tsx` declares `robots: { index: false, follow: false }`, so **every** not-found response is noindex whatever route produced it.
+- The sitemap never advertises a URL that does not resolve.
+- E2E journeys assert both, so the mitigation cannot quietly stop working.
+
+Revisit when Next offers a per-route prerender opt-out that coexists with Cache Components. Found by the Playwright journeys, not by reasoning — which is the argument for having them.
+
 ---
 
 ## 6. Internationalisation

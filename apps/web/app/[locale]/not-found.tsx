@@ -1,5 +1,19 @@
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+
+/**
+ * noindex lives HERE, not on the pages that call notFound().
+ *
+ * A page that calls notFound() can set its own robots metadata, but not every
+ * route that renders this boundary does. Declaring it here means every
+ * not-found response is noindex whatever produced it — belt and braces with
+ * the article page, which sets it too.
+ */
+export const metadata: Metadata = {
+  title: 'Not found',
+  robots: { index: false, follow: false },
+}
 
 export default async function NotFound(): Promise<React.ReactElement> {
   const t = await getTranslations('error')

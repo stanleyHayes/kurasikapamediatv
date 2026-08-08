@@ -67,6 +67,18 @@ jobs:
           MONGODB_URI: mongodb://127.0.0.1:27017/kurasikapa_ci
           MONGODB_DB: kurasikapa_ci
 
+      - name: Install Playwright browser
+        run: pnpm --filter @kurasikapa/web exec playwright install chromium --with-deps
+
+      # Runs against the production build above. Cache Components, PPR and
+      # Server Action serialisation all behave differently under `next dev`,
+      # so a journey that only passes there proves the dev server works.
+      - name: E2E journeys + accessibility
+        run: pnpm --filter @kurasikapa/web test:e2e
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/kurasikapa_e2e
+          MONGODB_DB: kurasikapa_e2e
+
       - name: Duplication
         run: pnpm dup
 

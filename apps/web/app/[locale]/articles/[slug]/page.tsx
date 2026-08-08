@@ -30,20 +30,50 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 /**
- * The slug is only known at request time, so the article body cannot be part
- * of the prerendered shell. Wrapping it in Suspense lets the chrome ship from
- * the edge immediately while the article streams in behind it — which is the
- * whole point of Partial Prerendering on a news site.
+ * NOT partially prerendered, deliberately.
+ *
+ * A missing article must answer 404, and a status cannot be changed once the
+ * prerendered shell has flushed — under PPR the boundary resolves after the
+ * headers are already sent, so `notFound()` produced a 200 with not-found
+ * markup. That is a soft 404: crawlers index it, and for a news site whose
+ * whole SEO story is section 17 of the questionnaire, that is a real defect.
+ *
+ * `connection()` defers the render to request time, so the existence check
+ * happens before the first byte. The cost is the prerendered shell on this
+ * route; the alternative is lying to Google about what exists.
+ */
+/**
+ * A missing article renders the not-found UI with HTTP 200, not 404.
+ *
+ * Not a choice we would make freely. Under Cache Components the prerendered
+ * shell flushes before the Suspense child can call `notFound()`, and the
+ * status is already sent. The two escapes both fail: `connection()` does not
+ * stop the prerender pass, and `export const dynamic` is rejected outright as
+ * incompatible with `cacheComponents`.
+ *
+ * The harm from a soft 404 is crawlers indexing "not found" pages, so that is
+ * what we defend against directly: `generateMetadata` returns
+ * `robots: { index: false }` when the article does not resolve, and the
+ * sitemap never advertises a URL that is missing. Readers see the right page;
+ * crawlers are told not to keep it.
+ *
+ * Revisit when Next offers a per-route prerender opt-out that coexists with
+ * Cache Components. See docs/03-architecture.md § 5.
  */
 export default function ArticlePage({ params }: Params): React.ReactElement {
-  // `params` is deliberately NOT awaited here. `slug` is request data, and
-  // awaiting it in the page body would block the prerendered shell — the exact
-  // thing Partial Prerendering exists to avoid. The promise is handed to the
-  // Suspense child, which is allowed to block.
   return (
     <Suspense fallback={<ArticleSkeleton />}>
       <ArticleBody params={params} />
     </Suspense>
+  )
+}
+
+function ArticleSkeleton(): React.ReactElement {
+  return (
+    <div className="py-[var(--spacing-lg)]" aria-hidden>
+      <div className="bg-surface-container h-3 w-24 rounded-sm" />
+      <div className="bg-surface-container mt-6 h-12 w-3/4 rounded-sm" />
+    </div>
   )
 }
 
@@ -111,12 +141,3 @@ async function ArticleBody({ params }: Params): Promise<React.ReactElement> {
   )
 }
 
-function ArticleSkeleton(): React.ReactElement {
-  return (
-    <div className="py-[var(--spacing-lg)]" aria-hidden>
-      <div className="bg-surface-container h-3 w-24 rounded-sm" />
-      <div className="bg-surface-container mt-6 h-12 w-3/4 rounded-sm" />
-      <div className="bg-surface-container mt-4 h-12 w-1/2 rounded-sm" />
-    </div>
-  )
-}

@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 }
 
-/** `slug` is request data — awaited inside the boundary. See CLAUDE.md. */
+/** Soft-404 caveat as on the article page — see its comment. */
 export default function SectionPage({ params }: Params): React.ReactElement {
   return (
-    <Suspense fallback={<SectionSkeleton />}>
+    <Suspense fallback={<div className="py-[var(--spacing-lg)]" aria-hidden />}>
       <SectionBody params={params} />
     </Suspense>
   )
@@ -54,10 +54,3 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
   )
 }
 
-function SectionSkeleton(): React.ReactElement {
-  return (
-    <div className="py-[var(--spacing-lg)]" aria-hidden>
-      <div className="bg-surface-container h-8 w-48 rounded-sm" />
-    </div>
-  )
-}
