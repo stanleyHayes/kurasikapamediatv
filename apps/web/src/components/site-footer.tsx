@@ -1,25 +1,66 @@
 import { cacheLife } from 'next/cache'
+import { Link } from '../i18n/navigation'
 
 /**
- * The copyright year is *data*, not markup.
+ * Every standing page is reachable from here.
  *
- * Under Cache Components, reading the clock in a Server Component before any
- * uncached data is a prerender error — and rightly so: a prerendered page has
- * no "now". Marking this `use cache` with a daily lifetime gives the year a
- * defined freshness instead of freezing it at build time.
+ * A page nobody can navigate to is not built, whatever the route table says —
+ * and the legal three in particular must be one click from anywhere, which is
+ * what makes a footer the right home for them.
  */
-// eslint-disable-next-line @typescript-eslint/require-await -- `use cache` requires an async function; there is nothing to await.
-export async function SiteFooter(): Promise<React.ReactElement> {
-  'use cache'
-  cacheLife('days')
+const LINKS = [
+  { href: '/about', label: 'About' },
+  { href: '/team', label: 'Our team' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/faq', label: 'FAQ' },
+  { href: '/advertise', label: 'Advertise' },
+  { href: '/careers', label: 'Careers' },
+  { href: '/legal/privacy', label: 'Privacy' },
+  { href: '/legal/terms', label: 'Terms' },
+  { href: '/legal/cookies', label: 'Cookies' },
+] as const
 
-  const year = new Date().getUTCFullYear()
-
+/**
+ * NOT cached as a whole.
+ *
+ * next-intl's Link resolves the locale through `headers()`, and dynamic data
+ * inside a `use cache` scope is refused outright. Only the year needs caching,
+ * so only the year is cached — which is the right decomposition anyway: cache
+ * the thing that changes with time, not the markup around it.
+ */
+export function SiteFooter(): React.ReactElement {
   return (
     <footer className="border-outline-variant mt-[var(--spacing-xl)] border-t">
-      <div className="text-on-surface-variant mx-auto max-w-[var(--container-page)] px-6 py-8 text-sm">
-        © {year} Kurasikapa Media TV
+      <div className="mx-auto max-w-[var(--container-page)] px-6 py-8">
+        <nav aria-label="Site information">
+          <ul className="text-on-surface-variant flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            {LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-primary transition-colors">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <p className="text-on-surface-variant mt-6 text-sm">
+          © <CopyrightYear /> Kurasikapa Media TV
+        </p>
       </div>
     </footer>
   )
+}
+
+/**
+ * The year is *data*, not markup. A prerendered page has no "now", so reading
+ * the clock in a Server Component is a prerender error; `use cache` with a
+ * daily lifetime gives it a defined freshness instead of freezing it at build.
+ */
+// eslint-disable-next-line @typescript-eslint/require-await -- `use cache` requires async; nothing to await.
+async function CopyrightYear(): Promise<React.ReactElement> {
+  'use cache'
+  cacheLife('days')
+
+  return <>{new Date().getUTCFullYear()}</>
 }
