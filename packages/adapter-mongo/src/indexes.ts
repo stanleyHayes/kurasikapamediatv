@@ -22,6 +22,14 @@ export async function ensureIndexes(db: Db): Promise<void> {
     { key: { status: 1, updatedAt: 1, _id: 1 }, name: 'awaiting_review' },
     // "My drafts" in the CMS.
     { key: { authorId: 1, status: 1, updatedAt: -1 }, name: 'author_recent' },
+    // Lexical search. Weighted so a term in the headline outranks the same
+    // term buried in the body — which is what a reader means by relevance.
+    {
+      key: { title: 'text', slug: 'text' },
+      name: 'article_text',
+      weights: { title: 10, slug: 2 },
+      default_language: 'english',
+    },
     // The publishing cron scans only scheduled articles, so the index is partial.
     {
       key: { scheduledAt: 1 },

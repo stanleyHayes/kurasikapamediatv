@@ -3,6 +3,7 @@ import {
   MongoArticleRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
+  MongoTextSearch,
 } from '@kurasikapa/adapter-mongo'
 import {
   type AiPort,
@@ -16,6 +17,7 @@ import {
   type IdPort,
   ListAuthoredArticles,
   ListAwaitingReview,
+  SearchArticles,
   ListPublishedArticles,
   PublishArticle,
   PublishDueArticles,
@@ -28,6 +30,7 @@ import {
 } from '@kurasikapa/application'
 import type {
   ArticleRepository,
+  SearchPort,
   RevisionRepository,
   RoleRepository,
 } from '@kurasikapa/application'
@@ -62,6 +65,7 @@ export interface Container {
   readonly listAuthoredArticles: ListAuthoredArticles
   readonly getDraft: GetDraft
   readonly listAwaitingReview: ListAwaitingReview
+  readonly searchArticles: SearchArticles
   readonly resolveActor: ResolveActor
 
   // Ports exposed for interactive use (AI streams straight to the editor)
@@ -88,6 +92,7 @@ export function buildContainer(infra: Infrastructure): Container {
   })
   const revisions: RevisionRepository = new MongoRevisionRepository(infra.db)
   const roles: RoleRepository = new MongoRoleRepository(infra.db)
+  const search: SearchPort = new MongoTextSearch(infra.db)
 
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
@@ -109,6 +114,7 @@ export function buildContainer(infra: Infrastructure): Container {
     listAuthoredArticles: new ListAuthoredArticles({ articles }),
     getDraft: new GetDraft({ articles, revisions }),
     listAwaitingReview: new ListAwaitingReview({ articles }),
+    searchArticles: new SearchArticles({ search }),
     resolveActor: new ResolveActor({ roles }),
 
     ai: infra.ai,

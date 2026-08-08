@@ -27,6 +27,12 @@ export type {
 export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pagination'
 export type { RevisionRepository } from './ports/revision-repository'
 export type { RoleRepository } from './ports/role-repository'
+export type { SearchHit, SearchPort, SearchQuery } from './ports/search'
+export {
+  SearchArticles,
+  type SearchArticlesDeps,
+  type SearchArticlesInput,
+} from './audience/search-articles'
 export {
   AssignRoles,
   type AssignRolesDeps,

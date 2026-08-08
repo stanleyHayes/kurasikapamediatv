@@ -19,3 +19,4 @@ export {
 } from './mongo-article-repository'
 export { MongoRevisionRepository } from './mongo-revision-repository'
 export { MongoRoleRepository } from './mongo-role-repository'
+export { MongoTextSearch } from './mongo-text-search'

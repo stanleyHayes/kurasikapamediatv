@@ -108,7 +108,22 @@ db.page_views.createIndex({ at: 1 }, { expireAfterSeconds: 34560000 })   // 400 
 db.sessions.createIndex({ expires: 1 }, { expireAfterSeconds: 0 })
 ```
 
-### Atlas Search — global + lexical search
+### Lexical search — `$text` today, Atlas Search when relevance demands it
+
+R1 ships MongoDB's own `$text` index, weighted so a term in the headline outranks the same term in the body:
+
+```js
+db.articles.createIndex(
+  { title: "text", slug: "text" },
+  { name: "article_text", weights: { title: 10, slug: 2 }, default_language: "english" },
+)
+```
+
+**Why not Atlas Search yet.** Atlas Search requires `mongot`, which MongoDB Community does not ship — so it cannot run in a Testcontainer, and a search adapter that only works in production is one nobody can test. `$text` gives stemming, stop words and relevance scoring, runs everywhere, and is honest about what it is.
+
+Atlas Search is a **second implementation of the same `SearchPort`** and one wiring line, taken when relevance matters more than portability. The index definition below is kept ready for that day.
+
+### Atlas Search — global + lexical search (R2)
 
 ```json
 {
