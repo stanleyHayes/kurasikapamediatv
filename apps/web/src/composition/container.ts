@@ -1,6 +1,7 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
 import {
   MongoArticleRepository,
+  MongoCategoryRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
   MongoTextSearch,
@@ -16,6 +17,7 @@ import {
   GetPublishedArticle,
   type IdPort,
   ListAuthoredArticles,
+  BrowseCategory,
   ListAwaitingReview,
   SearchArticles,
   ListPublishedArticles,
@@ -30,6 +32,7 @@ import {
 } from '@kurasikapa/application'
 import type {
   ArticleRepository,
+  CategoryRepository,
   SearchPort,
   RevisionRepository,
   RoleRepository,
@@ -62,6 +65,7 @@ export interface Container {
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
+  readonly browseCategory: BrowseCategory
   readonly listAuthoredArticles: ListAuthoredArticles
   readonly getDraft: GetDraft
   readonly listAwaitingReview: ListAwaitingReview
@@ -93,6 +97,7 @@ export function buildContainer(infra: Infrastructure): Container {
   const revisions: RevisionRepository = new MongoRevisionRepository(infra.db)
   const roles: RoleRepository = new MongoRoleRepository(infra.db)
   const search: SearchPort = new MongoTextSearch(infra.db)
+  const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
 
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
@@ -111,6 +116,7 @@ export function buildContainer(infra: Infrastructure): Container {
 
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
+    browseCategory: new BrowseCategory({ categories, articles }),
     listAuthoredArticles: new ListAuthoredArticles({ articles }),
     getDraft: new GetDraft({ articles, revisions }),
     listAwaitingReview: new ListAwaitingReview({ articles }),

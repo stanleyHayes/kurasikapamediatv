@@ -1,5 +1,6 @@
 export { Article, type ArticleProps, type NewArticle } from './editorial/article'
 export { NonMonotonicSequence, Revision, type RevisionProps } from './editorial/revision'
+export { Category, LocaleNotCovered, type CategoryProps } from './editorial/category'
 export {
   ARTICLE_STATUSES,
   TRANSITIONS,

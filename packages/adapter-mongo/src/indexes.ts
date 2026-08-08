@@ -1,5 +1,12 @@
 import type { Db } from 'mongodb'
-import { ARTICLES, REVISIONS, type ArticleDocument, type RevisionDocument } from './documents'
+import {
+  ARTICLES,
+  CATEGORIES,
+  REVISIONS,
+  type ArticleDocument,
+  type CategoryDocument,
+  type RevisionDocument,
+} from './documents'
 
 /**
  * Every index here exists because a specific screen or rule needs it.
@@ -36,6 +43,16 @@ export async function ensureIndexes(db: Db): Promise<void> {
       name: 'due_for_publication',
       partialFilterExpression: { status: 'scheduled' },
     },
+  ])
+
+  // One index per launch locale. A wildcard on `slugs.$**` would also work,
+  // but it indexes every future locale silently — an explicit list makes
+  // adding a language a visible decision.
+  const categories = db.collection<CategoryDocument>(CATEGORIES)
+  await categories.createIndexes([
+    { key: { 'slugs.en': 1 }, unique: true, sparse: true, name: 'slug_en_unique' },
+    { key: { 'slugs.fr': 1 }, unique: true, sparse: true, name: 'slug_fr_unique' },
+    { key: { order: 1 }, name: 'nav_order' },
   ])
 
   await revisions.createIndexes([

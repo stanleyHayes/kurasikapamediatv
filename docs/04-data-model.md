@@ -55,10 +55,10 @@ erDiagram
 |---|---|---|
 | `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
 | `article_revisions` | immutable history | `articleId`, `seq`, `body`, `authorId`, `createdAt` |
-| `categories` | hierarchy | `slug`, `parentId`, `names{locale}` |
+| `categories` | hierarchy | `parentId`, `slugs{locale}`, `names{locale}`, `order` |
 | `tags` | flat | `slug`, `names{locale}`, `usageCount` |
-| `users` | staff + readers | `email`, `roles[]`, `twoFactor`, `profile` |
-| `accounts` `sessions` `verification_tokens` | Auth.js adapter | managed by `@auth/mongodb-adapter` — **do not hand-edit** |
+| `role_assignments` | our RBAC, keyed by the auth user id | `roles[]` |
+| `user` `session` `account` `verification` | Better Auth | managed by the library — **do not hand-edit**. Roles live in `role_assignments`, ours. |
 | `assets` | images, audio, video | `kind`, `storageKey`, `muxAssetId`, `width`, `height`, `alt{locale}` |
 | `podcasts` / `episodes` | audio series | `episodes.assetId`, `duration`, `transcript` |
 | `live_streams` | Live TV | `muxStreamId`, `state`, `startedAt`, `viewerPeak` |

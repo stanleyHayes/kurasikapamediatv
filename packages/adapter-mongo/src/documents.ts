@@ -43,6 +43,15 @@ export interface RoleAssignmentDocument {
   roles: string[]
 }
 
+export interface CategoryDocument {
+  _id: string
+  parentId: string | null
+  slugs: Record<string, string>
+  names: Record<string, string>
+  order: number
+}
+
 export const ARTICLES = 'articles'
 export const REVISIONS = 'article_revisions'
 export const ROLE_ASSIGNMENTS = 'role_assignments'
+export const CATEGORIES = 'categories'

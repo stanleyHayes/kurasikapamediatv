@@ -16,6 +16,7 @@ import { type ArticleView, toArticleView } from './article-view'
 
 export const articleTag = (id: string): string => `article-${id}`
 export const listTag = (locale: string): string => `articles-${locale}`
+export const sectionTag = (slug: string, locale: string): string => `section-${locale}-${slug}`
 
 export async function cachedArticle(slug: string, locale: string): Promise<ArticleView | null> {
   'use cache'
@@ -44,5 +45,25 @@ export async function cachedLatest(locale: string, limit: number): Promise<Artic
   return {
     items: page.items.map(toArticleView),
     nextCursor: page.nextCursor,
+  }
+}
+
+export interface SectionView {
+  readonly name: string
+  readonly articles: readonly ArticleView[]
+}
+
+export async function cachedSection(slug: string, locale: string): Promise<SectionView | null> {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(listTag(locale))
+  cacheTag(sectionTag(slug, locale))
+
+  const result = await container().browseCategory.execute({ slug, locale })
+  if (result === null) return null
+
+  return {
+    name: result.category.nameIn(locale),
+    articles: result.articles.items.map(toArticleView),
   }
 }

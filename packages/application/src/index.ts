@@ -26,7 +26,14 @@ export type {
 } from './ports/article-repository'
 export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pagination'
 export type { RevisionRepository } from './ports/revision-repository'
+export type { CategoryRepository } from './ports/category-repository'
 export type { RoleRepository } from './ports/role-repository'
+export {
+  BrowseCategory,
+  type BrowseCategoryDeps,
+  type BrowseCategoryInput,
+  type CategoryPage,
+} from './editorial/browse-category'
 export type { SearchHit, SearchPort, SearchQuery } from './ports/search'
 export {
   SearchArticles,
