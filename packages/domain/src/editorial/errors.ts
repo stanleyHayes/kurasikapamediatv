@@ -1,5 +1,5 @@
-import type { ArticleId } from '../shared/ids.js'
-import type { ArticleStatus, Transition } from './article-status.js'
+import type { ArticleId } from '../shared/ids'
+import type { ArticleStatus, Transition } from './article-status'
 
 export class IllegalTransition extends Error {
   constructor(

@@ -1,5 +1,5 @@
-import type { UserId } from '../shared/ids.js'
-import { type Permission, type Role, permissionsOf } from './role.js'
+import type { UserId } from '../shared/ids'
+import { type Permission, type Role, permissionsOf } from './role'
 
 /** Whoever is attempting an action. Carries identity and roles, nothing else. */
 export class Actor {

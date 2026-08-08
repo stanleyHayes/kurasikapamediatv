@@ -12,12 +12,12 @@ import {
   familyId as toFamilyId,
   revisionId,
 } from '@kurasikapa/domain'
-import type { ClockPort, EventBusPort, IdPort } from '../ports/ambient.js'
-import type { ArticleRepository } from '../ports/article-repository.js'
-import type { RevisionRepository } from '../ports/revision-repository.js'
-import type { UseCase } from '../ports/use-case.js'
-import { SlugTaken } from './errors.js'
-import { draftCreated } from './events.js'
+import type { ClockPort, EventBusPort, IdPort } from '../ports/ambient'
+import type { ArticleRepository } from '../ports/article-repository'
+import type { RevisionRepository } from '../ports/revision-repository'
+import type { UseCase } from '../ports/use-case'
+import { SlugTaken } from './errors'
+import { draftCreated } from './events'
 
 export interface CreateDraftDeps {
   readonly articles: ArticleRepository

@@ -1,5 +1,5 @@
 import type { Db } from 'mongodb'
-import { ARTICLES, REVISIONS, type ArticleDocument, type RevisionDocument } from './documents.js'
+import { ARTICLES, REVISIONS, type ArticleDocument, type RevisionDocument } from './documents'
 
 /**
  * Every index here exists because a specific screen or rule needs it.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { articleId, revisionId, userId } from '../shared/ids.js'
-import { NonMonotonicSequence, Revision, type RevisionProps } from './revision.js'
+import { articleId, revisionId, userId } from '../shared/ids'
+import { NonMonotonicSequence, Revision, type RevisionProps } from './revision'
 
 const ARTICLE = articleId('art_1')
 const AUTHOR = userId('usr_author')

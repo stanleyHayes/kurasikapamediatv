@@ -1,9 +1,9 @@
 import { IllegalTransition, NotPermitted, articleId, revisionId } from '@kurasikapa/domain'
 import { anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { aJournalist, anEditor, harness } from '../testing/harness.js'
-import { ArticleNotFound } from './errors.js'
-import { RejectArticle } from './reject-article.js'
+import { aJournalist, anEditor, harness } from '../testing/harness'
+import { ArticleNotFound } from './errors'
+import { RejectArticle } from './reject-article'
 
 const target = articleId('art_1')
 const note = 'Second source needed for the ministry quote.'

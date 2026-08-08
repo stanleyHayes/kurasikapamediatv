@@ -9,7 +9,7 @@ import {
   tagId,
   userId,
 } from '@kurasikapa/domain'
-import type { ArticleDocument, RevisionDocument } from './documents.js'
+import type { ArticleDocument, RevisionDocument } from './documents'
 
 /**
  * The only place that knows both shapes.

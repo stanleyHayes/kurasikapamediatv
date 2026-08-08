@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { NotPermitted } from '../identity/actor.js'
-import { articleId, categoryId, familyId, tagId } from '../shared/ids.js'
-import { Slug } from '../shared/slug.js'
-import { Article } from './article.js'
-import { AUTHOR, OTHER, REVISION, actorWith, anApprovedArticle, anArticle } from '../testing/builders.js'
-import { IllegalTransition, MissingApprovedRevision, NotOwnArticle, ScheduleInPast } from './errors.js'
+import { NotPermitted } from '../identity/actor'
+import { articleId, categoryId, familyId, tagId } from '../shared/ids'
+import { Slug } from '../shared/slug'
+import { Article } from './article'
+import { AUTHOR, OTHER, REVISION, actorWith, anApprovedArticle, anArticle } from '../testing/builders'
+import { IllegalTransition, MissingApprovedRevision, NotOwnArticle, ScheduleInPast } from './errors'
 
 const NOW = new Date('2026-08-08T10:00:00Z')
 const LATER = new Date('2026-08-08T18:00:00Z')

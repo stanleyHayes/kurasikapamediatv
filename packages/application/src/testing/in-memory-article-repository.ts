@@ -3,8 +3,8 @@ import type {
   ArticleRepository,
   AuthoredQuery,
   PublishedQuery,
-} from '../ports/article-repository.js'
-import type { Cursor, Page } from '../ports/pagination.js'
+} from '../ports/article-repository'
+import type { Cursor, Page } from '../ports/pagination'
 
 /**
  * Hand-written, not generated and not auto-mocked.

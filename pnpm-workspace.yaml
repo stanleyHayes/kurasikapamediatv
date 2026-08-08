@@ -29,11 +29,21 @@ overrides:
   # @auth/mongodb-adapter@3 peers "^6" — driver v7 breaks Auth.js.
   mongodb: 6.21.0
 
-# Transitive dev-only deps of testcontainers. All denied: we reach Docker over
-# the local socket, so ssh2/cpu-features native bindings are never exercised,
-# and protobufjs' postinstall only regenerates types we do not consume.
-# Denying keeps arbitrary install-time code out of CI.
+# Install scripts are denied by default; each exception is a decision.
+#
+#   sharp             ALLOW — next/image optimisation genuinely needs its
+#                     native binary in production. Images are the bulk of a
+#                     media site's bytes, so this one earns its keep.
+#   @swc/core         DENY  — Next ships its own @next/swc-* platform binaries.
+#   @parcel/watcher   DENY  — dev-only file watching, has a JS fallback.
+#   ssh2, cpu-features DENY — testcontainers reaches Docker over the local
+#                     socket, so the SSH transport is never exercised.
+#   protobufjs        DENY  — its postinstall only regenerates types we do not
+#                     consume.
 allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
   cpu-features: false
   protobufjs: false
+  sharp: true
   ssh2: false

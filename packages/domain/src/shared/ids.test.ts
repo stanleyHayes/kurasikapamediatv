@@ -8,7 +8,7 @@ import {
   revisionId,
   tagId,
   userId,
-} from './ids.js'
+} from './ids'
 
 const CONSTRUCTORS = [
   ['articleId', articleId],

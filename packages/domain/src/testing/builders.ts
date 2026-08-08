@@ -1,8 +1,8 @@
-import { Article, type ArticleProps } from '../editorial/article.js'
-import { Actor } from '../identity/actor.js'
-import type { Role } from '../identity/role.js'
-import { articleId, categoryId, familyId, revisionId, userId } from '../shared/ids.js'
-import { Slug } from '../shared/slug.js'
+import { Article, type ArticleProps } from '../editorial/article'
+import { Actor } from '../identity/actor'
+import type { Role } from '../identity/role'
+import { articleId, categoryId, familyId, revisionId, userId } from '../shared/ids'
+import { Slug } from '../shared/slug'
 
 export const AUTHOR = userId('usr_author')
 export const OTHER = userId('usr_other')

@@ -1,9 +1,9 @@
 import { NotPermitted, Revision, articleId, revisionId, userId } from '@kurasikapa/domain'
 import { anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { NOW, aJournalist, anEditor, harness } from '../testing/harness.js'
-import { ApproveArticle } from './approve-article.js'
-import { ArticleNotFound, RevisionNotFound, RevisionNotOfArticle } from './errors.js'
+import { NOW, aJournalist, anEditor, harness } from '../testing/harness'
+import { ApproveArticle } from './approve-article'
+import { ArticleNotFound, RevisionNotFound, RevisionNotOfArticle } from './errors'
 
 const target = articleId('art_1')
 const approved = revisionId('rev_1')

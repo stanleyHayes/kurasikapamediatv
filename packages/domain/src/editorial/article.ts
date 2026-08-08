@@ -1,8 +1,8 @@
-import { type Actor, requirePermission } from '../identity/actor.js'
-import type { ArticleId, CategoryId, FamilyId, RevisionId, TagId, UserId } from '../shared/ids.js'
-import type { Slug } from '../shared/slug.js'
-import { type ArticleStatus, type Transition, isAllowedFrom, ruleFor } from './article-status.js'
-import { IllegalTransition, MissingApprovedRevision, NotOwnArticle, ScheduleInPast } from './errors.js'
+import { type Actor, requirePermission } from '../identity/actor'
+import type { ArticleId, CategoryId, FamilyId, RevisionId, TagId, UserId } from '../shared/ids'
+import type { Slug } from '../shared/slug'
+import { type ArticleStatus, type Transition, isAllowedFrom, ruleFor } from './article-status'
+import { IllegalTransition, MissingApprovedRevision, NotOwnArticle, ScheduleInPast } from './errors'
 
 export interface ArticleProps {
   readonly id: ArticleId

@@ -16,65 +16,75 @@ export type {
   ToneRequest,
   TranslateRequest,
   TranslatedArticle,
-} from './ports/ai.js'
-export type { EmbeddingPort } from './ports/embedding.js'
-export type { ClockPort, DomainEvent, EventBusPort, IdPort } from './ports/ambient.js'
+} from './ports/ai'
+export type { EmbeddingPort } from './ports/embedding'
+export type { ClockPort, DomainEvent, EventBusPort, IdPort } from './ports/ambient'
 export type {
   ArticleRepository,
   AuthoredQuery,
   PublishedQuery,
-} from './ports/article-repository.js'
-export type { Cursor, Page } from './ports/pagination.js'
-export type { RevisionRepository } from './ports/revision-repository.js'
-export type { UseCase } from './ports/use-case.js'
+} from './ports/article-repository'
+export type { Cursor, Page } from './ports/pagination'
+export type { RevisionRepository } from './ports/revision-repository'
+export type { UseCase } from './ports/use-case'
 
 export {
   ApproveArticle,
   type ApproveArticleDeps,
   type ApproveArticleInput,
-} from './editorial/approve-article.js'
+} from './editorial/approve-article'
 export {
   CreateDraft,
   type CreateDraftDeps,
   type CreateDraftInput,
   type CreateDraftResult,
-} from './editorial/create-draft.js'
+} from './editorial/create-draft'
+export {
+  GetPublishedArticle,
+  type GetPublishedArticleDeps,
+  type GetPublishedArticleInput,
+} from './editorial/get-published-article'
+export {
+  ListPublishedArticles,
+  type ListPublishedArticlesDeps,
+  type ListPublishedArticlesInput,
+} from './editorial/list-published-articles'
 export {
   PublishArticle,
   type PublishArticleDeps,
   type PublishArticleInput,
   type PublishArticleResult,
-} from './editorial/publish-article.js'
+} from './editorial/publish-article'
 export {
   PublishDueArticles,
   type PublishDueArticlesInput,
   type PublishDueArticlesResult,
-} from './editorial/publish-due-articles.js'
+} from './editorial/publish-due-articles'
 export {
   RejectArticle,
   type RejectArticleDeps,
   type RejectArticleInput,
-} from './editorial/reject-article.js'
+} from './editorial/reject-article'
 export {
   SchedulePublication,
   type SchedulePublicationDeps,
   type SchedulePublicationInput,
-} from './editorial/schedule-publication.js'
+} from './editorial/schedule-publication'
 export {
   UnpublishArticle,
   type UnpublishArticleDeps,
   type UnpublishArticleInput,
-} from './editorial/unpublish-article.js'
+} from './editorial/unpublish-article'
 export {
   SubmitForReview,
   type SubmitForReviewDeps,
   type SubmitForReviewInput,
   type TransitionResult,
-} from './editorial/submit-for-review.js'
+} from './editorial/submit-for-review'
 
 export {
   ArticleNotFound,
   RevisionNotFound,
   RevisionNotOfArticle,
   SlugTaken,
-} from './editorial/errors.js'
+} from './editorial/errors'

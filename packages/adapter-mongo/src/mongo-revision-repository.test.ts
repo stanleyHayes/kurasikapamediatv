@@ -1,8 +1,8 @@
 import { articleId, revisionId } from '@kurasikapa/domain'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { MongoRevisionRepository } from './mongo-revision-repository.js'
-import { revision } from './testing/fixtures.js'
-import { type MongoHarness, startMongo } from './testing/mongo-harness.js'
+import { MongoRevisionRepository } from './mongo-revision-repository'
+import { revision } from './testing/fixtures'
+import { type MongoHarness, startMongo } from './testing/mongo-harness'
 
 let mongo: MongoHarness
 let repo: MongoRevisionRepository

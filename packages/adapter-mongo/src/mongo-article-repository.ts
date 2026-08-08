@@ -7,8 +7,8 @@ import type {
 } from '@kurasikapa/application'
 import type { Article, ArticleId } from '@kurasikapa/domain'
 import type { Collection, Db, Filter } from 'mongodb'
-import { ARTICLES, type ArticleDocument } from './documents.js'
-import { articleToDocument, articleToDomain } from './mappers.js'
+import { ARTICLES, type ArticleDocument } from './documents'
+import { articleToDocument, articleToDomain } from './mappers'
 
 export interface MongoArticleRepositoryDeps {
   readonly db: Db

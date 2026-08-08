@@ -5,7 +5,7 @@ import {
   isAllowedFrom,
   isPubliclyVisible,
   ruleFor,
-} from './article-status.js'
+} from './article-status'
 
 describe('isPubliclyVisible', () => {
   it('shows published articles', () => {

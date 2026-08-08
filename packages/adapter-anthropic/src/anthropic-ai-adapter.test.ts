@@ -1,8 +1,8 @@
 import type { ArticleContext } from '@kurasikapa/application'
 import { describe, expect, it } from 'vitest'
-import { AnthropicAiAdapter } from './anthropic-ai-adapter.js'
-import { singleModel } from './models.js'
-import { drain, mockObjectModel, mockStreamModel, promptText } from './testing/mock-model.js'
+import { AnthropicAiAdapter } from './anthropic-ai-adapter'
+import { singleModel } from './models'
+import { drain, mockObjectModel, mockStreamModel, promptText } from './testing/mock-model'
 
 const article: ArticleContext = {
   title: 'Budget 2026 Explained',

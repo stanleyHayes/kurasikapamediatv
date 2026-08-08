@@ -1,6 +1,6 @@
 import { MongoDBContainer, type StartedMongoDBContainer } from '@testcontainers/mongodb'
 import { type Db, MongoClient } from 'mongodb'
-import { ensureIndexes } from '../indexes.js'
+import { ensureIndexes } from '../indexes'
 
 export interface MongoHarness {
   readonly db: Db

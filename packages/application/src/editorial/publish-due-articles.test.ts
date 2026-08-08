@@ -2,8 +2,8 @@ import { articleId, familyId } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { Slug } from '@kurasikapa/domain'
 import { describe, expect, it } from 'vitest'
-import { EARLIER, LATER, NOW, harness, theSystem } from '../testing/harness.js'
-import { PublishDueArticles } from './publish-due-articles.js'
+import { EARLIER, LATER, NOW, harness, theSystem } from '../testing/harness'
+import { PublishDueArticles } from './publish-due-articles'
 
 const due = (id: string, at = EARLIER): ReturnType<typeof anApprovedArticle> =>
   anApprovedArticle({

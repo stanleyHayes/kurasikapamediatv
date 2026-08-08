@@ -1,6 +1,6 @@
 import type { Actor, ArticleId } from '@kurasikapa/domain'
-import type { UseCase } from '../ports/use-case.js'
-import { type PublishArticleDeps, publishAndAnnounce } from './publish-article.js'
+import type { UseCase } from '../ports/use-case'
+import { type PublishArticleDeps, publishAndAnnounce } from './publish-article'
 
 export interface PublishDueArticlesInput {
   /** A system actor holding `article:publish`, supplied by the composition root. */

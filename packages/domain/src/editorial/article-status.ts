@@ -8,7 +8,7 @@
  * Both the legal transitions and the permission each one demands live here,
  * so neither can be answered by reading a route handler.
  */
-import type { Permission } from '../identity/role.js'
+import type { Permission } from '../identity/role'
 
 export const ARTICLE_STATUSES = [
   'draft',

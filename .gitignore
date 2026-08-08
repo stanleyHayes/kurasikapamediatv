@@ -44,3 +44,6 @@ stitch_kurasikapa_ai_media_platform.zip
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# next-intl / next generated
+apps/web/next-env.d.ts

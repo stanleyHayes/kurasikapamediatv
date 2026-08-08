@@ -1,8 +1,8 @@
 import type { RevisionRepository } from '@kurasikapa/application'
 import type { ArticleId, Revision, RevisionId } from '@kurasikapa/domain'
 import type { Collection, Db } from 'mongodb'
-import { REVISIONS, type RevisionDocument } from './documents.js'
-import { revisionToDocument, revisionToDomain } from './mappers.js'
+import { REVISIONS, type RevisionDocument } from './documents'
+import { revisionToDocument, revisionToDomain } from './mappers'
 
 export class MongoRevisionRepository implements RevisionRepository {
   private readonly revisions: Collection<RevisionDocument>

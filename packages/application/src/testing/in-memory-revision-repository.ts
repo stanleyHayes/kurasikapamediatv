@@ -1,5 +1,5 @@
 import type { ArticleId, Revision, RevisionId } from '@kurasikapa/domain'
-import type { RevisionRepository } from '../ports/revision-repository.js'
+import type { RevisionRepository } from '../ports/revision-repository'
 
 /** Append-only, like the real collection. There is no update and no delete. */
 export class InMemoryRevisionRepository implements RevisionRepository {

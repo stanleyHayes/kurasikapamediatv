@@ -1,5 +1,5 @@
 import type { Article, ArticleId, CategoryId, UserId } from '@kurasikapa/domain'
-import type { Cursor, Page } from './pagination.js'
+import type { Cursor, Page } from './pagination'
 
 export interface PublishedQuery extends Cursor {
   readonly locale: string

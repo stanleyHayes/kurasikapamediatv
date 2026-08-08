@@ -6,9 +6,9 @@ import {
 } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { EARLIER, LATER, NOW, aJournalist, anEditor, harness } from '../testing/harness.js'
-import { ArticleNotFound } from './errors.js'
-import { SchedulePublication } from './schedule-publication.js'
+import { EARLIER, LATER, NOW, aJournalist, anEditor, harness } from '../testing/harness'
+import { ArticleNotFound } from './errors'
+import { SchedulePublication } from './schedule-publication'
 
 const target = articleId('art_1')
 

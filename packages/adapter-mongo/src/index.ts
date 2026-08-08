@@ -1,13 +1,13 @@
-export { ARTICLES, REVISIONS, type ArticleDocument, type RevisionDocument } from './documents.js'
-export { ensureIndexes } from './indexes.js'
+export { ARTICLES, REVISIONS, type ArticleDocument, type RevisionDocument } from './documents'
+export { ensureIndexes } from './indexes'
 export {
   articleToDocument,
   articleToDomain,
   revisionToDocument,
   revisionToDomain,
-} from './mappers.js'
+} from './mappers'
 export {
   MongoArticleRepository,
   type MongoArticleRepositoryDeps,
-} from './mongo-article-repository.js'
-export { MongoRevisionRepository } from './mongo-revision-repository.js'
+} from './mongo-article-repository'
+export { MongoRevisionRepository } from './mongo-revision-repository'

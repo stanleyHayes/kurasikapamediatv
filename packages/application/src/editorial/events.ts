@@ -1,5 +1,5 @@
 import type { ArticleId, RevisionId, UserId } from '@kurasikapa/domain'
-import type { DomainEvent } from '../ports/ambient.js'
+import type { DomainEvent } from '../ports/ambient'
 
 /** Who did what to which article, and when. Every editorial event carries it. */
 export interface Occurrence {

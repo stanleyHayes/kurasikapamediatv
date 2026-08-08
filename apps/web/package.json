@@ -1,0 +1,36 @@
+{
+  "name": "@kurasikapa/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@kurasikapa/adapter-anthropic": "workspace:*",
+    "@kurasikapa/adapter-mongo": "workspace:*",
+    "@kurasikapa/application": "workspace:*",
+    "@kurasikapa/domain": "workspace:*",
+    "mongodb": "6.21.0",
+    "next": "16.2.12",
+    "next-intl": "4.13.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@kurasikapa/config": "workspace:*",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitest/coverage-v8": "4.1.10",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

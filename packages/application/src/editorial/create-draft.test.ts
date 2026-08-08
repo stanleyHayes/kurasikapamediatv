@@ -1,8 +1,8 @@
 import { NotPermitted, categoryId, familyId, tagId } from '@kurasikapa/domain'
 import { describe, expect, it } from 'vitest'
-import { NOW, aSubscriber, anAuthor, harness } from '../testing/harness.js'
-import { CreateDraft } from './create-draft.js'
-import { SlugTaken } from './errors.js'
+import { NOW, aSubscriber, anAuthor, harness } from '../testing/harness'
+import { CreateDraft } from './create-draft'
+import { SlugTaken } from './errors'
 
 const input = {
   actor: anAuthor,

@@ -1,5 +1,5 @@
-export { Article, type ArticleProps, type NewArticle } from './editorial/article.js'
-export { NonMonotonicSequence, Revision, type RevisionProps } from './editorial/revision.js'
+export { Article, type ArticleProps, type NewArticle } from './editorial/article'
+export { NonMonotonicSequence, Revision, type RevisionProps } from './editorial/revision'
 export {
   ARTICLE_STATUSES,
   TRANSITIONS,
@@ -8,16 +8,16 @@ export {
   isAllowedFrom,
   isPubliclyVisible,
   ruleFor,
-} from './editorial/article-status.js'
+} from './editorial/article-status'
 export {
   IllegalTransition,
   MissingApprovedRevision,
   NotOwnArticle,
   ScheduleInPast,
-} from './editorial/errors.js'
+} from './editorial/errors'
 
-export { Actor, NotPermitted, requirePermission } from './identity/actor.js'
-export { PERMISSIONS, ROLES, type Permission, type Role, permissionsOf } from './identity/role.js'
+export { Actor, NotPermitted, requirePermission } from './identity/actor'
+export { PERMISSIONS, ROLES, type Permission, type Role, permissionsOf } from './identity/role'
 
 export {
   EmptyIdentifier,
@@ -36,5 +36,5 @@ export {
   revisionId,
   tagId,
   userId,
-} from './shared/ids.js'
-export { InvalidSlug, Slug } from './shared/slug.js'
+} from './shared/ids'
+export { InvalidSlug, Slug } from './shared/slug'

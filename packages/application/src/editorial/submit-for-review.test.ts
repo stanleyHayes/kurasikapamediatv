@@ -1,9 +1,9 @@
 import { IllegalTransition, NotOwnArticle, NotPermitted, articleId } from '@kurasikapa/domain'
 import { anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { aStranger, aSubscriber, anAuthor, anEditor, harness } from '../testing/harness.js'
-import { ArticleNotFound } from './errors.js'
-import { SubmitForReview } from './submit-for-review.js'
+import { aStranger, aSubscriber, anAuthor, anEditor, harness } from '../testing/harness'
+import { ArticleNotFound } from './errors'
+import { SubmitForReview } from './submit-for-review'
 
 const target = articleId('art_1')
 

@@ -1,9 +1,9 @@
 import { articleId, revisionId, userId } from '@kurasikapa/domain'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { ARTICLES, type ArticleDocument } from './documents.js'
-import { MongoArticleRepository } from './mongo-article-repository.js'
-import { AUTHOR, BUSINESS, NOW, SPORTS, article, fixedClock, published } from './testing/fixtures.js'
-import { type MongoHarness, startMongo } from './testing/mongo-harness.js'
+import { ARTICLES, type ArticleDocument } from './documents'
+import { MongoArticleRepository } from './mongo-article-repository'
+import { AUTHOR, BUSINESS, NOW, SPORTS, article, fixedClock, published } from './testing/fixtures'
+import { type MongoHarness, startMongo } from './testing/mongo-harness'
 
 let mongo: MongoHarness
 let repo: MongoArticleRepository

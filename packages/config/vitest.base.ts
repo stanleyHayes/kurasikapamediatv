@@ -33,7 +33,12 @@ export function integrationConfig(floor: number): ViteUserConfig {
   })
 }
 
-export function baseConfig(floor: number): ViteUserConfig {
+/**
+ * `exclude` is for code that cannot be unit-tested at all — a framework
+ * boundary compiled by Next, for instance. It is not an escape hatch for code
+ * that is merely awkward to test, and every entry should say why in the caller.
+ */
+export function baseConfig(floor: number, exclude: readonly string[] = []): ViteUserConfig {
   return defineConfig({
     test: {
       globals: false,
@@ -43,7 +48,7 @@ export function baseConfig(floor: number): ViteUserConfig {
         provider: 'v8',
         reporter: ['text', 'lcov'],
         include: ['src/**/*.ts'],
-        exclude: ['src/**/*.test.ts', 'src/testing/**', 'src/index.ts'],
+        exclude: ['src/**/*.test.ts', 'src/testing/**', 'src/index.ts', ...exclude],
         thresholds: {
           lines: floor,
           functions: floor,

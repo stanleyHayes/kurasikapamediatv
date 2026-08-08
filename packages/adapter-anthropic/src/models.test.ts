@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { MODELS, anthropicModels, singleModel } from './models.js'
-import { SYSTEM } from './prompts.js'
-import { mockObjectModel } from './testing/mock-model.js'
+import { MODELS, anthropicModels, singleModel } from './models'
+import { SYSTEM } from './prompts'
+import { mockObjectModel } from './testing/mock-model'
 
 const idOf = (model: ReturnType<ReturnType<typeof anthropicModels>['for']>): string =>
   typeof model === 'string' ? model : model.modelId

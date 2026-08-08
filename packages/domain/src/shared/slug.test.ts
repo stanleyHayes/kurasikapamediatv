@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { InvalidSlug, Slug } from './slug.js'
+import { InvalidSlug, Slug } from './slug'
 
 describe('Slug.fromTitle', () => {
   it('lowercases and hyphenates', () => {

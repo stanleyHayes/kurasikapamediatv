@@ -1,7 +1,7 @@
 import { Actor, type Article, type Revision, type Role, userId } from '@kurasikapa/domain'
-import { FakeClock, RecordingEventBus, SequentialIds } from './fakes.js'
-import { InMemoryArticleRepository } from './in-memory-article-repository.js'
-import { InMemoryRevisionRepository } from './in-memory-revision-repository.js'
+import { FakeClock, RecordingEventBus, SequentialIds } from './fakes'
+import { InMemoryArticleRepository } from './in-memory-article-repository'
+import { InMemoryRevisionRepository } from './in-memory-revision-repository'
 
 export const NOW = new Date('2026-08-08T10:00:00Z')
 export const LATER = new Date('2026-08-08T18:00:00Z')

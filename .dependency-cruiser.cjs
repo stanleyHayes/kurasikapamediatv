@@ -39,6 +39,16 @@ module.exports = {
       to: { path: '^packages/adapter-' },
     },
     {
+      name: 'composition-root-is-the-only-door',
+      severity: 'error',
+      comment:
+        'Only apps/web/src/composition may import an adapter. Everything else in the app — ' +
+        'read models, components, actions — goes through a use case. Without this rule, ' +
+        'a helper module under src/ becomes a second, undocumented composition root.',
+      from: { path: '^apps/web/src/', pathNot: '^apps/web/src/composition/' },
+      to: { path: '^packages/adapter-' },
+    },
+    {
       name: 'adapters-are-siblings',
       severity: 'error',
       comment:

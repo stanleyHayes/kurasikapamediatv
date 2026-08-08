@@ -1,10 +1,10 @@
 import { IllegalTransition, NotPermitted, articleId, revisionId } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { NOW, aJournalist, anEditor, harness } from '../testing/harness.js'
-import { ArticleNotFound } from './errors.js'
-import { PublishArticle } from './publish-article.js'
-import { UnpublishArticle } from './unpublish-article.js'
+import { NOW, aJournalist, anEditor, harness } from '../testing/harness'
+import { ArticleNotFound } from './errors'
+import { PublishArticle } from './publish-article'
+import { UnpublishArticle } from './unpublish-article'
 
 const target = articleId('art_1')
 const reason = 'Ministry disputed the figure; pulled pending correction.'

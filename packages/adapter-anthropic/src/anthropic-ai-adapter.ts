@@ -15,9 +15,9 @@ import type {
   TranslateRequest,
   TranslatedArticle,
 } from '@kurasikapa/application'
-import { objectOf, streamOf } from './generate.js'
-import type { ModelResolver } from './models.js'
-import { PROMPT, SYSTEM } from './prompts.js'
+import { objectOf, streamOf } from './generate'
+import type { ModelResolver } from './models'
+import { PROMPT, SYSTEM } from './prompts'
 import {
   categorySchema,
   factCheckSchema,
@@ -27,7 +27,7 @@ import {
   summarySchema,
   tagsSchema,
   translationSchema,
-} from './schemas.js'
+} from './schemas'
 
 /**
  * The only place that knows Claude exists.

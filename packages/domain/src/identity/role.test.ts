@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { Actor, NotPermitted, requirePermission } from './actor.js'
-import { ROLES, permissionsOf } from './role.js'
-import { userId } from '../shared/ids.js'
+import { Actor, NotPermitted, requirePermission } from './actor'
+import { ROLES, permissionsOf } from './role'
+import { userId } from '../shared/ids'
 
 const someone = userId('usr_1')
 

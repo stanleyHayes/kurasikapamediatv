@@ -14,7 +14,7 @@ import type {
   ToneRequest,
   TranslateRequest,
   TranslatedArticle,
-} from '../ports/ai.js'
+} from '../ports/ai'
 
 export interface FakeAiScript {
   readonly stream?: readonly string[]

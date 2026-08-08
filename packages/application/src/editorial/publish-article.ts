@@ -1,10 +1,10 @@
 import type { Actor, Article, ArticleId } from '@kurasikapa/domain'
-import type { ClockPort, EventBusPort } from '../ports/ambient.js'
-import type { ArticleRepository } from '../ports/article-repository.js'
-import type { UseCase } from '../ports/use-case.js'
-import { ArticleNotFound } from './errors.js'
-import { articlePublished } from './events.js'
-import type { TransitionResult } from './submit-for-review.js'
+import type { ClockPort, EventBusPort } from '../ports/ambient'
+import type { ArticleRepository } from '../ports/article-repository'
+import type { UseCase } from '../ports/use-case'
+import { ArticleNotFound } from './errors'
+import { articlePublished } from './events'
+import type { TransitionResult } from './submit-for-review'
 
 export interface PublishArticleDeps {
   readonly articles: ArticleRepository

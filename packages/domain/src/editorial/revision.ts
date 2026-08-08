@@ -1,4 +1,4 @@
-import type { ArticleId, RevisionId, UserId } from '../shared/ids.js'
+import type { ArticleId, RevisionId, UserId } from '../shared/ids'
 
 export interface RevisionProps {
   readonly id: RevisionId

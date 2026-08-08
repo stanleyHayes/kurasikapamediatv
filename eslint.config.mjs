@@ -17,15 +17,31 @@ const sizeLimits = {
 
 /**
  * Determinism rules from AGENTS.md § 5.
- * Time and identity come from ClockPort and IdPort, never from the ambient runtime.
+ *
+ * Everywhere: reading the ambient clock or entropy source is banned. These are
+ * the calls that make a test depend on when it ran.
  */
 const determinism = {
-  'no-restricted-globals': ['error', { name: 'Date', message: 'Inject ClockPort instead.' }],
   'no-restricted-properties': [
     'error',
     { object: 'Date', property: 'now', message: 'Inject ClockPort instead.' },
     { object: 'Math', property: 'random', message: 'Inject IdPort or a seeded source instead.' },
     { object: 'crypto', property: 'randomUUID', message: 'Inject IdPort instead.' },
+  ],
+}
+
+/**
+ * The inner rings go further: they may not name `Date` at all.
+ *
+ * Not applied globally, because `new Date(isoString)` is deterministic parsing
+ * — the presentation layer needs it to format a timestamp for `Intl`. A rule
+ * that cannot tell those apart, applied everywhere, only teaches people to
+ * disable it.
+ */
+const noAmbientTime = {
+  'no-restricted-globals': [
+    'error',
+    { name: 'Date', message: 'The domain and application layers receive time via ClockPort.' },
   ],
 }
 
@@ -77,6 +93,13 @@ export default tseslint.config(
       eqeqeq: ['error', 'always'],
       'no-console': ['error', { allow: ['warn', 'error'] }],
     },
+  },
+
+  // The inner rings never touch the clock, in any form.
+  {
+    files: ['packages/domain/src/**/*.ts', 'packages/application/src/**/*.ts'],
+    ignores: ['**/*.test.ts', '**/testing/**'],
+    rules: noAmbientTime,
   },
 
   // Domain purity is enforced by dependency-cruiser (`domain-is-pure`), not here —

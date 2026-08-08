@@ -1,4 +1,4 @@
-import type { ClockPort, DomainEvent, EventBusPort, IdPort } from '../ports/ambient.js'
+import type { ClockPort, DomainEvent, EventBusPort, IdPort } from '../ports/ambient'
 
 /** Time you control. Nothing in a test should depend on the wall clock. */
 export class FakeClock implements ClockPort {

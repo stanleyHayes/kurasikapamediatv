@@ -1,0 +1,72 @@
+import type { Metadata } from 'next'
+import { NextIntlClientProvider, hasLocale } from 'next-intl'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { SiteFooter } from '@/components/site-footer'
+import { Link } from '@/i18n/navigation'
+import { routing } from '@/i18n/routing'
+import '../globals.css'
+
+export function generateStaticParams(): { locale: string }[] {
+  return routing.locales.map((locale) => ({ locale }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+
+  return {
+    title: { default: 'Kurasikapa Media TV', template: '%s · Kurasikapa Media TV' },
+    description:
+      'Television and digital journalism that educates, motivates and informs — from Kurasikapa Media TV.',
+    alternates: {
+      canonical: `/${locale}`,
+      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+    },
+    openGraph: { type: 'website', siteName: 'Kurasikapa Media TV', locale },
+    twitter: { card: 'summary_large_image' },
+  }
+}
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}): Promise<React.ReactElement> {
+  const { locale } = await params
+  if (!hasLocale(routing.locales, locale)) notFound()
+
+  // Opts this route into static rendering; without it every page becomes
+  // dynamic the moment a translation is read.
+  setRequestLocale(locale)
+
+  const t = await getTranslations('nav')
+
+  return (
+    <html lang={locale}>
+      <body className="bg-surface text-on-surface min-h-screen">
+        <NextIntlClientProvider>
+          <header className="border-outline-variant border-b">
+            <nav className="mx-auto flex max-w-[var(--container-page)] items-baseline gap-8 px-6 py-6">
+              <Link href="/" className="font-display text-primary text-2xl font-bold tracking-tight">
+                Kurasikapa
+              </Link>
+              <span className="text-label-bold text-on-surface-variant uppercase">
+                {t('sections')}
+              </span>
+            </nav>
+          </header>
+
+          <main className="mx-auto max-w-[var(--container-page)] px-6">{children}</main>
+
+          <SiteFooter />
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  )
+}
