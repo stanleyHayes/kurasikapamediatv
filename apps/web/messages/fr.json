@@ -1,1 +1,21 @@
-{"nav":{"home":"Accueil","sections":"Rubriques","live":"TV en direct","podcasts":"Podcasts"},"home":{"latest":"À la une","readMore":"Lire la suite"},"article":{"published":"Publié le","by":"Par","backToHome":"Retour à l'accueil"},"error":{"notFound":"Cet article est introuvable","notFoundBody":"Il a peut-être été dépublié, ou le lien est incorrect."}}
+{
+  "nav": {
+    "home": "Accueil",
+    "sections": "Rubriques",
+    "live": "Direct",
+    "podcasts": "Podcasts"
+  },
+  "home": {
+    "latest": "À la une",
+    "readMore": "Lire la suite"
+  },
+  "article": {
+    "published": "Publié le",
+    "by": "Par",
+    "backToHome": "Retour à l'accueil"
+  },
+  "error": {
+    "notFound": "Cet article est introuvable",
+    "notFoundBody": "Il a peut-être été dépublié, ou le lien est incorrect."
+  }
+}

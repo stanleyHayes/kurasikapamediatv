@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 /** Soft-404 caveat as on the article page — see its comment. */
 export default function SectionPage({ params }: Params): React.ReactElement {
   return (
-    <Suspense fallback={<div className="py-[var(--spacing-lg)]" aria-hidden />}>
+    <Suspense fallback={<div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]" aria-hidden />}>
       <SectionBody params={params} />
     </Suspense>
   )
@@ -38,7 +38,7 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
   if (section === null) notFound()
 
   return (
-    <section className="py-[var(--spacing-lg)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
       <h1 className="font-display text-primary text-[length:var(--text-headline-md)] font-semibold">
         {section.name}
       </h1>

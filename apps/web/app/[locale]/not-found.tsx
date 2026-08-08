@@ -19,7 +19,7 @@ export default async function NotFound(): Promise<React.ReactElement> {
   const t = await getTranslations('error')
 
   return (
-    <section className="py-[var(--spacing-xl)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-xl)]">
       <h1 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
         {t('notFound')}
       </h1>

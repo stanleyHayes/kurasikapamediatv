@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kurasikapa Media TV - Editorial CMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "surface-container-highest": "#273647",
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#ffdada",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#273647",
+                        "surface": "#051424",
+                        "secondary-fixed-dim": "#ffb3b6",
+                        "background": "#051424",
+                        "on-secondary-container": "#ffdcdc",
+                        "surface-container-lowest": "#010f1f",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#45464d",
+                        "inverse-surface": "#d4e4fa",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-bright": "#2c3a4c",
+                        "on-secondary": "#68001a",
+                        "on-surface-variant": "#c6c6cd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-background": "#d4e4fa",
+                        "secondary-container": "#cc003c",
+                        "primary-fixed-dim": "#bec6e0",
+                        "primary": "#bec6e0",
+                        "surface-tint": "#bec6e0",
+                        "on-secondary-fixed": "#40000c",
+                        "outline": "#909097",
+                        "on-tertiary": "#472a00",
+                        "primary-container": "#0f172a",
+                        "tertiary-container": "#251400",
+                        "secondary": "#ffb3b6",
+                        "inverse-on-surface": "#233143",
+                        "tertiary": "#ffb95f",
+                        "surface-container-high": "#1c2b3c",
+                        "on-tertiary-container": "#b47300",
+                        "surface-dim": "#051424",
+                        "surface-container": "#122131",
+                        "on-surface": "#d4e4fa",
+                        "on-secondary-fixed-variant": "#920028",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary": "#283044",
+                        "on-primary-container": "#798098",
+                        "surface-container-low": "#0d1c2d",
+                        "inverse-primary": "#565e74",
+                        "primary-fixed": "#dae2fd",
+                        "tertiary-fixed-dim": "#ffb95f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .glass-panel { background: rgba(13, 28, 45, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .inner-glow { box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+        .ambient-shadow { box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-background text-on-background font-body-md text-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex bg-surface-container-low docked left-0 h-full w-64 shadow-md h-screen flex-col p-4 border-r border-outline-variant z-40 relative flex-shrink-0">
+<!-- Header / Identity -->
+<div class="flex items-center gap-4 mb-8 px-2 mt-4">
+<img alt="Admin User Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant inner-glow" data-alt="A small, professional avatar of a media executive wearing a sleek dark suit in a well-lit modern broadcasting studio environment. High contrast, cinematic lighting, sophisticated modernism style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtkx5LAunX4bDlp5z-c0jVw0-COhgoMaibtdEGullkvcY3nUg4qjIgsY_3bLlkVAKKnYLOUN-3YwERXDzVAJxrykJoHTfL6H7UQINlD1ByWwzs-DO2T29eX4oWEeSaEQnOQSRNhnMlaKrq3RsxTgDqc-EV2wZENHSzvkPjO1va9N51Mw8XgiwPK37q6dqiicN4hUc8pOsO8ixfTGd5ujqkGkacL0q0eQkxIfzuAppdmtwDu34SStk0"/>
+<div>
+<h1 class="font-headline-md text-[20px] text-primary leading-tight">Kurasikapa Admin</h1>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mt-1">Editorial Control</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex flex-col gap-2 flex-grow">
+<!-- Dashboard -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest hover:scale-[1.02] transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+</li>
+<!-- Editorial (Active based on Intent: Editorial CMS) -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-on-secondary-container rounded-lg font-bold Active: scale-95 duration-150 transition-all shadow-sm" href="#">
+<span class="material-symbols-outlined text-[20px] fill">edit_note</span>
+<span>Editorial</span>
+</a>
+</li>
+<!-- Analytics -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest hover:scale-[1.02] transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">insights</span>
+<span>Analytics</span>
+</a>
+</li>
+<!-- Media -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest hover:scale-[1.02] transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">perm_media</span>
+<span>Media</span>
+</a>
+</li>
+<!-- Users -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest hover:scale-[1.02] transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span>Users</span>
+</a>
+</li>
+<!-- Settings -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest hover:scale-[1.02] transition-all rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>Settings</span>
+</a>
+</li>
+</ul>
+<!-- CTA -->
+<div class="mt-auto pt-6 border-t border-outline-variant">
+<button class="w-full bg-secondary-container text-on-secondary-container hover:scale-[1.02] transition-all duration-200 py-3 rounded-lg font-label-caps text-label-caps shadow-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create New Article
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Top App Bar (Contextual) -->
+<header class="h-20 flex items-center justify-between px-gutter border-b border-outline-variant bg-surface/60 backdrop-blur-md flex-shrink-0 z-30">
+<h2 class="font-headline-md text-headline-md text-on-surface">Editorial Workflow</h2>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-full py-1.5 pl-10 pr-4 text-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors w-64" placeholder="Search articles..." type="text"/>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-on-surface transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary-container rounded-full animate-pulse"></span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 overflow-y-auto p-gutter relative">
+<div class="max-w-container-max mx-auto space-y-8 pb-20">
+<!-- Quick Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Metric 1 -->
+<div class="glass-panel p-6 rounded-xl flex items-center gap-4 inner-glow">
+<div class="w-12 h-12 rounded-full bg-primary-container/50 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary">article</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">Total Articles</p>
+<p class="font-headline-md text-2xl text-on-surface">1,248</p>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="glass-panel p-6 rounded-xl flex items-center gap-4 inner-glow">
+<div class="w-12 h-12 rounded-full bg-tertiary-container/50 flex items-center justify-center border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">robot_2</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">AI Tokens Used</p>
+<p class="font-headline-md text-2xl text-on-surface">45.2k <span class="text-sm font-body-md text-on-surface-variant font-normal">/ 100k</span></p>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="glass-panel p-6 rounded-xl flex items-center gap-4 border border-secondary-container/30 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-secondary-container/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center border border-secondary-container/50 relative">
+<div class="absolute inset-0 rounded-full border border-secondary-container animate-ping opacity-20"></div>
+<span class="material-symbols-outlined text-secondary">campaign</span>
+</div>
+<div class="relative z-10">
+<p class="font-label-caps text-label-caps text-secondary mb-1 flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></span>
+                                Breaking Queue
+                            </p>
+<p class="font-headline-md text-2xl text-on-surface">3 Alerts</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Main Kanban/List Area -->
+<section class="lg:col-span-8 space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-xl text-on-surface">Active Pipeline</h3>
+<div class="flex gap-2">
+<button class="p-1.5 rounded-md bg-surface-container-high text-on-surface border border-outline-variant"><span class="material-symbols-outlined text-[18px]">view_list</span></button>
+<button class="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">view_kanban</span></button>
+</div>
+</div>
+<!-- Editorial List View -->
+<div class="space-y-3">
+<!-- Item 1 (Draft) -->
+<div class="glass-panel p-4 rounded-lg flex items-center gap-4 hover:border-outline-variant transition-colors cursor-pointer group inner-glow">
+<div class="w-16 h-16 rounded bg-surface-container-lowest overflow-hidden flex-shrink-0">
+<img alt="Article Thumbnail" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" data-alt="A macro shot of computer code reflecting on a futuristic glass interface. High contrast tech environment, dark mode aesthetic, sophisticated modernism. Neon blue and crimson accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjTlD2QFyOJwmxlROtXgF-yMWRrNWy2HUiLDxF_JDZLNRILuBOjr7EStZzkBaZB18Zd2YDW2rxggDNWCnMZbVJL50ODERltccPGecEEnRDGAbN1R7GFdFSsD_It6dsY3f73la5c7Bo5yjEY_GPZiiZ-TvmowMkxYgZ4pRDREvxr0rswU9evq6lst_NUPMsq4nF0zrRqvBed502zxGCVPo1ARs5nz9Z5JBy4uOjR1G9nAA22XJgi2OT"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full border border-tertiary/30 text-tertiary font-label-caps text-[10px] uppercase">Draft</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Tech • Updated 2h ago</span>
+</div>
+<h4 class="font-body-md font-semibold text-on-surface truncate">The Future of Quantum Encryption in Banking</h4>
+<p class="font-body-md text-sm text-on-surface-variant truncate">Exploring how major financial institutions are preparing for...</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<img alt="Author" class="w-8 h-8 rounded-full border-2 border-surface object-cover" data-alt="Small portrait of a professional tech journalist with glasses, dramatic side lighting, dark sophisticated background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeq7ZAmQRdmydIRzUk61wwuTJXvDWspNoBWWwPWueNvdVfcoQtrlXIZdnlp9n09bLGyH4krbCjQyFZxC3q4DMa6RJ1Ieh3W0PDuA2b8QY3V5WWYMr5NdnRjOaUvnY6PwzHMCyXhh5aJ8OkDrUo_BziDbJ1K-flshnWnObvFCqpU-tyGB-VqO5MOVbQAwdSjCO3ajULG4u1z-r99uI5H4pQJjLm-liplgMCdX-_VXSXdOCqKSyhanCw"/>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</div>
+</div>
+<!-- Item 2 (Review) -->
+<div class="glass-panel p-4 rounded-lg flex items-center gap-4 hover:border-outline-variant transition-colors cursor-pointer group inner-glow">
+<div class="w-16 h-16 rounded bg-surface-container-lowest overflow-hidden flex-shrink-0">
+<img alt="Article Thumbnail" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" data-alt="A wide angle shot of a modern political debate stage, empty, moody lighting with dramatic shadows and subtle red/blue ambient lights. Cinematic composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7x5W-oKnjDcL2aJMPrOZMvF3F3p9SEtmfBGy2anAnw-7TNuBmZhTpf40IlmOnTE8tA56M1o-nY3U7u2MaTjbT8KbiaNVdWlZ6kt6wq0wvSn-zm2hOxURcFaMsCsJPB5gC29IQOj7s8ESnSmZCOlIBLjK_awto0_nnXWrz0amzFH-NWD--NKgqE-_QT4mlFL7g8O66jLkSRdeApAzwGWyAsxRCIg89bUTFnzTeSZy294rQcgNNTTJq"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full border border-primary/30 text-primary font-label-caps text-[10px] uppercase bg-primary/10">In Review</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Politics • Updated 5h ago</span>
+</div>
+<h4 class="font-body-md font-semibold text-on-surface truncate">Global Summit Drafts New Trade Accords</h4>
+<p class="font-body-md text-sm text-on-surface-variant truncate">Preliminary documents suggest a major shift in tariff policies...</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<img alt="Author" class="w-8 h-8 rounded-full border-2 border-surface object-cover" data-alt="Small portrait of a senior political correspondent, serious expression, wearing a dark blazer, studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkX37Ja1QcefZHxUpy4TzVBeZTENrc_g7uDPiuI_lUf0RFVMNzixvuCCJbIBXfmaMEQAptptgDNSGzANDEO9TMM-7T6KSTA0LqYUxvXNCyi7Q8uROLsinVvfAHOrAjyDsc8gY6hrQ7Vr3KkJNQd07RJHdwc7VtaQLGnJiE-T00GZ3QBaP6_oSVpOsIlWFVU_mkf2B0vWgN1u-I8DY7nqGxHWuNOUBo8pyj8OgO7MtUjzxLGJOnjVER"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center text-xs font-label-caps">+1</div>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</div>
+</div>
+<!-- Item 3 (Published/Live) -->
+<div class="glass-panel p-4 rounded-lg flex items-center gap-4 border-secondary/20 hover:border-secondary/50 transition-colors cursor-pointer group inner-glow relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary/50"></div>
+<div class="w-16 h-16 rounded bg-surface-container-lowest overflow-hidden flex-shrink-0">
+<img alt="Article Thumbnail" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" data-alt="An intense, cinematic photograph of a stock market trading floor ticker screen glowing red and green in a dark room. High contrast, modern financial imagery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO3sRlFbyB-8VmrmilZbz4Ss-1hzemrOVK3vS3nq_d4oqRkE4079-MJClngnGbICLgXRwi_GMw7aXrAqZVs3ir4AFkQCt6_6h9c_wY1SO_nulbaEnjDcp2LM-Jo48hPSgYx8f6BU00LTsKrUDBKngE48PC17NPWRUmvwiqP0j1784_P5AHKWvh-XCB1-LCGzWkay0h3xldy19dSSTv_edQaRpZMZV01sYNrXUUS-tcPwGrrtj63fH9"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary font-label-caps text-[10px] uppercase flex items-center gap-1">
+<span class="w-1 h-1 bg-secondary rounded-full animate-pulse"></span>Live
+                                        </span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Business • Published 10m ago</span>
+</div>
+<h4 class="font-body-md font-semibold text-on-surface truncate">Markets React to Unexpected Rate Hike</h4>
+<p class="font-body-md text-sm text-on-surface-variant truncate">Central bank announcement triggers immediate sell-off across...</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant rounded text-xs font-label-caps text-on-surface transition-colors">Retract</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar: AI Assistant -->
+<section class="lg:col-span-4">
+<div class="glass-panel rounded-xl p-5 border border-outline-variant/50 flex flex-col h-[500px] sticky top-24 inner-glow ambient-shadow">
+<div class="flex items-center gap-3 mb-6 pb-4 border-b border-outline-variant/30">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-tertiary to-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-background text-[18px]">temp_preferences_custom</span>
+</div>
+<div>
+<h3 class="font-headline-md text-lg text-on-surface leading-tight">Editorial AI</h3>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mt-0.5">Kurasikapa Copilot</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+<p class="text-sm font-body-md text-on-surface-variant">Select an article from the pipeline to apply AI optimizations, or use general tools below.</p>
+<div class="grid grid-cols-2 gap-2">
+<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:border-tertiary/50 hover:bg-surface-container-highest transition-all group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">title</span>
+<span class="font-label-caps text-[10px] text-on-surface">Gen Headline</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary/50 hover:bg-surface-container-highest transition-all group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">history_edu</span>
+<span class="font-label-caps text-[10px] text-on-surface">Rewrite</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:border-primary/50 hover:bg-surface-container-highest transition-all group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">compress</span>
+<span class="font-label-caps text-[10px] text-on-surface">Summarize</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:border-secondary/50 hover:bg-surface-container-highest transition-all group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors">manage_search</span>
+<span class="font-label-caps text-[10px] text-on-surface">SEO Check</span>
+</button>
+</div>
+<div class="mt-6">
+<label class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-2 block">Quick Prompt</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 text-sm font-body-md text-on-surface focus:outline-none focus:border-tertiary focus:ring-1 focus:ring-tertiary/50 transition-all resize-none placeholder-on-surface-variant/50" placeholder="e.g. Make the intro more punchy..." rows="3"></textarea>
+<div class="flex justify-end mt-2">
+<button class="px-4 py-1.5 bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant rounded-md text-xs font-label-caps text-on-surface transition-colors flex items-center gap-2">
+                                            Run <span class="material-symbols-outlined text-[14px]">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<style>
+        /* Custom scrollbar for minimal look */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: theme('colors.outline-variant'); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: theme('colors.outline'); }
+    </style>
+</body></html>

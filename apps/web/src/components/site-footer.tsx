@@ -30,10 +30,12 @@ const LINKS = [
  */
 export function SiteFooter(): React.ReactElement {
   return (
-    <footer className="border-outline-variant mt-[var(--spacing-xl)] border-t">
-      <div className="mx-auto max-w-[var(--container-page)] px-6 py-8">
+    <footer className="border-outline-variant bg-surface-container-lowest mt-[var(--spacing-xl)] border-t">
+      <div className="mx-auto flex max-w-[var(--container-page)] flex-col items-center gap-6 px-6 py-12 text-center">
+        <p className="font-display text-secondary text-[length:var(--text-headline-md)]">Kurasikapa Media TV</p>
+
         <nav aria-label="Site information">
-          <ul className="text-on-surface-variant flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <ul className="text-on-surface-variant flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
             {LINKS.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="hover:text-primary transition-colors">
@@ -44,7 +46,7 @@ export function SiteFooter(): React.ReactElement {
           </ul>
         </nav>
 
-        <p className="text-on-surface-variant mt-6 text-sm">
+        <p className="text-on-surface-variant text-sm">
           © <CopyrightYear /> Kurasikapa Media TV
         </p>
       </div>

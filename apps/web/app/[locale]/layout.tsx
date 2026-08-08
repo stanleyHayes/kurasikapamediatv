@@ -4,7 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { SiteFooter } from '@/components/site-footer'
-import { Link } from '@/i18n/navigation'
+import { SiteHeader } from '@/components/site-header'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
 
@@ -74,18 +74,10 @@ export default async function LocaleLayout({
     <html lang={locale} className={`${playfair.variable} ${outfit.variable}`}>
       <body className="bg-surface text-on-surface min-h-screen">
         <NextIntlClientProvider>
-          <header className="border-outline-variant border-b">
-            <nav className="mx-auto flex max-w-[var(--container-page)] items-baseline gap-8 px-6 py-6">
-              <Link href="/" className="font-display text-primary text-2xl font-bold tracking-tight">
-                Kurasikapa
-              </Link>
-              <span className="text-label-bold text-on-surface-variant uppercase">
-                {t('sections')}
-              </span>
-            </nav>
-          </header>
+          <SiteHeader liveLabel={t('live')} />
 
-          <main className="mx-auto max-w-[var(--container-page)] px-6">{children}</main>
+          {/* pt for the fixed header, per the design's `pt-20` on <main>. */}
+          <main className="pt-20">{children}</main>
 
           <SiteFooter />
         </NextIntlClientProvider>

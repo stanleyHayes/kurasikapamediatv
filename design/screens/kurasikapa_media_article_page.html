@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>News Article - Kurasikapa Media TV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "surface-container-highest": "#273647",
+                        "error-container": "#93000a",
+                        "secondary-fixed": "#ffdada",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#273647",
+                        "surface": "#051424",
+                        "secondary-fixed-dim": "#ffb3b6",
+                        "background": "#051424",
+                        "on-secondary-container": "#ffdcdc",
+                        "surface-container-lowest": "#010f1f",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#45464d",
+                        "inverse-surface": "#d4e4fa",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-bright": "#2c3a4c",
+                        "on-secondary": "#68001a",
+                        "on-surface-variant": "#c6c6cd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-background": "#d4e4fa",
+                        "secondary-container": "#cc003c",
+                        "primary-fixed-dim": "#bec6e0",
+                        "primary": "#bec6e0",
+                        "surface-tint": "#bec6e0",
+                        "on-secondary-fixed": "#40000c",
+                        "outline": "#909097",
+                        "on-tertiary": "#472a00",
+                        "primary-container": "#0f172a",
+                        "tertiary-container": "#251400",
+                        "secondary": "#ffb3b6",
+                        "inverse-on-surface": "#233143",
+                        "tertiary": "#ffb95f",
+                        "surface-container-high": "#1c2b3c",
+                        "on-tertiary-container": "#b47300",
+                        "surface-dim": "#051424",
+                        "surface-container": "#122131",
+                        "on-surface": "#d4e4fa",
+                        "on-secondary-fixed-variant": "#920028",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary": "#283044",
+                        "on-primary-container": "#798098",
+                        "surface-container-low": "#0d1c2d",
+                        "inverse-primary": "#565e74",
+                        "primary-fixed": "#dae2fd",
+                        "tertiary-fixed-dim": "#ffb95f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(13, 28, 45, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .content-layer {
+            background: #0d1c2d;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 80px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between px-margin-desktop max-w-container-max mx-auto bg-surface/60 backdrop-blur-md border-b border-white/10 shadow-sm py-4 items-center h-[80px]">
+<div class="flex items-center gap-8">
+<span class="font-display-lg text-[32px] text-on-surface tracking-tighter leading-none">Kurasikapa Media TV</span>
+<div class="hidden md:flex gap-6">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">World</a>
+<a class="font-label-caps text-label-caps text-secondary border-b-2 border-secondary pb-1 hover:text-secondary transition-colors duration-200" href="#">Politics</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Tech</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Business</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Culture</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200 flex items-center gap-1" href="#">
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+                    Live
+                </a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="font-label-caps text-label-caps text-on-surface hover:text-secondary transition-colors">Donate</button>
+<button class="bg-secondary-container text-white px-6 py-2 rounded font-label-caps text-label-caps hover:scale-105 transition-transform">Subscribe</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[80px] pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Hero Section -->
+<article class="mt-8 md:mt-16 mb-16">
+<header class="max-w-4xl mx-auto mb-8 text-center">
+<div class="flex justify-center gap-2 mb-6">
+<span class="font-label-caps text-label-caps text-secondary px-3 py-1 rounded-full border border-secondary/30 bg-secondary/10">POLITICS</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant px-3 py-1 rounded-full border border-outline-variant">BREAKING</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-6">The Global Shift: New Diplomatic Channels Open in Tech Sector</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-3xl mx-auto">As emerging technologies blur national boundaries, leading nations are forging unprecedented agreements to regulate AI and cyber-infrastructure, marking a new era of digital diplomacy.</p>
+<div class="flex items-center justify-center gap-6 text-on-surface-variant border-t border-b border-outline-variant py-4">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant" data-alt="A sophisticated headshot of a journalist, dramatic lighting, dark moody background, high contrast, cinematic portrait style suited for a premium media site." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZjcT7mF68Qe2oTSpTZWi1DTQmpSM7BxNZrKb73P2kocsNcirMqyLo8HEoHv4tG9Nfg1N6rI1CGqymWOqLooWBCdVCLgXvzn8ZkfmFlY0750jJkHz11ogxAjNuv9ZhsMuNC1fubckb0xsnKSogVi6EJd5aT6MvEwRI38g5akpX9HLVZj5V6PtXjpoTPohw2i6RtNhRwEhuvU9v1cMPfPijdM5VIyhQiswgEXrP19HqQ8EM9V1i4Q8o"/>
+<div class="text-left">
+<div class="font-label-caps text-label-caps text-on-surface">Elena Rostova</div>
+<div class="font-body-md text-[14px]">Chief Tech Correspondent</div>
+</div>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex items-center gap-2 font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                        8 Min Read
+                    </div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex items-center gap-2 font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                        Oct 24, 2024
+                    </div>
+</div>
+</header>
+<!-- Hero Image -->
+<div class="w-full h-[400px] md:h-[600px] rounded-lg overflow-hidden relative mb-16 shadow-lg shadow-black/50 border border-white/5">
+<img class="w-full h-full object-cover" data-alt="A cinematic, wide-angle shot of a high-tech diplomatic conference room. Massive curved glass screens display global data nodes. Soft, ambient blue and deep navy lighting creates a serious, sophisticated mood. Dark mode aesthetic, extremely high detail, photorealistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeN1ZI7LRee90qR8u9BMFvUQKIqTl46fYWt71oYUTa2Ua6XxjuEflbXedLdIT_Mcp5Y59B6XgOAUOaQfr_joWkfh52c7qJPlpbc6gPveBaol0o375pgFLk24h6wnkYIRsGqvxXjEpMA35Zz7f-TXZYd8ko9_SwMxBKMCNBmTRpfuzRUEphQo0LJDLgW7SdgIJ8wZDA2CCwLmqrJp6WJnbfaKZiI4re1kqPzbN0Ie3UvbwGrYeHactO"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-4 left-4 font-label-caps text-[10px] text-on-surface-variant bg-surface/80 px-2 py-1 rounded backdrop-blur-sm">Image: Global Tech Summit 2024 / Kurasikapa Media</div>
+</div>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Sidebar (Social & TOC) -->
+<aside class="hidden md:block col-span-2">
+<div class="sticky-nav flex flex-col gap-8">
+<div class="glass-panel p-4 rounded-lg flex flex-col gap-4 items-center">
+<button class="w-10 h-10 rounded-full bg-surface-container-low hover:bg-secondary/20 flex items-center justify-center text-on-surface hover:text-secondary transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container-low hover:bg-secondary/20 flex items-center justify-center text-on-surface hover:text-secondary transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="w-6 h-px bg-outline-variant"></div>
+<button class="w-10 h-10 rounded-full bg-surface-container-low hover:bg-primary/20 flex items-center justify-center text-on-surface transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container-low hover:bg-primary/20 flex items-center justify-center text-on-surface transition-colors border border-outline-variant">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Editorial Content -->
+<div class="col-span-1 md:col-span-7">
+<!-- AI Features Bar -->
+<div class="glass-panel rounded-lg p-6 mb-12 flex flex-col gap-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-4">
+<div class="flex items-center gap-2 font-label-caps text-label-caps text-secondary">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                                AI Enhanced Reading
+                            </div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 text-on-surface hover:text-secondary transition-colors">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+<span class="font-label-caps text-[10px]">Listen</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface hover:text-secondary transition-colors">
+<span class="material-symbols-outlined text-[18px]">translate</span>
+<span class="font-label-caps text-[10px]">Translate</span>
+</button>
+</div>
+</div>
+<div>
+<h3 class="font-headline-md text-[20px] mb-2 text-on-surface">Key Takeaways</h3>
+<ul class="list-disc list-inside text-on-surface-variant font-body-md space-y-2">
+<li>Major powers have agreed to a framework for sharing cyber-threat intelligence.</li>
+<li>New regulations will require transparency in algorithmic decision-making.</li>
+<li>The agreement is expected to reshape global supply chains for semiconductor manufacturing.</li>
+</ul>
+</div>
+</div>
+<!-- Article Body -->
+<div class="prose prose-invert prose-lg max-w-none font-body-lg text-on-surface-variant space-y-8">
+<p>
+<span class="text-display-lg text-secondary float-left mr-4 leading-none mt-2">I</span>n a landmark summit held in Geneva, delegates from over forty nations have ratified the "Digital Accord," a comprehensive treaty designed to establish baseline norms for state behavior in cyberspace and regulate the rapid deployment of artificial intelligence systems.
+                        </p>
+<p>
+                            The negotiations, which lasted for a grueling 72 hours, were characterized by tense standoffs between leading tech producers and consumer nations. However, the resulting document is being hailed as the most significant diplomatic achievement in the digital realm since the inception of the World Wide Web.
+                        </p>
+<div class="my-12 p-8 content-layer rounded-lg border-l-4 border-l-secondary relative overflow-hidden">
+<span class="material-symbols-outlined absolute top-4 right-4 text-[64px] text-surface-container-highest opacity-50">format_quote</span>
+<blockquote class="relative z-10 font-headline-md text-[24px] text-on-surface italic">
+                                "We are no longer just regulating commerce; we are attempting to put guardrails on human cognitive evolution."
+                            </blockquote>
+<div class="mt-4 font-label-caps text-label-caps text-secondary">— Dr. Aris Thorne, UN Special Envoy on Technology</div>
+</div>
+<p>
+                            Central to the accord is the establishment of an international monitoring body, tasked with ensuring that algorithmic models deployed in critical infrastructure—such as energy grids and financial markets—adhere to strict transparency protocols. This move is seen as a direct response to a series of cascading failures in autonomous systems over the past year.
+                        </p>
+<!-- In-content Ad Slot -->
+<div class="my-12 w-full h-[250px] glass-panel flex flex-col items-center justify-center rounded-lg border border-outline-variant relative">
+<span class="absolute top-2 right-2 font-label-caps text-[10px] text-outline">ADVERTISEMENT</span>
+<div class="font-headline-md text-on-surface-variant opacity-50">Premium Brand Placement</div>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mt-12 mb-6">The Economic Fallout</h2>
+<p>
+                            While diplomats celebrate, markets have reacted with volatility. The technology sector, historically resistant to heavy-handed regulation, saw a brief dip in major indices before stabilizing. Analysts suggest that while compliance costs will rise, the establishment of clear, global rules of the road may ultimately foster greater institutional investment in AI ventures.
+                        </p>
+<p>
+                            "Uncertainty is the enemy of capital," notes financial strategist Marcus Vane. "This accord provides a framework. It's not perfect, but it's a map where previously there was only terra incognita."
+                        </p>
+</div>
+<!-- Tags -->
+<div class="mt-12 flex flex-wrap gap-3 pt-8 border-t border-outline-variant">
+<span class="px-4 py-2 rounded-full border border-outline-variant font-label-caps text-label-caps text-on-surface hover:bg-secondary/10 transition-colors cursor-pointer">AI REGULATION</span>
+<span class="px-4 py-2 rounded-full border border-outline-variant font-label-caps text-label-caps text-on-surface hover:bg-secondary/10 transition-colors cursor-pointer">GLOBAL DIPLOMACY</span>
+<span class="px-4 py-2 rounded-full border border-outline-variant font-label-caps text-label-caps text-on-surface hover:bg-secondary/10 transition-colors cursor-pointer">TECH SECTOR</span>
+</div>
+</div>
+<!-- Right Sidebar (Related & Ads) -->
+<aside class="hidden md:block col-span-3">
+<div class="sticky-nav flex flex-col gap-8">
+<!-- Related Stories Mini-Bento -->
+<div class="content-layer rounded-lg p-6">
+<h3 class="font-label-caps text-label-caps text-secondary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                                Trending in Politics
+                            </h3>
+<div class="flex flex-col gap-6">
+<a class="group flex gap-4 items-start" href="#">
+<div class="w-20 h-20 rounded bg-surface-container-highest flex-shrink-0 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A close up of a glowing fiber optic cable end, shallow depth of field, dark navy background, tech aesthetic, cinematic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvpAlSNQb3SYMm8MzlDqmPEvHAHaZy4Z0sikt55EuAnSBsN6HvaxaLlMd81zO1Zwxj2pIIsMRq7RPAo0Jln2Z5vZT7jw3aUxqaOOIFYjDGW_xW5IKsiy90zRaEGr6_PJ3p0iAvIXaG3zlDrsK0vI0yuNZd2SLKZ6mpJQDu0RntD2M3nWPMl1l4m0BV2PoEBzYk1L6X8Afce6k6fyDKDOcFEZMms_1SeGD6P3IYMmH1daB3kycXAJXq"/>
+</div>
+<div>
+<h4 class="font-body-md font-semibold text-on-surface group-hover:text-secondary transition-colors leading-tight mb-2">Senate Debates Privacy Implications of New Bill</h4>
+<span class="font-label-caps text-[10px] text-on-surface-variant">2 HOURS AGO</span>
+</div>
+</a>
+<a class="group flex gap-4 items-start" href="#">
+<div class="w-20 h-20 rounded bg-surface-container-highest flex-shrink-0 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Silhouette of a person standing in front of massive digital data screens glowing red and blue, dark modern corporate environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2BmlEAf13JBNh4o1LFbQa3QA9E8xPTJC1VB3LMcF_5Raf5Gf8QMP3cKrulezgbGhqTbv1hVaY2oqLUWC8KGemE0gfAxtuOyLmkyub2HOy-4277P2ioRzMGibwpg6gEloCXvHIVjpRwB1HBg8qcutSC2qehQi-3Bxf6-MlBndaU9o8OOIZl1Y6MfLsUeeFJT1ZejYGze2JbutKaKC9YhKBrdPc6RowU_7aoIANYtOGDpPYZvLuxS1W"/>
+</div>
+<div>
+<h4 class="font-body-md font-semibold text-on-surface group-hover:text-secondary transition-colors leading-tight mb-2">European Union Proposes Digital ID Framework</h4>
+<span class="font-label-caps text-[10px] text-on-surface-variant">5 HOURS AGO</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Sidebar Ad -->
+<div class="w-full h-[400px] glass-panel flex flex-col items-center justify-center rounded-lg border border-outline-variant relative">
+<span class="absolute top-2 right-2 font-label-caps text-[10px] text-outline">ADVERTISEMENT</span>
+<div class="font-headline-md text-on-surface-variant opacity-50">Vertical Space</div>
+</div>
+</div>
+</aside>
+</div>
+</article>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop bg-surface-container-lowest flex flex-col items-center gap-8 border-t border-outline-variant">
+<div class="font-display-lg-mobile text-display-lg-mobile text-secondary">Kurasikapa Media TV</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Careers</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Press</a>
+</div>
+<div class="font-body-md text-body-md text-on-surface-variant opacity-80 hover:opacity-100">© 2024 Kurasikapa Media TV. All rights reserved.</div>
+</footer>
+</body></html>

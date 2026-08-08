@@ -18,7 +18,7 @@ export default async function SearchPage(props: Props): Promise<React.ReactEleme
   setRequestLocale(locale)
 
   return (
-    <section className="py-[var(--spacing-lg)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
       <form action={`/${locale}/search`} role="search" className="mb-[var(--spacing-lg)]">
         <label className="flex flex-col gap-2">
           <span className="text-label-bold text-on-surface-variant uppercase">Search</span>

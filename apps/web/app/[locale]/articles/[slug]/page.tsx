@@ -70,7 +70,7 @@ export default function ArticlePage({ params }: Params): React.ReactElement {
 
 function ArticleSkeleton(): React.ReactElement {
   return (
-    <div className="py-[var(--spacing-lg)]" aria-hidden>
+    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]" aria-hidden>
       <div className="bg-surface-container h-3 w-24 rounded-sm" />
       <div className="bg-surface-container mt-6 h-12 w-3/4 rounded-sm" />
     </div>
@@ -97,7 +97,7 @@ async function ArticleBody({ params }: Params): Promise<React.ReactElement> {
   )
 
   return (
-    <article className="py-[var(--spacing-lg)]">
+    <article className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
       {/* Structured data for Google News and Discover. Escaped so a headline
           cannot close the script block — see seo/json-ld.ts. */}
       <script

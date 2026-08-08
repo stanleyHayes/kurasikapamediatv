@@ -1,9 +1,13 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
-import { ArticleCard } from '@/components/article-card'
+import { BriefingCard } from '@/components/home/briefing-card'
+import { Hero } from '@/components/home/hero'
+import { Trending } from '@/components/home/trending'
+import { Link } from '@/i18n/navigation'
 import { cachedLatest } from '@/read-model/queries'
 
-const RAIL_SIZE = 12
+/** Lead + four briefing cards + three trending, per the Stitch composition. */
+const RAIL_SIZE = 8
 
 export default async function HomePage({
   params,
@@ -13,46 +17,77 @@ export default async function HomePage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const t = await getTranslations('home')
+  return (
+    <Suspense fallback={<HomeSkeleton />}>
+      <Front locale={locale} />
+    </Suspense>
+  )
+}
+
+async function Front({ locale }: { locale: string }): Promise<React.ReactElement> {
+  const { items } = await cachedLatest(locale, RAIL_SIZE)
+
+  if (items.length === 0) {
+    return (
+      <p className="text-on-surface-variant py-[var(--spacing-xl)]">
+        Nothing published yet.
+      </p>
+    )
+  }
+
+  // The newest story leads; the next four fill the briefing grid; the rest
+  // become the trending rail. One query, sliced — the design's three regions
+  // are one editorial sequence, not three independent feeds.
+  const [lead, ...rest] = items
+  const briefing = rest.slice(0, 4)
+  const trending = rest.slice(4, 7)
 
   return (
     <>
-      {/* Static shell — prerendered, served from the edge immediately. */}
-      <section className="py-[var(--spacing-xl)]">
-        <h1 className="font-display text-primary text-[length:var(--text-display-lg)] leading-[1.1] font-bold tracking-[-0.02em]">
-          {t('latest')}
-        </h1>
+      {lead !== undefined && <Hero article={lead} />}
+
+      <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
+        <div className="grid grid-cols-1 gap-[var(--spacing-lg)] lg:grid-cols-12">
+          <div className="flex flex-col gap-8 lg:col-span-8">
+            <div className="border-outline-variant flex items-end justify-between border-b pb-4">
+              <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
+                Editor&rsquo;s Briefing
+              </h2>
+              <Link
+                href="/search"
+                className="text-label-bold text-on-surface-variant hover:text-secondary uppercase transition-colors"
+              >
+                View all
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 gap-[var(--spacing-md)] md:grid-cols-2">
+              {briefing.map((article) => (
+                <BriefingCard key={article.id} article={article} />
+              ))}
+            </div>
+          </div>
+
+          {trending.length > 0 && (
+            <div className="lg:col-span-4">
+              <Trending articles={trending} />
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Cached — revalidates in minutes, invalidated on publish by tag. */}
-      <Suspense fallback={<RailSkeleton />}>
-        <LatestRail locale={locale} />
-      </Suspense>
+      {/* The design's gradient hairline between regions. */}
+      <div className="mx-auto max-w-[var(--container-page)] px-6 py-8">
+        <div className="via-outline-variant h-px w-full bg-gradient-to-r from-transparent to-transparent" />
+      </div>
     </>
   )
 }
 
-async function LatestRail({ locale }: { locale: string }): Promise<React.ReactElement> {
-  const { items } = await cachedLatest(locale, RAIL_SIZE)
-
+function HomeSkeleton(): React.ReactElement {
   return (
-    <section className="pb-[var(--spacing-xl)]">
-      {items.map((article) => (
-        <ArticleCard key={article.id} article={article} />
-      ))}
-    </section>
-  )
-}
-
-function RailSkeleton(): React.ReactElement {
-  return (
-    <div className="pb-[var(--spacing-xl)]" aria-hidden>
-      {Array.from({ length: 4 }, (_, i) => (
-        <div key={i} className="border-outline-variant border-b py-6">
-          <div className="bg-surface-container h-3 w-24 rounded-sm" />
-          <div className="bg-surface-container mt-3 h-7 w-2/3 rounded-sm" />
-        </div>
-      ))}
+    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-md)]" aria-hidden>
+      <div className="bg-surface-container h-[480px] rounded-xl md:h-[640px]" />
     </div>
   )
 }

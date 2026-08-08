@@ -17,7 +17,7 @@ export default async function SignInPage({
   const configured = Object.keys(socialProviders(process.env)) as ('google' | 'facebook' | 'apple')[]
 
   return (
-    <section className="py-[var(--spacing-xl)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-xl)]">
       <h1 className="font-display text-primary mb-[var(--spacing-md)] text-[length:var(--text-headline-md)] font-semibold">
         Sign in
       </h1>

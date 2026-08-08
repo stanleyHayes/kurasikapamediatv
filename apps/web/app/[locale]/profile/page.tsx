@@ -17,7 +17,7 @@ interface Params {
  */
 export default function ProfilePage({ params }: Params): React.ReactElement {
   return (
-    <section className="py-[var(--spacing-lg)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
       <h1 className="font-display text-primary text-[length:var(--text-headline-md)] font-semibold">
         Saved articles
       </h1>

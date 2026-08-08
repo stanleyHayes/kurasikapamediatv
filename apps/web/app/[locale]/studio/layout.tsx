@@ -25,7 +25,7 @@ export default async function StudioLayout({
   setRequestLocale(locale)
 
   return (
-    <div className="py-[var(--spacing-lg)]">
+    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
       <header className="border-outline-variant mb-[var(--spacing-md)] border-b pb-[var(--spacing-md)]">
         <p className="text-label-bold text-secondary uppercase">Studio</p>
         <h1 className="font-display text-on-surface mt-1 text-[length:var(--text-headline-md)] font-semibold">

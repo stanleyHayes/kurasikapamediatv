@@ -9,7 +9,7 @@ import type { StandingPage } from '../content/pages'
  */
 export function StandingPageView({ page }: { page: StandingPage }): React.ReactElement {
   return (
-    <article className="py-[var(--spacing-xl)]">
+    <article className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-xl)]">
       <h1 className="font-display text-primary max-w-3xl text-[length:var(--text-headline-md)] leading-tight font-semibold">
         {page.title}
       </h1>
