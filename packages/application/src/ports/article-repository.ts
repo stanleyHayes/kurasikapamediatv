@@ -3,7 +3,7 @@ import type { Cursor, Page } from './pagination.js'
 
 export interface PublishedQuery extends Cursor {
   readonly locale: string
-  readonly categoryId?: CategoryId
+  readonly categoryId?: CategoryId | undefined
 }
 
 export interface AuthoredQuery extends Cursor {

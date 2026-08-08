@@ -12,6 +12,27 @@ export const COVERAGE_FLOORS = {
   web: 80,
 } as const
 
+/**
+ * Adapter suites start a real container, so they need room. Unit suites do not
+ * and should stay fast — a generous default timeout hides hangs.
+ */
+const CONTAINER_STARTUP_MS = 120_000
+
+export function integrationConfig(floor: number): ViteUserConfig {
+  const config = baseConfig(floor)
+
+  return defineConfig({
+    ...config,
+    test: {
+      ...config.test,
+      testTimeout: CONTAINER_STARTUP_MS,
+      hookTimeout: CONTAINER_STARTUP_MS,
+      // One container per file, reused across that file's tests.
+      fileParallelism: false,
+    },
+  })
+}
+
 export function baseConfig(floor: number): ViteUserConfig {
   return defineConfig({
     test: {

@@ -10,7 +10,7 @@ A French article is not a field on an English article. It has its own slug, byli
 
 So: **one document per (article, locale)**, joined by `familyId`.
 
-```
+```text
 familyId: fam_7Kd…   ──┬── articles/{_id: art_a1, locale: "en", slug: "budget-2026", status: "published"}
                        ├── articles/{_id: art_b2, locale: "fr", slug: "budget-2026", status: "in_review"}
                        └── articles/{_id: art_c3, locale: "tw", slug: "sikasɛm-2026", status: "draft"}
@@ -53,7 +53,7 @@ erDiagram
 
 | Collection | Purpose | Notable fields |
 |---|---|---|
-| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `body`, `seo`, `embedding[]`, `publishedAt` |
+| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
 | `article_revisions` | immutable history | `articleId`, `seq`, `body`, `authorId`, `createdAt` |
 | `categories` | hierarchy | `slug`, `parentId`, `names{locale}` |
 | `tags` | flat | `slug`, `names{locale}`, `usageCount` |
@@ -77,18 +77,24 @@ erDiagram
 
 Every one of these exists because a specific screen or gate needs it.
 
+Implemented in `packages/adapter-mongo/src/indexes.ts`, beside the queries that use them so the two cannot drift.
+
 ```js
-// articles — the hot path
+// articles — the hot path.
+// The trailing `_id: -1` matters: listings are keyset-paginated on the
+// compound sort key (publishedAt, _id), so the index must cover the tiebreak
+// or every page beyond the first falls back to an in-memory sort.
 db.articles.createIndex({ locale: 1, slug: 1 }, { unique: true })
 db.articles.createIndex({ familyId: 1, locale: 1 }, { unique: true })
-db.articles.createIndex({ status: 1, publishedAt: -1 })            // category listing, homepage rails
-db.articles.createIndex({ categoryId: 1, status: 1, publishedAt: -1 })
+db.articles.createIndex({ status: 1, publishedAt: -1, _id: -1 })            // homepage rails
+db.articles.createIndex({ categoryId: 1, status: 1, publishedAt: -1, _id: -1 })
 db.articles.createIndex({ tagIds: 1, status: 1, publishedAt: -1 })
-db.articles.createIndex({ authorId: 1, status: 1, updatedAt: -1 }) // "my drafts" in the CMS
+db.articles.createIndex({ authorId: 1, status: 1, updatedAt: -1 })          // "my drafts" in the CMS
 db.articles.createIndex({ scheduledAt: 1 }, { partialFilterExpression: { status: "scheduled" } })
 
-// workflow + queues
-db.article_revisions.createIndex({ articleId: 1, seq: -1 })
+// workflow + queues.
+// Unique, so a concurrent double-append fails loudly instead of losing a draft.
+db.article_revisions.createIndex({ articleId: 1, seq: -1 }, { unique: true })
 db.social_posts.createIndex({ state: 1, scheduledAt: 1 })
 db.audit_logs.createIndex({ entity: 1, entityId: 1, at: -1 })
 
@@ -132,6 +138,11 @@ db.sessions.createIndex({ expires: 1 }, { expireAfterSeconds: 0 })
 Embeddings are written by `media-svc` on publish, not on save — drafts change too often to be worth embedding.
 
 ---
+
+### Two fields that are persistence, not domain
+
+- **`_id` is our own id string**, not an `ObjectId`. Ids are minted by `IdPort`, so the domain owns identity and an exported document still means something.
+- **`articles.updatedAt`** exists only so the CMS can sort "my drafts" by recency. No business rule reads it, so it is not on the `Article` entity — the repository stamps it from an injected `ClockPort`, which keeps it deterministic in tests.
 
 ## 5. Consistency rules
 

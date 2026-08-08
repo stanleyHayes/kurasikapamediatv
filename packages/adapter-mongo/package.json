@@ -1,0 +1,26 @@
+{
+  "name": "@kurasikapa/adapter-mongo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@kurasikapa/application": "workspace:*",
+    "@kurasikapa/domain": "workspace:*",
+    "mongodb": "6.21.0"
+  },
+  "devDependencies": {
+    "@kurasikapa/config": "workspace:*",
+    "@testcontainers/mongodb": "12.0.4",
+    "@vitest/coverage-v8": "4.1.10",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

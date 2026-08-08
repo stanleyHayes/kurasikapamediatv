@@ -28,3 +28,12 @@ overrides:
   typescript: 5.9.3
   # @auth/mongodb-adapter@3 peers "^6" — driver v7 breaks Auth.js.
   mongodb: 6.21.0
+
+# Transitive dev-only deps of testcontainers. All denied: we reach Docker over
+# the local socket, so ssh2/cpu-features native bindings are never exercised,
+# and protobufjs' postinstall only regenerates types we do not consume.
+# Denying keeps arbitrary install-time code out of CI.
+allowBuilds:
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
