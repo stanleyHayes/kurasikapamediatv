@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raven.giggso.dev/schema/manifest-v1.json",
+  "version": "1.0.0",
+  "project": "kurasikapa-media",
+  "display_name": "Kurasikapa Media TV — AI Publishing Platform",
+  "owner": "neurodyne-technologies",
+  "client": {
+    "name": "Kurasikapa Media TV",
+    "registration": "BN511671125",
+    "industry": "Television, Radio and Online Media Services",
+    "jurisdiction": "FR",
+    "address": "4 Rue des Lys, 95190 Goussainville, France",
+    "contact_email": "kurasikapamediatv@yahoo.com",
+    "discovery_signed": "2026-08-06"
+  },
+  "primary_use": "production app",
+  "architecture": {
+    "style": "hexagonal",
+    "layout": "turborepo-monorepo",
+    "boundary_enforcement": "dependency-cruiser",
+    "hexagons": ["apps/web", "services/media-svc"]
+  },
+  "stack": {
+    "language": ["typescript", "go"],
+    "runtime": {
+      "node": "26.x",
+      "go": "1.26",
+      "package_manager": "pnpm@11"
+    },
+    "frontend": "next@16 (App Router, Cache Components, RSC)",
+    "styling": "tailwindcss@4",
+    "backend": [
+      "next@16 route-handlers + server-actions (driving adapter)",
+      "go@1.26 media service (streaming, transcode, batch, queues)"
+    ],
+    "db": "mongodb-atlas@6 (Atlas Search + Atlas Vector Search)",
+    "cloud": ["vercel", "render"],
+    "infra": "vercel (web) + render (go service) + mongodb-atlas (data)",
+    "libraries": {
+      "typescript": "5.9.3",
+      "next": "16.3.0",
+      "react": "19.2.8",
+      "mongodb": "6.21.0",
+      "next-auth": "5.0.0-beta.32",
+      "@auth/mongodb-adapter": "3.11.3",
+      "ai": "7.0.58",
+      "@ai-sdk/anthropic": "4.0.36",
+      "zod": "4.4.3",
+      "next-intl": "4.13.5",
+      "@mux/mux-node": "14.1.1",
+      "vitest": "4.1.10",
+      "@playwright/test": "1.62.1",
+      "eslint": "10.8.1",
+      "typescript-eslint": "8.66.0",
+      "dependency-cruiser": "18.1.1",
+      "turbo": "2.10.9"
+    },
+    "pinned_reasons": {
+      "typescript": "typescript-eslint@8 peers typescript <6.1.0 — TS 7 native compiler is not yet supported by the lint toolchain",
+      "mongodb": "@auth/mongodb-adapter@3 peers mongodb ^6 — driver v7 breaks the Auth.js adapter"
+    }
+  },
+  "quality": {
+    "gates": "local-first, sonarqube-ready",
+    "coverage_min_new_code": 80,
+    "coverage_min_domain": 95,
+    "max_lines_per_file": 250,
+    "max_lines_per_function": 50,
+    "max_cyclomatic_complexity": 10,
+    "duplication_max_pct": 3,
+    "sonar_config": "sonar-project.properties (dormant until SONAR_TOKEN is set)"
+  },
+  "standards": "raven-v1",
+  "sdlc": "neurodyne-ai-native-12-phase",
+  "approval_mode": "first_responder",
+  "compliance": ["GDPR", "CCPA-ready", "WCAG-2.2-AA"],
+  "created": "2026-08-08",
+  "created_by": "andie-v6.4"
+}

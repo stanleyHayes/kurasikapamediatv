@@ -1,0 +1,17 @@
+{
+  "threshold": 3,
+  "reporters": ["console"],
+  "absolute": true,
+  "gitignore": true,
+  "format": ["typescript", "tsx", "go"],
+  "path": ["packages", "apps", "services"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/coverage/**",
+    "**/*.test.ts",
+    "**/testing/**",
+    "stitch_kurasikapa_ai_media_platform/**"
+  ]
+}

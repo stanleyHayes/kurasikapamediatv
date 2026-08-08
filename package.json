@@ -1,0 +1,35 @@
+{
+  "name": "kurasikapa-media",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.11.0",
+  "engines": {
+    "node": ">=26.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "test:e2e": "turbo run test:e2e",
+    "lint": "eslint .",
+    "typecheck": "turbo run typecheck",
+    "boundaries": "depcruise packages apps --config .dependency-cruiser.cjs",
+    "dup": "jscpd",
+    "verify": "pnpm lint && pnpm typecheck && pnpm boundaries && pnpm test && pnpm dup",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.1.2",
+    "@vitest/coverage-v8": "4.1.10",
+    "dependency-cruiser": "18.1.0",
+    "eslint": "10.8.0",
+    "jscpd": "5.0.14",
+    "turbo": "2.10.8",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.65.0",
+    "vitest": "4.1.10"
+  }
+}

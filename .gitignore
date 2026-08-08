@@ -1,0 +1,46 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# raven — manifest is committed, session scratch is not
+.raven/.cache/
+.raven/state/
+.raven/.model-session.json
+
+# test + tooling artefacts
+coverage/
+.turbo/
+playwright-report/
+test-results/
+.jscpd/
+.scannerwork/
+
+# secrets — never commit any of these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.mcp.json
+
+# go
+services/media-svc/bin/
+services/media-svc/tmp/
+
+# design source — ~49MB of PNG renders, tracked out of band.
+# The tokens that engineers actually need are extracted into design/systems/.
+# See design/README.md — needs a Git LFS or shared-storage decision.
+stitch_kurasikapa_ai_media_platform/
+stitch_kurasikapa_ai_media_platform.zip
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

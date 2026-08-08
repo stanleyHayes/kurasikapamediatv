@@ -1,0 +1,30 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# --- Supply-chain hardening (see docs/07-quality-gates.md § 6) ---
+
+# Wait 7 days before installing a newly published version. A compromised
+# release is usually pulled well inside that window.
+minimumReleaseAge: 10080
+
+# Refuse transitive dependencies resolved from git/http/tarball sources.
+blockExoticSubdeps: true
+
+# A package update may never downgrade our security settings.
+trustPolicy: no-downgrade
+
+# Only these packages may run install scripts. Anything else is blocked.
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - esbuild
+  - sharp
+
+# --- Version pins (ADR-0007) ---
+# pnpm 11 reads overrides here, not from package.json.
+# Do not raise either of these without re-checking the peer range that caused it.
+overrides:
+  # typescript-eslint@8 peers "<6.1.0" — TS 7 would disable type-aware linting.
+  typescript: 5.9.3
+  # @auth/mongodb-adapter@3 peers "^6" — driver v7 breaks Auth.js.
+  mongodb: 6.21.0
