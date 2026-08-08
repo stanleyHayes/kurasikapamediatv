@@ -9,6 +9,7 @@ import { closeMongo } from './mongo'
 // The driver does not connect on construction, so the real graph can be built
 // in a unit test without a database.
 process.env['MONGODB_URI'] = 'mongodb://127.0.0.1:27017/kurasikapa_unit'
+process.env['BETTER_AUTH_SECRET'] = 'x'.repeat(32)
 
 /**
  * The Mongo repositories only call `db.collection()` in their constructors, so

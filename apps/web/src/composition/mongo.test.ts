@@ -4,6 +4,7 @@ import { closeMongo, mongoClient, mongoDb } from './mongo'
 
 // The driver does not connect on construction, so these run with no database.
 process.env['MONGODB_URI'] = 'mongodb://127.0.0.1:27017/kurasikapa_unit'
+process.env['BETTER_AUTH_SECRET'] = 'x'.repeat(32)
 
 afterEach(async () => {
   await closeMongo()

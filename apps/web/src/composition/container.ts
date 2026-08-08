@@ -1,8 +1,13 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
-import { MongoArticleRepository, MongoRevisionRepository } from '@kurasikapa/adapter-mongo'
+import {
+  MongoArticleRepository,
+  MongoRevisionRepository,
+  MongoRoleRepository,
+} from '@kurasikapa/adapter-mongo'
 import {
   type AiPort,
   ApproveArticle,
+  AssignRoles,
   type ClockPort,
   CreateDraft,
   type EventBusPort,
@@ -12,11 +17,16 @@ import {
   PublishArticle,
   PublishDueArticles,
   RejectArticle,
+  ResolveActor,
   SchedulePublication,
   SubmitForReview,
   UnpublishArticle,
 } from '@kurasikapa/application'
-import type { ArticleRepository, RevisionRepository } from '@kurasikapa/application'
+import type {
+  ArticleRepository,
+  RevisionRepository,
+  RoleRepository,
+} from '@kurasikapa/application'
 import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { mongoDb } from './mongo'
@@ -38,10 +48,12 @@ export interface Container {
   readonly publishArticle: PublishArticle
   readonly unpublishArticle: UnpublishArticle
   readonly publishDueArticles: PublishDueArticles
+  readonly assignRoles: AssignRoles
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
+  readonly resolveActor: ResolveActor
 
   // Ports exposed for interactive use (AI streams straight to the editor)
   readonly ai: AiPort
@@ -66,6 +78,7 @@ export function buildContainer(infra: Infrastructure): Container {
     clock: infra.clock,
   })
   const revisions: RevisionRepository = new MongoRevisionRepository(infra.db)
+  const roles: RoleRepository = new MongoRoleRepository(infra.db)
 
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
@@ -79,9 +92,11 @@ export function buildContainer(infra: Infrastructure): Container {
     publishArticle: new PublishArticle(write),
     unpublishArticle: new UnpublishArticle(write),
     publishDueArticles: new PublishDueArticles(write),
+    assignRoles: new AssignRoles({ roles, clock, events }),
 
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
+    resolveActor: new ResolveActor({ roles }),
 
     ai: infra.ai,
     events: infra.events,

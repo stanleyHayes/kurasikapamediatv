@@ -11,6 +11,12 @@ const schema = z.object({
   MONGODB_DB: z.string().min(1).default('kurasikapa'),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
   DEFAULT_LOCALE: z.string().min(2).default('en'),
+
+  // Auth. The secret signs session cookies, so a weak one is a full compromise
+  // of every account — 32 characters is the floor, not a suggestion.
+  BETTER_AUTH_SECRET: z.string().min(32),
+  APP_URL: z.url().default('http://localhost:3000'),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 })
 
 export type Env = z.infer<typeof schema>

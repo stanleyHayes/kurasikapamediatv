@@ -17,7 +17,11 @@ Losing the lint layer to gain compile speed is the wrong trade on a codebase who
 
 ### MongoDB driver pinned to `6.21.0`, not `7.5.0`
 
-`@auth/mongodb-adapter@3.11.3` declares `"mongodb": "^6"`. Driver v7 breaks the Auth.js adapter. See [ADR-0004](adr-0004-authjs-v5.md).
+**Original reason, now obsolete:** `@auth/mongodb-adapter@3.11.3` declared `"mongodb": "^6"`, so driver v7 broke it. That constraint disappeared when [ADR-0004](adr-0004-better-auth.md) moved us to Better Auth, whose Mongo adapter accepts `^6.0.0 || ^7.0.0`.
+
+**Current reason:** we stay on 6.21.0 by choice, not by force. `packages/adapter-mongo` is written and tested against the v6 API, v7 carries breaking changes, and there is no capability we need on the other side. Revisit when there is a reason beyond the version number being larger.
+
+Recording the obsolete reason rather than deleting it: a pin whose justification has quietly expired is how a codebase accumulates constraints nobody can explain.
 
 ### Other pins
 

@@ -1,4 +1,11 @@
-export { ARTICLES, REVISIONS, type ArticleDocument, type RevisionDocument } from './documents'
+export {
+  ARTICLES,
+  REVISIONS,
+  ROLE_ASSIGNMENTS,
+  type ArticleDocument,
+  type RevisionDocument,
+  type RoleAssignmentDocument,
+} from './documents'
 export { ensureIndexes } from './indexes'
 export {
   articleToDocument,
@@ -11,3 +18,4 @@ export {
   type MongoArticleRepositoryDeps,
 } from './mongo-article-repository'
 export { MongoRevisionRepository } from './mongo-revision-repository'
+export { MongoRoleRepository } from './mongo-role-repository'

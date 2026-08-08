@@ -18,6 +18,11 @@ export {
 
 export { Actor, NotPermitted, requirePermission } from './identity/actor'
 export { PERMISSIONS, ROLES, type Permission, type Role, permissionsOf } from './identity/role'
+export {
+  CannotAssignOwnRoles,
+  UnknownRole,
+  assertMayAssignRoles,
+} from './identity/role-assignment'
 
 export {
   EmptyIdentifier,

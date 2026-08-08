@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { parse } from './env'
 
-const valid = { MONGODB_URI: 'mongodb://localhost:27017/x' }
+const valid = {
+  MONGODB_URI: 'mongodb://localhost:27017/x',
+  BETTER_AUTH_SECRET: 'x'.repeat(32),
+}
 
 describe('env', () => {
   it('accepts the minimum viable configuration', () => {
@@ -22,7 +25,17 @@ describe('env', () => {
   })
 
   it('rejects an empty string, which is not the same as unset', () => {
-    expect(() => parse({ MONGODB_URI: '' })).toThrow(/MONGODB_URI/u)
+    expect(() => parse({ ...valid, MONGODB_URI: '' })).toThrow(/MONGODB_URI/u)
+  })
+
+  it('refuses a short auth secret', () => {
+    // The secret signs session cookies. A weak one compromises every account,
+    // and it is exactly the value someone sets to "changeme" in a hurry.
+    expect(() => parse({ ...valid, BETTER_AUTH_SECRET: 'short' })).toThrow(/BETTER_AUTH_SECRET/u)
+  })
+
+  it('defaults to development, so secure cookies are opt-in for production', () => {
+    expect(parse(valid).NODE_ENV).toBe('development')
   })
 
   it('treats the AI key as optional, so the public site boots without it', () => {

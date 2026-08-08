@@ -26,6 +26,19 @@ export type {
 } from './ports/article-repository'
 export type { Cursor, Page } from './ports/pagination'
 export type { RevisionRepository } from './ports/revision-repository'
+export type { RoleRepository } from './ports/role-repository'
+export {
+  AssignRoles,
+  type AssignRolesDeps,
+  type AssignRolesInput,
+  type AssignRolesResult,
+} from './identity/assign-roles'
+export { rolesAssigned, type RolesAssigned } from './identity/events'
+export {
+  ResolveActor,
+  type ResolveActorDeps,
+  type ResolveActorInput,
+} from './identity/resolve-actor'
 export type { UseCase } from './ports/use-case'
 
 export {

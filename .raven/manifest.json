@@ -2,7 +2,7 @@
   "$schema": "https://raven.giggso.dev/schema/manifest-v1.json",
   "version": "1.0.0",
   "project": "kurasikapa-media",
-  "display_name": "Kurasikapa Media TV — AI Publishing Platform",
+  "display_name": "Kurasikapa Media TV \u2014 AI Publishing Platform",
   "owner": "neurodyne-technologies",
   "client": {
     "name": "Kurasikapa Media TV",
@@ -18,10 +18,16 @@
     "style": "hexagonal",
     "layout": "turborepo-monorepo",
     "boundary_enforcement": "dependency-cruiser",
-    "hexagons": ["apps/web", "services/media-svc"]
+    "hexagons": [
+      "apps/web",
+      "services/media-svc"
+    ]
   },
   "stack": {
-    "language": ["typescript", "go"],
+    "language": [
+      "typescript",
+      "go"
+    ],
     "runtime": {
       "node": "26.x",
       "go": "1.26",
@@ -34,30 +40,34 @@
       "go@1.26 media service (streaming, transcode, batch, queues)"
     ],
     "db": "mongodb-atlas@6 (Atlas Search + Atlas Vector Search)",
-    "cloud": ["vercel", "render"],
+    "cloud": [
+      "vercel",
+      "render"
+    ],
     "infra": "vercel (web) + render (go service) + mongodb-atlas (data)",
     "libraries": {
-      "typescript": "5.9.3",
-      "next": "16.3.0",
-      "react": "19.2.8",
-      "mongodb": "6.21.0",
-      "next-auth": "5.0.0-beta.32",
-      "@auth/mongodb-adapter": "3.11.3",
-      "ai": "7.0.58",
-      "@ai-sdk/anthropic": "4.0.36",
-      "zod": "4.4.3",
-      "next-intl": "4.13.5",
+      "@ai-sdk/anthropic": "4.0.27",
       "@mux/mux-node": "14.1.1",
-      "vitest": "4.1.10",
       "@playwright/test": "1.62.1",
-      "eslint": "10.8.1",
-      "typescript-eslint": "8.66.0",
-      "dependency-cruiser": "18.1.1",
-      "turbo": "2.10.9"
+      "@testcontainers/mongodb": "12.0.4",
+      "ai": "7.0.47",
+      "better-auth": "1.6.25",
+      "dependency-cruiser": "18.1.0",
+      "eslint": "10.8.0",
+      "mongodb": "6.21.0",
+      "next": "16.2.12",
+      "next-intl": "4.13.4",
+      "react": "19.2.8",
+      "turbo": "2.10.8",
+      "typescript": "5.9.3",
+      "typescript-eslint": "8.65.0",
+      "vitest": "4.1.10",
+      "zod": "4.4.3"
     },
     "pinned_reasons": {
-      "typescript": "typescript-eslint@8 peers typescript <6.1.0 — TS 7 native compiler is not yet supported by the lint toolchain",
-      "mongodb": "@auth/mongodb-adapter@3 peers mongodb ^6 — driver v7 breaks the Auth.js adapter"
+      "typescript": "typescript-eslint@8 peers typescript <6.1.0 \u2014 TS 7 native compiler is not yet supported by the lint toolchain",
+      "mongodb": "Better Auth accepts ^6||^7, so the original Auth.js constraint is gone. We stay on v6 because adapter-mongo is written and tested against it and v7 offers nothing we need. See ADR-0007.",
+      "supply_chain": "pnpm minimumReleaseAge 7d + trustPolicy no-downgrade. Every pin is the newest version that clears both gates, not simply the newest."
     }
   },
   "quality": {
@@ -73,7 +83,11 @@
   "standards": "raven-v1",
   "sdlc": "neurodyne-ai-native-12-phase",
   "approval_mode": "first_responder",
-  "compliance": ["GDPR", "CCPA-ready", "WCAG-2.2-AA"],
+  "compliance": [
+    "GDPR",
+    "CCPA-ready",
+    "WCAG-2.2-AA"
+  ],
   "created": "2026-08-08",
   "created_by": "andie-v6.4"
 }

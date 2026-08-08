@@ -37,5 +37,12 @@ export interface RevisionDocument {
   createdAt: Date
 }
 
+export interface RoleAssignmentDocument {
+  /** The auth library's user id. We store roles against it, never inside it. */
+  _id: string
+  roles: string[]
+}
+
 export const ARTICLES = 'articles'
 export const REVISIONS = 'article_revisions'
+export const ROLE_ASSIGNMENTS = 'role_assignments'
