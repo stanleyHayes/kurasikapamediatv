@@ -28,6 +28,23 @@ export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pa
 export type { RevisionRepository } from './ports/revision-repository'
 export type { CategoryRepository } from './ports/category-repository'
 export type { BookmarkRepository } from './ports/bookmark-repository'
+export type {
+  SocialPostRepository,
+  SocialPublishPort,
+  SocialResult,
+  SocialTarget,
+} from './ports/social'
+export {
+  QueueSocialPost,
+  type QueueSocialPostDeps,
+  type QueueSocialPostInput,
+  type QueueSocialPostResult,
+} from './distribution/queue-social-post'
+export {
+  PublishDuePosts,
+  type PublishDuePostsDeps,
+  type PublishDuePostsResult,
+} from './distribution/publish-due-posts'
 export type { RoleRepository } from './ports/role-repository'
 export {
   SaveArticle,

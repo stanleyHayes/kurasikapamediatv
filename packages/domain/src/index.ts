@@ -47,3 +47,18 @@ export {
 } from './shared/ids'
 export { InvalidSlug, Slug } from './shared/slug'
 export { Bookmark, CannotSaveUnpublished, type BookmarkProps } from './audience/bookmark'
+export {
+  AlreadySent,
+  ArticleNotLive,
+  EmptyCaption,
+  PLATFORMS,
+  POST_STATES,
+  SchedulePostInPast,
+  SocialPost,
+  socialPostId,
+  type NewSocialPost,
+  type Platform,
+  type PostState,
+  type SocialPostId,
+  type SocialPostProps,
+} from './distribution/social-post'
