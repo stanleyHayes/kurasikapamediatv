@@ -17,5 +17,6 @@ export default baseConfig(COVERAGE_FLOORS.web, [
   // they carry lives in schemas.ts, result.ts and cache-invalidation.ts, each
   // fully covered here.
   'src/actions/editorial.ts',
+  'src/actions/ai.ts',
   'src/composition/subscribers.ts',
 ])

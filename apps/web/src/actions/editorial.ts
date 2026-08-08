@@ -12,6 +12,7 @@ import {
   rejectSchema,
   scheduleSchema,
   unpublishSchema,
+  updateDraftSchema,
 } from './schemas'
 
 /**
@@ -43,6 +44,24 @@ export async function createDraftAction(input: unknown): Promise<ActionResult<{ 
     })
 
     return { slug: result.slug }
+  })
+}
+
+export async function updateDraftAction(
+  input: unknown,
+): Promise<ActionResult<{ seq: number; slug: string }>> {
+  return attempt(async () => {
+    const parsed = parseInput(updateDraftSchema, input)
+    const actor = await requireActor()
+
+    const result = await container().updateDraft.execute({
+      actor,
+      articleId: parsed.articleId as ArticleId,
+      title: parsed.title,
+      body: parsed.body,
+    })
+
+    return { seq: result.seq, slug: result.slug }
   })
 }
 

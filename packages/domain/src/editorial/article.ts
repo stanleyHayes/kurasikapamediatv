@@ -2,7 +2,14 @@ import { type Actor, requirePermission } from '../identity/actor'
 import type { ArticleId, CategoryId, FamilyId, RevisionId, TagId, UserId } from '../shared/ids'
 import type { Slug } from '../shared/slug'
 import { type ArticleStatus, type Transition, isAllowedFrom, ruleFor } from './article-status'
-import { IllegalTransition, MissingApprovedRevision, NotOwnArticle, ScheduleInPast } from './errors'
+import {
+  IllegalTransition,
+  MissingApprovedRevision,
+  NotEditable,
+  NotOwnArticle,
+  ScheduleInPast,
+  SlugIsFrozen,
+} from './errors'
 
 export interface ArticleProps {
   readonly id: ArticleId
@@ -69,6 +76,42 @@ export class Article {
   get status(): ArticleStatus { return this.props.status }
   get scheduledAt(): Date | null { return this.props.scheduledAt }
   get publishedAt(): Date | null { return this.props.publishedAt }
+
+  /**
+   * Retitling a draft. The slug follows the title until the article has been
+   * published; after that it is frozen.
+   *
+   * A published URL is a promise to everyone who linked to it, shared it, or
+   * indexed it. Changing the slug silently breaks every one of those, and the
+   * gain is cosmetic.
+   */
+  retitle(actor: Actor, title: string, slug: Slug): Article {
+    this.guardEditable(actor)
+
+    if (this.hasBeenPublished() && !slug.equals(this.props.slug)) {
+      throw new SlugIsFrozen(this.props.id)
+    }
+
+    return this.with({ title, slug })
+  }
+
+  /** True once the article has ever gone live, even if since unpublished. */
+  hasBeenPublished(): boolean {
+    return this.props.publishedAt !== null
+  }
+
+  private guardEditable(actor: Actor): void {
+    requirePermission(actor, 'article:edit_own')
+    this.guardOwnership(actor)
+
+    // Editing text that is under review, scheduled or live would change what
+    // an editor approved out from under them. Those paths go through the
+    // workflow: reject it, or unpublish it, then edit.
+    const editable: readonly ArticleStatus[] = ['draft', 'unpublished']
+    if (!editable.includes(this.props.status)) {
+      throw new NotEditable(this.props.id, this.props.status)
+    }
+  }
 
   submitForReview(actor: Actor): Article {
     return this.transition('submit', actor)

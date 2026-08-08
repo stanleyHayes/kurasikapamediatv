@@ -13,6 +13,7 @@ import {
   type EventBusPort,
   GetPublishedArticle,
   type IdPort,
+  ListAuthoredArticles,
   ListPublishedArticles,
   PublishArticle,
   PublishDueArticles,
@@ -21,6 +22,7 @@ import {
   SchedulePublication,
   SubmitForReview,
   UnpublishArticle,
+  UpdateDraft,
 } from '@kurasikapa/application'
 import type {
   ArticleRepository,
@@ -42,6 +44,7 @@ import { registerSubscribers } from './subscribers'
 export interface Container {
   // Commands
   readonly createDraft: CreateDraft
+  readonly updateDraft: UpdateDraft
   readonly submitForReview: SubmitForReview
   readonly approveArticle: ApproveArticle
   readonly rejectArticle: RejectArticle
@@ -54,6 +57,7 @@ export interface Container {
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
+  readonly listAuthoredArticles: ListAuthoredArticles
   readonly resolveActor: ResolveActor
 
   // Ports exposed for interactive use (AI streams straight to the editor)
@@ -86,6 +90,7 @@ export function buildContainer(infra: Infrastructure): Container {
 
   return {
     createDraft: new CreateDraft({ articles, revisions, clock, ids, events }),
+    updateDraft: new UpdateDraft({ articles, revisions, clock, ids }),
     submitForReview: new SubmitForReview(write),
     approveArticle: new ApproveArticle({ ...write, revisions }),
     rejectArticle: new RejectArticle(write),
@@ -97,6 +102,7 @@ export function buildContainer(infra: Infrastructure): Container {
 
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
+    listAuthoredArticles: new ListAuthoredArticles({ articles }),
     resolveActor: new ResolveActor({ roles }),
 
     ai: infra.ai,

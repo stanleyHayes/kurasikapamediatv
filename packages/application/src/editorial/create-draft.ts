@@ -5,18 +5,17 @@ import {
   type CategoryId,
   type FamilyId,
   type RevisionId,
-  Revision,
   Slug,
   type TagId,
   articleId,
   familyId as toFamilyId,
-  revisionId,
 } from '@kurasikapa/domain'
 import type { ClockPort, EventBusPort, IdPort } from '../ports/ambient'
 import type { ArticleRepository } from '../ports/article-repository'
 import type { RevisionRepository } from '../ports/revision-repository'
 import type { UseCase } from '../ports/use-case'
 import { SlugTaken } from './errors'
+import { mintRevision } from './revisions'
 import { draftCreated } from './events'
 
 export interface CreateDraftDeps {
@@ -69,15 +68,9 @@ export class CreateDraft implements UseCase<CreateDraftInput, CreateDraftResult>
     })
 
     const now = this.deps.clock.now()
-    const revision = Revision.append(
-      {
-        id: revisionId(this.deps.ids.next()),
-        articleId: article.id,
-        title: input.title,
-        body: input.body,
-        authorId: input.actor.id,
-        createdAt: now,
-      },
+    const revision = mintRevision(
+      this.deps,
+      { articleId: article.id, title: input.title, body: input.body, authorId: input.actor.id },
       null,
     )
 

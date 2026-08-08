@@ -32,3 +32,20 @@ export class ScheduleInPast extends Error {
     this.name = 'ScheduleInPast'
   }
 }
+
+export class SlugIsFrozen extends Error {
+  constructor(readonly articleId: ArticleId) {
+    super(`Article ${articleId} has been published; its slug cannot change`)
+    this.name = 'SlugIsFrozen'
+  }
+}
+
+export class NotEditable extends Error {
+  constructor(
+    readonly articleId: ArticleId,
+    readonly status: ArticleStatus,
+  ) {
+    super(`An article in state "${status}" cannot be edited directly`)
+    this.name = 'NotEditable'
+  }
+}

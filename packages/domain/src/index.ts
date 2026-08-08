@@ -12,8 +12,10 @@ export {
 export {
   IllegalTransition,
   MissingApprovedRevision,
+  NotEditable,
   NotOwnArticle,
   ScheduleInPast,
+  SlugIsFrozen,
 } from './editorial/errors'
 
 export { Actor, NotPermitted, requirePermission } from './identity/actor'

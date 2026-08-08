@@ -63,6 +63,17 @@ export {
   type ListPublishedArticlesInput,
 } from './editorial/list-published-articles'
 export {
+  ListAuthoredArticles,
+  type ListAuthoredArticlesDeps,
+  type ListAuthoredArticlesInput,
+} from './editorial/list-authored-articles'
+export {
+  UpdateDraft,
+  type UpdateDraftDeps,
+  type UpdateDraftInput,
+  type UpdateDraftResult,
+} from './editorial/update-draft'
+export {
   PublishArticle,
   type PublishArticleDeps,
   type PublishArticleInput,

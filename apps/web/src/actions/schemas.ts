@@ -18,6 +18,12 @@ export const createDraftSchema = z.object({
 
 export const articleRefSchema = z.object({ articleId: id })
 
+export const updateDraftSchema = z.object({
+  articleId: id,
+  title: z.string().trim().min(1).max(300),
+  body: z.string().max(200_000),
+})
+
 export const approveSchema = z.object({ articleId: id, revisionId: id })
 
 export const rejectSchema = z.object({
