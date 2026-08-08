@@ -2,6 +2,7 @@ import type { ClockPort } from '@kurasikapa/application'
 import type {
   ArticleRepository,
   AuthoredQuery,
+  Cursor,
   Page,
   PublishedQuery,
 } from '@kurasikapa/application'
@@ -48,6 +49,19 @@ export class MongoArticleRepository implements ArticleRepository {
       .toArray()
 
     return sliceToPage(docs, query.limit)
+  }
+
+  async listAwaitingReview(cursor: Cursor): Promise<Page<Article>> {
+    // Ordered oldest-first: a submission waiting three days should be seen
+    // before one submitted this morning. Newest-first would let the backlog
+    // starve quietly at the bottom of the list.
+    const docs = await this.articles
+      .find({ status: 'in_review' })
+      .sort({ updatedAt: 1, _id: 1 })
+      .limit(cursor.limit + 1)
+      .toArray()
+
+    return sliceToPage(docs, cursor.limit)
   }
 
   async listDueForPublication(now: Date): Promise<readonly Article[]> {

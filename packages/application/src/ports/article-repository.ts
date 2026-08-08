@@ -19,6 +19,13 @@ export interface ArticleRepository {
   findBySlug(slug: string, locale: string): Promise<Article | null>
   listPublished(query: PublishedQuery): Promise<Page<Article>>
   listAuthoredBy(query: AuthoredQuery): Promise<Page<Article>>
+  /**
+   * Everything awaiting an editorial decision, across all authors.
+   *
+   * Unscoped by author on purpose — that is the whole point of a review queue,
+   * and the authorisation for it lives in the use case.
+   */
+  listAwaitingReview(cursor: Cursor): Promise<Page<Article>>
   /** Every article whose scheduled moment has arrived. Drives the cron. */
   listDueForPublication(now: Date): Promise<readonly Article[]>
   save(article: Article): Promise<void>

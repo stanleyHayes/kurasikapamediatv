@@ -118,6 +118,50 @@ describe('listDueForPublication', () => {
   })
 })
 
+describe('listAwaitingReview', () => {
+  it('returns submissions from every author', async () => {
+    await repo.save(article({ id: 'mine', status: 'in_review' }))
+    await repo.save(article({ id: 'theirs', status: 'in_review', authorId: userId('usr_other') }))
+    await repo.save(article({ id: 'draft' }))
+
+    const page = await repo.listAwaitingReview({ limit: 10 })
+
+    expect(page.items.map((a) => a.id).sort()).toEqual(['mine', 'theirs'])
+  })
+
+  it('orders oldest submission first, so the backlog cannot starve', async () => {
+    // Newest-first would leave a three-day-old submission quietly at the
+    // bottom of the queue while fresh ones get picked up.
+    const early = new MongoArticleRepository({ db: mongo.db, clock: fixedClock(at('2026-08-01T00:00:00Z')) })
+    await early.save(article({ id: 'waiting', status: 'in_review' }))
+
+    const late = new MongoArticleRepository({ db: mongo.db, clock: fixedClock(at('2026-08-07T00:00:00Z')) })
+    await late.save(article({ id: 'fresh', status: 'in_review' }))
+
+    const page = await repo.listAwaitingReview({ limit: 10 })
+
+    expect(page.items.map((a) => a.id)).toEqual(['waiting', 'fresh'])
+  })
+
+  it('pages without repeating', async () => {
+    for (let i = 0; i < 5; i++) {
+      await repo.save(article({ id: `sub_${String(i)}`, status: 'in_review' }))
+    }
+
+    const first = await repo.listAwaitingReview({ limit: 3 })
+
+    expect(first.items).toHaveLength(3)
+    expect(first.nextCursor).not.toBeNull()
+  })
+
+  it('returns an empty queue without a cursor', async () => {
+    const page = await repo.listAwaitingReview({ limit: 10 })
+
+    expect(page.items).toEqual([])
+    expect(page.nextCursor).toBeNull()
+  })
+})
+
 describe('listAuthoredBy', () => {
   it('returns only that author, newest first', async () => {
     const mine = new MongoArticleRepository({ db: mongo.db, clock: fixedClock(at('2026-08-01T00:00:00Z')) })

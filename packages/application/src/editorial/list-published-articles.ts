@@ -1,6 +1,6 @@
 import { type Article, type CategoryId, isPubliclyVisible } from '@kurasikapa/domain'
 import type { ArticleRepository } from '../ports/article-repository'
-import type { Page } from '../ports/pagination'
+import { type Page, clampLimit } from '../ports/pagination'
 import type { UseCase } from '../ports/use-case'
 
 export interface ListPublishedArticlesDeps {
@@ -14,9 +14,7 @@ export interface ListPublishedArticlesInput {
   readonly limit?: number | undefined
 }
 
-/** A page of 12 fills the homepage rails and the category grid without a second request. */
-const DEFAULT_LIMIT = 12
-const MAX_LIMIT = 50
+const LIMITS = { fallback: 12, max: 50 }
 
 export class ListPublishedArticles
   implements UseCase<ListPublishedArticlesInput, Page<Article>>
@@ -28,7 +26,7 @@ export class ListPublishedArticles
       locale: input.locale,
       categoryId: input.categoryId,
       after: input.after,
-      limit: clampLimit(input.limit),
+      limit: clampLimit(input.limit, LIMITS),
     })
 
     // Belt and braces: the repository filters, and so do we. A reader must
@@ -43,9 +41,3 @@ export class ListPublishedArticles
  * `limit` reaches this from a query string. Unclamped, a caller could ask for
  * every article ever published in one request.
  */
-function clampLimit(requested: number | undefined): number {
-  if (requested === undefined) return DEFAULT_LIMIT
-  if (!Number.isInteger(requested) || requested < 1) return DEFAULT_LIMIT
-
-  return Math.min(requested, MAX_LIMIT)
-}

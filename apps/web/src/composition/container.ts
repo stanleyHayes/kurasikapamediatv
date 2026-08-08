@@ -15,6 +15,7 @@ import {
   GetPublishedArticle,
   type IdPort,
   ListAuthoredArticles,
+  ListAwaitingReview,
   ListPublishedArticles,
   PublishArticle,
   PublishDueArticles,
@@ -60,6 +61,7 @@ export interface Container {
   readonly listPublishedArticles: ListPublishedArticles
   readonly listAuthoredArticles: ListAuthoredArticles
   readonly getDraft: GetDraft
+  readonly listAwaitingReview: ListAwaitingReview
   readonly resolveActor: ResolveActor
 
   // Ports exposed for interactive use (AI streams straight to the editor)
@@ -106,6 +108,7 @@ export function buildContainer(infra: Infrastructure): Container {
     listPublishedArticles: new ListPublishedArticles({ articles }),
     listAuthoredArticles: new ListAuthoredArticles({ articles }),
     getDraft: new GetDraft({ articles, revisions }),
+    listAwaitingReview: new ListAwaitingReview({ articles }),
     resolveActor: new ResolveActor({ roles }),
 
     ai: infra.ai,

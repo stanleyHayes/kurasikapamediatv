@@ -43,6 +43,11 @@ export class InMemoryArticleRepository implements ArticleRepository {
     return Promise.resolve(paginate(matches, query))
   }
 
+  listAwaitingReview(cursor: Cursor): Promise<Page<Article>> {
+    const matches = this.all().filter((a) => a.status === 'in_review')
+    return Promise.resolve(paginate(matches, cursor))
+  }
+
   listDueForPublication(now: Date): Promise<readonly Article[]> {
     return Promise.resolve(this.all().filter((a) => a.isDueForPublication(now)))
   }

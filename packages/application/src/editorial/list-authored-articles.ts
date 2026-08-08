@@ -1,6 +1,6 @@
 import type { Actor, Article } from '@kurasikapa/domain'
 import type { ArticleRepository } from '../ports/article-repository'
-import type { Page } from '../ports/pagination'
+import { type Page, clampLimit } from '../ports/pagination'
 import type { UseCase } from '../ports/use-case'
 
 export interface ListAuthoredArticlesDeps {
@@ -13,8 +13,7 @@ export interface ListAuthoredArticlesInput {
   readonly limit?: number | undefined
 }
 
-const DEFAULT_LIMIT = 25
-const MAX_LIMIT = 100
+const LIMITS = { fallback: 25, max: 100 }
 
 /**
  * "My drafts" in the CMS.
@@ -28,18 +27,16 @@ export class ListAuthoredArticles
 {
   constructor(private readonly deps: ListAuthoredArticlesDeps) {}
 
-  execute(input: ListAuthoredArticlesInput): Promise<Page<Article>> {
-    return this.deps.articles.listAuthoredBy({
+  /** async for the same reason as ListAwaitingReview: a sync throw from a
+   * method typed `Promise<T>` escapes `.catch()`. */
+  async execute(input: ListAuthoredArticlesInput): Promise<Page<Article>> {
+    const page = await this.deps.articles.listAuthoredBy({
       authorId: input.actor.id,
       after: input.after,
-      limit: clampLimit(input.limit),
+      limit: clampLimit(input.limit, LIMITS),
     })
+
+    return page
   }
 }
 
-function clampLimit(requested: number | undefined): number {
-  if (requested === undefined) return DEFAULT_LIMIT
-  if (!Number.isInteger(requested) || requested < 1) return DEFAULT_LIMIT
-
-  return Math.min(requested, MAX_LIMIT)
-}

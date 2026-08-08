@@ -18,6 +18,8 @@ export async function ensureIndexes(db: Db): Promise<void> {
     { key: { status: 1, publishedAt: -1, _id: -1 }, name: 'published_recent' },
     { key: { categoryId: 1, status: 1, publishedAt: -1, _id: -1 }, name: 'category_published' },
     { key: { tagIds: 1, status: 1, publishedAt: -1 }, name: 'tag_published' },
+    // The review queue: one status, oldest first.
+    { key: { status: 1, updatedAt: 1, _id: 1 }, name: 'awaiting_review' },
     // "My drafts" in the CMS.
     { key: { authorId: 1, status: 1, updatedAt: -1 }, name: 'author_recent' },
     // The publishing cron scans only scheduled articles, so the index is partial.

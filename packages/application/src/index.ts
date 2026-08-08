@@ -24,7 +24,7 @@ export type {
   AuthoredQuery,
   PublishedQuery,
 } from './ports/article-repository'
-export type { Cursor, Page } from './ports/pagination'
+export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pagination'
 export type { RevisionRepository } from './ports/revision-repository'
 export type { RoleRepository } from './ports/role-repository'
 export {
@@ -68,6 +68,11 @@ export {
   type GetDraftDeps,
   type GetDraftInput,
 } from './editorial/get-draft'
+export {
+  ListAwaitingReview,
+  type ListAwaitingReviewDeps,
+  type ListAwaitingReviewInput,
+} from './editorial/list-awaiting-review'
 export {
   ListAuthoredArticles,
   type ListAuthoredArticlesDeps,
