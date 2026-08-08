@@ -95,6 +95,13 @@ export default tseslint.config(
     },
   },
 
+  // NOTE: eslint-plugin-react-hooks is deliberately absent. It pulls a Babel
+  // subtree that fails our pnpm trust policy, and that policy has already
+  // caught two real supply-chain signals on this project. Two lint rules do
+  // not outweigh it. Hooks are instead written so they need no escape hatch —
+  // see useAutosave, whose dependency array is fixed-size by construction.
+  // Revisit if the plugin's dependency tree becomes attested.
+
   // The inner rings never touch the clock, in any form.
   {
     files: ['packages/domain/src/**/*.ts', 'packages/application/src/**/*.ts'],

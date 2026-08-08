@@ -1,6 +1,7 @@
 import { COVERAGE_FLOORS, baseConfig } from '@kurasikapa/config/vitest'
+import { defineConfig, mergeConfig } from 'vitest/config'
 
-export default baseConfig(COVERAGE_FLOORS.web, [
+const base = baseConfig(COVERAGE_FLOORS.web, [
   // `use cache` is a compiler directive. These functions only exist as written
   // once Next has transformed them, so they cannot run under a plain Vitest
   // process. They are covered by the Playwright journeys instead.
@@ -13,10 +14,24 @@ export default baseConfig(COVERAGE_FLOORS.web, [
   // next/headers only resolves inside a request. The branch that matters —
   // roles resolving to an Actor — is tested in the application layer.
   'src/composition/actor.ts',
-  // Server Actions and the subscriber wiring only run inside Next. The logic
-  // they carry lives in schemas.ts, result.ts and cache-invalidation.ts, each
-  // fully covered here.
+  // Server Actions and subscriber wiring only run inside Next. Their logic
+  // lives in schemas.ts, result.ts and cache-invalidation.ts, all covered here.
   'src/actions/editorial.ts',
   'src/actions/ai.ts',
   'src/composition/subscribers.ts',
+  // Presentational only — no branching worth a unit test. Covered by the
+  // Playwright journeys, which is where markup belongs under test.
+  'src/components/**/*.tsx',
 ])
+
+export default mergeConfig(
+  base,
+  defineConfig({
+    test: {
+      // Hooks need a DOM. Unit tests do not, but one environment for the
+      // package is simpler than two projects for the sake of a few files.
+      environment: 'happy-dom',
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    },
+  }),
+)

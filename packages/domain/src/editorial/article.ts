@@ -100,6 +100,18 @@ export class Article {
     return this.props.publishedAt !== null
   }
 
+  /**
+   * May this actor see the article's unpublished text?
+   *
+   * Separate from editability: a published article can be read in the CMS but
+   * not edited directly. An unpublished draft is confidential until the
+   * newsroom decides otherwise.
+   */
+  assertReadableBy(actor: Actor): void {
+    requirePermission(actor, 'article:edit_own')
+    this.guardOwnership(actor)
+  }
+
   private guardEditable(actor: Actor): void {
     requirePermission(actor, 'article:edit_own')
     this.guardOwnership(actor)

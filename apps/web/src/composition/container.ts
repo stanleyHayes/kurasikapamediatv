@@ -11,6 +11,7 @@ import {
   type ClockPort,
   CreateDraft,
   type EventBusPort,
+  GetDraft,
   GetPublishedArticle,
   type IdPort,
   ListAuthoredArticles,
@@ -58,6 +59,7 @@ export interface Container {
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
   readonly listAuthoredArticles: ListAuthoredArticles
+  readonly getDraft: GetDraft
   readonly resolveActor: ResolveActor
 
   // Ports exposed for interactive use (AI streams straight to the editor)
@@ -103,6 +105,7 @@ export function buildContainer(infra: Infrastructure): Container {
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
     listAuthoredArticles: new ListAuthoredArticles({ articles }),
+    getDraft: new GetDraft({ articles, revisions }),
     resolveActor: new ResolveActor({ roles }),
 
     ai: infra.ai,

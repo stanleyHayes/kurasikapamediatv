@@ -57,6 +57,28 @@ Implement against those designs. Do not invent new visual direction.
 
 `cookies()`, `headers()` and `searchParams` may **never** appear inside `'use cache'`. Read them in the dynamic shell and pass them as arguments.
 
+### The rule that has bitten us three times
+
+**Any request-scoped read belongs INSIDE a `<Suspense>` boundary, never above one.** That includes `await params` on a dynamic segment, `cookies()`, `headers()`, and anything that reads the session.
+
+Reading above the boundary blocks the prerendered shell, and the build fails with *"Uncached data was accessed outside of `<Suspense>`"*. It has caught us on the article page (`await params` for `[slug]`), the studio layout (session), and would have shipped as "the site feels slow" if the build were not a gate.
+
+The shape that works — pass the promise down rather than awaiting it:
+
+```tsx
+export default function Page({ params }: Params) {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <Body params={params} />   {/* awaits inside */}
+    </Suspense>
+  )
+}
+```
+
+For a layout guarding its children, wrap `children` rather than running the check above them. A Server Component's children are elements, not results, so the page below only executes once the guard admits it.
+
+Also: reading the clock (`new Date()`) in a Server Component is a prerender error for the same reason — a prerendered page has no "now". Put it behind `'use cache'` with a `cacheLife`, as `SiteFooter` does.
+
 Publishing calls `updateTag('article-{id}')` and `revalidateTag('homepage')` from the Server Action, so breaking news is live within the request.
 
 ## Version pins that will bite you
@@ -64,14 +86,14 @@ Publishing calls `updateTag('article-{id}')` and `revalidateTag('homepage')` fro
 | Package | Pinned | Why |
 |---|---|---|
 | `typescript` | 5.9.3 | `typescript-eslint@8` peers `<6.1.0`. TS 7 kills type-aware linting. |
-| `mongodb` | 6.21.0 | `@auth/mongodb-adapter@3` peers `^6`. v7 breaks Auth.js. |
+| `mongodb` | 6.21.0 | Deliberate, not forced. adapter-mongo is written against v6. |
 
 Do not "upgrade to latest". Check the peer range first — [ADR-0007](docs/decisions/adr-0007-toolchain-pins.md).
 
 ## Product rules that are not negotiable
 
 1. **No AI output is persisted or published without a named human approver.** Every `AiPort` method returns a proposal. This is an editorial-integrity requirement, not a UX preference.
-2. **Authorisation lives in the domain.** Auth.js says who someone is; `packages/domain/identity` decides what they may do. A UI role check is cosmetic and is never the control.
+2. **Authorisation lives in the domain.** Better Auth says who someone is; `packages/domain/identity` decides what they may do. A UI role check is cosmetic and is never the control. Roles are read on every request, never carried in the session token, so a revocation lands immediately.
 3. **Locale is data.** A French article is its own document with its own slug, byline and publish state — not a field on the English one.
 4. **Audit and insight collections are append-only.** No updates, no deletes.
 
