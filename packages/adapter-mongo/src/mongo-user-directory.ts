@@ -1,16 +1,28 @@
 import type { Cursor, DirectoryUser, Page, UserDirectory } from '@kurasikapa/application'
 import { ROLES, type Role, userId } from '@kurasikapa/domain'
-import type { Collection, Db } from 'mongodb'
+import { ObjectId, type Collection, type Db } from 'mongodb'
 import { ROLE_ASSIGNMENTS, type RoleAssignmentDocument } from './documents'
 
 /** Better Auth owns this collection and its shape. We only ever read it. */
 const USERS = 'user'
 
+/**
+ * `_id` is an ObjectId, not a string.
+ *
+ * Better Auth lets Mongo mint the key, so the driver hands back an ObjectId
+ * while its API reports `user.id` as the hex string. This interface once
+ * claimed `string`; TypeScript then happily compared an ObjectId against a
+ * hex string, every role lookup missed, and users appeared with no roles at
+ * all. Typing it truthfully is what forces the conversions below.
+ */
 interface AuthUserDocument {
-  _id: string
+  _id: ObjectId
   email: string
   name: string
 }
+
+/** The id shape the rest of the system uses: Better Auth's `user.id`. */
+const hex = (id: ObjectId): string => id.toHexString()
 
 const KNOWN: ReadonlySet<string> = new Set(ROLES)
 
@@ -32,7 +44,11 @@ export class MongoUserDirectory implements UserDirectory {
   }
 
   async list(cursor: Cursor): Promise<Page<DirectoryUser>> {
-    const filter = cursor.after === undefined ? {} : { _id: { $gt: cursor.after } }
+    // The cursor travels as a hex string, so it has to become an ObjectId
+    // again to compare against the stored key. ObjectIds sort by their leading
+    // timestamp, which keeps keyset pagination stable.
+    const filter =
+      cursor.after === undefined ? {} : { _id: { $gt: ObjectId.createFromHexString(cursor.after) } }
 
     const docs = await this.users
       .find(filter)
@@ -42,19 +58,20 @@ export class MongoUserDirectory implements UserDirectory {
 
     const page = docs.slice(0, cursor.limit)
     const hasMore = docs.length > cursor.limit
+    const last = page.at(-1)
 
     // One query for the page's roles rather than one per user: a 200-row
     // directory would otherwise be 201 round trips.
-    const roles = await this.rolesFor(page.map((d) => d._id))
+    const roles = await this.rolesFor(page.map((d) => hex(d._id)))
 
     return {
       items: page.map((doc) => ({
-        id: userId(doc._id),
+        id: userId(hex(doc._id)),
         email: doc.email,
         name: doc.name,
-        roles: roles.get(doc._id) ?? [],
+        roles: roles.get(hex(doc._id)) ?? [],
       })),
-      nextCursor: hasMore ? (page.at(-1)?._id ?? null) : null,
+      nextCursor: hasMore && last !== undefined ? hex(last._id) : null,
     }
   }
 

@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb'
+import { MongoClient, type ObjectId } from 'mongodb'
 
 /**
  * Local shapes, not the adapter's.
@@ -118,15 +118,21 @@ export async function seedEditor(baseUrl: string): Promise<void> {
     throw new Error(`sign-up failed (${String(response.status)}) at ${baseUrl}: ${body}`)
   }
 
+  // Better Auth stores `user._id` as an ObjectId. The annotation here used to
+  // claim `string`, so TypeScript accepted copying it straight into the role
+  // assignment — and Mongo stored an ObjectId key that the app, which looks
+  // roles up by the session's hex string, could never match. The editor
+  // resolved with no roles and was bounced out of the studio.
   const created = await db
-    .collection<{ _id: string; email: string }>('user')
+    .collection<{ _id: ObjectId; email: string }>('user')
     .findOne({ email: EDITOR.email })
   if (created === null) throw new Error('editor was not created')
 
-  // Roles are ours, not the library's — see ADR-0004.
+  // Roles are ours, not the library's — see ADR-0004. The id must be the same
+  // string shape the session carries.
   await db
     .collection('role_assignments')
-    .insertOne({ _id: created._id, roles: ['editor'] } as never)
+    .insertOne({ _id: created._id.toHexString(), roles: ['editor'] } as never)
 
   await client.close()
 }

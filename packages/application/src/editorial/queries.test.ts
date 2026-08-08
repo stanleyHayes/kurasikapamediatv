@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import type { PublishedQuery } from '../ports/article-repository'
 import type { Page } from '../ports/pagination'
 import { InMemoryArticleRepository } from '../testing/in-memory-article-repository'
+import { InMemoryRevisionRepository } from '../testing/in-memory-revision-repository'
 import { GetPublishedArticle } from './get-published-article'
 import { ListPublishedArticles } from './list-published-articles'
 
@@ -16,16 +17,16 @@ describe('GetPublishedArticle', () => {
   it('returns a published article', async () => {
     const articles = repoWith(anArticle({ status: 'published', publishedAt: NOW }))
 
-    const found = await new GetPublishedArticle({ articles }).execute({
+    const found = await new GetPublishedArticle({ articles, revisions: new InMemoryRevisionRepository() }).execute({
       slug: 'budget-2026',
       locale: 'en',
     })
 
-    expect(found?.id).toBe('art_1')
+    expect(found?.article.id).toBe('art_1')
   })
 
   it('returns null when nothing matches', async () => {
-    const found = await new GetPublishedArticle({ articles: repoWith() }).execute({
+    const found = await new GetPublishedArticle({ articles: repoWith(), revisions: new InMemoryRevisionRepository() }).execute({
       slug: 'nope',
       locale: 'en',
     })
@@ -36,7 +37,7 @@ describe('GetPublishedArticle', () => {
   it('does not cross locales', async () => {
     const articles = repoWith(anArticle({ status: 'published', publishedAt: NOW }))
 
-    const found = await new GetPublishedArticle({ articles }).execute({
+    const found = await new GetPublishedArticle({ articles, revisions: new InMemoryRevisionRepository() }).execute({
       slug: 'budget-2026',
       locale: 'fr',
     })
@@ -52,7 +53,7 @@ describe('GetPublishedArticle', () => {
       // and it is tested without a database.
       const articles = repoWith(anArticle({ status }))
 
-      const found = await new GetPublishedArticle({ articles }).execute({
+      const found = await new GetPublishedArticle({ articles, revisions: new InMemoryRevisionRepository() }).execute({
         slug: 'budget-2026',
         locale: 'en',
       })

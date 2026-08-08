@@ -98,7 +98,11 @@ module.exports = {
       path: '(\\.test\\.ts$|\\.spec\\.ts$|/testing/|^(packages|apps)/[^/]+/(dist|coverage|\\.next)/)',
     },
     tsPreCompilationDeps: true,
-    tsConfig: { fileName: 'tsconfig.json' },
+    // The web app's `@/*` mapping lives in apps/web/tsconfig.json. Reading
+    // only the root one left every app-internal import unresolved, so the
+    // app's own module graph was invisible here and a component imported
+    // solely through `@/` looked like an orphan.
+    tsConfig: { fileName: 'tsconfig.depcruise.json' },
     enhancedResolveOptions: {
       exportsFields: ['exports'],
       conditionNames: ['import', 'require', 'node', 'default', 'types'],

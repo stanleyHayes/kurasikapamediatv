@@ -10,9 +10,7 @@
     "readMore": "Read more"
   },
   "article": {
-    "published": "Published",
-    "by": "By",
-    "backToHome": "Back to home"
+    "by": "By"
   },
   "error": {
     "notFound": "That article is not here",

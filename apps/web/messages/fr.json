@@ -10,9 +10,7 @@
     "readMore": "Lire la suite"
   },
   "article": {
-    "published": "Publié le",
-    "by": "Par",
-    "backToHome": "Retour à l'accueil"
+    "by": "Par"
   },
   "error": {
     "notFound": "Cet article est introuvable",

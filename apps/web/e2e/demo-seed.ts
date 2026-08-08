@@ -44,6 +44,34 @@ const STORIES: Story[] = [
 // eslint-disable-next-line no-restricted-properties
 const at = (daysAgo: number): Date => new Date(Date.now() - daysAgo * 86_400_000)
 
+/**
+ * Demo prose.
+ *
+ * Deliberately generic and clearly placeholder in substance — this is seed
+ * data for a demo environment, and inventing plausible-looking reporting
+ * attributed to a real newsroom would be a liability the moment a screenshot
+ * escapes. Length is realistic so the layout and the reading-time estimate
+ * are exercised honestly.
+ */
+function bodyFor(story: Story): string {
+  const lead =
+    story.locale === 'fr'
+      ? `Contenu de démonstration pour « ${story.title} ». Ce texte occupe la place de l'article réel afin de valider la mise en page.`
+      : `Demonstration copy for "${story.title}". This text stands in for the real article so the layout can be reviewed.`
+
+  const paragraph =
+    story.locale === 'fr'
+      ? "Chaque paragraphe provient de la révision approuvée de l'article, et non d'un champ de l'article lui-même. Une correction en cours de rédaction reste donc invisible pour le lecteur jusqu'à son approbation."
+      : 'Each paragraph comes from the article\'s approved revision rather than a field on the article itself. A correction still being drafted therefore stays invisible to readers until it is approved.'
+
+  const close =
+    story.locale === 'fr'
+      ? "Remplacez ce contenu par la copie éditoriale réelle avant toute démonstration publique."
+      : 'Replace this content with real editorial copy before any public demonstration.'
+
+  return [lead, paragraph, paragraph, close].join('\n\n')
+}
+
 async function main(): Promise<void> {
   const client = new MongoClient(URI)
   await client.connect()
@@ -70,6 +98,22 @@ async function main(): Promise<void> {
     publishedAt: s.status === undefined ? at(s.daysAgo) : null,
     updatedAt: at(s.daysAgo),
   }))
+
+  // Every article claims an approvedRevisionId, so the revision it names has
+  // to exist — the reader's body text comes from the approved revision, not
+  // from a field on the article. Seeding one without the other left the demo
+  // showing "no text yet" on every story.
+  await db.collection('article_revisions').insertMany(
+    STORIES.map((s) => ({
+      _id: `rev_${s.id}`,
+      articleId: s.id,
+      seq: 1,
+      title: s.title,
+      body: bodyFor(s),
+      authorId: 'usr_demo_author',
+      createdAt: at(s.daysAgo),
+    })) as never[],
+  )
 
   await db.collection('articles').insertMany(articles as never[])
   await db.collection('articles').createIndex(

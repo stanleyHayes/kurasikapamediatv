@@ -30,13 +30,17 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
   webServer: {
-    command: `pnpm exec next start --port ${String(PORT)}`,
+    // Builds first, deliberately. `next start` serves whatever is already in
+    // .next, so without this the suite silently tests a stale build — the same
+    // failure mode as reusing a foreign server, and harder to notice because
+    // the tests still pass, just against the wrong code.
+    command: `pnpm exec next build && pnpm exec next start --port ${String(PORT)}`,
     url: BASE_URL,
     // Never reuse. A stale or foreign server on this port would be tested
     // instead of the build under test — which is exactly what happened the
     // first time these journeys ran.
     reuseExistingServer: false,
-    timeout: 120_000,
+    timeout: 300_000,
     env: {
       MONGODB_URI: process.env['MONGODB_URI'] ?? 'mongodb://127.0.0.1:37017/kurasikapa_e2e?directConnection=true',
       MONGODB_DB: 'kurasikapa_e2e',

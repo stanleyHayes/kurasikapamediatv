@@ -18,16 +18,23 @@ export const articleTag = (id: string): string => `article-${id}`
 export const listTag = (locale: string): string => `articles-${locale}`
 export const sectionTag = (slug: string, locale: string): string => `section-${locale}-${slug}`
 
-export async function cachedArticle(slug: string, locale: string): Promise<ArticleView | null> {
+export interface ReadableArticle extends ArticleView {
+  readonly body: string | null
+}
+
+export async function cachedArticle(
+  slug: string,
+  locale: string,
+): Promise<ReadableArticle | null> {
   'use cache'
   cacheLife('hours')
   cacheTag(listTag(locale))
 
-  const article = await container().getPublishedArticle.execute({ slug, locale })
-  if (article === null) return null
+  const found = await container().getPublishedArticle.execute({ slug, locale })
+  if (found === null) return null
 
-  cacheTag(articleTag(article.id))
-  return toArticleView(article)
+  cacheTag(articleTag(found.article.id))
+  return { ...toArticleView(found.article), body: found.body }
 }
 
 export interface ArticleListView {
@@ -65,5 +72,35 @@ export async function cachedSection(slug: string, locale: string): Promise<Secti
   return {
     name: result.category.nameIn(locale),
     articles: result.articles.items.map(toArticleView),
+  }
+}
+
+/**
+ * Key Takeaways for the reader-facing AI panel.
+ *
+ * Cached under the article's own tag, so the model runs once per published
+ * version and republishing regenerates it — not once per page view. A news
+ * site's traffic is overwhelmingly reads of the same few stories; billing an
+ * Anthropic call against each one would be indefensible.
+ *
+ * Returns null rather than throwing when the model is unreachable or no key
+ * is configured. Takeaways are an enhancement; an article that cannot be read
+ * because a summariser was down would be a worse failure than no summary.
+ */
+export async function cachedTakeaways(
+  articleId: string,
+  title: string,
+  body: string,
+  locale: string,
+): Promise<readonly string[] | null> {
+  'use cache'
+  cacheLife('days')
+  cacheTag(articleTag(articleId))
+
+  try {
+    const summary = await container().ai.summarise({ title, body, locale })
+    return summary.bullets.length > 0 ? summary.bullets : null
+  } catch {
+    return null
   }
 }

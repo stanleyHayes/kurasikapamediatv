@@ -110,6 +110,7 @@ export {
   GetPublishedArticle,
   type GetPublishedArticleDeps,
   type GetPublishedArticleInput,
+  type PublishedArticle,
 } from './editorial/get-published-article'
 export {
   ListPublishedArticles,

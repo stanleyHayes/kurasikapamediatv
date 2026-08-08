@@ -134,7 +134,7 @@ export function buildContainer(infra: Infrastructure): Container {
     removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
     listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
 
-    getPublishedArticle: new GetPublishedArticle({ articles }),
+    getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
     browseCategory: new BrowseCategory({ categories, articles }),
     listSections: new ListSections({ categories }),

@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
-import { Link } from '@/i18n/navigation'
+import { ArticleBody } from '@/components/article/article-body'
+import { ArticleHeader } from '@/components/article/article-header'
+import { ReadingPanel } from '@/components/article/reading-panel'
+import { ShareButton } from '@/components/article/share-button'
+import { SaveControl } from '@/components/article/save-control'
 import { env } from '@/composition/env'
 import { cachedArticle } from '@/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
@@ -63,7 +67,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default function ArticlePage({ params }: Params): React.ReactElement {
   return (
     <Suspense fallback={<ArticleSkeleton />}>
-      <ArticleBody params={params} />
+      <Story params={params} />
     </Suspense>
   )
 }
@@ -77,7 +81,7 @@ function ArticleSkeleton(): React.ReactElement {
   )
 }
 
-async function ArticleBody({ params }: Params): Promise<React.ReactElement> {
+async function Story({ params }: Params): Promise<React.ReactElement> {
   const { locale, slug } = await params
   setRequestLocale(locale)
 
@@ -86,8 +90,6 @@ async function ArticleBody({ params }: Params): Promise<React.ReactElement> {
   // draft is indistinguishable from a missing one. That is deliberate: a 403
   // would confirm the article exists.
   if (article === null) notFound()
-
-  const t = await getTranslations('article')
 
   const canonical = `${env().APP_URL}/${locale}/articles/${article.slug}`
   const jsonLd = newsArticleJsonLd(
@@ -105,38 +107,41 @@ async function ArticleBody({ params }: Params): Promise<React.ReactElement> {
         dangerouslySetInnerHTML={{ __html: asScriptContent(jsonLd) }}
       />
 
-      <div className="text-label-bold text-secondary mb-4 uppercase">
-        {article.categoryId.replace(/^cat_/u, '')}
-      </div>
-
-      <h1 className="font-display text-on-surface max-w-3xl text-[length:var(--text-display-lg)] leading-[1.1] font-bold tracking-[-0.02em]">
-        {article.title}
-      </h1>
-
-      {article.publishedAt !== null && (
-        <p className="text-on-surface-variant mt-6 text-sm">
-          {t('published')}{' '}
-          <time dateTime={article.publishedAt}>
-            {new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
-              new Date(article.publishedAt),
-            )}
-          </time>
-        </p>
-      )}
-
-      <hr className="border-outline-variant my-[var(--spacing-lg)]" />
+      <ArticleHeader article={article} body={article.body} />
 
       {/*
-        Body rendering lands with the markdown editor in the CMS slice — the
-        approved revision holds the prose, not a field on the article.
+        The design puts a full-bleed hero image here. Articles carry no image
+        reference until the media library lands in R3, and an empty 440px
+        panel reads as a broken image rather than as a slot — so the block is
+        omitted rather than stubbed. It returns with the media work.
       */}
 
-      <Link
-        href="/"
-        className="text-primary text-label-bold uppercase underline-offset-4 hover:underline"
-      >
-        {t('backToHome')}
-      </Link>
+      <div className="grid grid-cols-1 gap-[var(--spacing-md)] md:grid-cols-12">
+        <div className="md:col-span-2">
+          <div className="sticky top-28 flex flex-row items-center gap-3 md:flex-col md:items-start">
+            <Suspense fallback={null}>
+              <SaveControl articleId={article.id} />
+            </Suspense>
+            <ShareButton title={article.title} />
+          </div>
+        </div>
+
+        <div className="md:col-span-7 md:col-start-3">
+          {article.body !== null && (
+            <Suspense fallback={null}>
+              <ReadingPanel
+                articleId={article.id}
+                title={article.title}
+                body={article.body}
+                locale={locale}
+                slug={article.slug}
+              />
+            </Suspense>
+          )}
+
+          <ArticleBody body={article.body} />
+        </div>
+      </div>
     </article>
   )
 }

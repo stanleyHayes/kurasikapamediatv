@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@kurasikapa/domain": ["./packages/domain/src/index.ts"],
+      "@kurasikapa/domain/testing": ["./packages/domain/src/testing/builders.ts"],
+      "@kurasikapa/application": ["./packages/application/src/index.ts"],
+      "@kurasikapa/config/vitest": ["./packages/config/vitest.base.ts"],
+      "@/*": ["./apps/web/src/*"]
+    }
+  }
+}

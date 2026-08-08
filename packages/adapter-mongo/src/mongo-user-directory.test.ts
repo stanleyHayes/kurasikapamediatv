@@ -1,4 +1,5 @@
 import { userId } from '@kurasikapa/domain'
+import { ObjectId } from 'mongodb'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { MongoRoleRepository } from './mongo-role-repository'
 import { MongoUserDirectory } from './mongo-user-directory'
@@ -22,14 +23,23 @@ afterAll(async () => {
   await mongo.stop()
 })
 
+/** A deterministic, ascending 24-hex id, so paging order is predictable. */
+const oid = (n: number): string => String(n).padStart(24, '0')
+
 const addUser = async (id: string, email: string): Promise<void> => {
-  await mongo.db.collection('user').insertOne({ _id: id, email, name: email } as never)
+  // Better Auth lets Mongo mint the key, so these are ObjectIds — not the
+  // readable strings it would be tempting to use here. Seeding strings is what
+  // hid a real defect: the code compared an ObjectId to a hex string and
+  // always came up empty, and a test that seeded strings agreed with it.
+  await mongo.db
+    .collection('user')
+    .insertOne({ _id: ObjectId.createFromHexString(id), email, name: email })
 }
 
 describe('list', () => {
   it('returns users with the roles we hold for them', async () => {
-    await addUser('usr_1', 'editor@kurasikapa.tv')
-    await roles.replace(userId('usr_1'), ['editor'])
+    await addUser(oid(1), 'editor@kurasikapa.tv')
+    await roles.replace(userId(oid(1)), ['editor'])
 
     const page = await directory.list({ limit: 10 })
 
@@ -38,7 +48,7 @@ describe('list', () => {
   })
 
   it('returns an empty role list for a reader who has been granted nothing', async () => {
-    await addUser('usr_2', 'reader@example.com')
+    await addUser(oid(2), 'reader@example.com')
 
     const page = await directory.list({ limit: 10 })
 
@@ -46,10 +56,10 @@ describe('list', () => {
   })
 
   it('drops a stored role the platform no longer defines', async () => {
-    await addUser('usr_3', 'ghost@example.com')
+    await addUser(oid(3), 'ghost@example.com')
     await mongo.db
       .collection('role_assignments')
-      .insertOne({ _id: 'usr_3', roles: ['editor', 'chief_wizard'] } as never)
+      .insertOne({ _id: oid(3), roles: ['editor', 'chief_wizard'] } as never)
 
     const page = await directory.list({ limit: 10 })
 
@@ -57,7 +67,7 @@ describe('list', () => {
   })
 
   it('pages without repeating', async () => {
-    for (let i = 0; i < 5; i++) await addUser(`usr_${String(i)}`, `u${String(i)}@example.com`)
+    for (let i = 0; i < 5; i++) await addUser(oid(i), `u${String(i)}@example.com`)
 
     const first = await directory.list({ limit: 2 })
     const second = await directory.list({ limit: 2, after: first.nextCursor ?? undefined })
@@ -69,8 +79,8 @@ describe('list', () => {
   it('reads the roles for a page in one query, not one per user', async () => {
     // A 200-row directory would otherwise be 201 round trips.
     for (let i = 0; i < 3; i++) {
-      await addUser(`usr_${String(i)}`, `u${String(i)}@example.com`)
-      await roles.replace(userId(`usr_${String(i)}`), ['journalist'])
+      await addUser(oid(i), `u${String(i)}@example.com`)
+      await roles.replace(userId(oid(i)), ['journalist'])
     }
 
     const page = await directory.list({ limit: 10 })
