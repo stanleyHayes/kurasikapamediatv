@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { SignOutButton } from '@/components/auth/sign-out-button'
 import { currentActor } from '@/composition/actor'
 
 /**
@@ -50,9 +51,27 @@ async function RequireNewsroom({
   // Anyone who cannot draft has no business in a UI built for the newsroom.
   // This is convenience, not security: every action re-derives the Actor and
   // lets the domain decide, so a hand-crafted POST is refused regardless.
-  if (!actor?.can('article:draft')) redirect(`/${locale}`)
+  //
+  // Signed-out goes to sign-in; signed-in-but-unauthorised goes home. Sending
+  // the second case to sign-in would loop them through a form that cannot
+  // help — they are already who they are.
+  if (actor === null) redirect(`/${locale}/sign-in`)
+  if (!actor.can('article:draft')) redirect(`/${locale}`)
 
-  return children
+  return (
+    <>
+      {/*
+        Inside the boundary, not in the prerendered header. Two reasons: the
+        auth client executes during SSR and would make the shell depend on
+        request data, and "Sign out" has no meaning for a visitor who is not
+        signed in — which is exactly who sees a prerendered shell.
+      */}
+      <div className="mb-[var(--spacing-sm)] flex justify-end">
+        <SignOutButton />
+      </div>
+      {children}
+    </>
+  )
 }
 
 function ListSkeleton(): React.ReactElement {

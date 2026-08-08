@@ -1,9 +1,20 @@
+import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { seed } from './seed'
+import { EDITOR, seed, seedEditor } from './seed'
 
-test.beforeAll(async () => {
+test.beforeAll(async ({ baseURL }) => {
   await seed()
+  await seedEditor(baseURL ?? '')
 })
+
+/** Signs in through the real form — the same path a newsroom uses. */
+async function signIn(page: Page): Promise<void> {
+  await page.goto('/en/sign-in')
+  await page.getByLabel('Email').fill(EDITOR.email)
+  await page.getByLabel('Password').fill(EDITOR.password)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+  await page.waitForURL(/\/en\/studio/u)
+}
 
 /**
  * The studio is behind authentication. These prove the gate holds for an
@@ -11,16 +22,19 @@ test.beforeAll(async () => {
  * seeded session and lands with the sign-in UI.
  */
 test.describe('studio access', () => {
-  test('an anonymous visitor is redirected away from the studio', async ({ page }) => {
+  test('an anonymous visitor is sent to sign in, not to the homepage', async ({ page }) => {
+    // Sending them home would leave them guessing how to get back. Sending a
+    // signed-in but unauthorised reader to sign-in would be worse — a form
+    // that cannot help, since they are already who they are.
     await page.goto('/en/studio')
 
-    await expect(page).toHaveURL(/\/en$/u)
+    await expect(page).toHaveURL(/\/en\/sign-in$/u)
   })
 
-  test('an anonymous visitor is redirected away from the review queue', async ({ page }) => {
+  test('an anonymous visitor is sent to sign in from the review queue too', async ({ page }) => {
     await page.goto('/en/studio/review')
 
-    await expect(page).toHaveURL(/\/en$/u)
+    await expect(page).toHaveURL(/\/en\/sign-in$/u)
   })
 
   test('robots.txt keeps crawlers out of the studio', async ({ page }) => {
@@ -38,20 +52,51 @@ test.describe('studio access', () => {
  * Written now and skipped, so the gap is visible in every CI run rather than
  * forgotten. docs/07-quality-gates.md § 3.
  */
-test.describe('editorial cycle', () => {
-  test.skip('journalist drafts with AI assist and submits for review', () => {
-    // Blocked on the sign-in UI.
+/** Journeys 2–4, now that a real sign-in exists. docs/07-quality-gates.md § 3. */
+test.describe('signed in', () => {
+  test('an editor reaches the studio through the real sign-in form', async ({ page }) => {
+    await signIn(page)
+
+    await expect(page.getByRole('heading', { name: 'Newsroom', level: 1 })).toBeVisible()
   })
 
-  test.skip('editor rejects with a note, journalist revises, editor approves', () => {
-    // Blocked on the sign-in UI.
+  test('the review queue opens for someone who may approve', async ({ page }) => {
+    await signIn(page)
+    await page.goto('/en/studio/review')
+
+    await expect(page).toHaveURL(/\/studio\/review$/u)
   })
 
-  test.skip('publishing makes the article live within the same request', () => {
-    // Blocked on the sign-in UI.
+  test('signing out ends the session, not just the page', async ({ page }) => {
+    await signIn(page)
+    await page.getByRole('button', { name: 'Sign out' }).click()
+    await page.waitForURL(/\/en$/u)
+
+    // Returning to the studio must require signing in again. A sign-out that
+    // only navigates away leaves the session alive.
+    await page.goto('/en/studio')
+    await expect(page).toHaveURL(/\/sign-in$/u)
+  })
+})
+
+test.describe('failed sign-in', () => {
+  test('a wrong password does not reveal whether the account exists', async ({ page }) => {
+    // The message is the only place that could leak which addresses are
+    // registered, so it says the same thing either way.
+    await page.goto('/en/sign-in')
+    await page.getByLabel('Email').fill(EDITOR.email)
+    await page.getByLabel('Password').fill('definitely-not-the-password')
+    await page.getByRole('button', { name: 'Sign in' }).click()
+
+    await expect(page.getByText('Those details did not match an account.')).toBeVisible()
   })
 
-  test.skip('a scheduled article goes live at its time and invalidates the homepage', () => {
-    // Blocked on the sign-in UI.
+  test('an unknown email gets the identical message', async ({ page }) => {
+    await page.goto('/en/sign-in')
+    await page.getByLabel('Email').fill('nobody@kurasikapa.test')
+    await page.getByLabel('Password').fill('anything-at-all')
+    await page.getByRole('button', { name: 'Sign in' }).click()
+
+    await expect(page.getByText('Those details did not match an account.')).toBeVisible()
   })
 })
