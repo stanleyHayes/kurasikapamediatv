@@ -19,6 +19,7 @@ import {
   ListAuthoredArticles,
   BrowseCategory,
   ListAwaitingReview,
+  ListSections,
   SearchArticles,
   ListPublishedArticles,
   PublishArticle,
@@ -66,6 +67,7 @@ export interface Container {
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
   readonly browseCategory: BrowseCategory
+  readonly listSections: ListSections
   readonly listAuthoredArticles: ListAuthoredArticles
   readonly getDraft: GetDraft
   readonly listAwaitingReview: ListAwaitingReview
@@ -117,6 +119,7 @@ export function buildContainer(infra: Infrastructure): Container {
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
     browseCategory: new BrowseCategory({ categories, articles }),
+    listSections: new ListSections({ categories }),
     listAuthoredArticles: new ListAuthoredArticles({ articles }),
     getDraft: new GetDraft({ articles, revisions }),
     listAwaitingReview: new ListAwaitingReview({ articles }),

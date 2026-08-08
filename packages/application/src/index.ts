@@ -29,6 +29,11 @@ export type { RevisionRepository } from './ports/revision-repository'
 export type { CategoryRepository } from './ports/category-repository'
 export type { RoleRepository } from './ports/role-repository'
 export {
+  ListSections,
+  type ListSectionsDeps,
+  type ListSectionsInput,
+} from './editorial/list-sections'
+export {
   BrowseCategory,
   type BrowseCategoryDeps,
   type BrowseCategoryInput,

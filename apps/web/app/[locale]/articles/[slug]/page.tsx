@@ -3,7 +3,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Link } from '@/i18n/navigation'
+import { env } from '@/composition/env'
 import { cachedArticle } from '@/read-model/queries'
+import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
 
 interface Params {
   params: Promise<{ locale: string; slug: string }>
@@ -57,8 +59,22 @@ async function ArticleBody({ params }: Params): Promise<React.ReactElement> {
 
   const t = await getTranslations('article')
 
+  const canonical = `${env().APP_URL}/${locale}/articles/${article.slug}`
+  const jsonLd = newsArticleJsonLd(
+    article,
+    { name: 'Kurasikapa Media TV', url: env().APP_URL },
+    canonical,
+  )
+
   return (
     <article className="py-[var(--spacing-lg)]">
+      {/* Structured data for Google News and Discover. Escaped so a headline
+          cannot close the script block — see seo/json-ld.ts. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: asScriptContent(jsonLd) }}
+      />
+
       <div className="text-label-bold text-secondary mb-4 uppercase">
         {article.categoryId.replace(/^cat_/u, '')}
       </div>
