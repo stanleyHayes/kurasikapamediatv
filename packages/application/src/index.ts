@@ -27,7 +27,20 @@ export type {
 export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pagination'
 export type { RevisionRepository } from './ports/revision-repository'
 export type { CategoryRepository } from './ports/category-repository'
+export type { BookmarkRepository } from './ports/bookmark-repository'
 export type { RoleRepository } from './ports/role-repository'
+export {
+  SaveArticle,
+  type SaveArticleDeps,
+  type SaveArticleInput,
+} from './audience/save-article'
+export {
+  ListSavedArticles,
+  RemoveSavedArticle,
+  type ListSavedArticlesInput,
+  type RemoveSavedArticleInput,
+  type SavedArticlesDeps,
+} from './audience/manage-saved-articles'
 export type { DirectoryUser, UserDirectory } from './ports/user-directory'
 export {
   ListUsers,

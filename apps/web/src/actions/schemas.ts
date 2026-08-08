@@ -24,6 +24,8 @@ export const updateDraftSchema = z.object({
   body: z.string().max(200_000),
 })
 
+export const bookmarkSchema = z.object({ articleId: id })
+
 export const approveSchema = z.object({ articleId: id, revisionId: id })
 
 export const rejectSchema = z.object({

@@ -51,7 +51,17 @@ export interface CategoryDocument {
   order: number
 }
 
+export interface BookmarkDocument {
+  /** `${readerId}:${articleId}` — a reader cannot save the same article twice. */
+  _id: string
+  readerId: string
+  articleId: string
+  locale: string
+  savedAt: Date
+}
+
 export const ARTICLES = 'articles'
 export const REVISIONS = 'article_revisions'
 export const ROLE_ASSIGNMENTS = 'role_assignments'
 export const CATEGORIES = 'categories'
+export const BOOKMARKS = 'bookmarks'

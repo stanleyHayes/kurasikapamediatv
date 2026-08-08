@@ -29,6 +29,11 @@ export class InMemoryArticleRepository implements ArticleRepository {
     return Promise.resolve(match ?? null)
   }
 
+  findManyByIds(ids: readonly ArticleId[]): Promise<readonly Article[]> {
+    const wanted = new Set<string>(ids)
+    return Promise.resolve(this.all().filter((a) => wanted.has(a.id)))
+  }
+
   listPublished(query: PublishedQuery): Promise<Page<Article>> {
     const matches = this.all()
       .filter((a) => a.status === 'published' && a.locale === query.locale)

@@ -1,9 +1,11 @@
 import type { Db } from 'mongodb'
 import {
   ARTICLES,
+  BOOKMARKS,
   CATEGORIES,
   REVISIONS,
   type ArticleDocument,
+  type BookmarkDocument,
   type CategoryDocument,
   type RevisionDocument,
 } from './documents'
@@ -54,6 +56,11 @@ export async function ensureIndexes(db: Db): Promise<void> {
     { key: { 'slugs.fr': 1 }, unique: true, sparse: true, name: 'slug_fr_unique' },
     { key: { order: 1 }, name: 'nav_order' },
   ])
+
+  // The reader's own list, newest first. Reader-scoped by construction: there
+  // is no index that supports querying bookmarks without one.
+  const bookmarks = db.collection<BookmarkDocument>(BOOKMARKS)
+  await bookmarks.createIndexes([{ key: { readerId: 1, savedAt: -1, _id: -1 }, name: 'reader_recent' }])
 
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.

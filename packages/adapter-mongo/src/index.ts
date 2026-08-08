@@ -1,10 +1,12 @@
 export {
   ARTICLES,
   REVISIONS,
+  BOOKMARKS,
   CATEGORIES,
   ROLE_ASSIGNMENTS,
   type ArticleDocument,
   type RevisionDocument,
+  type BookmarkDocument,
   type CategoryDocument,
   type RoleAssignmentDocument,
 } from './documents'
@@ -24,3 +26,4 @@ export { MongoRoleRepository } from './mongo-role-repository'
 export { MongoTextSearch } from './mongo-text-search'
 export { MongoCategoryRepository } from './mongo-category-repository'
 export { MongoUserDirectory } from './mongo-user-directory'
+export { MongoBookmarkRepository } from './mongo-bookmark-repository'

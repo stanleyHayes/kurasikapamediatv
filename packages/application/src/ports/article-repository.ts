@@ -17,6 +17,11 @@ export interface AuthoredQuery extends Cursor {
 export interface ArticleRepository {
   findById(id: ArticleId): Promise<Article | null>
   findBySlug(slug: string, locale: string): Promise<Article | null>
+  /**
+   * Batch read for a saved list. One query for a page of bookmarks rather than
+   * one per bookmark — a 20-item list would otherwise be 21 round trips.
+   */
+  findManyByIds(ids: readonly ArticleId[]): Promise<readonly Article[]>
   listPublished(query: PublishedQuery): Promise<Page<Article>>
   listAuthoredBy(query: AuthoredQuery): Promise<Page<Article>>
   /**

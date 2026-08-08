@@ -34,6 +34,13 @@ export class MongoArticleRepository implements ArticleRepository {
     return doc === null ? null : articleToDomain(doc)
   }
 
+  async findManyByIds(ids: readonly ArticleId[]): Promise<readonly Article[]> {
+    if (ids.length === 0) return []
+
+    const docs = await this.articles.find({ _id: { $in: [...ids] } }).toArray()
+    return docs.map(articleToDomain)
+  }
+
   async listPublished(query: PublishedQuery): Promise<Page<Article>> {
     const filter: Filter<ArticleDocument> = { status: 'published', locale: query.locale }
     if (query.categoryId !== undefined) filter.categoryId = query.categoryId

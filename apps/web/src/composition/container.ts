@@ -1,6 +1,7 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
 import {
   MongoArticleRepository,
+  MongoBookmarkRepository,
   MongoCategoryRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
@@ -21,7 +22,10 @@ import {
   BrowseCategory,
   ListAwaitingReview,
   ListSections,
+  ListSavedArticles,
   ListUsers,
+  RemoveSavedArticle,
+  SaveArticle,
   SearchArticles,
   ListPublishedArticles,
   PublishArticle,
@@ -35,6 +39,7 @@ import {
 } from '@kurasikapa/application'
 import type {
   ArticleRepository,
+  BookmarkRepository,
   UserDirectory,
   CategoryRepository,
   SearchPort,
@@ -66,6 +71,9 @@ export interface Container {
   readonly publishDueArticles: PublishDueArticles
   readonly assignRoles: AssignRoles
   readonly listUsers: ListUsers
+  readonly saveArticle: SaveArticle
+  readonly removeSavedArticle: RemoveSavedArticle
+  readonly listSavedArticles: ListSavedArticles
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -104,6 +112,7 @@ export function buildContainer(infra: Infrastructure): Container {
   const roles: RoleRepository = new MongoRoleRepository(infra.db)
   const search: SearchPort = new MongoTextSearch(infra.db)
   const users: UserDirectory = new MongoUserDirectory(infra.db)
+  const bookmarks: BookmarkRepository = new MongoBookmarkRepository(infra.db)
   const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
 
   const { clock, ids, events } = infra
@@ -121,6 +130,9 @@ export function buildContainer(infra: Infrastructure): Container {
     publishDueArticles: new PublishDueArticles(write),
     assignRoles: new AssignRoles({ roles, clock, events }),
     listUsers: new ListUsers({ users }),
+    saveArticle: new SaveArticle({ bookmarks, articles, clock }),
+    removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
+    listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
 
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),

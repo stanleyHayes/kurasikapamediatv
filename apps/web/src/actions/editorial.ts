@@ -14,7 +14,7 @@ import {
   unpublishSchema,
   updateDraftSchema,
 } from './schemas'
-import { assignRolesSchema } from './schemas'
+import { assignRolesSchema, bookmarkSchema } from './schemas'
 
 /**
  * The editorial Server Actions.
@@ -182,5 +182,28 @@ export async function assignRolesAction(
     })
 
     return { roles: result.roles }
+  })
+}
+
+/**
+ * Saving is a reader action, not an editorial one — but it lives here because
+ * the file is "Server Actions", not "editorial". Any signed-in reader may
+ * save; the scoping to `actor.id` in the use case is what protects one
+ * reader's list from another.
+ */
+export async function toggleSavedAction(
+  input: unknown,
+  saved: boolean,
+): Promise<ActionResult<{ saved: boolean }>> {
+  return attempt(async () => {
+    const { articleId } = parseInput(bookmarkSchema, input)
+    const actor = await requireActor()
+    const target = articleId as ArticleId
+
+    const result = saved
+      ? await container().removeSavedArticle.execute({ actor, articleId: target })
+      : await container().saveArticle.execute({ actor, articleId: target })
+
+    return { saved: result.saved }
   })
 }

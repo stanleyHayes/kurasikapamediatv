@@ -46,3 +46,4 @@ export {
   userId,
 } from './shared/ids'
 export { InvalidSlug, Slug } from './shared/slug'
+export { Bookmark, CannotSaveUnpublished, type BookmarkProps } from './audience/bookmark'
