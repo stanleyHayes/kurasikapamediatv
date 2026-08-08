@@ -1,3 +1,23 @@
+export type {
+  AiPort,
+  ArticleContext,
+  BulletRequest,
+  CategoryOption,
+  CategoryRequest,
+  CategorySuggestion,
+  DraftRequest,
+  FactCheckNote,
+  Headline,
+  RewriteRequest,
+  SeoSuggestion,
+  Summary,
+  TagSuggestion,
+  Tone,
+  ToneRequest,
+  TranslateRequest,
+  TranslatedArticle,
+} from './ports/ai.js'
+export type { EmbeddingPort } from './ports/embedding.js'
 export type { ClockPort, DomainEvent, EventBusPort, IdPort } from './ports/ambient.js'
 export type {
   ArticleRepository,

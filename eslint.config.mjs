@@ -64,6 +64,13 @@ export default tseslint.config(
         { allowExpressions: true, allowTypedFunctionExpressions: true },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
+      // A leading underscore marks a parameter that exists to satisfy a
+      // signature — common when implementing an interface method that
+      // genuinely ignores an argument.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',

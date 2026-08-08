@@ -13,6 +13,26 @@ Sixteen AI features are ticked: draft from prompt, draft from bullets, rewrite, 
 
 Two capabilities are not text and get their own ports in R3, decided then: text-to-speech (article-to-audio) and speech-to-text (voice-to-article).
 
+### Embeddings are a separate port, and a separate provider
+
+**Anthropic ships no embedding model.** This was found while building the adapter, not while planning it. `AiPort` therefore has no `embed()` method; `EmbeddingPort` is its own interface in `packages/application/src/ports/embedding.ts`, deliberately unimplemented.
+
+That matters because two ticked features depend on it — AI semantic search and recommended articles, both via Atlas Vector Search. Both land in **R2**, so the provider decision (Voyage, OpenAI, Cohere, or Atlas-managed embeddings) is deferred to the R2 planning gate rather than guessed now. `EmbeddingPort.dimensions` is part of the contract because it must match `numDimensions` on the Atlas index — a mismatch degrades result quality silently rather than erroring.
+
+### Model routing
+
+One provider, three tiers, routed per task in `packages/adapter-anthropic/src/models.ts`:
+
+| Tier | Model | Tasks |
+|---|---|---|
+| best | `claude-opus-5` | fact-checking — a miss here is a correction, not an annoyance |
+| balanced | `claude-sonnet-5` | drafting, rewriting, headlines, translation — editors read every word |
+| cheap | `claude-haiku-4-5` | SEO, tagging, category detection, summaries — mechanical work |
+
+Per-task overrides are config, not code, so a tier can be re-pointed without a deploy. Auto-tagging every wire story on a frontier model is how AI quietly becomes the platform's largest line item.
+
+**Naming trap:** the direct provider hyphenates versions (`claude-haiku-4-5`); AI Gateway uses a namespace and dots (`anthropic/claude-haiku-4.5`). We are on the direct provider, so hyphens are correct — `tsc` checks the ids against the provider's own union type. Linters tuned for Gateway slugs report a false positive here.
+
 ## Consequences
 
 **Good.** One vendor relationship. Provider-specific behaviour — prompt shape, token accounting, retries, refusals — is isolated in `adapter-anthropic`. Streaming is exposed to the application as `AsyncIterable<string>`, so no framework stream type leaks inward.

@@ -1,0 +1,25 @@
+{
+  "name": "@kurasikapa/adapter-anthropic",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "4.0.27",
+    "@kurasikapa/application": "workspace:*",
+    "@kurasikapa/domain": "workspace:*",
+    "ai": "7.0.47",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@kurasikapa/config": "workspace:*",
+    "@vitest/coverage-v8": "4.1.10",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}
