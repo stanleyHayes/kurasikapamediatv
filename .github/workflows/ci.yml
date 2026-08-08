@@ -16,6 +16,17 @@ jobs:
   quality:
     name: Quality gates
     runs-on: ubuntu-latest
+    services:
+      # `next build` prerenders the cached components, which read the database.
+      # A standalone mongod is enough here: the build only reads, and
+      # transactions (which need a replica set) are exercised by the adapter
+      # suite via Testcontainers.
+      mongo:
+        image: mongo:8
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
     env:
       # Hoisted to job scope so the Sonar step's `if:` can read it. A secret
       # referenced only inside a step is not visible to that step's condition.
@@ -46,6 +57,15 @@ jobs:
 
       - name: Tests + coverage floors
         run: pnpm test
+
+      # Its own gate. `tsc --noEmit` passing is not evidence the app builds:
+      # this step caught three prerender defects that typecheck and unit tests
+      # both missed. See ADR-0008.
+      - name: Build
+        run: pnpm build
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/kurasikapa_ci
+          MONGODB_DB: kurasikapa_ci
 
       - name: Duplication
         run: pnpm dup
