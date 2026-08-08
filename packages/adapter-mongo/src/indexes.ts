@@ -2,10 +2,12 @@ import type { Db } from 'mongodb'
 import {
   ARTICLES,
   BOOKMARKS,
+  SOCIAL_POSTS,
   CATEGORIES,
   REVISIONS,
   type ArticleDocument,
   type BookmarkDocument,
+  type SocialPostDocument,
   type CategoryDocument,
   type RevisionDocument,
 } from './documents'
@@ -61,6 +63,18 @@ export async function ensureIndexes(db: Db): Promise<void> {
   // is no index that supports querying bookmarks without one.
   const bookmarks = db.collection<BookmarkDocument>(BOOKMARKS)
   await bookmarks.createIndexes([{ key: { readerId: 1, savedAt: -1, _id: -1 }, name: 'reader_recent' }])
+
+  // The fan-out worker scans only queued posts whose moment has arrived.
+  // Partial, so exhausted and sent posts never enter the scan at all.
+  const social = db.collection<SocialPostDocument>(SOCIAL_POSTS)
+  await social.createIndexes([
+    {
+      key: { scheduledAt: 1 },
+      name: 'social_due',
+      partialFilterExpression: { state: 'queued' },
+    },
+    { key: { state: 1, scheduledAt: 1 }, name: 'social_queue' },
+  ])
 
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.

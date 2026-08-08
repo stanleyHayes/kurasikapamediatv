@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Outfit, Playfair_Display } from 'next/font/google'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -6,6 +7,28 @@ import { SiteFooter } from '@/components/site-footer'
 import { Link } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
+
+/**
+ * Self-hosted via next/font: the files are served from our own origin, so
+ * there is no request to Google on a reader's first paint and no third-party
+ * dependency on the critical path — which also matters under GDPR.
+ *
+ * `display: swap` shows the fallback immediately rather than holding text
+ * invisible while a font downloads. On a news site, words first.
+ */
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  display: 'swap',
+  variable: '--font-playfair',
+})
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+  variable: '--font-outfit',
+})
 
 export function generateStaticParams(): { locale: string }[] {
   return routing.locales.map((locale) => ({ locale }))
@@ -48,7 +71,7 @@ export default async function LocaleLayout({
   const t = await getTranslations('nav')
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${playfair.variable} ${outfit.variable}`}>
       <body className="bg-surface text-on-surface min-h-screen">
         <NextIntlClientProvider>
           <header className="border-outline-variant border-b">

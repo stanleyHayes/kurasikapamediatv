@@ -39,8 +39,10 @@
   --color-on-error-container: #93000a;
 
   /* Type — Playfair for expression, Outfit for everything you read at length */
-  --font-display: 'Playfair Display', ui-serif, Georgia, serif;
-  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  /* next/font sets these variables on <html>; the fallbacks stay so text is
+     readable during the swap rather than invisible. */
+  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 
   --text-display-lg: 4rem; /* 64px */
   --text-display-lg--line-height: 1.1;

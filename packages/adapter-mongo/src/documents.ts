@@ -60,8 +60,21 @@ export interface BookmarkDocument {
   savedAt: Date
 }
 
+export interface SocialPostDocument {
+  _id: string
+  articleId: string
+  platform: string
+  caption: string
+  scheduledAt: Date
+  state: string
+  attempts: number
+  lastError: string | null
+  createdBy: string
+}
+
 export const ARTICLES = 'articles'
 export const REVISIONS = 'article_revisions'
 export const ROLE_ASSIGNMENTS = 'role_assignments'
 export const CATEGORIES = 'categories'
 export const BOOKMARKS = 'bookmarks'
+export const SOCIAL_POSTS = 'social_posts'
