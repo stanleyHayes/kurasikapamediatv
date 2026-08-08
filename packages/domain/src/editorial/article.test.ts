@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { NotPermitted } from '../identity/actor.js'
+import { articleId, categoryId, familyId, tagId } from '../shared/ids.js'
 import { Slug } from '../shared/slug.js'
+import { Article } from './article.js'
 import { AUTHOR, OTHER, REVISION, actorWith, anApprovedArticle, anArticle } from '../testing/builders.js'
 import { IllegalTransition, MissingApprovedRevision, NotOwnArticle, ScheduleInPast } from './errors.js'
 
@@ -12,6 +14,45 @@ const author = actorWith(['author'])
 const journalist = actorWith(['journalist'])
 const editor = actorWith(['editor'], OTHER)
 const subscriber = actorWith(['subscriber'], OTHER)
+
+describe('create', () => {
+  const input = {
+    id: articleId('art_new'),
+    familyId: familyId('fam_new'),
+    locale: 'en',
+    slug: Slug.of('new-piece'),
+    title: 'New Piece',
+    categoryId: categoryId('cat_news'),
+  }
+
+  it('starts life as a draft', () => {
+    expect(Article.create(author, input).status).toBe('draft')
+  })
+
+  it('attributes authorship to whoever created it, not to a passed-in id', () => {
+    expect(Article.create(author, input).authorId).toBe(AUTHOR)
+  })
+
+  it('starts with no approval, no schedule and no publication', () => {
+    const created = Article.create(author, input).snapshot()
+    expect(created.approvedRevisionId).toBeNull()
+    expect(created.scheduledAt).toBeNull()
+    expect(created.publishedAt).toBeNull()
+  })
+
+  it('defaults to no tags', () => {
+    expect(Article.create(author, input).snapshot().tagIds).toEqual([])
+  })
+
+  it('keeps tags when supplied', () => {
+    const tagged = Article.create(author, { ...input, tagIds: [tagId('tag_budget')] })
+    expect(tagged.snapshot().tagIds).toEqual(['tag_budget'])
+  })
+
+  it('refuses an actor who may not draft', () => {
+    expect(() => Article.create(subscriber, input)).toThrow(NotPermitted)
+  })
+})
 
 describe('submitForReview', () => {
   it('moves a draft into review', () => {

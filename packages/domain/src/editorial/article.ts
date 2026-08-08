@@ -19,6 +19,17 @@ export interface ArticleProps {
   readonly publishedAt: Date | null
 }
 
+/** What a caller supplies to create a draft. Everything else is derived. */
+export interface NewArticle {
+  readonly id: ArticleId
+  readonly familyId: FamilyId
+  readonly locale: string
+  readonly slug: Slug
+  readonly title: string
+  readonly categoryId: CategoryId
+  readonly tagIds?: readonly TagId[]
+}
+
 /**
  * One article, in one locale. A French article is a separate Article sharing a
  * `familyId` with the English one — it has its own slug, byline and publish
@@ -30,8 +41,24 @@ export interface ArticleProps {
 export class Article {
   private constructor(private readonly props: ArticleProps) {}
 
+  /** Rebuild from storage. Applies no rules — the article already existed. */
   static reconstitute(props: ArticleProps): Article {
     return new Article(props)
+  }
+
+  /** A brand-new draft. The only way an Article comes into existence. */
+  static create(actor: Actor, input: NewArticle): Article {
+    requirePermission(actor, 'article:draft')
+
+    return new Article({
+      ...input,
+      tagIds: input.tagIds ?? [],
+      authorId: actor.id,
+      status: 'draft',
+      approvedRevisionId: null,
+      scheduledAt: null,
+      publishedAt: null,
+    })
   }
 
   get id(): ArticleId { return this.props.id }

@@ -1,4 +1,5 @@
-export { Article, type ArticleProps } from './editorial/article.js'
+export { Article, type ArticleProps, type NewArticle } from './editorial/article.js'
+export { NonMonotonicSequence, Revision, type RevisionProps } from './editorial/revision.js'
 export {
   ARTICLE_STATUSES,
   TRANSITIONS,

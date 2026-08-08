@@ -121,28 +121,49 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 
 ### Shape of a use case
 
+Dependencies arrive as **one `Deps` object**, not as positional constructor parameters. Two reasons: the `max-params: 4` gate is real and several use cases legitimately need five collaborators, and a named object makes the composition root readable at the call site.
+
 ```ts
-export class PublishArticle implements UseCase<PublishInput, PublishResult> {
-  constructor(
-    private readonly articles: ArticleRepository,
-    private readonly clock: ClockPort,
-    private readonly events: EventBusPort,
-  ) {}
+export interface PublishArticleDeps {
+  readonly articles: ArticleRepository
+  readonly clock: ClockPort
+  readonly events: EventBusPort
+}
 
-  async execute(input: PublishInput): Promise<PublishResult> {
-    const article = await this.articles.findById(input.articleId)
-    if (!article) throw new ArticleNotFound(input.articleId)
+export class PublishArticle implements UseCase<PublishArticleInput, PublishArticleResult> {
+  constructor(private readonly deps: PublishArticleDeps) {}
 
-    const published = article.publish(input.actor, this.clock.now())  // ← the rule lives in the entity
-    await this.articles.save(published)
-    await this.events.publish(new ArticlePublished(published.id, published.publishedAt))
+  async execute(input: PublishArticleInput): Promise<PublishArticleResult> {
+    const article = await this.deps.articles.findById(input.articleId)
+    if (article === null) throw new ArticleNotFound(input.articleId)
 
-    return { slug: published.slug, publishedAt: published.publishedAt }
+    const published = article.publish(input.actor, this.deps.clock.now()) // ← the rule lives in the entity
+
+    await this.deps.articles.save(published)
+    await this.deps.events.publish(
+      articlePublished(
+        { articleId: published.id, actorId: input.actor.id, occurredAt: now },
+        published.slug.value,
+        published.locale,
+      ),
+    )
+
+    return { articleId: published.id, status: published.status, slug: published.slug.value, ... }
   }
 }
 ```
 
 The workflow rule — *may this actor publish this article in this state?* — is inside `article.publish()`, in `packages/domain`, tested with no database, no mocks and no framework.
+
+### Events carry what the subscriber needs
+
+`article.published` carries `slug` and `locale` so the cache-invalidation subscriber can call `updateTag` without re-reading the article. `article.rejected` carries the editor's `note`; `article.unpublished` carries the `reason`. An event that forces a round trip to be useful is an incomplete event.
+
+### Built in R1
+
+`CreateDraft` · `SubmitForReview` · `ApproveArticle` · `RejectArticle` · `SchedulePublication` · `PublishArticle` · `UnpublishArticle` · `PublishDueArticles`
+
+`PublishDueArticles` is the scheduled-publication cron. It collects per-article failures rather than throwing, because one bad article must not strand the newsroom's queue — and it returns them rather than logging, because a scheduled article that silently never publishes is the worst outcome available.
 
 ---
 
