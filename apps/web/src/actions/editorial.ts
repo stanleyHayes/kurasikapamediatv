@@ -1,6 +1,6 @@
 'use server'
 
-import type { ArticleId, CategoryId, FamilyId, RevisionId, TagId } from '@kurasikapa/domain'
+import type { ArticleId, CategoryId, FamilyId, RevisionId, TagId, UserId } from '@kurasikapa/domain'
 import { requireActor } from '../composition/actor'
 import { container } from '../composition/container'
 import { type ActionResult, attempt } from './result'
@@ -14,6 +14,7 @@ import {
   unpublishSchema,
   updateDraftSchema,
 } from './schemas'
+import { assignRolesSchema } from './schemas'
 
 /**
  * The editorial Server Actions.
@@ -162,5 +163,24 @@ export async function unpublishArticleAction(
     })
 
     return { status: result.status }
+  })
+}
+
+export async function assignRolesAction(
+  input: unknown,
+): Promise<ActionResult<{ roles: readonly string[] }>> {
+  return attempt(async () => {
+    const parsed = parseInput(assignRolesSchema, input)
+    const actor = await requireActor()
+
+    const result = await container().assignRoles.execute({
+      actor,
+      targetUserId: parsed.targetUserId as UserId,
+      // Left as strings: the domain decides what counts as a role, refuses
+      // self-assignment, and refuses anything it does not recognise.
+      roles: parsed.roles,
+    })
+
+    return { roles: result.roles }
   })
 }

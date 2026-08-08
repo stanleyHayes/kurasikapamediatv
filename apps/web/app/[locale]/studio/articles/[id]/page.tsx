@@ -56,6 +56,7 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
         initialBody={draft.latest?.body ?? ''}
         status={status}
         editable={EDITABLE.includes(status)}
+        locale={draft.article.locale}
       />
     </>
   )

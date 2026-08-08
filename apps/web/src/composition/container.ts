@@ -4,6 +4,7 @@ import {
   MongoCategoryRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
+  MongoUserDirectory,
   MongoTextSearch,
 } from '@kurasikapa/adapter-mongo'
 import {
@@ -20,6 +21,7 @@ import {
   BrowseCategory,
   ListAwaitingReview,
   ListSections,
+  ListUsers,
   SearchArticles,
   ListPublishedArticles,
   PublishArticle,
@@ -33,6 +35,7 @@ import {
 } from '@kurasikapa/application'
 import type {
   ArticleRepository,
+  UserDirectory,
   CategoryRepository,
   SearchPort,
   RevisionRepository,
@@ -62,6 +65,7 @@ export interface Container {
   readonly unpublishArticle: UnpublishArticle
   readonly publishDueArticles: PublishDueArticles
   readonly assignRoles: AssignRoles
+  readonly listUsers: ListUsers
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -99,6 +103,7 @@ export function buildContainer(infra: Infrastructure): Container {
   const revisions: RevisionRepository = new MongoRevisionRepository(infra.db)
   const roles: RoleRepository = new MongoRoleRepository(infra.db)
   const search: SearchPort = new MongoTextSearch(infra.db)
+  const users: UserDirectory = new MongoUserDirectory(infra.db)
   const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
 
   const { clock, ids, events } = infra
@@ -115,6 +120,7 @@ export function buildContainer(infra: Infrastructure): Container {
     unpublishArticle: new UnpublishArticle(write),
     publishDueArticles: new PublishDueArticles(write),
     assignRoles: new AssignRoles({ roles, clock, events }),
+    listUsers: new ListUsers({ users }),
 
     getPublishedArticle: new GetPublishedArticle({ articles }),
     listPublishedArticles: new ListPublishedArticles({ articles }),

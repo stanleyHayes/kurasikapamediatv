@@ -28,6 +28,12 @@ export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pa
 export type { RevisionRepository } from './ports/revision-repository'
 export type { CategoryRepository } from './ports/category-repository'
 export type { RoleRepository } from './ports/role-repository'
+export type { DirectoryUser, UserDirectory } from './ports/user-directory'
+export {
+  ListUsers,
+  type ListUsersDeps,
+  type ListUsersInput,
+} from './identity/list-users'
 export {
   ListSections,
   type ListSectionsDeps,

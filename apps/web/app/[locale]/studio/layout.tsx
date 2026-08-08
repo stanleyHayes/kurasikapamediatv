@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { SignOutButton } from '@/components/auth/sign-out-button'
+import { Link } from '@/i18n/navigation'
 import { currentActor } from '@/composition/actor'
 
 /**
@@ -66,7 +67,28 @@ async function RequireNewsroom({
         request data, and "Sign out" has no meaning for a visitor who is not
         signed in — which is exactly who sees a prerendered shell.
       */}
-      <div className="mb-[var(--spacing-sm)] flex justify-end">
+      <div className="mb-[var(--spacing-sm)] flex items-center justify-between">
+        <nav aria-label="Studio">
+          <ul className="text-label-bold text-on-surface-variant flex gap-4 uppercase">
+            <li>
+              <Link href="/studio" className="hover:text-primary transition-colors">
+                Drafts
+              </Link>
+            </li>
+            <li>
+              <Link href="/studio/review" className="hover:text-primary transition-colors">
+                Review
+              </Link>
+            </li>
+            <li>
+              {/* Visible to everyone in the newsroom; the page itself refuses
+                  anyone without role:assign and sends them back. */}
+              <Link href="/studio/people" className="hover:text-primary transition-colors">
+                People
+              </Link>
+            </li>
+          </ul>
+        </nav>
         <SignOutButton />
       </div>
       {children}
