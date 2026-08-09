@@ -12,6 +12,14 @@ export interface RevisionRepository {
    * Order is not guaranteed — callers index by id.
    */
   findManyByIds(ids: readonly RevisionId[]): Promise<readonly Revision[]>
+  /**
+   * The newest revision of each given article, in one query.
+   *
+   * The studio shows what an editor is currently working on, which is the
+   * latest revision — not the approved one the public site reads. Calling
+   * `findLatest` per row would make a 20-item pipeline 21 round trips.
+   */
+  findLatestForArticles(ids: readonly ArticleId[]): Promise<readonly Revision[]>
   /** Append-only. There is deliberately no update and no delete. */
   append(revision: Revision): Promise<void>
 }

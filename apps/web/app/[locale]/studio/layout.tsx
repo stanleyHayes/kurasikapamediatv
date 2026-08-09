@@ -1,11 +1,14 @@
 import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import { SignOutButton } from '@/components/auth/sign-out-button'
-import { Link } from '@/i18n/navigation'
+import { StudioSideNav } from '@/components/studio/side-nav'
 import { currentActor } from '@/composition/actor'
 
 /**
+ * The studio app shell, per the Stitch editorial CMS: a docked 256px rail and
+ * a scrolling canvas under a contextual top bar. `h-screen overflow-hidden`
+ * with the canvas scrolling independently is what makes the rail stay put.
+ *
  * The studio is behind authentication. Reading the session is request data, so
  * it happens inside a Suspense boundary — otherwise it blocks the prerendered
  * chrome and the whole route becomes a blank wait.
@@ -25,28 +28,21 @@ export default async function StudioLayout({
   setRequestLocale(locale)
 
   return (
-    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
-      <header className="border-outline-variant mb-[var(--spacing-md)] border-b pb-[var(--spacing-md)]">
-        <p className="text-label-bold text-secondary uppercase">Studio</p>
-        <h1 className="font-display text-on-surface mt-1 text-[length:var(--text-headline-md)] font-semibold">
-          Newsroom
-        </h1>
-      </header>
-
-      <Suspense fallback={<ListSkeleton />}>
-        <RequireNewsroom locale={locale}>{children}</RequireNewsroom>
+    <div className="bg-background flex h-screen overflow-hidden">
+      <Suspense fallback={<RailSkeleton />}>
+        <Guarded locale={locale}>{children}</Guarded>
       </Suspense>
     </div>
   )
 }
 
-async function RequireNewsroom({
+async function Guarded({
   locale,
   children,
 }: {
   locale: string
   children: React.ReactNode
-}): Promise<React.ReactNode> {
+}): Promise<React.ReactElement> {
   const actor = await currentActor()
 
   // Anyone who cannot draft has no business in a UI built for the newsroom.
@@ -61,50 +57,37 @@ async function RequireNewsroom({
 
   return (
     <>
-      {/*
-        Inside the boundary, not in the prerendered header. Two reasons: the
-        auth client executes during SSR and would make the shell depend on
-        request data, and "Sign out" has no meaning for a visitor who is not
-        signed in — which is exactly who sees a prerendered shell.
-      */}
-      <div className="mb-[var(--spacing-sm)] flex items-center justify-between">
-        <nav aria-label="Studio">
-          <ul className="text-label-bold text-on-surface-variant flex gap-4 uppercase">
-            <li>
-              <Link href="/studio" className="hover:text-primary transition-colors">
-                Drafts
-              </Link>
-            </li>
-            <li>
-              <Link href="/studio/review" className="hover:text-primary transition-colors">
-                Review
-              </Link>
-            </li>
-            <li>
-              {/* Visible to everyone in the newsroom; the page itself refuses
-                  anyone without role:assign and sends them back. */}
-              <Link href="/studio/people" className="hover:text-primary transition-colors">
-                People
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        <SignOutButton />
-      </div>
-      {children}
+      {/* Rendered inside the boundary, not in the prerendered shell: it holds
+          the sign-out control, and "sign out" has no meaning for the visitor
+          who sees a prerendered page. */}
+      <StudioSideNav active="/studio" />
+
+      <main className="relative flex h-full flex-1 flex-col overflow-hidden">
+        <header className="border-outline-variant bg-surface/60 flex h-20 shrink-0 items-center justify-between border-b px-6 backdrop-blur-md">
+          <h1 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
+            Editorial Workflow
+          </h1>
+        </header>
+
+        <div className="relative flex-1 overflow-y-auto p-6">
+          <div className="mx-auto max-w-[var(--container-page)]">{children}</div>
+        </div>
+      </main>
     </>
   )
 }
 
-function ListSkeleton(): React.ReactElement {
+function RailSkeleton(): React.ReactElement {
   return (
-    <div aria-hidden>
-      {Array.from({ length: 5 }, (_, i) => (
-        <div key={i} className="border-outline-variant flex items-center gap-4 border-b px-2 py-4">
-          <div className="bg-surface-container h-6 w-20 rounded-lg" />
-          <div className="bg-surface-container h-4 flex-1 rounded-sm" />
-        </div>
-      ))}
+    <div className="flex h-full w-full" aria-hidden>
+      <div className="border-outline-variant bg-surface-container-low hidden w-64 shrink-0 border-r p-4 md:block">
+        {Array.from({ length: 6 }, (_, i) => (
+          <div key={i} className="bg-surface-container mb-3 h-9 rounded-lg" />
+        ))}
+      </div>
+      <div className="flex-1 p-6">
+        <div className="bg-surface-container h-24 rounded-xl" />
+      </div>
     </div>
   )
 }

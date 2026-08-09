@@ -138,7 +138,7 @@ export function buildContainer(infra: Infrastructure): Container {
     listPublishedArticles: new ListPublishedArticles({ articles }),
     browseCategory: new BrowseCategory({ categories, articles, revisions }),
     listSections: new ListSections({ categories }),
-    listAuthoredArticles: new ListAuthoredArticles({ articles }),
+    listAuthoredArticles: new ListAuthoredArticles({ articles, revisions }),
     getDraft: new GetDraft({ articles, revisions }),
     listAwaitingReview: new ListAwaitingReview({ articles }),
     searchArticles: new SearchArticles({ search }),

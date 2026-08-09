@@ -133,6 +133,7 @@ export {
   ListAuthoredArticles,
   type ListAuthoredArticlesDeps,
   type ListAuthoredArticlesInput,
+  type AuthoredArticle,
 } from './editorial/list-authored-articles'
 export {
   UpdateDraft,

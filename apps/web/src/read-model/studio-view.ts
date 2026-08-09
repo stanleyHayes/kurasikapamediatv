@@ -12,12 +12,27 @@ export interface DraftView {
   readonly status: ArticleStatus
   readonly publishedAt: string | null
   readonly scheduledAt: string | null
+  readonly categoryId: string
+  /**
+   * Opening of the LATEST revision — the work in progress, not the approved
+   * text. Null when the article has no revision history yet.
+   */
+  readonly excerpt: string | null
 }
 
-export const toDraftView = (article: Article): DraftView => {
+/**
+ * `excerpt` is required, not defaulted.
+ *
+ * A default made `.map(toDraftView)` compile while silently passing the array
+ * index as the excerpt. Requiring it turns every call site into a decision the
+ * compiler checks.
+ */
+export const toDraftView = (article: Article, excerpt: string | null): DraftView => {
   const props = article.snapshot()
 
   return {
+    categoryId: props.categoryId,
+    excerpt,
     id: props.id,
     title: props.title,
     slug: props.slug.value,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from '../../i18n/navigation'
+import { useLocale } from 'next-intl'
 import { signIn } from '../../lib/auth-client'
 import { SocialButtons } from './social-buttons'
 
@@ -31,7 +31,7 @@ const FIELD =
  * sign-in page.
  */
 export function SignInForm(props: SignInFormProps): React.ReactElement {
-  const router = useRouter()
+  const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
 
   const submit = async (form: FormData): Promise<void> => {
@@ -59,8 +59,18 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
       return
     }
 
-    router.push(props.redirectTo)
-    router.refresh()
+    // A full load, not router.push.
+    //
+    // Sign-in lives in the public (site) group and the studio is its own
+    // full-screen shell. Route groups are invisible in the URL, so a
+    // client-side navigation across that boundary left the reader's chrome
+    // mounted over the admin surface — the footer stayed on screen, which an
+    // E2E assertion caught. Crossing between route-group roots is a full page
+    // load by design; making it explicit is the fix.
+    //
+    // The locale prefix is added by hand here because next-intl's router,
+    // which normally supplies it, is exactly what is being bypassed.
+    window.location.assign(`/${locale}${props.redirectTo}`)
   }
 
   return (

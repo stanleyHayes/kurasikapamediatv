@@ -26,7 +26,8 @@ export default async function ReviewQueuePage({
       throw error
     })
 
-  const queue = page.items.map(toDraftView)
+  // The review queue lists articles, not revisions; no standfirst is loaded.
+  const queue = page.items.map((article) => toDraftView(article, null))
 
   return (
     <DraftList

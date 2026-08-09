@@ -27,6 +27,14 @@ export class InMemoryRevisionRepository implements RevisionRepository {
     return Promise.resolve(this.store.filter((r) => wanted.has(r.id)))
   }
 
+  findLatestForArticles(ids: readonly ArticleId[]): Promise<readonly Revision[]> {
+    const latest = ids
+      .map((id) => this.forArticle(id).at(-1))
+      .filter((r): r is Revision => r !== undefined)
+
+    return Promise.resolve(latest)
+  }
+
   append(revision: Revision): Promise<void> {
     this.store.push(revision)
     return Promise.resolve()

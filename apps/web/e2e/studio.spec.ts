@@ -57,7 +57,11 @@ test.describe('signed in', () => {
   test('an editor reaches the studio through the real sign-in form', async ({ page }) => {
     await signIn(page)
 
-    await expect(page.getByRole('heading', { name: 'Newsroom', level: 1 })).toBeVisible()
+    // The studio's own shell, not the public masthead: the Stitch editorial CMS
+    // is a full-screen admin surface, so reaching it must show its top bar AND
+    // must not show the reader's site chrome.
+    await expect(page.getByRole('heading', { name: 'Editorial Workflow', level: 1 })).toBeVisible()
+    await expect(page.locator('footer')).toHaveCount(0)
   })
 
   test('the review queue opens for someone who may approve', async ({ page }) => {

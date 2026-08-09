@@ -35,6 +35,23 @@ export class MongoRevisionRepository implements RevisionRepository {
     return docs.map(revisionToDomain)
   }
 
+  async findLatestForArticles(ids: readonly ArticleId[]): Promise<readonly Revision[]> {
+    if (ids.length === 0) return []
+
+    // Sort descending then take the first of each group: $group's $first is
+    // defined by the incoming order, so the sort is what makes this correct.
+    const docs = await this.revisions
+      .aggregate<RevisionDocument>([
+        { $match: { articleId: { $in: [...ids] } } },
+        { $sort: { articleId: 1, seq: -1 } },
+        { $group: { _id: '$articleId', doc: { $first: '$$ROOT' } } },
+        { $replaceRoot: { newRoot: '$doc' } },
+      ])
+      .toArray()
+
+    return docs.map(revisionToDomain)
+  }
+
   /**
    * insertOne, never upsert. History is append-only, and the unique
    * (articleId, seq) index turns a concurrent double-append into a duplicate

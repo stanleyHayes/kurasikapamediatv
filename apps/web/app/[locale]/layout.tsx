@@ -1,10 +1,8 @@
 import type { Metadata } from 'next'
 import { Outfit, Playfair_Display } from 'next/font/google'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
 
@@ -68,19 +66,12 @@ export default async function LocaleLayout({
   // dynamic the moment a translation is read.
   setRequestLocale(locale)
 
-  const t = await getTranslations('nav')
-
   return (
     <html lang={locale} className={`${playfair.variable} ${outfit.variable}`}>
       <body className="bg-surface text-on-surface min-h-screen">
-        <NextIntlClientProvider>
-          <SiteHeader liveLabel={t('live')} />
-
-          {/* pt for the fixed header, per the design's `pt-20` on <main>. */}
-          <main className="pt-20">{children}</main>
-
-          <SiteFooter />
-        </NextIntlClientProvider>
+        {/* Chrome lives in the (site) group, not here — the studio is a
+            full-screen admin shell and must not inherit the masthead. */}
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   )

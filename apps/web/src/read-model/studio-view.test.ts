@@ -7,21 +7,21 @@ const NOW = new Date('2026-08-08T10:00:00Z')
 
 describe('toDraftView', () => {
   it('carries the workflow state the public view has no use for', () => {
-    const view = toDraftView(anArticle({ status: 'in_review' }))
+    const view = toDraftView(anArticle({ status: 'in_review' }), null)
 
     expect(view.status).toBe('in_review')
     expect(view.title).toBe('Budget 2026')
   })
 
   it('serialises both dates, or null', () => {
-    const scheduled = toDraftView(anArticle({ status: 'scheduled', scheduledAt: NOW }))
+    const scheduled = toDraftView(anArticle({ status: 'scheduled', scheduledAt: NOW }), null)
 
     expect(scheduled.scheduledAt).toBe('2026-08-08T10:00:00.000Z')
     expect(scheduled.publishedAt).toBeNull()
   })
 
   it('crosses the RSC boundary as plain strings', () => {
-    const view = toDraftView(anArticle({ status: 'published', publishedAt: NOW }))
+    const view = toDraftView(anArticle({ status: 'published', publishedAt: NOW }), null)
     const serialisable = Object.values(view).every((v) => v === null || typeof v === 'string')
 
     expect(serialisable).toBe(true)
@@ -29,7 +29,7 @@ describe('toDraftView', () => {
 })
 
 describe('byWorkflowPriority', () => {
-  const of = (status: DraftView['status']): DraftView => toDraftView(anArticle({ status }))
+  const of = (status: DraftView['status']): DraftView => toDraftView(anArticle({ status }), null)
 
   it('puts work awaiting a decision first', () => {
     // Alphabetical or purely chronological ordering buries the rejected draft
