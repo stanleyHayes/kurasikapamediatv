@@ -154,8 +154,8 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_admin_editorial_cms` | `/studio` | ✅ KUR-27 |
 | `kurasikapa_admin_roles_permissions` | `/studio/people` | ❌ own layout |
 | `kurasikapa_media_user_profile_saved_articles` | `/profile` | ❌ own layout |
-| `about_us_kurasikapa_media_tv` | `/about` | ❌ own layout |
-| `our_team_kurasikapa_media_tv` | `/team` | ❌ own layout |
+| `about_us_kurasikapa_media_tv` | `/about` | ✅ KUR-42 — display hero over the client's own copy |
+| `our_team_kurasikapa_media_tv` | `/team` | ◑ KUR-42 — hero done. The design's member grid needs names, roles, bios and portraits the client has **not supplied**; building it would mean inventing journalists. |
 | `kurasikapa_admin_ai_content_editor` | `/studio/articles/{id}` | ✅ KUR-41 — two-pane workspace with a tabbed co-pilot |
 | `social_media_publishing_kurasikapa_admin` | — | ❌ no route (R2) |
 | `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |

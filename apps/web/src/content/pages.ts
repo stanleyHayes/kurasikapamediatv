@@ -21,6 +21,14 @@ export interface StandingPage {
   readonly sections: readonly Section[]
   /** Shown where copy is provisional and needs the client's own words. */
   readonly needsClientCopy?: boolean
+  /**
+   * Renders the title as a full-bleed display hero rather than a page heading.
+   *
+   * Only for the pages whose designs call for one — About and Team. Applying
+   * it everywhere would give a cookie policy the same weight as the masthead,
+   * which is the sort of thing that makes a design system feel arbitrary.
+   */
+  readonly hero?: boolean
 }
 
 export type PageKey =
@@ -39,6 +47,7 @@ type Catalogue = Readonly<Record<string, Readonly<Record<PageKey, StandingPage>>
 const EN: Readonly<Record<PageKey, StandingPage>> = {
   about: {
     title: 'About Kurasikapa Media TV',
+    hero: true,
     lead: 'Media as a tool for empowerment, education and social impact — not entertainment alone.',
     sections: [
       {
@@ -74,6 +83,7 @@ const EN: Readonly<Record<PageKey, StandingPage>> = {
 
   team: {
     title: 'Our Team',
+    hero: true,
     lead: 'The editorial board and journalists behind Kurasikapa Media TV.',
     needsClientCopy: true,
     sections: [
