@@ -3,6 +3,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Editor } from '@/components/studio/editor'
+import { TranslatePanel } from '@/components/studio/translate-panel'
 import { StatusBadge } from '@/components/studio/status-badge'
 import { requireActor } from '@/composition/actor'
 import { container } from '@/composition/container'
@@ -40,6 +41,8 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
     })
 
   const status = draft.article.status
+  const props = draft.article.snapshot()
+  const body = draft.latest?.body ?? ''
 
   return (
     <>
@@ -50,14 +53,28 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
         </span>
       </div>
 
-      <Editor
-        articleId={draft.article.id}
-        initialTitle={draft.article.snapshot().title}
-        initialBody={draft.latest?.body ?? ''}
-        status={status}
-        editable={EDITABLE.includes(status)}
-        locale={draft.article.locale}
-      />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <Editor
+            articleId={draft.article.id}
+            initialTitle={props.title}
+            initialBody={body}
+            status={status}
+            editable={EDITABLE.includes(status)}
+            locale={draft.article.locale}
+          />
+        </div>
+
+        <aside className="lg:col-span-4">
+          <TranslatePanel
+            title={props.title}
+            body={body}
+            locale={draft.article.locale}
+            familyId={props.familyId}
+            categoryId={props.categoryId}
+          />
+        </aside>
+      </div>
     </>
   )
 }

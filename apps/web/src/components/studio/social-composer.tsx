@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { callAction } from '../../actions/call'
 import { queueSocialPostAction } from '../../actions/editorial'
 
 const PLATFORMS = [
@@ -78,7 +79,7 @@ export function SocialComposer({
     setQueued(null)
 
     startTransition(async () => {
-      const result = await queueSocialPostAction(requestFrom(form, platforms))
+      const result = await callAction(() => queueSocialPostAction(requestFrom(form, platforms)))
 
       if (result.ok) {
         setQueued(result.data.queued)

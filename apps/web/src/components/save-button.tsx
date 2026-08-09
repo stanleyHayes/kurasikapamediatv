@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { callAction } from '../actions/call'
 import { toggleSavedAction } from '../actions/editorial'
 
 /**
@@ -27,7 +28,7 @@ export function SaveButton({
     setError(null)
 
     startTransition(async () => {
-      const result = await toggleSavedAction({ articleId }, was)
+      const result = await callAction(() => toggleSavedAction({ articleId }, was))
 
       if (result.ok) {
         setSaved(result.data.saved)

@@ -7,11 +7,12 @@ import type {
   SeoSuggestion,
   Summary,
   TagSuggestion,
+  TranslatedArticle,
 } from '@kurasikapa/application'
 import { requireActor } from '../composition/actor'
 import { container } from '../composition/container'
 import { type ActionResult, attempt } from './result'
-import { aiContextSchema, parseInput } from './schemas'
+import { aiContextSchema, parseInput, translateSchema } from './schemas'
 
 /**
  * AI assists for the editor.
@@ -74,4 +75,30 @@ export async function detectCategoryAction(
   options: readonly { slug: string; label: string }[],
 ): Promise<ActionResult<readonly CategorySuggestion[]>> {
   return assist(input, (ctx) => container().ai.detectCategory({ ...ctx, options }))
+}
+
+/**
+ * Proposes a translation. Persists nothing.
+ *
+ * Product rule 1: no AI output is persisted or published without a named human
+ * approver. So this returns a proposal and stops. Turning it into an article
+ * is a separate, deliberate act — the editor reads the translation and calls
+ * createDraft, which is the same path any other draft takes.
+ *
+ * "Locale is data" is what makes that work: the French article is its own
+ * document with its own slug and publish state, joined to the English one by
+ * familyId. There is no field to overwrite and nothing to get half-written.
+ */
+export async function translateAction(input: unknown): Promise<ActionResult<TranslatedArticle>> {
+  return attempt(async () => {
+    const parsed = parseInput(translateSchema, input)
+    await requireActor()
+
+    return container().ai.translate({
+      title: parsed.title,
+      body: parsed.body,
+      locale: parsed.locale,
+      targetLocale: parsed.targetLocale,
+    })
+  })
 }

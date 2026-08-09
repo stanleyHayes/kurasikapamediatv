@@ -1,6 +1,7 @@
 'use client'
 
 import type { Role } from '@kurasikapa/domain'
+import { callAction } from '../../actions/call'
 import { useState, useTransition } from 'react'
 import { assignRolesAction } from '../../actions/editorial'
 import { RoleCheckboxes } from './role-checkboxes'
@@ -60,7 +61,7 @@ export function RoleEditor({
     setState('idle')
 
     startTransition(async () => {
-      const result = await assignRolesAction({ targetUserId: person.id, roles: next })
+      const result = await callAction(() => assignRolesAction({ targetUserId: person.id, roles: next }))
 
       if (result.ok) {
         setState('saved')

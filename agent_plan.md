@@ -181,7 +181,7 @@ the wiring is missing.
 
 | Capability | Where it lives | What's missing |
 |---|---|---|
-| **`AiPort.translate()`** | `adapter-anthropic` — implemented and tested | No Server Action, no UI. Locale is data (ADR/product rule 3), so translating creates a *new article document*. Highest-value gap: the site is bilingual by design and there is no way to produce the French version from the English one. |
+| ~~`AiPort.translate()`~~ | **DONE — KUR-35.** Translate panel in the studio editor. | Needs `ANTHROPIC_API_KEY` to exercise live; unset locally. |
 | **`AiPort.draftFromPrompt` / `draftFromBullets`** | implemented, streaming | `/api/ai/[task]` route exists; the studio editor does not offer "generate". |
 | ~~`PublishDueArticles`~~ | **DONE — KUR-34.** `/api/cron/publish-due`, triggered by Vercel Cron. | — |
 | **`QueueSocialPost` / `PublishDuePosts`** | use cases built, KUR-22 | `MongoSocialPostRepository` is never instantiated in `container.ts`; no admin queue screen; no `SocialPublishPort` adapter. |
@@ -326,10 +326,10 @@ Ordered by value per unit of risk, not by release number.
 1. **Port the `editorial` bounded context to Go.** Domain, ports, the first use
    cases and the Mongo adapter are done (KUR-29 … KUR-32). Remaining: the HTTP
    layer, the composition root, and the BFF seam in Next.
-2. **Expose `AiPort.translate()`.** The site is bilingual by design, the adapter
-   is built and tested, and there is no way to produce the French document today.
-3. **Revision history UI.** The data is append-only and complete, and nothing
+2. **Revision history UI.** The data is append-only and complete, and nothing
    has ever shown it.
+3. **Rework the remaining designed screens** — About, Team, the AI content
+   editor and user management still use my layouts. See §3.7.
 
 Then close R1 properly: security headers, rate limiting, audit logging, and a
 first deployment.

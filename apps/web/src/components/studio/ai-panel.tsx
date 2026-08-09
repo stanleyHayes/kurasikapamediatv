@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { callAction } from '../../actions/call'
 import {
   suggestHeadlinesAction,
   suggestSeoAction,
@@ -156,14 +157,14 @@ const ASSISTS: Readonly<
   Record<Assist, (ctx: Ctx) => Promise<ActionResult<readonly Suggestion[]>>>
 > = {
   headlines: async (ctx) => {
-    const result = await suggestHeadlinesAction(ctx)
+    const result = await callAction(() => suggestHeadlinesAction(ctx))
     if (!result.ok) return result
 
     return ok(result.data.map((h) => ({ text: h.text, note: h.rationale, applicable: true })))
   },
 
   seo: async (ctx) => {
-    const result = await suggestSeoAction(ctx)
+    const result = await callAction(() => suggestSeoAction(ctx))
     if (!result.ok) return result
 
     return ok([
@@ -174,7 +175,7 @@ const ASSISTS: Readonly<
   },
 
   tags: async (ctx) => {
-    const result = await suggestTagsAction(ctx)
+    const result = await callAction(() => suggestTagsAction(ctx))
     if (!result.ok) return result
 
     return ok(
@@ -187,7 +188,7 @@ const ASSISTS: Readonly<
   },
 
   summary: async (ctx) => {
-    const result = await summariseAction(ctx)
+    const result = await callAction(() => summariseAction(ctx))
     if (!result.ok) return result
 
     return ok([

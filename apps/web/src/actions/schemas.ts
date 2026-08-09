@@ -90,3 +90,17 @@ export const queueSocialPostSchema = z.object({
   caption: z.string().trim().min(1).max(2200),
   scheduledAt: z.iso.datetime(),
 })
+
+/**
+ * Requesting a translation proposal.
+ *
+ * `targetLocale` is a literal union, not a free string: an arbitrary locale
+ * would produce an article at a URL prefix the router does not serve, and the
+ * cost of that only shows up after the model has been paid.
+ */
+export const translateSchema = z.object({
+  title: z.string().trim().min(1).max(300),
+  body: z.string().min(1).max(200_000),
+  locale: z.string().trim().min(2).max(10),
+  targetLocale: z.enum(['en', 'fr']),
+})
