@@ -183,7 +183,7 @@ the wiring is missing.
 |---|---|---|
 | **`AiPort.translate()`** | `adapter-anthropic` — implemented and tested | No Server Action, no UI. Locale is data (ADR/product rule 3), so translating creates a *new article document*. Highest-value gap: the site is bilingual by design and there is no way to produce the French version from the English one. |
 | **`AiPort.draftFromPrompt` / `draftFromBullets`** | implemented, streaming | `/api/ai/[task]` route exists; the studio editor does not offer "generate". |
-| **`PublishDueArticles`** | use case + container key `publishDueArticles` | Nothing calls it. Scheduling writes a `scheduledAt` that **nothing ever acts on** — an article scheduled today will never publish. Needs a cron (Vercel Cron or media-svc). |
+| ~~`PublishDueArticles`~~ | **DONE — KUR-34.** `/api/cron/publish-due`, triggered by Vercel Cron. | — |
 | **`QueueSocialPost` / `PublishDuePosts`** | use cases built, KUR-22 | `MongoSocialPostRepository` is never instantiated in `container.ts`; no admin queue screen; no `SocialPublishPort` adapter. |
 | **Revision history** | domain + repository are append-only and complete | No UI anywhere. The data is being written and never shown. |
 | **`ListUsers` beyond roles** | works | Only used by the roles screen. |
@@ -323,15 +323,13 @@ Resend (R2), Stripe + Paystack (R4), Meta Graph API and app review (R2).
 
 Ordered by value per unit of risk, not by release number.
 
-1. **Port the `editorial` bounded context to Go.** It is the whole of R1 and
-   the largest outstanding piece. Everything below is cheaper once the rules
-   live where they are going to live.
-2. **Wire scheduled publishing to a cron.** `SchedulePublication` writes a
-   promise the system never keeps — an editor can schedule an article and it
-   will silently never publish. A correctness bug wearing a feature's clothes.
-   Build it in Go, since that is where the use case is heading.
-3. **Expose `AiPort.translate()`.** The site is bilingual by design, the adapter
+1. **Port the `editorial` bounded context to Go.** Domain, ports, the first use
+   cases and the Mongo adapter are done (KUR-29 … KUR-32). Remaining: the HTTP
+   layer, the composition root, and the BFF seam in Next.
+2. **Expose `AiPort.translate()`.** The site is bilingual by design, the adapter
    is built and tested, and there is no way to produce the French document today.
+3. **Revision history UI.** The data is append-only and complete, and nothing
+   has ever shown it.
 
 Then close R1 properly: security headers, rate limiting, audit logging, and a
 first deployment.

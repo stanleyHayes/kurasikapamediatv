@@ -16,6 +16,16 @@ const schema = z.object({
   // of every account — 32 characters is the floor, not a suggestion.
   BETTER_AUTH_SECRET: z.string().min(32),
   APP_URL: z.url().default('http://localhost:3000'),
+
+  /**
+   * Shared secret for the scheduled-publication endpoint.
+   *
+   * Optional so local development and tests boot without it — but the route
+   * REFUSES every request when it is unset, rather than running unprotected.
+   * An endpoint that publishes articles must never be open, and "unconfigured"
+   * is not a reason to make it so.
+   */
+  CRON_SECRET: z.string().min(32).optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 })
 

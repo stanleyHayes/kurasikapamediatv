@@ -43,5 +43,18 @@ export class PublishDueArticles implements UseCase<PublishDueArticlesInput, Publ
   }
 }
 
-const describe = (error: unknown): string =>
-  error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+/**
+ * Flattens an error into something an operator can act on.
+ *
+ * An AggregateError's own message is "1 subscriber(s) failed", which names the
+ * count and hides the cause — reporting that alone is a failure that is
+ * technically logged and practically invisible, which is the exact thing this
+ * batch reporting exists to prevent.
+ */
+const describe = (error: unknown): string => {
+  if (error instanceof AggregateError) {
+    return `${error.message}: ${error.errors.map(describe).join('; ')}`
+  }
+
+  return error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+}

@@ -10,8 +10,25 @@ import type { InProcessEventBus } from './ambient'
 const LISTING_PROFILE = 'minutes'
 
 const nextTags: CacheTags = {
+  /**
+   * `updateTag` is Server-Action-only; Next throws everywhere else and says so.
+   *
+   * The same publish happens from two places: an editor's Server Action, where
+   * an in-request update is what makes breaking news live within the request,
+   * and the cron route handler, where there is no reader waiting on this
+   * response and nothing to update in-request.
+   *
+   * There is no API to ask which context we are in, so the attempt IS the
+   * question and the fallback is the answer. Falling back to `revalidateTag`
+   * rather than rethrowing is correct on the merits: the cron's job is to make
+   * the article live, and it has.
+   */
   update: (tag) => {
-    updateTag(tag)
+    try {
+      updateTag(tag)
+    } catch {
+      revalidateTag(tag, LISTING_PROFILE)
+    }
   },
   revalidate: (tag) => {
     revalidateTag(tag, LISTING_PROFILE)

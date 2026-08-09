@@ -48,13 +48,36 @@ export async function publishAndAnnounce(
   const published = article.publish(actor, now)
 
   await deps.articles.save(published)
-  await deps.events.publish(
-    articlePublished(
-      { articleId: published.id, actorId: actor.id, occurredAt: now },
-      published.slug.value,
-      published.locale,
-    ),
-  )
+
+  // The article IS published by this point. A failing subscriber must not turn
+  // that into an error, for two reasons that both bite:
+  //
+  //   - An editor told "publish failed" presses publish again.
+  //   - The scheduled-publication cron marks it failed and retries next
+  //     minute. The domain then refuses published → published, so the retry
+  //     fails too — for ever. An alert that never clears, about an article
+  //     that has been live the whole time.
+  //
+  // This is not a silent failure: the event bus collects its subscribers'
+  // errors and is responsible for reporting them, and a stale cache expires on
+  // its own. See EventBusPort.
+  await deps.events
+    .publish(
+      articlePublished(
+        { articleId: published.id, actorId: actor.id, occurredAt: now },
+        published.slug.value,
+        published.locale,
+      ),
+    )
+    .catch((error: unknown) => {
+      console.error(
+        JSON.stringify({
+          event: 'article.published.announce_failed',
+          articleId: published.id,
+          reason: error instanceof Error ? error.message : String(error),
+        }),
+      )
+    })
 
   return {
     articleId: published.id,
