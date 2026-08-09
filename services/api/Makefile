@@ -13,9 +13,13 @@ APP_PROFILE := coverage-app.out
 DOMAIN_FLOOR := 95.0
 APP_FLOOR := 90.0
 
-.PHONY: verify fmt vet lint test cover cover-app clean
+.PHONY: verify verify-all fmt vet lint test cover cover-app integration clean
 
+## verify is the fast gate: no database required.
 verify: fmt vet lint cover cover-app
+
+## verify-all adds the integration suite. This is what CI runs.
+verify-all: verify integration
 
 ## fmt fails rather than rewrites, so CI cannot silently "fix" a diff.
 fmt:
@@ -60,6 +64,20 @@ cover-app:
 	echo "app coverage: $$total% (floor $(APP_FLOOR)%)"; \
 	awk -v t="$$total" -v f="$(APP_FLOOR)" 'BEGIN { exit !(t+0 >= f+0) }' || \
 		{ echo "FAIL: app coverage $$total% is below the $(APP_FLOOR)% floor"; exit 1; }
+
+## integration runs the adapter suite against a real MongoDB.
+##
+## KURA_REQUIRE_MONGO is exported so the harness FAILS rather than skips when
+## the URI is missing. Without it a misconfigured CI job reports green having
+## run nothing, which is the failure mode this project keeps rediscovering.
+integration:
+	@if [ -z "$$KURA_TEST_MONGO_URI" ]; then \
+		echo "KURA_TEST_MONGO_URI is not set."; \
+		echo "Start one with: docker run -d -p 37017:27017 mongo:8 --replSet rs0"; \
+		echo "Then: export KURA_TEST_MONGO_URI='mongodb://127.0.0.1:37017/?directConnection=true'"; \
+		exit 1; \
+	fi
+	KURA_REQUIRE_MONGO=1 $(GO) test -race ./internal/adapter/...
 
 clean:
 	rm -f $(COVER_PROFILE) $(APP_PROFILE)
