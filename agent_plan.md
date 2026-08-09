@@ -69,10 +69,14 @@ Seven bounded contexts: `editorial` · `identity` · `media` · `distribution` �
 `revenue` and `insight` are named in the architecture but have no files in
 either language.
 
-**Go migration progress:** `shared`, `identity` and `editorial` domains ported
-with tests, plus the application ports, the first editorial use cases and the
-MongoDB adapter (KUR-29 … KUR-32). Remaining: HTTP layer, composition root,
-and the BFF seam in Next.
+**Go migration progress:** domain, application ports, editorial use cases, the
+MongoDB adapter, the HTTP layer and the composition root are done
+(KUR-29 … KUR-43). **The service runs** — verified against real MongoDB:
+`/healthz`, a 403 for an anonymous caller, a 201 that wrote a real article and
+its revision, and the cron guard refusing a wrong secret.
+
+Remaining for the cutover: the BFF seam in Next (calling this service instead
+of its own container), then deleting the TypeScript editorial packages.
 
 ---
 

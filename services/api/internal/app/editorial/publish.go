@@ -43,14 +43,17 @@ func (uc PublishArticle) Execute(ctx context.Context, in PublishArticleInput) (e
 // a scheduled article quietly never goes live, which is the worst outcome
 // available to a newsroom.
 type PublishDueResult struct {
-	Published []shared.ArticleID
-	Failed    []PublishFailure
+	// Tagged because this crosses the wire. Without tags Go emits
+	// "Published"/"Failed", which is inconsistent with every other response
+	// and the sort of thing a client works around rather than reports.
+	Published []shared.ArticleID `json:"published"`
+	Failed    []PublishFailure   `json:"failed"`
 }
 
 // PublishFailure names one article that could not be published, and why.
 type PublishFailure struct {
-	ArticleID shared.ArticleID
-	Reason    string
+	ArticleID shared.ArticleID `json:"articleId"`
+	Reason    string           `json:"reason"`
 }
 
 // PublishDueArticles is the scheduled-publication cron.
@@ -78,7 +81,10 @@ func (uc PublishDueArticles) Execute(ctx context.Context, actor identity.Actor) 
 		return PublishDueResult{}, fmt.Errorf("listing due articles: %w", err)
 	}
 
-	result := PublishDueResult{}
+	// Initialised to empty slices, not nil. nil marshals to `null`, and a
+	// client doing `failed.length` on null crashes — "nothing failed" is a
+	// fact worth stating positively rather than as an absence.
+	result := PublishDueResult{Published: []shared.ArticleID{}, Failed: []PublishFailure{}}
 
 	for _, article := range due {
 		if _, err := publishAndAnnounce(ctx, uc.deps, article, actor, now); err != nil {

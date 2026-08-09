@@ -53,13 +53,16 @@ cover:
 	awk -v t="$$total" -v f="$(DOMAIN_FLOOR)" 'BEGIN { exit !(t+0 >= f+0) }' || \
 		{ echo "FAIL: domain coverage $$total% is below the $(DOMAIN_FLOOR)% floor"; exit 1; }
 
-## cover-app holds the application ring to its own floor.
+## cover-app holds the application and transport rings to their floor.
 ##
-## internal/app/testing is excluded: it is the fakes, exercised entirely by the
-## tests that use them. Counting a test double's own coverage measures nothing.
+## internal/http is included: it is where authorisation is enforced at the
+## edge, and an untested transport layer is where a guard quietly stops being
+## applied. internal/app/testing is excluded — it is the fakes, exercised
+## entirely by the tests that use them, and a test double's own coverage
+## measures nothing.
 cover-app:
 	$(GO) test -race -coverprofile=$(APP_PROFILE) \
-		$$($(GO) list ./internal/app/... | grep -v '/app/testing')
+		$$($(GO) list ./internal/app/... ./internal/http/... | grep -v '/app/testing')
 	@total=$$($(GO) tool cover -func=$(APP_PROFILE) | awk '/^total:/ {gsub(/%/,"",$$3); print $$3}'); \
 	echo "app coverage: $$total% (floor $(APP_FLOOR)%)"; \
 	awk -v t="$$total" -v f="$(APP_FLOOR)" 'BEGIN { exit !(t+0 >= f+0) }' || \
