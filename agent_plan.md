@@ -158,7 +158,7 @@ brand variants. All **21 base desktop screens** are extracted into
 | `our_team_kurasikapa_media_tv` | `/team` | ❌ own layout |
 | `kurasikapa_admin_ai_content_editor` | `/studio/articles/{id}` | ❌ own layout |
 | `social_media_publishing_kurasikapa_admin` | — | ❌ no route (R2) |
-| `user_management_kurasikapa_admin` | — | ❌ no route |
+| `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |
 | `kurasikapa_media_podcast_library` | — | ❌ no route (R3) |
 | `kurasikapa_media_live_tv_gallery` | — | ❌ no route (R3) |
 | `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
@@ -203,7 +203,7 @@ the wiring is missing.
 | ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
 | **Rich-text editor** | Not built. `editor-fields.tsx` is a plain `<textarea>`. No tiptap/lexical/prosemirror. `ArticleBody` splits on blank lines rather than parsing Markdown — deliberately, since rendering stored HTML without a sanitiser is an injection route. |
 | ~~Security headers~~ | **DONE — KUR-37.** CSP and Permissions-Policy added; the rest were already in next.config.ts (my earlier note checked proxy.ts and was wrong). Applied to every route including /api. |
-| ~~Rate limiting~~ | **DONE — KUR-39.** AI endpoints limited via a shared MongoDB counter (fails closed). Auth limited by Better Auth's own limiter, moved to database storage — its in-memory default is per-instance and limits nothing on serverless. Search not yet limited. |
+| ~~Rate limiting~~ | **DONE — KUR-39.** AI endpoints limited via a shared MongoDB counter (fails closed). Auth limited by Better Auth's own limiter, moved to database storage — its in-memory default is per-instance and limits nothing on serverless. Search limited too (fails open — it is the least valuable thing to protect and the most visible to break). |
 | **2FA** | Not built. |
 | **CAPTCHA** | Not built. |
 | **Google Analytics / Search Console** | Not built. No gtag, no GTM. |

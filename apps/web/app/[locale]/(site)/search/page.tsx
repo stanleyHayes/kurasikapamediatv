@@ -1,7 +1,9 @@
 import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { Link } from '@/i18n/navigation'
+import { currentActor } from '@/composition/actor'
 import { container } from '@/composition/container'
+import { callerKey, limit } from '@/security/rate-limit'
 
 interface Props {
   params: Promise<{ locale: string }>
@@ -45,13 +47,40 @@ async function Results({
   locale: string
 }): Promise<React.ReactElement> {
   const { q } = await searchParams
-  const terms = q ?? ''
+  const terms = (q ?? '').trim()
 
-  const page = await container().searchArticles.execute({ terms, locale })
-
-  if (terms.trim().length < 2) {
+  // Checked before the query, not after. The use case short-circuits on a
+  // short term anyway, so this is not a correctness fix — but calling it and
+  // then deciding the call was pointless reads as if the guard were doing
+  // something it is not.
+  if (terms.length < 2) {
     return <p className="text-on-surface-variant">Type at least two characters.</p>
   }
+
+  // Limited only once there is a real query. A `$text` scan is the cost worth
+  // protecting; an empty search box is not, and limiting it would let a reader
+  // exhaust their allowance by pressing enter on nothing.
+  //
+  // Fails OPEN: search is the least valuable thing to protect and the most
+  // visible to break, and a reader who cannot search because a counter is
+  // unreachable has no idea why.
+  const actor = await currentActor()
+  const verdict = await limit(
+    container().rateLimiter,
+    await callerKey(actor?.id ?? null),
+    'search',
+    'open',
+  )
+
+  if (!verdict.allowed) {
+    return (
+      <p className="text-on-surface-variant">
+        Too many searches. Try again in {verdict.retryAfterSeconds} seconds.
+      </p>
+    )
+  }
+
+  const page = await container().searchArticles.execute({ terms, locale })
 
   if (page.items.length === 0) {
     return <p className="text-on-surface-variant">Nothing matched “{terms}”.</p>
