@@ -104,3 +104,9 @@ export const translateSchema = z.object({
   locale: z.string().trim().min(2).max(10),
   targetLocale: z.enum(['en', 'fr']),
 })
+
+/** Restoring an older revision as the current text. */
+export const restoreRevisionSchema = z.object({
+  articleId: id,
+  revisionId: id,
+})

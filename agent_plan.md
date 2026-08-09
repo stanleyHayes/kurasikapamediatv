@@ -185,7 +185,7 @@ the wiring is missing.
 | **`AiPort.draftFromPrompt` / `draftFromBullets`** | implemented, streaming | `/api/ai/[task]` route exists; the studio editor does not offer "generate". |
 | ~~`PublishDueArticles`~~ | **DONE — KUR-34.** `/api/cron/publish-due`, triggered by Vercel Cron. | — |
 | **`QueueSocialPost` / `PublishDuePosts`** | use cases built, KUR-22 | `MongoSocialPostRepository` is never instantiated in `container.ts`; no admin queue screen; no `SocialPublishPort` adapter. |
-| **Revision history** | domain + repository are append-only and complete | No UI anywhere. The data is being written and never shown. |
+| ~~Revision history~~ | **DONE — KUR-36.** History panel in the studio editor, with restore. | — |
 | **`ListUsers` beyond roles** | works | Only used by the roles screen. |
 
 ---
@@ -326,10 +326,10 @@ Ordered by value per unit of risk, not by release number.
 1. **Port the `editorial` bounded context to Go.** Domain, ports, the first use
    cases and the Mongo adapter are done (KUR-29 … KUR-32). Remaining: the HTTP
    layer, the composition root, and the BFF seam in Next.
-2. **Revision history UI.** The data is append-only and complete, and nothing
-   has ever shown it.
-3. **Rework the remaining designed screens** — About, Team, the AI content
+2. **Rework the remaining designed screens** — About, Team, the AI content
    editor and user management still use my layouts. See §3.7.
+3. **Close R1 properly** — security headers, rate limiting, audit logging, and
+   a first deployment. See §5.1.
 
 Then close R1 properly: security headers, rate limiting, audit logging, and a
 first deployment.

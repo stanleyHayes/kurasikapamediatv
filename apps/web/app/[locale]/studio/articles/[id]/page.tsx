@@ -3,6 +3,9 @@ import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Editor } from '@/components/studio/editor'
+import type { ArticleStatus, Revision } from '@kurasikapa/domain'
+import { excerptFrom } from '@kurasikapa/application'
+import { RevisionHistory, type RevisionView } from '@/components/studio/revision-history'
 import { TranslatePanel } from '@/components/studio/translate-panel'
 import { StatusBadge } from '@/components/studio/status-badge'
 import { requireActor } from '@/composition/actor'
@@ -23,6 +26,14 @@ export default function EditorPage({ params }: Params): React.ReactElement {
 }
 
 /** Editing is refused once an editor has judged the text. See Article.retitle. */
+const toRevisionView = (revision: Revision): RevisionView => ({
+  id: revision.id,
+  seq: revision.seq,
+  title: revision.title,
+  createdAt: revision.createdAt.toISOString(),
+  excerpt: excerptFrom(revision.body, 160),
+})
+
 const EDITABLE: readonly string[] = ['draft', 'unpublished']
 
 async function EditorBody({ params }: Params): Promise<React.ReactElement> {
@@ -43,6 +54,14 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
   const status = draft.article.status
   const props = draft.article.snapshot()
   const body = draft.latest?.body ?? ''
+  const editable = EDITABLE.includes(status)
+
+  const history = await container().listRevisions.execute({
+    actor,
+    articleId: draft.article.id,
+  })
+
+  const revisions = history.map(toRevisionView)
 
   return (
     <>
@@ -53,28 +72,18 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <div className="lg:col-span-8">
-          <Editor
-            articleId={draft.article.id}
-            initialTitle={props.title}
-            initialBody={body}
-            status={status}
-            editable={EDITABLE.includes(status)}
-            locale={draft.article.locale}
-          />
-        </div>
-
-        <aside className="lg:col-span-4">
-          <TranslatePanel
-            title={props.title}
-            body={body}
-            locale={draft.article.locale}
-            familyId={props.familyId}
-            categoryId={props.categoryId}
-          />
-        </aside>
-      </div>
+      <EditorWorkspace
+        articleId={draft.article.id}
+        title={props.title}
+        body={body}
+        status={status}
+        editable={editable}
+        articleLocale={draft.article.locale}
+        familyId={props.familyId}
+        categoryId={props.categoryId}
+        revisions={revisions}
+        locale={locale}
+      />
     </>
   )
 }
@@ -84,6 +93,56 @@ function EditorSkeleton(): React.ReactElement {
     <div className="flex flex-col gap-[var(--spacing-md)]" aria-hidden>
       <div className="bg-surface-container h-10 rounded" />
       <div className="bg-surface-container h-96 rounded" />
+    </div>
+  )
+}
+
+interface WorkspaceProps {
+  articleId: string
+  title: string
+  body: string
+  status: ArticleStatus
+  editable: boolean
+  /** The article's own locale, which drives translation. */
+  articleLocale: string
+  familyId: string
+  categoryId: string
+  revisions: readonly RevisionView[]
+  /** The UI locale, which drives date formatting. */
+  locale: string
+}
+
+/** Editor on the left, the panels that act on it on the right. */
+function EditorWorkspace(props: WorkspaceProps): React.ReactElement {
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="lg:col-span-8">
+        <Editor
+          articleId={props.articleId}
+          initialTitle={props.title}
+          initialBody={props.body}
+          status={props.status}
+          editable={props.editable}
+          locale={props.articleLocale}
+        />
+      </div>
+
+      <aside className="lg:col-span-4">
+        <TranslatePanel
+          title={props.title}
+          body={props.body}
+          locale={props.articleLocale}
+          familyId={props.familyId}
+          categoryId={props.categoryId}
+        />
+
+        <RevisionHistory
+          articleId={props.articleId}
+          revisions={props.revisions}
+          locale={props.locale}
+          editable={props.editable}
+        />
+      </aside>
     </div>
   )
 }

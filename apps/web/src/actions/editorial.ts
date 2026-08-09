@@ -14,7 +14,12 @@ import {
   unpublishSchema,
   updateDraftSchema,
 } from './schemas'
-import { assignRolesSchema, bookmarkSchema, queueSocialPostSchema } from './schemas'
+import {
+  assignRolesSchema,
+  bookmarkSchema,
+  queueSocialPostSchema,
+  restoreRevisionSchema,
+} from './schemas'
 
 /**
  * The editorial Server Actions.
@@ -234,5 +239,28 @@ export async function queueSocialPostAction(
     // The queue screen is never cached — an editor acting on a stale queue is
     // worse than a slower screen — so there is no tag to invalidate here.
     return { queued: result.queued.length }
+  })
+}
+
+/**
+ * Brings an older version's text back as the current one.
+ *
+ * The domain writes it FORWARD as a new revision rather than rewinding, so the
+ * history keeps every step including the mistake and the restoration.
+ */
+export async function restoreRevisionAction(
+  input: unknown,
+): Promise<ActionResult<{ seq: number }>> {
+  return attempt(async () => {
+    const parsed = parseInput(restoreRevisionSchema, input)
+    const actor = await requireActor()
+
+    const restored = await container().restoreRevision.execute({
+      actor,
+      articleId: parsed.articleId as ArticleId,
+      revisionId: parsed.revisionId as RevisionId,
+    })
+
+    return { seq: restored.seq }
   })
 }

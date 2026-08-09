@@ -112,6 +112,19 @@ export class Article {
     this.guardOwnership(actor)
   }
 
+  /**
+   * Throws unless this actor may change the article's text right now.
+   *
+   * Public because the application genuinely needs to ask it: restoring an old
+   * revision is an edit, and the alternative was calling `retitle` with the
+   * existing title purely for its side effect — a guard invoked through an
+   * operation that pretends to do something else is a guard that stops being
+   * called the moment someone tidies up.
+   */
+  assertEditableBy(actor: Actor): void {
+    this.guardEditable(actor)
+  }
+
   private guardEditable(actor: Actor): void {
     requirePermission(actor, 'article:edit_own')
     this.guardOwnership(actor)

@@ -212,3 +212,39 @@ describe('immutability', () => {
     expect(draft.status).toBe('draft')
   })
 })
+
+describe('assertEditableBy', () => {
+  it('admits the author of an editable draft', () => {
+    expect(() => {
+      anArticle().assertEditableBy(actorWith(['author']))
+    }).not.toThrow()
+  })
+
+  it('refuses a reader before it mentions ownership', () => {
+    // Permission outranks ownership. Telling someone with no editorial
+    // permission that an article "belongs to another author" confirms both
+    // that an unpublished draft exists and who wrote it.
+    expect(() => {
+      anArticle().assertEditableBy(actorWith(['subscriber']))
+    }).toThrow(NotPermitted)
+  })
+
+  it("refuses another author's draft", () => {
+    expect(() => {
+      anArticle().assertEditableBy(actorWith(['author'], OTHER))
+    }).toThrow(NotOwnArticle)
+  })
+
+  it('refuses an article that is in review', () => {
+    // It must not move under the reviewer reading it.
+    expect(() => {
+      anArticle({ status: 'in_review' }).assertEditableBy(actorWith(['editor']))
+    }).toThrow()
+  })
+
+  it('admits an unpublished article, so a correction can be made', () => {
+    expect(() => {
+      anArticle({ status: 'unpublished' }).assertEditableBy(actorWith(['editor']))
+    }).not.toThrow()
+  })
+})

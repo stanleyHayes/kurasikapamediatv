@@ -23,6 +23,8 @@ import {
   ListAuthoredArticles,
   BrowseCategory,
   ListAwaitingReview,
+  ListRevisions,
+  RestoreRevision,
   ListSections,
   ListSavedArticles,
   ListUsers,
@@ -88,6 +90,8 @@ export interface Container {
   readonly listSections: ListSections
   readonly listAuthoredArticles: ListAuthoredArticles
   readonly getDraft: GetDraft
+  readonly listRevisions: ListRevisions
+  readonly restoreRevision: RestoreRevision
   readonly listAwaitingReview: ListAwaitingReview
   readonly searchArticles: SearchArticles
   readonly resolveActor: ResolveActor
@@ -149,6 +153,8 @@ export function buildContainer(infra: Infrastructure): Container {
     listSections: new ListSections({ categories }),
     listAuthoredArticles: new ListAuthoredArticles({ articles, revisions }),
     getDraft: new GetDraft({ articles, revisions }),
+    listRevisions: new ListRevisions({ articles, revisions, clock, ids }),
+    restoreRevision: new RestoreRevision({ articles, revisions, clock, ids }),
     listAwaitingReview: new ListAwaitingReview({ articles }),
     searchArticles: new SearchArticles({ search }),
     resolveActor: new ResolveActor({ roles }),

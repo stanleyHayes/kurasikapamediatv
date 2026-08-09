@@ -181,3 +181,13 @@ export {
   RevisionNotOfArticle,
   SlugTaken,
 } from './editorial/errors'
+
+export {
+  ListRevisions,
+  RestoreRevision,
+  type ListRevisionsInput,
+  type RestoreRevisionInput,
+  type RevisionHistoryDeps,
+} from './editorial/revisions-history'
+
+export { excerptFrom } from './editorial/excerpt'
