@@ -1,6 +1,7 @@
 import type { Db } from 'mongodb'
 import {
   ARTICLES,
+  AUDIT_ENTRIES,
   BOOKMARKS,
   SOCIAL_POSTS,
   CATEGORIES,
@@ -79,5 +80,14 @@ export async function ensureIndexes(db: Db): Promise<void> {
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.
     { key: { articleId: 1, seq: -1 }, unique: true, name: 'article_seq_unique' },
+  ])
+
+  await db.collection(AUDIT_ENTRIES).createIndexes([
+    // The audit log only ever grows, so the one query it serves — newest
+    // first, paged backwards — must not become a collection scan. Of every
+    // index here this is the one whose absence gets worse every day.
+    { key: { occurredAt: -1 }, name: 'audit_recent' },
+    // "What happened to this article" is the second question anyone asks.
+    { key: { subjectId: 1, occurredAt: -1 }, name: 'audit_by_subject' },
   ])
 }

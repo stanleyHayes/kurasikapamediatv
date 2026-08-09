@@ -191,3 +191,7 @@ export {
 } from './editorial/revisions-history'
 
 export { excerptFrom } from './editorial/excerpt'
+
+export type { AuditLog } from './ports/audit'
+export { auditEntryFor } from './insight/audit-events'
+export { ReadAuditLog, type ReadAuditLogInput, type ReadAuditLogDeps } from './insight/read-audit-log'

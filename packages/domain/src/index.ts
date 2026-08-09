@@ -62,3 +62,5 @@ export {
   type SocialPostId,
   type SocialPostProps,
 } from './distribution/social-post'
+
+export { AuditEntry, type AuditEntryProps } from './insight/audit-entry'

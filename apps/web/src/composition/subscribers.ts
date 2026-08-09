@@ -1,3 +1,5 @@
+import type { AuditLog, IdPort } from '@kurasikapa/application'
+import { auditEntryFor } from '@kurasikapa/application'
 import { revalidateTag, updateTag } from 'next/cache'
 import { type CacheTags, invalidateFor } from './cache-invalidation'
 import type { InProcessEventBus } from './ambient'
@@ -38,14 +40,26 @@ const nextTags: CacheTags = {
 /**
  * Registered once, on the production graph only.
  *
- * Attaching cache invalidation to the event bus rather than to the Server
- * Action means the scheduled-publication cron invalidates exactly the same way
- * an editor's click does. Wiring it into the action would have left scheduled
- * articles live in the database and stale on the site.
+ * Attaching these to the event bus rather than to the Server Action means the
+ * scheduled-publication cron invalidates and audits exactly the same way an
+ * editor's click does. Wiring them into the action would have left scheduled
+ * articles live in the database, stale on the site, and absent from the record.
  */
-export function registerSubscribers(events: InProcessEventBus): void {
+export function registerSubscribers(events: InProcessEventBus, audit: AuditLog, ids: IdPort): void {
   events.on((event) => {
     invalidateFor(nextTags, event)
     return Promise.resolve()
+  })
+
+  // Audit every event, not a chosen few. Deciding here which actions are
+  // "worth recording" is how the one action somebody later needs turns out to
+  // be the one nobody kept.
+  //
+  // A failing audit write does NOT fail the action that caused it: the thing
+  // already happened, and refusing to acknowledge a publication because the
+  // log was unreachable would tell an editor to publish twice. The event bus
+  // collects and reports subscriber failures — see EventBusPort.
+  events.on(async (event) => {
+    await audit.append(auditEntryFor(event, ids.next()))
   })
 }

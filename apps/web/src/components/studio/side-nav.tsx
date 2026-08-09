@@ -17,6 +17,7 @@ const LIVE = [
   { href: '/studio/review', label: 'Review', icon: '☑' },
   { href: '/studio/social', label: 'Social', icon: '◈' },
   { href: '/studio/people', label: 'Users', icon: '☰' },
+  { href: '/studio/audit', label: 'Audit', icon: '◫' },
 ] as const
 
 const FORTHCOMING = [

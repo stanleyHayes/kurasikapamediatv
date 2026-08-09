@@ -13,6 +13,7 @@ const TITLES: readonly { href: string; title: string }[] = [
   { href: '/studio/review', title: 'Review Queue' },
   { href: '/studio/social', title: 'Social Publishing' },
   { href: '/studio/people', title: 'Roles & Permissions' },
+  { href: '/studio/audit', title: 'Audit Log' },
   { href: '/studio/articles', title: 'Editor' },
   { href: '/studio', title: 'Editorial Workflow' },
 ]

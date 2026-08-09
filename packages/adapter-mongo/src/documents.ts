@@ -80,3 +80,14 @@ export const ROLE_ASSIGNMENTS = 'role_assignments'
 export const CATEGORIES = 'categories'
 export const BOOKMARKS = 'bookmarks'
 export const SOCIAL_POSTS = 'social_posts'
+/** Append-only. Product rule 4. */
+export const AUDIT_ENTRIES = 'audit_entries'
+
+export interface AuditEntryDocument {
+  _id: string
+  action: string
+  actorId: string
+  subjectId: string
+  occurredAt: Date
+  detail: Record<string, string>
+}

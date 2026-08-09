@@ -2,6 +2,7 @@ import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthrop
 import {
   MongoArticleRepository,
   MongoBookmarkRepository,
+  MongoAuditLog,
   MongoSocialPostRepository,
   MongoCategoryRepository,
   MongoRevisionRepository,
@@ -12,6 +13,7 @@ import {
 import {
   type AiPort,
   type SocialPostRepository,
+  type AuditLog,
   ApproveArticle,
   AssignRoles,
   type ClockPort,
@@ -30,6 +32,7 @@ import {
   ListUsers,
   RemoveSavedArticle,
   QueueSocialPost,
+  ReadAuditLog,
   SaveArticle,
   SearchArticles,
   ListPublishedArticles,
@@ -80,6 +83,7 @@ export interface Container {
   readonly queueSocialPost: QueueSocialPost
   /** Read side for the publishing queue screen. */
   readonly socialPosts: SocialPostRepository
+  readonly readAuditLog: ReadAuditLog
   readonly removeSavedArticle: RemoveSavedArticle
   readonly listSavedArticles: ListSavedArticles
 
@@ -124,6 +128,7 @@ export function buildContainer(infra: Infrastructure): Container {
   const users: UserDirectory = new MongoUserDirectory(infra.db)
   const bookmarks: BookmarkRepository = new MongoBookmarkRepository(infra.db)
   const socialPosts: SocialPostRepository = new MongoSocialPostRepository(infra.db)
+  const audit: AuditLog = new MongoAuditLog(infra.db)
   const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
 
   const { clock, ids, events } = infra
@@ -144,6 +149,7 @@ export function buildContainer(infra: Infrastructure): Container {
     saveArticle: new SaveArticle({ bookmarks, articles, clock }),
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
     socialPosts,
+    readAuditLog: new ReadAuditLog({ audit }),
     removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
     listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
 
@@ -171,10 +177,15 @@ export function container(): Container {
   if (instance !== undefined) return instance
 
   const events = new InProcessEventBus()
-  registerSubscribers(events)
+  const db = mongoDb()
+
+  // Subscribers are registered against the same database the use cases write
+  // to, before anything can emit. An event published before the audit
+  // subscriber exists is an action that happened and was never recorded.
+  registerSubscribers(events, new MongoAuditLog(db), cryptoIds)
 
   instance = buildContainer({
-    db: mongoDb(),
+    db,
     clock: systemClock,
     ids: cryptoIds,
     events,

@@ -69,8 +69,10 @@ Seven bounded contexts: `editorial` · `identity` · `media` · `distribution` �
 `revenue` and `insight` are named in the architecture but have no files in
 either language.
 
-**Go migration progress:** `shared.Slug` ported with tests (95.2% coverage).
-Everything else is still TypeScript only.
+**Go migration progress:** `shared`, `identity` and `editorial` domains ported
+with tests, plus the application ports, the first editorial use cases and the
+MongoDB adapter (KUR-29 … KUR-32). Remaining: HTTP layer, composition root,
+and the BFF seam in Next.
 
 ---
 
@@ -198,7 +200,7 @@ the wiring is missing.
 |---|---|
 | **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". Hosting for the Go service is now an open question — Render was chosen for a worker, not for the primary API. |
 | **The Go backend itself** | Just started. One value object ported. This is the largest single piece of outstanding work. |
-| **Audit logs** | Not built. Only the *permission name* `audit:read` exists — there is no audit collection, no use case, no writer. Product rule 4 (append-only audit) is currently unenforced because there is nothing to enforce it on. |
+| ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
 | **Rich-text editor** | Not built. `editor-fields.tsx` is a plain `<textarea>`. No tiptap/lexical/prosemirror. `ArticleBody` splits on blank lines rather than parsing Markdown — deliberately, since rendering stored HTML without a sanitiser is an injection route. |
 | ~~Security headers~~ | **DONE — KUR-37.** CSP and Permissions-Policy added; the rest were already in next.config.ts (my earlier note checked proxy.ts and was wrong). Applied to every route including /api. |
 | **Rate limiting** | Not built — on auth, search, or the AI endpoints. |
