@@ -84,9 +84,39 @@ EmailPort      Resend: transactional now, bulk at R2
   Audit and insight collections are already append-only (product rule 4); chat
   is **not** covered by that rule and must be deletable on request.
 
-## Open for the client
+## Settled with the client, 2026-08-09
 
-- **Live TV audience ceiling.** Sizes the quota request and the bitrate ladder.
-- **Is a 720p default acceptable** for the main broadcast? It roughly halves
-  delivery cost against 1080p and is kinder to West African data budgets.
-- **Chat retention period**, given GDPR and the moderation requirement.
+**720p is the default rendition.** 1080p stays in the ladder for viewers whose
+connection supports it, but the default the player selects is 720p. This roughly
+halves delivery cost against a 1080p default and is materially kinder to West
+African data budgets, where mobile data is a real household expense. Cost and
+audience pull the same way here, which is rare and worth taking.
+
+**Chat messages are retained for 30 days.** Long enough for moderation to act
+on a report and for an editor to review a complaint; short enough to defend
+under GDPR's storage-limitation principle for a France-registered controller.
+
+Moderation *actions* — bans, deletions, the fact that a decision was taken —
+persist beyond 30 days as enforcement records. That is a different lawful basis
+from the message content, and conflating the two would either destroy the ban
+list every month or keep everyone's chat forever. Neither is acceptable.
+
+Note this does **not** fall under product rule 4 (audit and insight collections
+are append-only). Chat is personal data and must be deletable on request; an
+append-only chat log would put us in direct conflict with a subject access
+deletion.
+
+**Audience ceiling: plan for 25,000 concurrent, provisioned to 50,000.**
+
+This is an estimate, not a client figure — recorded as such so nobody later
+mistakes it for one. The reasoning: a launching regional broadcaster serving
+Ghana plus a European diaspora realistically peaks in the hundreds to low
+thousands day to day, and the spikes that matter are elections, national team
+matches and major breaking news. 25,000 leaves room for a spike an order of
+magnitude above routine traffic.
+
+The operational consequence matters more than the number. **IVS defaults to
+15,000 concurrent viewers per region**, and raising it is a support ticket
+measured in days with no priority lane. The quota increase to 50,000 must be
+requested *before* a scheduled event, not during one. Revisit after the first
+real broadcast, when there is traffic data instead of an estimate.
