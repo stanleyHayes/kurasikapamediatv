@@ -19,6 +19,11 @@ export interface AiPanelProps {
   readonly locale: string
   /** Called when the editor accepts a headline. Acceptance is theirs alone. */
   readonly onUseHeadline: (headline: string) => void
+  /**
+   * False once an article leaves draft. Suggestions stay readable, but
+   * accepting one would write into a field the domain refuses to change.
+   */
+  readonly editable: boolean
 }
 
 /**
@@ -60,7 +65,7 @@ export function AiPanel(props: AiPanelProps): React.ReactElement {
         Suggestions only. Nothing is applied until you apply it.
       </p>
 
-      <AssistButtons disabled={pending || props.body.trim() === ''} onRun={run} />
+      <AssistButtons disabled={pending || !props.editable || props.body.trim() === ''} onRun={run} />
 
       <AssistResults
         pending={pending}
