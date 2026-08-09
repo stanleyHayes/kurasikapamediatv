@@ -203,7 +203,7 @@ the wiring is missing.
 | ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
 | **Rich-text editor** | Not built. `editor-fields.tsx` is a plain `<textarea>`. No tiptap/lexical/prosemirror. `ArticleBody` splits on blank lines rather than parsing Markdown — deliberately, since rendering stored HTML without a sanitiser is an injection route. |
 | ~~Security headers~~ | **DONE — KUR-37.** CSP and Permissions-Policy added; the rest were already in next.config.ts (my earlier note checked proxy.ts and was wrong). Applied to every route including /api. |
-| **Rate limiting** | Not built — on auth, search, or the AI endpoints. |
+| ~~Rate limiting~~ | **DONE — KUR-39.** AI endpoints limited via a shared MongoDB counter (fails closed). Auth limited by Better Auth's own limiter, moved to database storage — its in-memory default is per-instance and limits nothing on serverless. Search not yet limited. |
 | **2FA** | Not built. |
 | **CAPTCHA** | Not built. |
 | **Google Analytics / Search Console** | Not built. No gtag, no GTM. |

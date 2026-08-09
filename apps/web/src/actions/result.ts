@@ -8,6 +8,7 @@ import {
   ScheduleInPast,
   UnknownRole,
 } from '@kurasikapa/domain'
+import { RateLimited } from '../security/rate-limit'
 import {
   ArticleNotFound,
   RevisionNotFound,
@@ -48,6 +49,7 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [InvalidSlug, 'invalid_slug'],
   [CannotAssignOwnRoles, 'cannot_assign_own_roles'],
   [UnknownRole, 'unknown_role'],
+  [RateLimited, 'rate_limited'],
 ]
 
 export function toActionError(error: unknown): ActionError {

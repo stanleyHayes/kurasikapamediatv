@@ -1,5 +1,6 @@
 import { requireActor } from '@/composition/actor'
 import { container } from '@/composition/container'
+import { callerKey, limit } from '@/security/rate-limit'
 import { parseInput, rewriteSchema } from '@/actions/schemas'
 
 const STREAMING_TASKS = ['rewrite', 'tone', 'draft'] as const
@@ -27,7 +28,21 @@ export async function POST(
 
   // AI tokens cost money. An unauthenticated caller must not be able to spend
   // them, and this endpoint is reachable without a form.
-  await requireActor()
+  const actor = await requireActor()
+
+  // Signed in is not the same as unlimited. A compromised editor account, or
+  // an honest script in a loop, spends real money — and this endpoint streams,
+  // so a caller can hold many open at once.
+  //
+  // Fails CLOSED: if the counter is unreachable we cannot count, and an
+  // uncounted AI endpoint is an unbounded bill. A refusal is recoverable.
+  const verdict = await limit(container().rateLimiter, await callerKey(actor.id), 'ai', 'closed')
+  if (!verdict.allowed) {
+    return new Response('Too many requests', {
+      status: 429,
+      headers: { 'Retry-After': String(verdict.retryAfterSeconds) },
+    })
+  }
 
   const input = parseInput(rewriteSchema, await request.json())
   const stream = container().ai.rewrite(input)

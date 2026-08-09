@@ -50,11 +50,14 @@ export class MongoAuditLog implements AuditLog {
       .toArray()
 
     const page = docs.slice(0, cursor.limit)
-    const hasMore = docs.length > cursor.limit
+    // Derived from the last row rather than from `hasMore` plus an optional
+    // chain: if another page exists then this one is non-empty, so the
+    // "missing last row" case is unreachable and testing it is impossible.
+    const last = docs.length > cursor.limit ? page.at(-1) : undefined
 
     return {
       items: page.map(toDomain),
-      nextCursor: hasMore ? (page.at(-1)?.occurredAt.toISOString() ?? null) : null,
+      nextCursor: last === undefined ? null : last.occurredAt.toISOString(),
     }
   }
 }

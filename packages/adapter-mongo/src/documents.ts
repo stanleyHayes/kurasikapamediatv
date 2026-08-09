@@ -82,6 +82,8 @@ export const BOOKMARKS = 'bookmarks'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'
+/** Ephemeral counters, reaped by a TTL index. */
+export const RATE_LIMITS = 'rate_limits'
 
 export interface AuditEntryDocument {
   _id: string
@@ -90,4 +92,12 @@ export interface AuditEntryDocument {
   subjectId: string
   occurredAt: Date
   detail: Record<string, string>
+}
+
+export interface RateLimitDocument {
+  /** `${key}:${windowStart}` — a new window is a new document. */
+  _id: string
+  count: number
+  /** TTL anchor. Mongo reaps the document some time after this. */
+  expiresAt: Date
 }

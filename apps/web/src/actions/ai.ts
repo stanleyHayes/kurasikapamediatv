@@ -11,6 +11,7 @@ import type {
 } from '@kurasikapa/application'
 import { requireActor } from '../composition/actor'
 import { container } from '../composition/container'
+import { RateLimited, callerKey, limit } from '../security/rate-limit'
 import { type ActionResult, attempt } from './result'
 import { aiContextSchema, parseInput, translateSchema } from './schemas'
 
@@ -29,7 +30,7 @@ import { aiContextSchema, parseInput, translateSchema } from './schemas'
 const assist = <T>(input: unknown, run: (ctx: AiContext) => Promise<T>): Promise<ActionResult<T>> =>
   attempt(async () => {
     const ctx = parseInput(aiContextSchema, input)
-    await requireActor()
+    await requireAiBudget()
 
     return run(ctx)
   })
@@ -92,7 +93,7 @@ export async function detectCategoryAction(
 export async function translateAction(input: unknown): Promise<ActionResult<TranslatedArticle>> {
   return attempt(async () => {
     const parsed = parseInput(translateSchema, input)
-    await requireActor()
+    await requireAiBudget()
 
     return container().ai.translate({
       title: parsed.title,
@@ -101,4 +102,23 @@ export async function translateAction(input: unknown): Promise<ActionResult<Tran
       targetLocale: parsed.targetLocale,
     })
   })
+}
+
+/**
+ * Authenticates AND counts the call against the AI budget.
+ *
+ * Every AI action shares one limit rather than each having its own, because
+ * they share one bill. Per-action limits would let a caller take the sum of
+ * them, which is the number nobody meant to allow.
+ *
+ * Fails CLOSED, like the streaming route: an uncounted AI call is an
+ * unbounded one.
+ */
+async function requireAiBudget(): Promise<void> {
+  const actor = await requireActor()
+
+  const verdict = await limit(container().rateLimiter, await callerKey(actor.id), 'ai', 'closed')
+  if (!verdict.allowed) {
+    throw new RateLimited(verdict.retryAfterSeconds)
+  }
 }

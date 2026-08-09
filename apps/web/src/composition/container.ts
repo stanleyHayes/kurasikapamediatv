@@ -3,6 +3,7 @@ import {
   MongoArticleRepository,
   MongoBookmarkRepository,
   MongoAuditLog,
+  MongoRateLimiter,
   MongoSocialPostRepository,
   MongoCategoryRepository,
   MongoRevisionRepository,
@@ -14,6 +15,7 @@ import {
   type AiPort,
   type SocialPostRepository,
   type AuditLog,
+  type RateLimiter,
   ApproveArticle,
   AssignRoles,
   type ClockPort,
@@ -84,6 +86,8 @@ export interface Container {
   /** Read side for the publishing queue screen. */
   readonly socialPosts: SocialPostRepository
   readonly readAuditLog: ReadAuditLog
+  /** Exposed directly: limiting is a transport concern, not a use case. */
+  readonly rateLimiter: RateLimiter
   readonly removeSavedArticle: RemoveSavedArticle
   readonly listSavedArticles: ListSavedArticles
 
@@ -132,6 +136,7 @@ export function buildContainer(infra: Infrastructure): Container {
   const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
 
   const { clock, ids, events } = infra
+  const rateLimiter: RateLimiter = new MongoRateLimiter(infra.db, clock)
   const write = { articles, clock, events }
 
   return {
@@ -150,6 +155,7 @@ export function buildContainer(infra: Infrastructure): Container {
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
     socialPosts,
     readAuditLog: new ReadAuditLog({ audit }),
+    rateLimiter,
     removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
     listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
 
