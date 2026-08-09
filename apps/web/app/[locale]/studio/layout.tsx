@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { StudioSideNav } from '@/components/studio/side-nav'
+import { StudioTopBar } from '@/components/studio/top-bar'
 import { currentActor } from '@/composition/actor'
 
 /**
@@ -60,14 +61,10 @@ async function Guarded({
       {/* Rendered inside the boundary, not in the prerendered shell: it holds
           the sign-out control, and "sign out" has no meaning for the visitor
           who sees a prerendered page. */}
-      <StudioSideNav active="/studio" />
+      <StudioSideNav />
 
       <main className="relative flex h-full flex-1 flex-col overflow-hidden">
-        <header className="border-outline-variant bg-surface/60 flex h-20 shrink-0 items-center justify-between border-b px-6 backdrop-blur-md">
-          <h1 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
-            Editorial Workflow
-          </h1>
-        </header>
+        <StudioTopBar />
 
         <div className="relative flex-1 overflow-y-auto p-6">
           <div className="mx-auto max-w-[var(--container-page)]">{children}</div>

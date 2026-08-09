@@ -102,7 +102,7 @@ describe('reader lists never cross', () => {
     const mine = await new ListSavedArticles(d).execute({ actor: READER })
 
     expect(mine.items).toHaveLength(1)
-    expect(mine.items[0]?.id).toBe(target)
+    expect(mine.items[0]?.article.id).toBe(target)
   })
 
   it('removes only the actor’s own bookmark', async () => {
@@ -154,7 +154,7 @@ describe('ListSavedArticles', () => {
 
     const page = await new ListSavedArticles(d).execute({ actor: READER })
 
-    expect(page.items.map((a) => a.id)).toEqual(['art_2', 'art_1'])
+    expect(page.items.map((s) => s.article.id)).toEqual(['art_2', 'art_1'])
   })
 
   it.each([
@@ -173,5 +173,24 @@ describe('ListSavedArticles', () => {
     await new ListSavedArticles(d).execute({ actor: READER, limit: requested })
 
     expect(seen).toEqual([expected])
+  })
+})
+
+describe('savedAt travels with the article', () => {
+  it('reports the reader’s own save time, not the article’s publication time', async () => {
+    // "Saved 2 days ago" is a fact about this reader. Only the bookmark holds
+    // it, so dropping it in the join would leave the saved list unable to say
+    // the one thing that distinguishes it from any other list of articles.
+    const savedAt = new Date('2026-08-01T09:00:00.000Z')
+    const d = { ...deps(), clock: new FakeClock(savedAt) }
+
+    await new SaveArticle(d).execute({ actor: READER, articleId: target })
+
+    const page = await new ListSavedArticles(d).execute({ actor: READER })
+
+    expect(page.items[0]?.savedAt).toEqual(savedAt)
+    // The article was published at NOW, which is deliberately a different
+    // instant — so a mix-up here cannot pass.
+    expect(page.items[0]?.article.snapshot().publishedAt).toEqual(NOW)
   })
 })

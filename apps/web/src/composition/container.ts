@@ -2,6 +2,7 @@ import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthrop
 import {
   MongoArticleRepository,
   MongoBookmarkRepository,
+  MongoSocialPostRepository,
   MongoCategoryRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
@@ -10,6 +11,7 @@ import {
 } from '@kurasikapa/adapter-mongo'
 import {
   type AiPort,
+  type SocialPostRepository,
   ApproveArticle,
   AssignRoles,
   type ClockPort,
@@ -25,6 +27,7 @@ import {
   ListSavedArticles,
   ListUsers,
   RemoveSavedArticle,
+  QueueSocialPost,
   SaveArticle,
   SearchArticles,
   ListPublishedArticles,
@@ -72,6 +75,9 @@ export interface Container {
   readonly assignRoles: AssignRoles
   readonly listUsers: ListUsers
   readonly saveArticle: SaveArticle
+  readonly queueSocialPost: QueueSocialPost
+  /** Read side for the publishing queue screen. */
+  readonly socialPosts: SocialPostRepository
   readonly removeSavedArticle: RemoveSavedArticle
   readonly listSavedArticles: ListSavedArticles
 
@@ -113,6 +119,7 @@ export function buildContainer(infra: Infrastructure): Container {
   const search: SearchPort = new MongoTextSearch(infra.db)
   const users: UserDirectory = new MongoUserDirectory(infra.db)
   const bookmarks: BookmarkRepository = new MongoBookmarkRepository(infra.db)
+  const socialPosts: SocialPostRepository = new MongoSocialPostRepository(infra.db)
   const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
 
   const { clock, ids, events } = infra
@@ -131,6 +138,8 @@ export function buildContainer(infra: Infrastructure): Container {
     assignRoles: new AssignRoles({ roles, clock, events }),
     listUsers: new ListUsers({ users }),
     saveArticle: new SaveArticle({ bookmarks, articles, clock }),
+    queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
+    socialPosts,
     removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
     listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
 

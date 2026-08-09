@@ -1,5 +1,7 @@
+'use client'
+
 import { SignOutButton } from '../auth/sign-out-button'
-import { Link } from '../../i18n/navigation'
+import { Link, usePathname } from '../../i18n/navigation'
 
 /**
  * The docked studio navigation, per the Stitch editorial CMS: a 256px rail
@@ -13,6 +15,7 @@ import { Link } from '../../i18n/navigation'
 const LIVE = [
   { href: '/studio', label: 'Editorial', icon: '✎' },
   { href: '/studio/review', label: 'Review', icon: '☑' },
+  { href: '/studio/social', label: 'Social', icon: '◈' },
   { href: '/studio/people', label: 'Users', icon: '☰' },
 ] as const
 
@@ -22,7 +25,25 @@ const FORTHCOMING = [
   { label: 'Settings', icon: '⚙', release: 'R5' },
 ] as const
 
-export function StudioSideNav({ active }: { active: string }): React.ReactElement {
+/**
+ * A client component solely so it can read the pathname.
+ *
+ * A server layout cannot know which child route rendered, so the active
+ * section was hardcoded and Review and Users never highlighted — the rail
+ * silently lied about where you were. usePathname is the smallest fix that
+ * makes it tell the truth.
+ */
+export function StudioSideNav(): React.ReactElement {
+  const pathname = usePathname()
+
+  // Longest match wins: /studio is a prefix of every studio route, so a plain
+  // startsWith would light up Editorial on every page.
+  const active =
+    [...LIVE]
+      .sort((a, b) => b.href.length - a.href.length)
+      .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))?.href ??
+    '/studio'
+
   return (
     <nav
       aria-label="Studio"

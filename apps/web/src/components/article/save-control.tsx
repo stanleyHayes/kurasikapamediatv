@@ -20,7 +20,7 @@ export async function SaveControl({ articleId }: { articleId: string }): Promise
   if (actor === null) return <SaveButton articleId={articleId} initiallySaved={false} />
 
   const saved = await container().listSavedArticles.execute({ actor })
-  const already = saved.items.some((article) => article.id === articleId)
+  const already = saved.items.some(({ article }) => article.id === articleId)
 
   return <SaveButton articleId={articleId} initiallySaved={already} />
 }

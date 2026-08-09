@@ -14,7 +14,7 @@ import {
   unpublishSchema,
   updateDraftSchema,
 } from './schemas'
-import { assignRolesSchema, bookmarkSchema } from './schemas'
+import { assignRolesSchema, bookmarkSchema, queueSocialPostSchema } from './schemas'
 
 /**
  * The editorial Server Actions.
@@ -205,5 +205,34 @@ export async function toggleSavedAction(
       : await container().saveArticle.execute({ actor, articleId: target })
 
     return { saved: result.saved }
+  })
+}
+
+/**
+ * Queues a published article to the social platforms.
+ *
+ * One post per platform, all validated before any is written — the use case
+ * refuses the whole request rather than leaving half a fan-out queued, which
+ * would mean an article announced on Facebook and silently missing from
+ * Instagram.
+ */
+export async function queueSocialPostAction(
+  input: unknown,
+): Promise<ActionResult<{ queued: number }>> {
+  return attempt(async () => {
+    const parsed = parseInput(queueSocialPostSchema, input)
+    const actor = await requireActor()
+
+    const result = await container().queueSocialPost.execute({
+      actor,
+      articleId: parsed.articleId as ArticleId,
+      platforms: parsed.platforms,
+      caption: parsed.caption,
+      scheduledAt: new Date(parsed.scheduledAt),
+    })
+
+    // The queue screen is never cached — an editor acting on a stale queue is
+    // worse than a slower screen — so there is no tag to invalidate here.
+    return { queued: result.queued.length }
   })
 }

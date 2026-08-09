@@ -53,6 +53,7 @@ export {
 } from './audience/save-article'
 export {
   ListSavedArticles,
+  type SavedArticle,
   RemoveSavedArticle,
   type ListSavedArticlesInput,
   type RemoveSavedArticleInput,

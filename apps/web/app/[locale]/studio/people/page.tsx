@@ -1,9 +1,35 @@
 import { NotPermitted } from '@kurasikapa/domain'
 import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
-import { RoleEditor } from '@/components/studio/role-editor'
+import { type Metric, MetricCards } from '@/components/studio/metric-cards'
+import { MemberRow } from '@/components/studio/member-row'
 import { requireActor } from '@/composition/actor'
 import { container } from '@/composition/container'
+
+interface Person {
+  readonly id: string
+  readonly email: string
+  readonly name: string
+  readonly roles: readonly string[]
+}
+
+/**
+ * The design's stats row reads Total Members / Active Super Admins / Pending
+ * Invitations. The first two are derivable from the directory; invitations are
+ * not — there is no invitation flow, so counting them would mean reporting
+ * zero forever and calling it a feature. Replaced with the count that actually
+ * matters on this screen: how many people hold no role at all.
+ */
+const metricsFor = (people: readonly Person[]): readonly Metric[] => [
+  { label: 'People', value: people.length, icon: '☰' },
+  {
+    label: 'Can assign roles',
+    value: people.filter((p) => p.roles.includes('super_admin')).length,
+    icon: '◈',
+    emphasis: true,
+  },
+  { label: 'No role yet', value: people.filter((p) => p.roles.length === 0).length, icon: '○' },
+]
 
 export default async function PeoplePage({
   params,
@@ -18,31 +44,62 @@ export default async function PeoplePage({
   const page = await container()
     .listUsers.execute({ actor })
     .catch((error: unknown) => {
+      // The page refuses anyone without role:assign and sends them back. The
+      // domain already refused; this is how the UI stops shouting about it.
       if (error instanceof NotPermitted) redirect(`/${locale}/studio`)
       throw error
     })
 
-  return (
-    <>
-      <p className="text-on-surface-variant mb-[var(--spacing-sm)] text-sm">
-        {page.items.length} people. Changes take effect on their next request — roles are read per
-        request, never carried in a session.
-      </p>
+  const people: Person[] = page.items.map((p) => ({
+    id: p.id,
+    email: p.email,
+    name: p.name,
+    roles: [...p.roles],
+  }))
 
-      <ul>
-        {page.items.map((person) => (
-          <RoleEditor
-            key={person.id}
-            isSelf={person.id === actor.id}
-            person={{
-              id: person.id,
-              email: person.email,
-              name: person.name,
-              roles: [...person.roles],
-            }}
-          />
-        ))}
-      </ul>
-    </>
+  return (
+    <div className="space-y-8 pb-20">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          {/* The top bar names the section; repeating it here would announce
+              the same heading twice. */}
+          <p className="text-on-surface-variant text-sm">
+            Changes take effect on their next request — roles are read per request, never carried in
+            a session token.
+          </p>
+        </div>
+      </header>
+
+      <MetricCards metrics={metricsFor(people)} />
+
+      <MembersTable people={people} selfId={actor.id} />
+    </div>
+  )
+}
+
+function MembersTable({
+  people,
+  selfId,
+}: {
+  people: readonly Person[]
+  selfId: string
+}): React.ReactElement {
+  return (
+    <div className="border-outline-variant/50 bg-surface-container-low overflow-hidden rounded-xl border">
+      <div className="border-outline-variant/50 text-label-bold text-on-surface-variant hidden border-b px-6 py-3 uppercase md:grid md:grid-cols-12 md:gap-4">
+        <span className="md:col-span-4">Member</span>
+        <span className="md:col-span-8">Roles</span>
+      </div>
+
+      {people.length === 0 ? (
+        <p className="text-on-surface-variant p-6">Nobody has signed up yet.</p>
+      ) : (
+        <ul>
+          {people.map((person) => (
+            <MemberRow key={person.id} person={person} isSelf={person.id === selfId} />
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }

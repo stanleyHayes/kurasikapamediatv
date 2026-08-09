@@ -45,7 +45,13 @@ const LIMITS = { fallback: 20, max: 100 }
  * person's reading list readable by editing a query string, and what someone
  * reads is among the most sensitive data this platform holds.
  */
-export class ListSavedArticles implements UseCase<ListSavedArticlesInput, Page<Article>> {
+export interface SavedArticle {
+  readonly article: Article
+  /** When this reader saved it — the only thing a saved list can order by. */
+  readonly savedAt: Date
+}
+
+export class ListSavedArticles implements UseCase<ListSavedArticlesInput, Page<SavedArticle>> {
   constructor(private readonly deps: SavedArticlesDeps) {}
 
   /**
@@ -59,7 +65,7 @@ export class ListSavedArticles implements UseCase<ListSavedArticlesInput, Page<A
    * trips — and the reader's own order is preserved, because "most recently
    * saved" is what a saved list means.
    */
-  async execute(input: ListSavedArticlesInput): Promise<Page<Article>> {
+  async execute(input: ListSavedArticlesInput): Promise<Page<SavedArticle>> {
     const page = await this.deps.bookmarks.listFor(input.actor.id, {
       after: input.after,
       limit: clampLimit(input.limit, LIMITS),
@@ -70,8 +76,15 @@ export class ListSavedArticles implements UseCase<ListSavedArticlesInput, Page<A
     const byId = new Map(found.map((a) => [String(a.id), a]))
 
     // An article deleted since it was saved simply drops out of the list
-    // rather than rendering as a blank row.
-    const ordered = ids.map((id) => byId.get(String(id))).filter((a): a is Article => a !== undefined)
+    // rather than rendering as a blank row. savedAt travels with it: it is the
+    // reader's own timestamp, not the article's, and only the bookmark has it.
+    const ordered = page.items
+      .map((b) => {
+        const article = byId.get(String(b.articleId))
+
+        return article === undefined ? undefined : { article, savedAt: b.savedAt }
+      })
+      .filter((s): s is SavedArticle => s !== undefined)
 
     return { items: ordered, nextCursor: page.nextCursor }
   }
