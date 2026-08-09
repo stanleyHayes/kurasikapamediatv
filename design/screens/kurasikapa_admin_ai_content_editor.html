@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kurasikapa Admin - Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#ffb95f",
+                    "surface-container-highest": "#273647",
+                    "on-secondary": "#68001a",
+                    "primary-container": "#0f172a",
+                    "secondary": "#ffb3b6",
+                    "outline-variant": "#45464d",
+                    "secondary-fixed-dim": "#ffb3b6",
+                    "inverse-surface": "#d4e4fa",
+                    "surface-dim": "#051424",
+                    "on-secondary-fixed": "#40000c",
+                    "on-tertiary-container": "#b47300",
+                    "on-error": "#690005",
+                    "surface-container-low": "#0d1c2d",
+                    "primary-fixed": "#dae2fd",
+                    "surface-variant": "#273647",
+                    "surface-bright": "#2c3a4c",
+                    "on-surface-variant": "#c6c6cd",
+                    "tertiary-container": "#251400",
+                    "error-container": "#93000a",
+                    "surface-container-high": "#1c2b3c",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "surface-container": "#122131",
+                    "secondary-container": "#cc003c",
+                    "error": "#ffb4ab",
+                    "surface": "#051424",
+                    "on-primary-fixed": "#131b2e",
+                    "primary": "#bec6e0",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary": "#472a00",
+                    "surface-tint": "#bec6e0",
+                    "on-secondary-container": "#ffdcdc",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-primary-container": "#798098",
+                    "on-surface": "#d4e4fa",
+                    "inverse-on-surface": "#233143",
+                    "primary-fixed-dim": "#bec6e0",
+                    "surface-container-lowest": "#010f1f",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary": "#283044",
+                    "secondary-fixed": "#ffdada",
+                    "on-background": "#d4e4fa",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-secondary-fixed-variant": "#920028",
+                    "outline": "#909097",
+                    "background": "#051424",
+                    "inverse-primary": "#565e74"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-desktop": "64px",
+                    "container-max": "1440px",
+                    "unit": "8px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "display-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        }
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden font-body-md text-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Shared Component: SideNavBar -->
+<nav class="bg-surface-container-low text-primary docked left-0 h-full w-64 shadow-md bg-surface-container-low h-screen flex flex-col p-4 border-r border-outline-variant hidden md:flex shrink-0 relative z-20">
+<div class="mb-8 px-2 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A highly detailed, professional headshot of a corporate media executive, neutral background, dramatic but professional studio lighting, emphasizing authority and modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl76VwmHNXaNV5Og9FEIZCjeY6EkSVlDgwVIfVmdZpWoMIaYEydB3lDHHBFs7zT3-H6XnYGq_Y1jhYf_guZSIEIXvuNb9PEFb6wYXv4fCT4ZKpcgAtuTWmagDb0yj9r8DbvBhgUVTMqHZ1ywF3d1W7yXbxMnvISU6H0uR0b36DzP4u3P9qTmSC9WIxxQha2i71Z_RggLHnH-76BZL0CXzEyl54CEZazL8Au6XmXxj0j-_uAKBNIA5s"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary text-[20px] leading-tight">Kurasikapa Admin</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Editorial Control</p>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:scale-[1.02] active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Editorial (Active) -->
+<a class="flex items-center gap-3 px-3 py-2.5 bg-secondary-container text-on-secondary-container rounded-lg font-bold transition-all hover:scale-[1.02] active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit_note" data-weight="fill" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span>Editorial</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:scale-[1.02] active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="insights">insights</span>
+<span>Analytics</span>
+</a>
+<!-- Media -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:scale-[1.02] active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="perm_media">perm_media</span>
+<span>Media</span>
+</a>
+<!-- Users -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:scale-[1.02] active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+<span>Users</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:scale-[1.02] active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant">
+<button class="w-full flex items-center justify-center gap-2 py-3 bg-surface-container-highest hover:bg-outline-variant text-on-surface rounded-lg transition-all hover:scale-[1.02] active:scale-95 duration-150 font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create New Article
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative z-10 bg-surface">
+<!-- Editor Header -->
+<header class="h-20 border-b border-outline-variant flex items-center justify-between px-gutter shrink-0 bg-surface/60 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-caps text-label-caps">
+<span>Editorial</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-on-surface truncate max-w-[200px]">The Future of Global Tech Policy</span>
+</div>
+<div class="flex items-center gap-2 border border-tertiary-container bg-tertiary-container/20 text-tertiary px-2 py-1 rounded-full font-label-caps text-label-caps">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+                    Draft
+                </div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[18px]">history</span>
+                    History
+                </button>
+<div class="h-6 w-px bg-outline-variant"></div>
+<button class="px-4 py-2 border border-outline-variant text-on-surface hover:bg-surface-container-highest rounded-lg font-label-caps text-label-caps transition-all hover:scale-105">
+                    Save Draft
+                </button>
+<button class="px-5 py-2 bg-secondary-container text-on-secondary-container rounded-lg font-label-caps text-label-caps transition-all hover:scale-105 flex items-center gap-2 shadow-[0_0_15px_rgba(204,0,60,0.3)]">
+<span class="material-symbols-outlined text-[18px]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">send</span>
+                    Publish
+                </button>
+</div>
+</header>
+<!-- Split Screen Workspace -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left: Rich Text / Markdown Editor -->
+<section class="flex-1 flex flex-col border-r border-outline-variant bg-surface-container-lowest relative">
+<!-- Formatting Toolbar -->
+<div class="h-12 border-b border-outline-variant flex items-center gap-1 px-4 bg-surface-container-low shrink-0 overflow-x-auto">
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Bold">
+<span class="material-symbols-outlined text-[20px]">format_bold</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Italic">
+<span class="material-symbols-outlined text-[20px]">format_italic</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Underline">
+<span class="material-symbols-outlined text-[20px]">format_underlined</span>
+</button>
+<div class="w-px h-5 bg-outline-variant mx-2"></div>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Heading 1">
+<span class="material-symbols-outlined text-[20px]">format_h1</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Heading 2">
+<span class="material-symbols-outlined text-[20px]">format_h2</span>
+</button>
+<div class="w-px h-5 bg-outline-variant mx-2"></div>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Link">
+<span class="material-symbols-outlined text-[20px]">link</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Image">
+<span class="material-symbols-outlined text-[20px]">image</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors" title="Quote">
+<span class="material-symbols-outlined text-[20px]">format_quote</span>
+</button>
+<div class="w-px h-5 bg-outline-variant mx-2"></div>
+<button class="p-1.5 rounded text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface transition-colors ml-auto" title="Markdown Mode">
+<span class="material-symbols-outlined text-[20px]">markdown</span>
+</button>
+</div>
+<!-- Editing Canvas -->
+<div class="flex-1 overflow-auto p-12 lg:p-16">
+<input class="w-full bg-transparent border-none outline-none font-headline-md text-headline-md text-on-surface placeholder:text-outline mb-6 focus:ring-0 p-0" placeholder="Article Headline..." type="text" value="The Future of Global Tech Policy"/>
+<textarea class="w-full h-full min-h-[500px] bg-transparent border-none outline-none font-body-lg text-body-lg text-on-surface-variant placeholder:text-outline resize-none focus:ring-0 p-0 leading-relaxed" placeholder="Start writing or paste your draft here...">As international bodies debate the regulations surrounding artificial intelligence, a new consensus is beginning to emerge among global tech leaders. The focus is shifting from unfettered innovation to responsible deployment, with an emphasis on transparency and data sovereignty.</textarea>
+</div>
+</section>
+<!-- Right: AI Assistant & Tools Panel -->
+<aside class="w-[400px] lg:w-[450px] bg-surface flex flex-col shrink-0 border-l border-outline-variant relative">
+<!-- Assistant Header -->
+<div class="h-12 border-b border-outline-variant flex items-center justify-between px-4 bg-surface-container-low shrink-0">
+<div class="flex items-center gap-2 text-primary font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+                        AI Co-Pilot
+                    </div>
+<div class="flex gap-2">
+<button class="text-on-surface-variant hover:text-on-surface text-label-caps font-label-caps pb-1 border-b-2 border-transparent hover:border-outline-variant transition-all">Preview</button>
+<button class="text-secondary text-label-caps font-label-caps pb-1 border-b-2 border-secondary">Tools</button>
+</div>
+</div>
+<!-- Tools Scroll Area -->
+<div class="flex-1 overflow-auto p-4 space-y-4">
+<!-- Tool Card: Generate Headline -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden group hover:border-outline transition-colors">
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between bg-surface-container-highest/30">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">title</span>
+                                Generate Headline
+                            </h3>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">expand_more</span></button>
+</div>
+<div class="p-4 space-y-3">
+<p class="font-body-md text-body-md text-sm text-on-surface-variant">Suggests variations based on current content.</p>
+<button class="w-full py-2 bg-surface-container-highest hover:bg-outline-variant text-on-surface rounded border border-outline-variant text-sm font-label-caps transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">autorenew</span>
+                                Generate Options
+                            </button>
+</div>
+</div>
+<!-- Tool Card: SEO Check -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden group hover:border-outline transition-colors">
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between bg-surface-container-highest/30">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-[#4ade80]">troubleshoot</span>
+                                SEO Analysis
+                            </h3>
+<span class="text-[#4ade80] font-label-caps text-label-caps border border-[#4ade80]/30 bg-[#4ade80]/10 px-2 py-0.5 rounded-full">Good 85/100</span>
+</div>
+<div class="p-4 space-y-3">
+<ul class="space-y-2 font-body-md text-sm text-on-surface-variant">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-[#4ade80] mt-0.5">check_circle</span>
+<span>Primary keyword found in first paragraph.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary mt-0.5">warning</span>
+<span>Meta description is slightly too short. Add ~20 words.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-error mt-0.5">error</span>
+<span>No internal links detected.</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Tool Card: Tone Adjustment -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden group hover:border-outline transition-colors">
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between bg-surface-container-highest/30">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary">tune</span>
+                                Tone Adjustment
+                            </h3>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full border border-secondary text-secondary bg-secondary/10 font-label-caps text-[10px] uppercase tracking-wider">Authoritative</button>
+<button class="px-3 py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:border-outline font-label-caps text-[10px] uppercase tracking-wider transition-colors">Accessible</button>
+<button class="px-3 py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:border-outline font-label-caps text-[10px] uppercase tracking-wider transition-colors">Urgent</button>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant/50">
+<p class="font-body-md text-sm text-on-surface italic opacity-80">"As international bodies rigorously mandate AI frameworks..."</p>
+</div>
+<button class="text-secondary font-label-caps text-sm hover:underline flex items-center gap-1">
+                                Apply to selected text <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Tool Card: Translation -->
+<div class="bg-surface-container rounded-lg border border-outline-variant overflow-hidden group hover:border-outline transition-colors opacity-75">
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between bg-surface-container-highest/30">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">translate</span>
+                                Translate Draft
+                            </h3>
+</div>
+<div class="p-4 flex gap-2">
+<select class="flex-1 bg-surface-container-highest border border-outline-variant rounded text-on-surface text-sm p-2 outline-none focus:border-primary focus:ring-0">
+<option>Spanish (ES)</option>
+<option>French (FR)</option>
+<option>German (DE)</option>
+</select>
+<button class="px-3 bg-surface-container-highest hover:bg-outline-variant border border-outline-variant rounded text-on-surface transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

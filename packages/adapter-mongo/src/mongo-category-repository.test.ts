@@ -25,6 +25,7 @@ const category = (id: string, slugs: Record<string, string>, order = 1): Categor
     parentId: null,
     slugs,
     names: { en: id, fr: id },
+    descriptions: {},
     order,
   })
 

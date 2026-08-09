@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kurasikapa Media TV - Events</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#051424",
+                        "on-primary-fixed": "#131b2e",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface-container-highest": "#273647",
+                        "surface-container": "#122131",
+                        "error-container": "#93000a",
+                        "outline-variant": "#45464d",
+                        "surface-container-high": "#1c2b3c",
+                        "on-secondary-container": "#ffdcdc",
+                        "secondary-fixed-dim": "#ffb3b6",
+                        "background": "#051424",
+                        "inverse-on-surface": "#233143",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#c6c6cd",
+                        "surface": "#051424",
+                        "on-primary": "#283044",
+                        "on-surface": "#d4e4fa",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "primary-fixed": "#dae2fd",
+                        "primary-container": "#0f172a",
+                        "surface-bright": "#2c3a4c",
+                        "surface-variant": "#273647",
+                        "secondary-fixed": "#ffdada",
+                        "inverse-primary": "#565e74",
+                        "inverse-surface": "#d4e4fa",
+                        "on-tertiary": "#472a00",
+                        "on-background": "#d4e4fa",
+                        "surface-container-lowest": "#010f1f",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "outline": "#909097",
+                        "on-secondary-fixed-variant": "#920028",
+                        "surface-tint": "#bec6e0",
+                        "primary-fixed-dim": "#bec6e0",
+                        "secondary-container": "#cc003c",
+                        "on-error": "#690005",
+                        "primary": "#bec6e0",
+                        "secondary": "#ffb3b6",
+                        "on-primary-container": "#798098",
+                        "tertiary": "#ffb95f",
+                        "on-tertiary-container": "#b47300",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-low": "#0d1c2d",
+                        "on-secondary": "#68001a",
+                        "tertiary-container": "#251400",
+                        "on-secondary-fixed": "#40000c",
+                        "tertiary-fixed": "#ffddb8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1440px",
+                        "unit": "8px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(18, 33, 49, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .btn-hover-scale {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface/60 backdrop-blur-md font-label-caps text-label-caps docked full-width top-0 border-b border-white/10 shadow-sm fixed top-0 w-full z-50 flex justify-between px-margin-desktop max-w-container-max mx-auto items-center h-20 hidden md:flex">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-display-lg text-on-surface tracking-tighter text-[24px]" href="#">Kurasikapa Media TV</a>
+<nav class="flex gap-6">
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">World</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Politics</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Tech</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Business</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Culture</a>
+<a class="text-secondary border-b-2 border-secondary pb-1" href="#">Live</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-on-surface hover:text-secondary cursor-pointer transition-colors" data-icon="search">search</span>
+<button class="text-on-surface-variant hover:text-secondary transition-colors duration-200">Donate</button>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded scale-102 hover:scale-105 transition-transform font-bold">Subscribe</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-24 pb-20 md:pt-32">
+<!-- Hero Section -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-20">
+<div class="relative w-full h-[614px] rounded-xl overflow-hidden glass-panel flex items-end">
+<div class="absolute inset-0 bg-cover bg-center opacity-60" data-alt="A cinematic wide shot of a massive, modern conference hall illuminated by dramatic blue and crimson stage lights. A huge screen displays a glowing globe. The atmosphere is tense and professional, capturing the high-stakes environment of a global media summit. The dark, sleek architectural lines enhance the premium editorial aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKoUa04v5BGBB9lFX9nlZqfKT0W4-csxvfcrJyKOmCpac8API-i6PQHlRsysAuNRpzD5xPlm6Sv4zji94HywcpuDoPNB293jAAn7Gc8lxLt4bqZDPMPLG6Q8okaE5ftDP2m1ROBAjZfixrMMTuwL-lsEsGfzVUjf9ZfaGLS9jDR59OUeiVmtTrwmz6FkTaUsHzulDw9IHo6PLWwKc5noraiHuKQFtLR2KFKL0O2hiXVqmGJq7kfilA')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
+<div class="relative z-10 p-8 md:p-16 max-w-4xl">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-secondary text-secondary font-label-caps text-label-caps mb-4">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span> Featured Event
+                    </span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-4">Global Media Summit 2024</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-2xl">The premier gathering of industry leaders, technologists, and journalists shaping the future of global broadcasting and digital narratives.</p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-secondary-container text-on-secondary-container font-label-caps text-label-caps px-8 py-4 rounded btn-hover-scale shadow-[0_20px_50px_rgba(204,0,60,0.2)]">Register Now</button>
+<button class="glass-panel text-on-surface font-label-caps text-label-caps px-8 py-4 rounded hover:bg-surface-container-high transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="calendar_add_on">calendar_add_on</span> View Schedule
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Events Grid -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-4">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Upcoming Sessions</h2>
+<p class="text-on-surface-variant mt-2 font-label-caps text-label-caps">Webinars &amp; Conferences</p>
+</div>
+<div class="flex gap-4 mt-6 md:mt-0">
+<button class="glass-panel px-4 py-2 rounded text-on-surface hover:text-secondary transition-colors font-label-caps text-label-caps flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span> Filter
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Event Card 1 -->
+<article class="glass-panel rounded-lg overflow-hidden group border border-outline-variant hover:border-secondary transition-colors duration-300 flex flex-col h-full">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A close-up shot of a modern podcast microphone in a dark, soundproofed studio with subtle neon blue backlighting. The setting conveys an intimate, high-tech digital broadcasting environment fitting for an editorial tech discussion." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDexFa8zEXNktUuVgIa9Jq0lBPKGZ7h7LzcvIDRp7pKw7TB_9GZi338BoDfS-mI-rkgw-cE0Eb5WuNkhsy9dDVnuEdbXzSIGj_Vm-pczbUvG6uC_qm4k563I1ACHaM3byussvhLJCMfXgQ7263H7zpq66a1m7GRKLxadn4v_HTQ_nb_fKcLW2CV27eLK6dY_I6fIDIQgY0ZKaGnlvOqlFVfQZAZz9eK0gSmc3gNmZ9CiG-TOhQ1FNR9"/>
+<div class="absolute top-4 left-4 bg-surface-dim/80 backdrop-blur px-3 py-1 rounded border border-white/10 font-label-caps text-label-caps text-on-surface">Webinar</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex items-center gap-4 text-on-surface-variant font-label-caps text-label-caps mb-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="calendar_today">calendar_today</span> Oct 15</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 14:00 GMT</span>
+</div>
+<h3 class="font-headline-md text-[24px] text-on-surface mb-2 leading-tight">The Future of Decentralized News</h3>
+<p class="text-on-surface-variant text-sm mb-6 flex-grow">Exploring the impact of blockchain and decentralized networks on journalistic integrity and content distribution.</p>
+<div class="flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-surface-container-high object-cover" data-alt="Professional headshot of a female tech journalist with short dark hair and glasses, set against a dark grey studio background with a slight rim light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe_eC7QbGTw8nZcZqx-wmt6pNhz6M9NZLATKs5dTJJYlVmzwc5cXupBhguWQw_rhd-W4gvrgeIkgvtZvDB9ldy_AgEJ1lb0Z_Zht4SdbGZ5rayyUtBGmJLgk6dtY40PeWWXfPWAk_wG3rYYzApT51Wqwu7_6MH37j3gR2HomZIFjT8oJEC3ts2lXMhzCSl2qvdaAQ_uiopR0nmzqX117cqYwX6z3nuXMT42mBJGnijRlDd3hde4Hsc"/>
+<img class="w-8 h-8 rounded-full border-2 border-surface-container-high object-cover" data-alt="Professional headshot of a male media executive with a beard, wearing a dark suit against a deep navy background, conveying authority and experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZKKQShT6VS9tQVXbkNR3f4mXMPpOGKvOHI2p_ILHHFO7QGnbKALqA1Wz-fQxKFA4U5nc5rFHoRw9Uk4vmOdZ2ZrWmnKVmfy22bCZIAwHE2UYjRYFOIC5NPCPr4kX7CoaUEDFggiWnF7nObuxZ6lOukcvEo-IJrgzcLeRpJ4eY2T-Q_2uTfTPl72_ZUEn2eWZjXbSXUJw_eoaF99kyhZWGSVWoIgBCAfC8i3_UDqhuCx8SYi65bddh"/>
+</div>
+<button class="text-secondary hover:text-secondary-fixed font-label-caps text-label-caps flex items-center gap-1">Register <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span></button>
+</div>
+</div>
+</article>
+<!-- Event Card 2 -->
+<article class="glass-panel rounded-lg overflow-hidden group border border-outline-variant hover:border-secondary transition-colors duration-300 flex flex-col h-full">
+<div class="h-48 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A wide shot of a panel discussion on a brightly lit stage with large screens displaying data visualizations. The audience is dark and out of focus in the foreground. The scene captures a formal, high-stakes political debate setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCFtQhugKDUahKGLh75uShFZGGj_yhCMxFloGofn-dA9fd0YPkRUErrT4F2ozzxkGK4LRWfDICp5NmQcOqwMves4eto4f39D0L0jOLYyX7nHhmwh6FoydCT1fofVjGLD5JPjpCmLl28aHecCiMumM_yYNqq8ZxYsbVZrwlc7gOxtbtu34YTCC-tuNoDXyqmBduZMQ3-5et_sxoa0FArxwYsD69Z3iYbvswvlVyygBNN-dpCkeU8eOe"/>
+<div class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded font-label-caps text-label-caps">Live Conference</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex items-center gap-4 text-on-surface-variant font-label-caps text-label-caps mb-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="calendar_today">calendar_today</span> Nov 02</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span> London, UK</span>
+</div>
+<h3 class="font-headline-md text-[24px] text-on-surface mb-2 leading-tight">Geopolitics &amp; Media Censorship</h3>
+<p class="text-on-surface-variant text-sm mb-6 flex-grow">A high-level roundtable discussing regulatory pressures and the defense of free press in emerging markets.</p>
+<div class="flex items-center justify-between pt-4 border-t border-white/5">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-surface-container-high object-cover" data-alt="Portrait of an older distinguished gentleman in a tweed jacket, looking thoughtful against a dark background, representing an experienced international correspondent." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN_Y46vj5SI5uBx3Dm_7wDoJzozHQ-q1O4Usk6VWs6e9sdceFsSDOkzVoZQEc-qe-Z-xQy1JXnWfjWE745gHuUSSGOhUH82wgkJFlUa9W05oIxUtTNn7fFMo-hFUKjBPoz5g_0vCp5p8okDH4MjBLuSGytae_Y98EtFZyeymtrpNDoy2UcvyCEDZIJs6lmeC8nt2tJYiaEHJnALQ2R5UJY9h441l8d5OhI5ieOPZRjdFP8ChXrqgtk"/>
+</div>
+<button class="text-secondary hover:text-secondary-fixed font-label-caps text-label-caps flex items-center gap-1">Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span></button>
+</div>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop bg-surface-container-lowest flex flex-col items-center gap-8 border-t border-outline-variant mt-20">
+<div class="font-display-lg-mobile text-display-lg-mobile text-secondary">Kurasikapa Media TV</div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">About</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Careers</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Contact</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Press</a>
+</nav>
+<p class="text-on-surface font-body-md text-body-md text-sm opacity-60">© 2024 Kurasikapa Media TV. All rights reserved.</p>
+</footer>
+</body></html>

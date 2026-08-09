@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile &amp; Dashboard - Kurasikapa Media TV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f0f3ff",
+                        "primary": "#000000",
+                        "surface": "#f9f9ff",
+                        "background": "#f9f9ff",
+                        "on-secondary-container": "#54647a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary-container": "#171c1f",
+                        "on-tertiary-fixed": "#171c1f",
+                        "on-background": "#111c2d",
+                        "on-primary-container": "#7c839b",
+                        "surface-tint": "#565e74",
+                        "tertiary": "#000000",
+                        "on-surface-variant": "#45464d",
+                        "surface-container-high": "#dee8ff",
+                        "surface-container-highest": "#d8e3fb",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#dfe3e7",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#ecf1ff",
+                        "secondary-container": "#d0e1fb",
+                        "surface-variant": "#d8e3fb",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-container": "#808488",
+                        "surface-container": "#e7eeff",
+                        "inverse-surface": "#263143",
+                        "surface-bright": "#f9f9ff",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-dim": "#cfdaf2",
+                        "on-tertiary-fixed-variant": "#43474b",
+                        "on-surface": "#111c2d",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline-variant": "#c6c6cd",
+                        "primary-container": "#131b2e",
+                        "secondary": "#505f76",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed-dim": "#c3c7cb",
+                        "on-error": "#ffffff",
+                        "outline": "#76777d",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#131b2e",
+                        "inverse-primary": "#bec6e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "margin-desktop": "64px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "lg": "48px",
+                        "margin-mobile": "16px",
+                        "xl": "80px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display", "serif"],
+                        "headline-lg": ["Playfair Display", "serif"],
+                        "headline-md": ["Playfair Display", "serif"],
+                        "display-lg-mobile": ["Playfair Display", "serif"],
+                        "body-sm": ["Outfit", "sans-serif"],
+                        "label-sm": ["Outfit", "sans-serif"],
+                        "body-lg": ["Outfit", "sans-serif"],
+                        "label-md": ["Outfit", "sans-serif"],
+                        "body-md": ["Outfit", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        .ambient-shadow {
+            box-shadow: 0px 12px 32px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface dark:bg-background border-b border-outline-variant dark:border-on-surface-variant sticky top-0 z-50 w-full flat no shadows">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-[1120px] mx-auto h-20">
+<div class="flex items-center gap-gutter">
+<a class="font-headline-lg text-headline-lg text-primary dark:text-on-background tracking-tight" href="/">
+                    Kurasikapa Media TV
+                </a>
+<!-- Desktop Navigation -->
+<nav class="hidden md:flex gap-md items-center h-full">
+<a class="text-secondary dark:text-on-secondary-container font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">World</a>
+<a class="text-secondary dark:text-on-secondary-container font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Politics</a>
+<a class="text-secondary dark:text-on-secondary-container font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Tech</a>
+<a class="text-secondary dark:text-on-secondary-container font-medium font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Live</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="pl-xl pr-sm py-sm border border-outline-variant rounded-DEFAULT bg-surface text-on-surface font-body-sm text-body-sm focus:outline-none focus:border-primary w-48" placeholder="Search..." type="text"/>
+</div>
+<button class="font-label-md text-label-md text-primary hover:opacity-80 transition-opacity">Subscribe</button>
+<button class="font-label-md text-label-md bg-primary text-on-primary px-gutter py-sm rounded-DEFAULT hover:opacity-80 transition-opacity">Donate</button>
+</div>
+</div>
+</header>
+<div class="flex flex-1 w-full max-w-[1120px] mx-auto">
+<!-- SideNavBar (Shared Component, Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-80px)] sticky top-20 w-64 bg-surface-container-low dark:bg-surface-container-lowest shadow-sm border-r border-outline-variant shrink-0 py-lg">
+<div class="px-md mb-lg">
+<div class="flex items-center gap-sm mb-sm">
+<div class="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-outline-variant">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="A professional headshot of an administrator in a well-lit, modern corporate environment. Minimalist light-mode aesthetic with clean white lighting and sharp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4KkzAvhP8tGSao9HSs5zGlt-8p0ZAAcEocPVIjWWXeJHoLo3eslbH0g-mGtcVkI37b5ltrpOO06jxuL5M3y6ic5btDEq7aCZJA-Dxzlgs-OsHzpdmX4A3NPEEezHJKA7Kwudk66osjph_tt3t5HVQe6pv56OMG1mRMA25WVEfN0--ml1mMMLeI3-QXrYcKsU3wd4RL2G_I8m_g_hlViqddsJObCaSPBVMUJsWvRF9RoCs_ig7jnMC"/>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary dark:text-on-primary-fixed leading-tight">Media CMS</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">AI-Powered Panel</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm rounded-DEFAULT mt-sm hover:opacity-90 transition-opacity flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span> New Entry
+                </button>
+</div>
+<nav class="flex-1 px-sm flex flex-col gap-xs">
+<a class="flex items-center gap-3 bg-secondary-container dark:bg-primary-container text-on-secondary-container dark:text-on-primary-container rounded-lg px-4 py-3 font-label-md text-label-md opacity-80 transition-all scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-outline px-4 py-3 font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                    Editorial
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-outline px-4 py-3 font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Analytics
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-outline px-4 py-3 font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="perm_media">perm_media</span>
+                    Media
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-outline px-4 py-3 font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                    Users
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-outline px-4 py-3 font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 w-full px-margin-mobile md:px-margin-desktop py-lg max-w-full overflow-hidden">
+<!-- Welcome Header -->
+<header class="mb-xl flex flex-col md:flex-row md:justify-between md:items-end gap-md border-b border-outline-variant pb-lg">
+<div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-sm">Good morning, Alex.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Here is your customized overview for today.</p>
+</div>
+<div class="flex items-center gap-md">
+<span class="bg-surface-container-high text-primary px-sm py-xs rounded-DEFAULT font-label-sm text-label-sm">Premium Member</span>
+<button class="border border-outline-variant text-primary px-md py-sm rounded-DEFAULT font-label-md text-label-md hover:bg-surface-container-low transition-colors">Manage Plan</button>
+</div>
+</header>
+<!-- Dashboard Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-xl">
+<!-- Saved Articles (Large Span) -->
+<section class="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col h-[400px]">
+<div class="flex justify-between items-center mb-md pb-sm border-b border-outline-variant">
+<h3 class="font-headline-md text-headline-md text-primary">Saved Articles</h3>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors flex items-center gap-xs" href="#">View All <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span></a>
+</div>
+<div class="flex-1 overflow-y-auto pr-sm space-y-md">
+<!-- Article Item 1 -->
+<article class="flex gap-md group cursor-pointer border-b border-surface-container-high pb-md last:border-0 last:pb-0">
+<div class="w-32 h-24 shrink-0 rounded-DEFAULT overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A minimalist architectural photo of a modern political building in Washington D.C., featuring clean geometric lines, bright daylight, and a premium editorial aesthetic. High contrast with deep navy accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbD8vcrfOVyfv4ubbolci5ww_IWqlkrYu-qBy3az2OyvuEuqh-cOPtf0Ote-65ejnjOsq1pk23_mVEOBrr7v62HSHsq1qsmsjzy12hwp_q5rW_SoKegpo0h3h4Ex4ofYl0DUczYbcgtY45lHUz8nQW-aS7cKuND-fnkaDq4xHPRqZwxpjd7xBBZx03Yf9w4LJLUFoSbE_s6BWY_Dz0C8-AuzXULGj_n4S24uaOHzFSgj-KqM56g03g"/>
+</div>
+<div class="flex flex-col justify-between py-xs">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-xs block">Politics</span>
+<h4 class="font-headline-md text-headline-md text-primary text-[20px] leading-tight group-hover:text-surface-tint transition-colors line-clamp-2">The Shifting Dynamics of Global Trade Agreements in 2024</h4>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant font-body-sm text-body-sm mt-sm">
+<span>5 min read</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span>Saved 2 days ago</span>
+</div>
+</div>
+</article>
+<!-- Article Item 2 -->
+<article class="flex gap-md group cursor-pointer border-b border-surface-container-high pb-md last:border-0 last:pb-0">
+<div class="w-32 h-24 shrink-0 rounded-DEFAULT overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Abstract visualization of artificial intelligence technology, featuring glowing nodes connecting over a dark navy background with bright white and subtle red accents. High-end tech editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlLCDuPLUquT446XuGcsMy5PaL1lJeJzfyaKHKCCWnhJzijR9pCEiR4dGbTMEEftDBZ92LrRL8Pe8tU157Gfvhh0o16nPuUpjmbPZGc2akiDE3K7Nxa7eegYn3E5ot3-eQKcD-biuWeWLkld5ERmfcVzJYQ4ErLHasRonyEVZphjN1LSLZ4ew_25P3AcXD5zVn2Vpwq_68M3q1mPqLgsYcGAXv1Sv6lVf96MW6mqpiC6SRANJLiAce"/>
+</div>
+<div class="flex flex-col justify-between py-xs">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-xs block">Tech</span>
+<h4 class="font-headline-md text-headline-md text-primary text-[20px] leading-tight group-hover:text-surface-tint transition-colors line-clamp-2">How Generative AI is Reshaping the Modern Newsroom</h4>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant font-body-sm text-body-sm mt-sm">
+<span>8 min read</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span>Saved 1 week ago</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Reading Stats (Small Span) -->
+<section class="md:col-span-4 bg-tertiary-container text-on-tertiary-fixed rounded-xl p-md flex flex-col justify-between h-[400px] relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline-md text-headline-md text-on-tertiary-fixed mb-xl">Your Insights</h3>
+<div class="space-y-lg">
+<div>
+<p class="font-label-md text-label-md text-on-tertiary-container mb-xs uppercase tracking-widest">Articles Read This Week</p>
+<p class="font-display-lg text-display-lg text-on-tertiary-fixed">24</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-tertiary-container mb-xs uppercase tracking-widest">Top Category</p>
+<p class="font-headline-lg text-headline-lg text-on-tertiary-fixed">Technology</p>
+</div>
+</div>
+</div>
+<!-- Decorative subtle gradient -->
+<div class="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-surface-tint/20 to-transparent rounded-tl-full mix-blend-overlay"></div>
+</section>
+</div>
+<!-- Settings & Quick Actions -->
+<section class="mb-xl">
+<h3 class="font-headline-md text-headline-md text-primary mb-md pb-sm border-b border-outline-variant">Account &amp; Preferences</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-md hover:border-primary transition-colors cursor-pointer group flex flex-col items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<h4 class="font-headline-md text-[20px] text-primary mb-xs">Profile Details</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Update your personal information and email address.</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-md hover:border-primary transition-colors cursor-pointer group flex flex-col items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</div>
+<div>
+<h4 class="font-headline-md text-[20px] text-primary mb-xs">Notifications</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manage your email newsletters and push alerts.</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-md hover:border-primary transition-colors cursor-pointer group flex flex-col items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+</div>
+<div>
+<h4 class="font-headline-md text-[20px] text-primary mb-xs">Security</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Change password and setup two-factor authentication.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer (Shared Component) -->
+<footer class="bg-primary-container dark:bg-tertiary-container mt-lg w-full py-lg px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-[1120px] mx-auto flat no shadows">
+<div class="font-headline-md text-headline-md text-on-primary-fixed mb-md md:mb-0">
+            Kurasikapa Media TV
+        </div>
+<nav class="flex flex-wrap justify-center gap-md mb-md md:mb-0">
+<a class="font-label-sm text-label-sm text-on-primary-container dark:text-on-tertiary-container hover:text-on-primary-fixed dark:hover:text-on-tertiary-fixed transition-opacity" href="#">About Us</a>
+<a class="font-label-sm text-label-sm text-on-primary-container dark:text-on-tertiary-container hover:text-on-primary-fixed dark:hover:text-on-tertiary-fixed transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-primary-container dark:text-on-tertiary-container hover:text-on-primary-fixed dark:hover:text-on-tertiary-fixed transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-primary-container dark:text-on-tertiary-container hover:text-on-primary-fixed dark:hover:text-on-tertiary-fixed transition-opacity" href="#">Contact</a>
+<a class="font-label-sm text-label-sm text-on-primary-container dark:text-on-tertiary-container hover:text-on-primary-fixed dark:hover:text-on-tertiary-fixed transition-opacity" href="#">Ethics Code</a>
+</nav>
+<div class="font-body-sm text-body-sm text-on-primary-container dark:text-on-tertiary-container text-center md:text-right">
+            © 2024 Kurasikapa Media TV. All rights reserved.
+        </div>
+</footer>
+</body></html>

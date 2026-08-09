@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management - CMS Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#bec6e0",
+                      "surface-container": "#eceef0",
+                      "inverse-surface": "#2d3133",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#191c1e",
+                      "surface-tint": "#565e74",
+                      "surface-container-highest": "#e0e3e5",
+                      "outline": "#76777d",
+                      "tertiary": "#000000",
+                      "secondary-fixed": "#ffdea5",
+                      "background": "#f7f9fb",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#785a1a",
+                      "tertiary-container": "#271901",
+                      "on-primary": "#ffffff",
+                      "secondary-container": "#fed488",
+                      "inverse-on-surface": "#eff1f3",
+                      "surface-bright": "#f7f9fb",
+                      "surface-container-high": "#e6e8ea",
+                      "on-tertiary-container": "#98805d",
+                      "primary-fixed": "#dae2fd",
+                      "secondary": "#775a19",
+                      "tertiary-fixed": "#fcdeb5",
+                      "inverse-primary": "#bec6e0",
+                      "on-background": "#191c1e",
+                      "on-secondary-fixed-variant": "#5d4201",
+                      "tertiary-fixed-dim": "#dec29a",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#7c839b",
+                      "surface": "#f7f9fb",
+                      "on-error": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed": "#131b2e",
+                      "on-surface-variant": "#45464d",
+                      "secondary-fixed-dim": "#e9c176",
+                      "on-secondary-fixed": "#261900",
+                      "on-tertiary-fixed": "#271901",
+                      "outline-variant": "#c6c6cd",
+                      "primary": "#000000",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-error-container": "#93000a",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-variant": "#e0e3e5",
+                      "primary-container": "#131b2e",
+                      "on-tertiary-fixed-variant": "#574425"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "lg": "48px",
+                      "xs": "4px",
+                      "base": "8px",
+                      "md": "24px",
+                      "sm": "12px",
+                      "container-max": "1280px",
+                      "xl": "80px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Outfit"
+                      ],
+                      "display-lg-mobile": [
+                              "Playfair Display"
+                      ],
+                      "headline-md": [
+                              "Playfair Display"
+                      ],
+                      "display-lg": [
+                              "Playfair Display"
+                      ],
+                      "label-bold": [
+                              "Outfit"
+                      ],
+                      "body-lg": [
+                              "Outfit"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "label-sm": [
+                              "Outfit"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-bold": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #191c1e; /* dark:bg-on-surface */
+            color: #eceef0; /* dark:text-surface-container */
+        }
+        
+        /* Smooth Entrance Animation */
+        .ease-entrance {
+            animation: fadeInY 0.5s cubic-bezier(0.2, 0, 0, 1) forwards;
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        @keyframes fadeInY {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 { animation-delay: 100ms; }
+        .stagger-2 { animation-delay: 200ms; }
+        .stagger-3 { animation-delay: 300ms; }
+
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-body-md text-body-md bg-inverse-surface">
+<!-- SideNavBar (Shared Component) -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-inverse-surface border-r border-outline/20 hidden md:flex flex-col p-md space-y-base z-40">
+<!-- Header -->
+<div class="mb-lg">
+<div class="flex items-center space-x-sm">
+<img alt="Admin User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="A small circular avatar placeholder image for a generic admin user profile. It should depict a subtle, minimalist geometric pattern in dark grays and muted blues, fitting a dark mode editorial CMS interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoXcTTiePUyjVdffDgs3-dW_uCICNp80sGC5PxJIYVcu5r2HsyUxOhOL2MzijeVYALJZPVZame-aQCVwLboejSliaKkp2WWBG7BH9iYZjgO7Yc4samFSq9bYtZ4ek-j-MXvAUd42muSZR3p2SIInZxKHi0B-c1-Ks-RsUa3iXcnESCnoh9UAykOtx7f12oDqULZWbDKmV4jkzYytqKLSQv5dAOHXmghle5Z5o5uETZVeCn-pF90pC3"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary-fixed-dim">CMS Portal</h1>
+<p class="font-label-sm text-label-sm text-outline-variant">Editorial Control</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 space-y-2">
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">edit_note</span>
+<span>Editorial</span>
+</a>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">insights</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">image</span>
+<span>Media Library</span>
+</a>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg bg-on-primary-container text-primary-fixed-dim font-bold shadow-[0_4px_32px_rgba(0,0,0,0.08)] group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span>Authors</span>
+</a>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<!-- Footer Actions -->
+<div class="mt-auto space-y-2 pt-md border-t border-outline/20">
+<button class="w-full bg-primary-fixed-dim text-inverse-surface font-label-bold text-label-bold py-2 px-4 rounded-lg hover:bg-secondary-fixed transition-colors duration-fast mb-4">
+                Create New Story
+            </button>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">help</span>
+<span>Help Center</span>
+</a>
+<a class="flex items-center space-x-sm px-sm py-2 rounded-lg text-outline-variant hover:bg-on-primary-fixed-variant transition-all duration-fast group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-fast">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-64 overflow-y-auto bg-inverse-surface p-gutter lg:p-lg">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-xl ease-entrance">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary-fixed-dim mb-2">User Management</h2>
+<p class="text-outline-variant font-body-lg text-body-lg">Manage platform access, roles, and administrative privileges.</p>
+</div>
+<div class="mt-4 md:mt-0">
+<button class="flex items-center space-x-2 bg-on-primary-container text-primary-fixed-dim font-label-bold text-label-bold px-4 py-2 rounded-lg border border-outline/20 hover:border-secondary-fixed-dim transition-colors duration-fast">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+<span>Invite User</span>
+</button>
+</div>
+</header>
+<!-- Controls Toolbar -->
+<div class="flex flex-col md:flex-row justify-between items-center bg-[#242729] p-4 rounded-lg border border-outline/20 mb-md ease-entrance stagger-1">
+<!-- Search -->
+<div class="relative w-full md:w-96 mb-4 md:mb-0">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+<input class="w-full bg-inverse-surface border-b border-outline/30 focus:border-secondary-fixed-dim text-primary-fixed-dim pl-10 pr-4 py-2 rounded-none focus:outline-none focus:ring-0 transition-colors duration-fast font-body-md text-body-md placeholder:text-outline-variant" placeholder="Search users by name, email, or role..." type="text"/>
+</div>
+<!-- Filters -->
+<div class="flex items-center space-x-sm w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+<button class="flex items-center space-x-1 bg-inverse-surface border border-outline/30 px-3 py-1.5 rounded-full text-primary-fixed-dim font-label-sm text-label-sm hover:border-secondary-fixed-dim transition-colors whitespace-nowrap">
+<span>All Roles</span>
+<span class="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+</button>
+<button class="flex items-center space-x-1 bg-inverse-surface border border-outline/30 px-3 py-1.5 rounded-full text-primary-fixed-dim font-label-sm text-label-sm hover:border-secondary-fixed-dim transition-colors whitespace-nowrap">
+<span>Status: Active</span>
+<span class="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+</button>
+<button class="flex items-center justify-center bg-inverse-surface border border-outline/30 w-8 h-8 rounded-full text-outline-variant hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Users Table -->
+<div class="bg-[#242729] rounded-lg border border-outline/20 overflow-hidden ease-entrance stagger-2">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline/20 text-outline-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="p-4 font-semibold">User</th>
+<th class="p-4 font-semibold">Role</th>
+<th class="p-4 font-semibold">Status</th>
+<th class="p-4 font-semibold">Last Active</th>
+<th class="p-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline/10 text-primary-fixed-dim font-body-md text-body-md">
+<!-- Row 1: Super Admin -->
+<tr class="hover:bg-on-primary-fixed-variant/30 transition-colors duration-fast">
+<td class="p-4">
+<div class="flex items-center space-x-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline/20" data-alt="A sophisticated portrait of a professional woman with short dark hair, wearing a dark turtleneck. Lighting is moody and cinematic, suited for a high-end editorial admin dashboard dark theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIdV8Z0ULwR9BLKWhOJDdRMshUCpodVrYjFy6D0sfx1GYRxJmbemDu1r_37FCIN-CpXlKAqZL4PWVvGUEL95oLDAmp0QyX_widNRJacWodFQs8hFW4jeBCbpejxDkDxzlUcZ3kzqvyrvRwKT7VmGREoKu0IJiZODVC79A4DYGOlxRI-LwVggbe4oEvQ9ldx9XAPaKad55Q3IhZJkSnaJLDFFirw_aqh7bLq8ZEoCez150G8fResc3M"/>
+<div>
+<div class="font-medium text-surface-container-lowest">Eleanor Vance</div>
+<div class="text-outline-variant text-sm">eleanor.v@metropolitan.com</div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-lg bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm border border-tertiary-container">
+                                    Super Admin
+                                </span>
+</td>
+<td class="p-4">
+<div class="flex items-center space-x-1.5">
+<div class="w-2 h-2 rounded-full bg-[#A8C7FA]"></div>
+<span class="text-sm">Active</span>
+</div>
+</td>
+<td class="p-4 text-outline-variant text-sm">Just now</td>
+<td class="p-4 text-right">
+<button class="text-outline-variant hover:text-primary-fixed-dim transition-colors p-1 rounded hover:bg-outline/10">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Editor -->
+<tr class="hover:bg-on-primary-fixed-variant/30 transition-colors duration-fast">
+<td class="p-4">
+<div class="flex items-center space-x-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline/20" data-alt="A portrait of a male professional with a short beard and glasses, wearing a neutral dark blazer. High contrast, clean lighting, matching a dark mode minimalist UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlqzJaMOys_Z2eL_lKnK2PnoONEtHz-8WNnmtlRPjQRPioDM60klShga4vtMdJMHM9yEwGJcwWL-7zuhIrR3fgB74O7WatSLZih7nLvVwu_8sIeDgM7Bbi-udaTySefuJEW_UtV6dd0CrLshPekAQumqpj9tbsZROzf9gp3AAEx5n2-NBu1KFkGhiIy-69ScywK_2EWE6QHH6nNZTyEa-yvCnRd3QGU1iY8tDnvTkoWYZRXhNsi6_j"/>
+<div>
+<div class="font-medium text-surface-container-lowest">Marcus Thorne</div>
+<div class="text-outline-variant text-sm">m.thorne@metropolitan.com</div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-lg bg-primary-container text-on-primary-container font-label-sm text-label-sm border border-primary-container">
+                                    Editor-in-Chief
+                                </span>
+</td>
+<td class="p-4">
+<div class="flex items-center space-x-1.5">
+<div class="w-2 h-2 rounded-full bg-[#A8C7FA]"></div>
+<span class="text-sm">Active</span>
+</div>
+</td>
+<td class="p-4 text-outline-variant text-sm">2 hrs ago</td>
+<td class="p-4 text-right">
+<button class="text-outline-variant hover:text-primary-fixed-dim transition-colors p-1 rounded hover:bg-outline/10">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Journalist -->
+<tr class="hover:bg-on-primary-fixed-variant/30 transition-colors duration-fast">
+<td class="p-4">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-surface-tint flex items-center justify-center text-on-primary border border-outline/20 font-label-bold">
+                                        SL
+                                    </div>
+<div>
+<div class="font-medium text-surface-container-lowest">Sarah Lin</div>
+<div class="text-outline-variant text-sm">s.lin@metropolitan.com</div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm border border-outline-variant">
+                                    Senior Journalist
+                                </span>
+</td>
+<td class="p-4">
+<div class="flex items-center space-x-1.5">
+<div class="w-2 h-2 rounded-full border border-outline-variant bg-transparent"></div>
+<span class="text-sm text-outline-variant">Offline</span>
+</div>
+</td>
+<td class="p-4 text-outline-variant text-sm">1 day ago</td>
+<td class="p-4 text-right">
+<button class="text-outline-variant hover:text-primary-fixed-dim transition-colors p-1 rounded hover:bg-outline/10">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Suspended -->
+<tr class="hover:bg-on-primary-fixed-variant/30 transition-colors duration-fast opacity-70">
+<td class="p-4">
+<div class="flex items-center space-x-3">
+<img class="w-10 h-10 rounded-full object-cover border border-outline/20 grayscale" data-alt="A dimly lit, slightly desaturated portrait of a young male professional to indicate an inactive or suspended user state in a dark mode dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbWmsxzLITYuivBfDhs2Np486JBO6JvFMJH5RKYU9fXv7MPgF8MuBfziqqIkaZ3mJm1z4hvcq4azGTl1uSPJ9P9JpkECuS1s3FZf3FLCDiYgp80BzjDUiPpfrw4fkB70uXsCj2Jh-1J3r2qg5s3iCqxxI3b-WPWS_TSggbysQskXJi5qXElIcC7wogwDhKvY6DMTgkX9RQCeEr-LuxAbKBHY1K67iEJOjnue-gwblo9bgyIHSGmxQV"/>
+<div>
+<div class="font-medium text-surface-container-lowest line-through">James Sterling</div>
+<div class="text-outline-variant text-sm">j.sterling@metropolitan.com</div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm border border-outline-variant">
+                                    Contributor
+                                </span>
+</td>
+<td class="p-4">
+<div class="flex items-center space-x-1.5">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-sm text-error">Suspended</span>
+</div>
+</td>
+<td class="p-4 text-outline-variant text-sm">2 weeks ago</td>
+<td class="p-4 text-right">
+<button class="text-outline-variant hover:text-primary-fixed-dim transition-colors p-1 rounded hover:bg-outline/10">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="p-4 border-t border-outline/20 flex items-center justify-between text-sm text-outline-variant">
+<div>Showing 1 to 4 of 24 users</div>
+<div class="flex space-x-2">
+<button class="px-3 py-1 border border-outline/30 rounded-lg hover:border-secondary-fixed-dim hover:text-primary-fixed-dim transition-colors disabled:opacity-50" disabled="">Previous</button>
+<button class="px-3 py-1 border border-outline/30 rounded-lg hover:border-secondary-fixed-dim hover:text-primary-fixed-dim transition-colors">Next</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

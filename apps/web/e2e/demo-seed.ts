@@ -12,9 +12,11 @@ const URI = process.env['MONGODB_URI'] ?? 'mongodb://127.0.0.1:37017/kurasikapa?
 const DB = process.env['MONGODB_DB'] ?? 'kurasikapa'
 
 const SECTIONS = [
-  { _id: 'cat_business', parentId: null, slugs: { en: 'business', fr: 'economie' }, names: { en: 'Business', fr: 'Économie' }, order: 1 },
-  { _id: 'cat_politics', parentId: null, slugs: { en: 'politics', fr: 'politique' }, names: { en: 'Politics', fr: 'Politique' }, order: 2 },
-  { _id: 'cat_education', parentId: null, slugs: { en: 'education', fr: 'education' }, names: { en: 'Education', fr: 'Éducation' }, order: 3 },
+  // Descriptions are per-locale and do NOT fall back — cat_education has only
+  // an English one on purpose, so the French section exercises the null path.
+  { _id: 'cat_business', parentId: null, slugs: { en: 'business', fr: 'economie' }, names: { en: 'Business', fr: 'Économie' }, descriptions: { en: 'Markets, trade and the money moving through West Africa and beyond.', fr: "Marchés, commerce et les capitaux qui traversent l'Afrique de l'Ouest." }, order: 1 },
+  { _id: 'cat_politics', parentId: null, slugs: { en: 'politics', fr: 'politique' }, names: { en: 'Politics', fr: 'Politique' }, descriptions: { en: 'Power, policy and the people who wield both.', fr: 'Le pouvoir, les politiques publiques et ceux qui les exercent.' }, order: 2 },
+  { _id: 'cat_education', parentId: null, slugs: { en: 'education', fr: 'education' }, names: { en: 'Education', fr: 'Éducation' }, descriptions: { en: 'Schools, training and the shape of the next generation.' }, order: 3 },
 ]
 
 interface Story {

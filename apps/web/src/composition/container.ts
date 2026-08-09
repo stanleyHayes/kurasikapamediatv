@@ -136,7 +136,7 @@ export function buildContainer(infra: Infrastructure): Container {
 
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
-    browseCategory: new BrowseCategory({ categories, articles }),
+    browseCategory: new BrowseCategory({ categories, articles, revisions }),
     listSections: new ListSections({ categories }),
     listAuthoredArticles: new ListAuthoredArticles({ articles }),
     getDraft: new GetDraft({ articles, revisions }),

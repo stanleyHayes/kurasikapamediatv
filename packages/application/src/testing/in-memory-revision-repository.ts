@@ -22,6 +22,11 @@ export class InMemoryRevisionRepository implements RevisionRepository {
     return Promise.resolve(this.forArticle(articleId))
   }
 
+  findManyByIds(ids: readonly RevisionId[]): Promise<readonly Revision[]> {
+    const wanted = new Set(ids)
+    return Promise.resolve(this.store.filter((r) => wanted.has(r.id)))
+  }
+
   append(revision: Revision): Promise<void> {
     this.store.push(revision)
     return Promise.resolve()

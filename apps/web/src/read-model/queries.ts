@@ -55,9 +55,24 @@ export async function cachedLatest(locale: string, limit: number): Promise<Artic
   }
 }
 
+/** An article as a listing shows it: the card data plus its standfirst. */
+export interface ListedArticleView extends ArticleView {
+  readonly excerpt: string | null
+}
+
 export interface SectionView {
   readonly name: string
-  readonly articles: readonly ArticleView[]
+  /**
+   * The instant this cache entry was built.
+   *
+   * Relative timestamps ("2 hours ago") need a reference point, and a Server
+   * Component may not read the clock. Capturing it here is legal precisely
+   * because this function is cached: the value is evaluated once per entry.
+   */
+  readonly now: string
+  /** Null when this locale has no translated standfirst — never another locale's. */
+  readonly description: string | null
+  readonly articles: readonly ListedArticleView[]
 }
 
 export async function cachedSection(slug: string, locale: string): Promise<SectionView | null> {
@@ -71,7 +86,14 @@ export async function cachedSection(slug: string, locale: string): Promise<Secti
 
   return {
     name: result.category.nameIn(locale),
-    articles: result.articles.items.map(toArticleView),
+    // Legal here precisely because this function is cached: a non-deterministic
+    // value inside 'use cache' is evaluated once per entry, not per request.
+    now: new Date().toISOString(),
+    description: result.category.descriptionIn(locale),
+    articles: result.articles.items.map(({ article, excerpt }) => ({
+      ...toArticleView(article),
+      excerpt,
+    })),
   }
 }
 

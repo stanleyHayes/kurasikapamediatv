@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Podcast Library | Kurasikapa Media TV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@500&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-dim": "#051424",
+                      "on-primary-fixed": "#131b2e",
+                      "error": "#ffb4ab",
+                      "on-tertiary-fixed": "#2a1700",
+                      "surface-container-highest": "#273647",
+                      "surface-container": "#122131",
+                      "error-container": "#93000a",
+                      "outline-variant": "#45464d",
+                      "surface-container-high": "#1c2b3c",
+                      "on-secondary-container": "#ffdcdc",
+                      "secondary-fixed-dim": "#ffb3b6",
+                      "background": "#051424",
+                      "inverse-on-surface": "#233143",
+                      "on-error-container": "#ffdad6",
+                      "on-surface-variant": "#c6c6cd",
+                      "surface": "#051424",
+                      "on-primary": "#283044",
+                      "on-surface": "#d4e4fa",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "primary-fixed": "#dae2fd",
+                      "primary-container": "#0f172a",
+                      "surface-bright": "#2c3a4c",
+                      "surface-variant": "#273647",
+                      "secondary-fixed": "#ffdada",
+                      "inverse-primary": "#565e74",
+                      "inverse-surface": "#d4e4fa",
+                      "on-tertiary": "#472a00",
+                      "on-background": "#d4e4fa",
+                      "surface-container-lowest": "#010f1f",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "outline": "#909097",
+                      "on-secondary-fixed-variant": "#920028",
+                      "surface-tint": "#bec6e0",
+                      "primary-fixed-dim": "#bec6e0",
+                      "secondary-container": "#cc003c",
+                      "on-error": "#690005",
+                      "primary": "#bec6e0",
+                      "secondary": "#ffb3b6",
+                      "on-primary-container": "#798098",
+                      "tertiary": "#ffb95f",
+                      "on-tertiary-container": "#b47300",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "surface-container-low": "#0d1c2d",
+                      "on-secondary": "#68001a",
+                      "tertiary-container": "#251400",
+                      "on-secondary-fixed": "#40000c",
+                      "tertiary-fixed": "#ffddb8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "unit": "8px",
+                      "margin-mobile": "20px",
+                      "margin-desktop": "64px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "JetBrains Mono"
+                      ],
+                      "display-lg": [
+                              "Playfair Display"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Playfair Display"
+                      ],
+                      "headline-md": [
+                              "Playfair Display"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+      </script>
+<style>
+        .glass-panel {
+            background: rgba(18, 33, 49, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-inner-glow {
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .ambient-shadow {
+            box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .hover-scale {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full z-50 flex justify-between px-margin-desktop max-w-container-max mx-auto bg-surface/60 backdrop-blur-md shadow-sm border-b border-white/10 hidden md:flex h-20 items-center">
+<div class="flex items-center gap-8">
+<h1 class="font-display-lg text-[32px] text-on-surface tracking-tighter">Kurasikapa Media TV</h1>
+<nav class="flex gap-6">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">World</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Politics</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Tech</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Business</a>
+<a class="font-label-caps text-label-caps text-secondary border-b-2 border-secondary pb-1" href="#">Culture</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Live</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-caps text-label-caps text-on-surface-variant hover:text-secondary transition-colors duration-200">Donate</button>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-full font-label-caps text-label-caps hover-scale">Subscribe</button>
+</div>
+</header>
+<!-- Mobile Nav Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-white/10 flex md:hidden items-center justify-between px-margin-mobile h-16">
+<h1 class="font-display-lg-mobile text-[24px] text-on-surface tracking-tighter">Kurasikapa Media TV</h1>
+<button class="text-on-surface">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+<main class="flex-grow pt-24 md:pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Hero Section: Featured Podcast -->
+<section class="mb-16 md:mb-24">
+<div class="relative w-full h-[500px] md:h-[600px] rounded-xl overflow-hidden glass-panel ambient-shadow group">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105" data-alt="A highly detailed cinematic photograph of an intricate, futuristic audio mixing board in a dimly lit, high-end studio. The scene is illuminated by striking crimson and deep navy accent lights, casting dramatic shadows and highlighting the metallic textures of the knobs and dials. The overall aesthetic is sophisticated modernism, reflecting a premium media landscape. The mood is focused and intense, suggesting high-tech precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNBedM82J818z5_lagvHf9sllRjG410r0_OYx-5l6zblW_hVzMwAYDUpkUeGS_oyrRRdsibZtiAFEVHcqJA6QxI1R9Mz_ffJI1w9gksMWM9CmkcFCoqUvWAOGY-kHTLszsAostV7tpQSeY0FYBnAXsJzcenuPrl43C-swATVLlME2VEazQpVNm0Me521w91uEUWmLvAjWeHSw_enShtpDtWwsJxNDVl1nK9D3sqypbsqI-2fJnWizx"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+</div>
+<div class="relative z-10 h-full flex flex-col justify-end p-8 md:p-12">
+<div class="flex items-center gap-3 mb-4">
+<span class="px-3 py-1 rounded-full border border-secondary text-secondary font-label-caps text-label-caps bg-secondary/10">Featured Episode</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Tech &amp; Society • 45 Min</span>
+</div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-6 max-w-3xl">The Algorithmic Divide: How AI Shapes Global Discourse</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-8">
+                        Join our chief correspondent as they dive deep into the unseen mechanisms governing modern communication networks, featuring insights from leading digital ethicists.
+                    </p>
+<div class="flex flex-wrap items-center gap-4">
+<button class="flex items-center gap-2 bg-secondary-container text-on-secondary-container px-8 py-4 rounded-full font-body-md font-bold hover-scale">
+<span class="material-symbols-outlined" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                            Listen Now
+                        </button>
+<button class="flex items-center gap-2 border border-outline-variant text-on-surface px-6 py-4 rounded-full font-body-md hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                            Queue
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Category Filters -->
+<section class="mb-12 border-b border-outline-variant/30 pb-6">
+<div class="flex items-center justify-between flex-wrap gap-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Browse Library</h3>
+<div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface font-label-caps text-label-caps border border-outline-variant">All</button>
+<button class="px-5 py-2 rounded-full bg-surface text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps border border-transparent hover:border-outline-variant transition-all">Politics</button>
+<button class="px-5 py-2 rounded-full bg-surface text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps border border-transparent hover:border-outline-variant transition-all">Tech</button>
+<button class="px-5 py-2 rounded-full bg-surface text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps border border-transparent hover:border-outline-variant transition-all">Culture</button>
+<button class="px-5 py-2 rounded-full bg-surface text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps border border-transparent hover:border-outline-variant transition-all">Business</button>
+</div>
+</div>
+</section>
+<!-- Grid Layout -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<article class="bg-surface-container-low rounded-lg overflow-hidden card-inner-glow hover-scale group cursor-pointer flex flex-col">
+<div class="relative h-48 md:h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A striking digital illustration representing geopolitical tensions, featuring abstract globe motifs interwoven with bold, intersecting lines in deep navy and vibrant crimson. The aesthetic is sophisticated modernism, suggesting high-stakes political analysis within a premium media context. The lighting is dramatic and moody, emphasizing a digital prestige feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtDoNgGdXzjNqaOGDCpGTWvNlcP_1fUtR0bYfI8cMmmEiaVho4HmfgYKyN_OgxYtAyoh8LdZreXg8k_-ON3XXIO3xrpJZ9QIYAdk-vkUmMyUlL4ewUvCqifvgCftA1T72FD2k33xTHnSi479G6IW48pTMGpVaLYFofXdJZdCtX34MSHvPFP3MHv4tlodVK3FMCi-yOan2nHdGtcfgo0OtdM7a3RJP2OSkPSv-1x94uXad08pgpcqq0"/>
+<div class="absolute bottom-4 right-4 bg-surface/80 backdrop-blur-md rounded-full p-3 shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<span class="material-symbols-outlined text-secondary" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="p-6 flex-grow flex flex-col">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-caps text-label-caps text-secondary">Politics</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Oct 12 • 52m</span>
+</div>
+<h4 class="font-headline-md text-[20px] leading-tight text-on-surface mb-2 group-hover:text-primary transition-colors">Shifting Sands: The New Global Alliances</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mt-auto">An analysis of recent diplomatic maneuvers in Eastern Europe and their economic implications.</p>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-low rounded-lg overflow-hidden card-inner-glow hover-scale group cursor-pointer flex flex-col">
+<div class="relative h-48 md:h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A macro photograph of an advanced silicon microchip, glowing with intense internal light against a stark, deep blue-black background. The circuitry details are sharp and precise. The composition uses sophisticated modernism styling, highlighting the intersection of technology and premium visual storytelling. The mood is clinical yet awe-inspiring." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA3JAZTPHHO46tqE23aAaPavjlkIakPftvmBg4Og4iJbtc6-_kokj-bZsYZXujgsj6g8L_AK7MLO2Nx0sorb1KHWvqTIN-jvonphiuu80i9amgAkGWoojo710T5Wy5tUB3cfwQoUAKJgsJdFFMwx2qef0gZMxp4hFTjBVXUeOTWBCFNoYoeiOnjNfcn3aT2WEt-5rqWIsZoOEzY_JIr2KBLneCf1j20npekFHPX9-lS6dsH_vBojcQ"/>
+<div class="absolute bottom-4 right-4 bg-surface/80 backdrop-blur-md rounded-full p-3 shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<span class="material-symbols-outlined text-secondary" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="p-6 flex-grow flex flex-col">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-caps text-label-caps text-secondary">Tech</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Oct 10 • 38m</span>
+</div>
+<h4 class="font-headline-md text-[20px] leading-tight text-on-surface mb-2 group-hover:text-primary transition-colors">Quantum Supremacy: Beyond the Hype</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mt-auto">Separating fact from fiction as tech giants race toward the next computing frontier.</p>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-low rounded-lg overflow-hidden card-inner-glow hover-scale group cursor-pointer flex flex-col">
+<div class="relative h-48 md:h-56 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A stylized, architectural photograph of a modern art museum's interior, characterized by sweeping concrete curves and dramatic natural light shafts cutting through shadows. The deep navy and subtle slate tones create a premium, minimalist Swiss design feel. The image conveys a sense of high culture and intellectual depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5s3ZalNkuAzkDhu51FHMSzazBYfxGmxghnthF581BKIZg8vzaqPDZOBqMhiWJchkbTf5P7T1XSZsMeeqM1PmJrutsiTBmc2BWJCXUS3iLETv-zKJ3fdeVpGgCMyMUvotXOK2xN4w4SPj6PUT2mBvLZMBsTWeexpL1cOeo-3Xc3sNChoNeP4tMoBe2lGX1mgBkb3a6edZG8ttFFNXrCbciVToyEb0eUYWUdRqcQai4YbVkE1WnWCYp"/>
+<div class="absolute bottom-4 right-4 bg-surface/80 backdrop-blur-md rounded-full p-3 shadow-lg transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<span class="material-symbols-outlined text-secondary" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="p-6 flex-grow flex flex-col">
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-caps text-label-caps text-secondary">Culture</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Oct 05 • 65m</span>
+</div>
+<h4 class="font-headline-md text-[20px] leading-tight text-on-surface mb-2 group-hover:text-primary transition-colors">The Architecture of Silence</h4>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mt-auto">Exploring how modern urban spaces are designed to foster or suppress human connection.</p>
+</div>
+</article>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop bg-surface-container-lowest flex flex-col items-center gap-8 border-t border-outline-variant mt-auto">
+<h2 class="font-display-lg-mobile text-[32px] text-secondary tracking-tighter">Kurasikapa Media TV</h2>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Careers</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Press</a>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-60">© 2024 Kurasikapa Media TV. All rights reserved.</p>
+</footer>
+</body></html>

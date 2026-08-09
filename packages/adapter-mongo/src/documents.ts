@@ -48,6 +48,8 @@ export interface CategoryDocument {
   parentId: string | null
   slugs: Record<string, string>
   names: Record<string, string>
+  /** Optional and per-locale — older documents predate the field. */
+  descriptions?: Record<string, string>
   order: number
 }
 

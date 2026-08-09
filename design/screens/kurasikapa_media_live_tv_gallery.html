@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kurasikapa Media TV - Live</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#ffb95f",
+                        "surface-container-highest": "#273647",
+                        "on-secondary": "#68001a",
+                        "primary-container": "#0f172a",
+                        "secondary": "#ffb3b6",
+                        "outline-variant": "#45464d",
+                        "secondary-fixed-dim": "#ffb3b6",
+                        "inverse-surface": "#d4e4fa",
+                        "surface-dim": "#051424",
+                        "on-secondary-fixed": "#40000c",
+                        "on-tertiary-container": "#b47300",
+                        "on-error": "#690005",
+                        "surface-container-low": "#0d1c2d",
+                        "primary-fixed": "#dae2fd",
+                        "surface-variant": "#273647",
+                        "surface-bright": "#2c3a4c",
+                        "on-surface-variant": "#c6c6cd",
+                        "tertiary-container": "#251400",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#1c2b3c",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "surface-container": "#122131",
+                        "secondary-container": "#cc003c",
+                        "error": "#ffb4ab",
+                        "surface": "#051424",
+                        "on-primary-fixed": "#131b2e",
+                        "primary": "#bec6e0",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#472a00",
+                        "surface-tint": "#bec6e0",
+                        "on-secondary-container": "#ffdcdc",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-primary-container": "#798098",
+                        "on-surface": "#d4e4fa",
+                        "inverse-on-surface": "#233143",
+                        "primary-fixed-dim": "#bec6e0",
+                        "surface-container-lowest": "#010f1f",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary": "#283044",
+                        "secondary-fixed": "#ffdada",
+                        "on-background": "#d4e4fa",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-secondary-fixed-variant": "#920028",
+                        "outline": "#909097",
+                        "background": "#051424",
+                        "inverse-primary": "#565e74"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "container-max": "1440px",
+                        "unit": "8px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(204, 0, 60, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(204, 0, 60, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(204, 0, 60, 0); }
+        }
+        .glass-overlay {
+            background: rgba(5, 20, 36, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopNavBar -->
+<nav class="bg-surface/60 backdrop-blur-md shadow-sm fixed top-0 w-full z-50 flex justify-between px-margin-desktop max-w-container-max mx-auto border-b border-white/10 py-4 items-center">
+<div class="font-display-lg text-display-lg text-on-surface tracking-tighter text-3xl">
+            Kurasikapa Media TV
+        </div>
+<div class="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">World</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Politics</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Tech</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Business</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200" href="#">Culture</a>
+<a class="text-secondary border-b-2 border-secondary pb-1 hover:text-secondary transition-colors duration-200" href="#">Live</a>
+</div>
+<div class="flex gap-4 font-label-caps text-label-caps items-center">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-secondary cursor-pointer">search</span>
+<button class="text-on-surface-variant hover:text-secondary transition-colors duration-200 uppercase">Donate</button>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded scale-102 hover:scale-105 transition-transform uppercase">Subscribe</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow pt-24 pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Live Player Section (Hero) -->
+<section class="mb-16 grid grid-cols-1 lg:grid-cols-4 gap-6 relative">
+<div class="lg:col-span-3 relative rounded-xl overflow-hidden aspect-video bg-surface-container-high group">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-definition live broadcast shot of a global news anchor at a sleek, futuristic news desk. Dramatic studio lighting with deep navy blues and glowing crimson accents. The image feels premium, authoritative, and perfectly composed within a dark mode UI context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADpUpBE8kpH87J34vCoDMqd3cWdgXNDQSxSSq5g2ymVgPL-TPdIXcV0TcabDuAMjvajoGTTouOI2cuPSW7gxoKMJQIR-df1Tb60QYxxVKbb2pTrjlJ-WTApAdtnPvw5zwjPAry_24run9Aei0BKxHjXxN8gZDqlfK44cPoTMFQ_kDsqMa7jkXfkY0l9LrjwThDBLyzjR8mngLpNuKBP6FYaGNWLQpdcaksetl7i37HDwzy7TrRKs5h"/>
+<!-- Player Controls Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-2 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+<div class="w-2 h-2 rounded-full bg-secondary-container pulse"></div>
+<span class="font-label-caps text-label-caps text-on-surface">LIVE NOW</span>
+</div>
+<div class="flex gap-2">
+<button class="glass-overlay p-2 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-on-surface">cast</span>
+</button>
+<button class="glass-overlay p-2 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-on-surface">subtitles</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h1 class="font-headline-md text-headline-md text-on-surface drop-shadow-md">Global Summit: Uncharted Territories</h1>
+<div class="flex items-center gap-4 text-on-surface">
+<button class="hover:text-secondary transition-colors"><span class="material-symbols-outlined text-4xl" data-weight="fill">play_arrow</span></button>
+<button class="hover:text-secondary transition-colors"><span class="material-symbols-outlined">volume_up</span></button>
+<div class="flex-grow h-1 bg-white/20 rounded-full cursor-pointer relative">
+<div class="absolute top-0 left-0 h-full w-1/3 bg-secondary rounded-full"></div>
+<div class="absolute top-1/2 left-1/3 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow"></div>
+</div>
+<span class="font-label-caps text-label-caps">LIVE</span>
+<button class="hover:text-secondary transition-colors"><span class="material-symbols-outlined">fullscreen</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Up Next / Chat Sidebar -->
+<div class="lg:col-span-1 glass-overlay rounded-xl flex flex-col overflow-hidden h-[500px] lg:h-auto">
+<div class="p-4 border-b border-white/10 flex justify-between items-center bg-surface-container/50">
+<h3 class="font-label-caps text-label-caps text-on-surface">UP NEXT</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">queue_play_next</span>
+</div>
+<div class="flex-grow overflow-y-auto p-4 flex flex-col gap-4 scrollbar-hide">
+<div class="flex gap-3 group cursor-pointer">
+<div class="w-24 h-16 rounded bg-surface-container-high overflow-hidden shrink-0 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A close-up portrait of a tech CEO during an intense interview, dramatically lit against a dark studio background. High-contrast, cinematic framing fitting for premium editorial content." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxRuZ12okz75bXrkQGPD913nQ0TIaOQIes-SzwnArSK8JSiJFkKCE86Yv-4yx6TYmsT1GyPdzDtkyEHXsTTVV-Agv5RGHvRH4chFYmv49aHVMQYbYpbMzSnUwrpmi0c354xUmMSNcq6nCadgxwnAWoQpMpVrGuskUXkapn21MVHnnL1Tmce2076pTX-bjMrMbPmmCCe7Iz_ofjkOiLaVIktWJIwyMc4lT819XuQv7KdUfz80Iom2Y8"/>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded font-label-caps text-[10px]">12:45</div>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-label-caps text-[10px] text-secondary mb-1">INTERVIEW</span>
+<p class="font-body-md text-sm text-on-surface leading-snug line-clamp-2 group-hover:text-secondary transition-colors">The Future of Silicon: Exclusive with Tech Titan</p>
+</div>
+</div>
+<div class="flex gap-3 group cursor-pointer">
+<div class="w-24 h-16 rounded bg-surface-container-high overflow-hidden shrink-0 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Aerial drone shot of a bustling European city square at twilight. Cool, moody tones with glowing streetlights, illustrating a documentary segment on urban development." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrOxMjcbsYdzTApeFJ2jLtIhMKP-4p38GIiF4lafIGv_niqLYgwA-0vgveLWxqSYH1rdRrxq9O9xQ6OzZzmLYRH3AtD2BDtOcgJSZuvN7BRhYwsp1hjMQ9wFmu37DPE1HfkiFegV8siy74-4C7qPdn_DRqezPPidGQWGh3RfD4nx-GRuMoow_dOMOcTzGLvFFf8PCYFeIDy2Kzu1Pp9fBnUw4rD9-aWEZosLM-hSj2HQGYqyixx09b"/>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded font-label-caps text-[10px]">45:20</div>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-label-caps text-[10px] text-secondary mb-1">DOCUMENTARY</span>
+<p class="font-body-md text-sm text-on-surface leading-snug line-clamp-2 group-hover:text-secondary transition-colors">Urban Sprawl: Redefining the Modern Metropolis</p>
+</div>
+</div>
+<div class="flex gap-3 group cursor-pointer">
+<div class="w-24 h-16 rounded bg-surface-container-high overflow-hidden shrink-0 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A dynamic shot of a stock market trading floor in motion blur, symbolizing fast-paced business news. Dark, sophisticated color palette with flashes of green and red tickers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC75FKwhvLOAOiYAVv2_XiE_qXoKrSHaEuY3wORZZcBZAxUbmatcLzcE9Tcu_WGpqUG8O5B4PYk0bT1A63m_SQOsG3eLRQKHiSKGdFdArh6frgxSH8JNNja8HgoK9OVWFSrpDxZUbHdFqyW8c8STuuJNFiinV-zrz8rbxJ1htJk4AR__DclW6v6mygvL7ws8QkyVR9baq2S1gu2uDIxsUheXqjIAFdsoVsjzuHcypM0_WjhWvXU3j_1"/>
+<div class="absolute bottom-1 right-1 bg-black/70 px-1 rounded font-label-caps text-[10px]">08:15</div>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-label-caps text-[10px] text-secondary mb-1">MARKETS</span>
+<p class="font-body-md text-sm text-on-surface leading-snug line-clamp-2 group-hover:text-secondary transition-colors">Closing Bell: Weekly Market Analysis</p>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-white/10 bg-surface-container/50">
+<button class="w-full py-2 border border-outline-variant rounded hover:bg-white/5 transition-colors font-label-caps text-label-caps text-on-surface-variant flex items-center justify-center gap-2">
+                        View Full Schedule <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop bg-surface-container-lowest flex flex-col items-center gap-8 border-t border-outline-variant mt-auto">
+<div class="font-display-lg-mobile text-display-lg-mobile text-secondary">
+            Kurasikapa
+        </div>
+<div class="flex flex-wrap justify-center gap-6 font-body-md text-body-md text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">About</a>
+<a class="hover:text-primary transition-colors" href="#">Careers</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+<a class="hover:text-primary transition-colors" href="#">Press</a>
+</div>
+<div class="font-body-md text-sm text-on-surface-variant opacity-60">
+            © 2024 Kurasikapa Media TV. All rights reserved.
+        </div>
+</footer>
+</body></html>

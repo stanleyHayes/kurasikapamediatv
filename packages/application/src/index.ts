@@ -74,6 +74,7 @@ export {
   type BrowseCategoryDeps,
   type BrowseCategoryInput,
   type CategoryPage,
+  type ListedArticle,
 } from './editorial/browse-category'
 export type { SearchHit, SearchPort, SearchQuery } from './ports/search'
 export {

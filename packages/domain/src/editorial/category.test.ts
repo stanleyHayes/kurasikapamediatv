@@ -8,6 +8,7 @@ const politics = (over: Partial<Parameters<typeof Category.reconstitute>[0]> = {
     parentId: null,
     slugs: { en: 'politics', fr: 'politique' },
     names: { en: 'Politics', fr: 'Politique' },
+    descriptions: { en: 'Power, policy and the people who wield both.' },
     order: 1,
     ...over,
   })
@@ -67,5 +68,23 @@ describe('hierarchy', () => {
 
     expect(child.isRootLevel()).toBe(false)
     expect(child.parentId).toBe('cat_news')
+  })
+})
+
+describe('descriptionIn', () => {
+  it('gives the standfirst for a locale that has one', () => {
+    expect(politics().descriptionIn('en')).toBe('Power, policy and the people who wield both.')
+  })
+
+  it('does NOT fall back to another locale, unlike nameIn', () => {
+    // Deliberate asymmetry. A heading in the wrong language is a visible
+    // glitch someone fixes; a whole paragraph in the wrong language reads as
+    // a broken translation to every French reader who lands on the section.
+    expect(politics().descriptionIn('fr')).toBeNull()
+    expect(politics().nameIn('fr')).toBe('Politique')
+  })
+
+  it('is null when the section has no descriptions at all', () => {
+    expect(politics({ descriptions: {} }).descriptionIn('en')).toBeNull()
   })
 })

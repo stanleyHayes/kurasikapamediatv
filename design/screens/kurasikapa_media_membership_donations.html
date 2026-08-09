@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Membership &amp; Donations - Kurasikapa Media TV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f0f3ff",
+                    "primary": "#000000",
+                    "surface": "#f9f9ff",
+                    "background": "#f9f9ff",
+                    "on-secondary-container": "#54647a",
+                    "on-secondary-fixed": "#0b1c30",
+                    "tertiary-container": "#171c1f",
+                    "on-tertiary-fixed": "#171c1f",
+                    "on-background": "#111c2d",
+                    "on-primary-container": "#7c839b",
+                    "surface-tint": "#565e74",
+                    "tertiary": "#000000",
+                    "on-surface-variant": "#45464d",
+                    "surface-container-high": "#dee8ff",
+                    "surface-container-highest": "#d8e3fb",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#dfe3e7",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#ecf1ff",
+                    "secondary-container": "#d0e1fb",
+                    "surface-variant": "#d8e3fb",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "on-tertiary-container": "#808488",
+                    "surface-container": "#e7eeff",
+                    "inverse-surface": "#263143",
+                    "surface-bright": "#f9f9ff",
+                    "primary-fixed": "#dae2fd",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "surface-dim": "#cfdaf2",
+                    "on-tertiary-fixed-variant": "#43474b",
+                    "on-surface": "#111c2d",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "primary-fixed-dim": "#bec6e0",
+                    "outline-variant": "#c6c6cd",
+                    "primary-container": "#131b2e",
+                    "secondary": "#505f76",
+                    "secondary-fixed": "#d3e4fe",
+                    "tertiary-fixed-dim": "#c3c7cb",
+                    "on-error": "#ffffff",
+                    "outline": "#76777d",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#131b2e",
+                    "inverse-primary": "#bec6e0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "gutter": "24px",
+                    "md": "24px",
+                    "lg": "48px",
+                    "margin-mobile": "16px",
+                    "xl": "80px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Playfair Display"
+                    ],
+                    "headline-lg": [
+                            "Playfair Display"
+                    ],
+                    "headline-md": [
+                            "Playfair Display"
+                    ],
+                    "display-lg-mobile": [
+                            "Playfair Display"
+                    ],
+                    "body-sm": [
+                            "Outfit"
+                    ],
+                    "label-sm": [
+                            "Outfit"
+                    ],
+                    "body-lg": [
+                            "Outfit"
+                    ],
+                    "label-md": [
+                            "Outfit"
+                    ],
+                    "body-md": [
+                            "Outfit"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "56px",
+                            {
+                                    "lineHeight": "64px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "40px",
+                            {
+                                    "lineHeight": "48px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Ambient Shadow Utility */
+        .shadow-ambient {
+            box-shadow: 0px 12px 32px rgba(15, 23, 42, 0.08);
+        }
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant sticky top-0 z-50 w-full">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-[1120px] mx-auto h-20">
+<!-- Brand -->
+<a class="font-headline-lg text-headline-lg text-primary tracking-tight" href="#">Kurasikapa Media TV</a>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex items-center gap-gutter">
+<a class="text-secondary font-medium hover:text-primary transition-colors duration-200" href="#">World</a>
+<a class="text-secondary font-medium hover:text-primary transition-colors duration-200" href="#">Politics</a>
+<a class="text-secondary font-medium hover:text-primary transition-colors duration-200" href="#">Tech</a>
+<a class="text-secondary font-medium hover:text-primary transition-colors duration-200" href="#">Live</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<button class="hidden md:flex font-label-md text-label-md text-primary border border-outline-variant rounded-full px-6 py-2 hover:bg-surface-container-low transition-colors duration-200">
+                    Donate
+                </button>
+<button class="font-label-md text-label-md bg-primary text-on-primary rounded-full px-6 py-2 hover:opacity-80 transition-opacity duration-200">
+                    Subscribe
+                </button>
+</div>
+</div>
+</header>
+<main class="w-full">
+<!-- Hero Section -->
+<section class="max-w-[1120px] mx-auto px-margin-mobile md:px-margin-desktop py-xl text-center flex flex-col items-center">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-6 max-w-3xl">
+                Support Independent Journalism
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-lg">
+                Your support enables our dedicated reporters to pursue truth, hold power accountable, and bring you stories that matter from around the globe. Join us in preserving the integrity of news.
+            </p>
+</section>
+<!-- Membership Tiers Section -->
+<section class="max-w-[1120px] mx-auto px-margin-mobile md:px-margin-desktop pb-xl">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Silver Tier -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 flex flex-col h-full hover:shadow-ambient transition-shadow duration-300">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Silver</h3>
+<div class="flex items-baseline gap-1 mb-6 border-b border-surface-container-high pb-6">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">$5</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ month</span>
+</div>
+<ul class="flex flex-col gap-4 mb-8 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Ad-free reading experience</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Weekly exclusive editorial newsletter</span>
+</li>
+</ul>
+<button class="w-full font-label-md text-label-md bg-transparent border border-primary text-primary rounded-full px-6 py-3 hover:bg-surface-container-low transition-colors duration-200">
+                        Choose Silver
+                    </button>
+</div>
+<!-- Gold Tier (Highlighted) -->
+<div class="bg-surface-container-lowest border-2 border-primary rounded-xl p-8 flex flex-col h-full shadow-ambient relative transform md:-translate-y-4">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-on-primary font-label-sm text-label-sm px-4 py-1 rounded-full">
+                        Most Popular
+                    </div>
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Gold</h3>
+<div class="flex items-baseline gap-1 mb-6 border-b border-surface-container-high pb-6">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">$15</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ month</span>
+</div>
+<ul class="flex flex-col gap-4 mb-8 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Everything in Silver</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Full access to premium investigative articles</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Monthly live Q&amp;A with editors</span>
+</li>
+</ul>
+<button class="w-full font-label-md text-label-md bg-primary text-on-primary rounded-full px-6 py-3 hover:opacity-90 transition-opacity duration-200">
+                        Choose Gold
+                    </button>
+</div>
+<!-- Platinum Tier -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 flex flex-col h-full hover:shadow-ambient transition-shadow duration-300">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Platinum</h3>
+<div class="flex items-baseline gap-1 mb-6 border-b border-surface-container-high pb-6">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">$50</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ month</span>
+</div>
+<ul class="flex flex-col gap-4 mb-8 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Everything in Gold</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">Physical quarterly magazine delivered</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="check">check</span>
+<span class="font-body-md text-body-md text-on-surface">VIP invitations to annual symposiums</span>
+</li>
+</ul>
+<button class="w-full font-label-md text-label-md bg-transparent border border-primary text-primary rounded-full px-6 py-3 hover:bg-surface-container-low transition-colors duration-200">
+                        Choose Platinum
+                    </button>
+</div>
+</div>
+</section>
+<!-- Direct Donation Section -->
+<section class="bg-surface-container-low w-full py-xl border-t border-outline-variant">
+<div class="max-w-[1120px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<!-- Donation Form -->
+<div class="bg-surface-container-lowest rounded-xl p-8 md:p-12 shadow-ambient border border-outline-variant">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Make a Contribution</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8">Not looking for a membership? A direct donation of any amount helps fuel our newsroom.</p>
+<!-- Tabs -->
+<div class="flex gap-2 mb-8 bg-surface-container-low p-1 rounded-lg w-max">
+<button class="bg-surface-container-lowest shadow-sm rounded px-6 py-2 font-label-md text-label-md text-primary">One-time</button>
+<button class="rounded px-6 py-2 font-label-md text-label-md text-on-surface-variant hover:text-primary">Monthly</button>
+</div>
+<!-- Preset Amounts -->
+<div class="grid grid-cols-4 gap-4 mb-6">
+<button class="border border-outline-variant rounded-lg py-3 font-label-md text-label-md text-primary hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary transition-all">$10</button>
+<button class="border border-primary bg-primary-container/5 rounded-lg py-3 font-label-md text-label-md text-primary">$25</button>
+<button class="border border-outline-variant rounded-lg py-3 font-label-md text-label-md text-primary hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary transition-all">$50</button>
+<button class="border border-outline-variant rounded-lg py-3 font-label-md text-label-md text-primary hover:border-primary focus:border-primary focus:ring-1 focus:ring-primary transition-all">$100</button>
+</div>
+<!-- Custom Amount -->
+<div class="mb-8">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-2" for="custom_amount">Custom Amount</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-4 flex items-center font-body-md text-on-surface-variant">$</span>
+<input class="w-full pl-8 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-tertiary-container transition-all" id="custom_amount" placeholder="Other amount" type="number"/>
+</div>
+</div>
+<button class="w-full font-label-md text-label-md bg-primary text-on-primary rounded-full px-6 py-4 hover:opacity-90 transition-opacity duration-200">
+                        Proceed to Payment
+                    </button>
+</div>
+<!-- Editorial Image -->
+<div class="hidden lg:block h-full min-h-[500px] rounded-xl overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full absolute inset-0" data-alt="A high-end editorial photograph of a busy, modern newsroom environment in a minimalist, bright architectural space. Soft, natural daylight streams through large windows, illuminating sleek workstations and professional journalists deep in focus. The color palette emphasizes clean whites, sophisticated slate greys, and subtle accents of deep navy, perfectly aligning with a premium corporate media brand identity." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3vyCbHhDYqIVRtb5hpLtFbczlTmnJssm1sKqEgcMbRrTrX1q0vIGbIORAO2syiXf8fS9TSM3PKv8mJ4EBDbbbU0YGOYfk1lRvtv7rC2aFZ8BtcOAi_3Uobn3OynXHFN77EhHY2dwweatgwJXIXRTeEiNVzdnE7AaUdj2ES1Kb332omonMIcrtW-v6Y1CW2sYdCA5I3KFwMgWVrcuvMpW14i5xYzDj4x2vyC2SgY6JxYo5BpIG-QR8')"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary-container w-full mt-auto">
+<div class="w-full py-lg px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-[1120px] mx-auto gap-8">
+<div class="font-headline-md text-headline-md text-on-primary-fixed">Kurasikapa Media TV</div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-label-sm text-label-sm text-on-primary-container hover:text-on-primary-fixed transition-opacity" href="#">About Us</a>
+<a class="font-label-sm text-label-sm text-on-primary-container hover:text-on-primary-fixed transition-opacity" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-primary-container hover:text-on-primary-fixed transition-opacity" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-primary-container hover:text-on-primary-fixed transition-opacity" href="#">Contact</a>
+<a class="font-label-sm text-label-sm text-on-primary-container hover:text-on-primary-fixed transition-opacity" href="#">Ethics Code</a>
+</nav>
+<div class="font-body-sm text-body-sm text-on-primary-container">
+                © 2024 Kurasikapa Media TV. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>

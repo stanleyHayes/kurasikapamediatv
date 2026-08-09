@@ -9,6 +9,7 @@ const section = (id: string, slugs: Record<string, string>, order: number): Cate
     parentId: null,
     slugs,
     names: { en: id },
+    descriptions: {},
     order,
   })
 

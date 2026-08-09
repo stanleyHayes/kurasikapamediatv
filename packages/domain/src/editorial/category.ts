@@ -7,6 +7,14 @@ export interface CategoryProps {
   /** Locale → slug. A category is reachable only in locales it has one for. */
   readonly slugs: Readonly<Record<string, string>>
   readonly names: Readonly<Record<string, string>>
+  /**
+   * Locale → standfirst shown under the section heading.
+   *
+   * Separate from `names` and independently translatable: a section can be
+   * named in French long before someone writes its French description, and
+   * showing an English paragraph under a French heading is worse than none.
+   */
+  readonly descriptions: Readonly<Record<string, string>>
   readonly order: number
 }
 
@@ -65,6 +73,17 @@ export class Category {
    */
   nameIn(locale: string): string {
     return this.props.names[locale] ?? Object.values(this.props.names)[0] ?? ''
+  }
+
+  /**
+   * The section standfirst, or null.
+   *
+   * Deliberately does NOT fall back to another locale, unlike `nameIn`. A
+   * heading in the wrong language is a visible glitch someone will fix; a
+   * whole paragraph in the wrong language reads as a broken translation.
+   */
+  descriptionIn(locale: string): string | null {
+    return this.props.descriptions[locale] ?? null
   }
 
   snapshot(): CategoryProps {

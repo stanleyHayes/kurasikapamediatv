@@ -43,6 +43,9 @@ const toDomain = (doc: CategoryDocument): Category =>
   Category.reconstitute({
     id: categoryId(doc._id),
     parentId: doc.parentId === null ? null : categoryId(doc.parentId),
+    // Documents written before descriptions existed have no field at all;
+    // an absent map reads the same as "no description in any locale".
+    descriptions: doc.descriptions ?? {},
     slugs: doc.slugs,
     names: doc.names,
     order: doc.order,

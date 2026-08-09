@@ -26,6 +26,15 @@ export class MongoRevisionRepository implements RevisionRepository {
     return docs.map(revisionToDomain)
   }
 
+  async findManyByIds(ids: readonly RevisionId[]): Promise<readonly Revision[]> {
+    // Guard the empty case: `$in: []` is a round trip that can only return
+    // nothing, and listings hit this whenever a page has no approved revisions.
+    if (ids.length === 0) return []
+
+    const docs = await this.revisions.find({ _id: { $in: [...ids] } }).toArray()
+    return docs.map(revisionToDomain)
+  }
+
   /**
    * insertOne, never upsert. History is append-only, and the unique
    * (articleId, seq) index turns a concurrent double-append into a duplicate
