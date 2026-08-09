@@ -200,7 +200,7 @@ the wiring is missing.
 | **The Go backend itself** | Just started. One value object ported. This is the largest single piece of outstanding work. |
 | **Audit logs** | Not built. Only the *permission name* `audit:read` exists — there is no audit collection, no use case, no writer. Product rule 4 (append-only audit) is currently unenforced because there is nothing to enforce it on. |
 | **Rich-text editor** | Not built. `editor-fields.tsx` is a plain `<textarea>`. No tiptap/lexical/prosemirror. `ArticleBody` splits on blank lines rather than parsing Markdown — deliberately, since rendering stored HTML without a sanitiser is an injection route. |
-| **Security headers** | `apps/web/proxy.ts` sets **no** CSP, HSTS, X-Content-Type-Options or Referrer-Policy. Docs claim these; the file does not have them. |
+| ~~Security headers~~ | **DONE — KUR-37.** CSP and Permissions-Policy added; the rest were already in next.config.ts (my earlier note checked proxy.ts and was wrong). Applied to every route including /api. |
 | **Rate limiting** | Not built — on auth, search, or the AI endpoints. |
 | **2FA** | Not built. |
 | **CAPTCHA** | Not built. |

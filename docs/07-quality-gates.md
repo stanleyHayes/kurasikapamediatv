@@ -108,7 +108,14 @@ Local gates are not a placeholder for Sonar — they are the same rules, enforce
 - `pnpm audit` and `govulncheck` fail on **high** or above.
 - No secret in source, ever. Env vars only; `.env.example` documents every key with a fake value.
 - Auth.js session cookies: `httpOnly`, `secure`, `sameSite=lax`.
-- CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy` set in Next.js middleware.
+- CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
+  `Permissions-Policy` set in `next.config.ts` — **not** in `proxy.ts`, whose
+  matcher excludes `/api` and would miss the auth and AI endpoints. The policy
+  lives in `apps/web/src/security/headers.ts` so it is testable.
+- CSP uses `'unsafe-inline'` for scripts rather than a nonce, **deliberately**.
+  Nonces force every page dynamic and are incompatible with Partial
+  Prerendering, which is this application's caching architecture. Upgrade path
+  is `experimental.sri` when it stabilises. See the module comment.
 - Every mutating Server Action re-checks authorisation through `AuthorizeAction` in the domain. UI-level role checks are cosmetic and are never the control.
 - Rate limiting on auth, comments, search and all AI endpoints.
 
