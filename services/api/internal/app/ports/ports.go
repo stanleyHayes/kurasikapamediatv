@@ -1,0 +1,157 @@
+// Package ports declares what the application needs from the outside world.
+//
+// Interfaces are declared here, by the consumer, and implemented in
+// internal/adapter. That direction is the whole hexagon: the application says
+// "I need to load an article by slug", and MongoDB's job is to satisfy that —
+// not the other way round.
+//
+// Nothing in this package mentions a driver, a wire format or a vendor. If an
+// interface here starts leaking bson.M, an *http.Response or a Cloudinary
+// type, the boundary has already been crossed.
+package ports
+
+import (
+	"context"
+	"errors"
+	"time"
+
+	"github.com/kurasikapa/api/internal/domain/editorial"
+	"github.com/kurasikapa/api/internal/domain/identity"
+	"github.com/kurasikapa/api/internal/domain/shared"
+)
+
+// ErrNotFound is returned when a lookup finds nothing.
+//
+// One sentinel rather than one per repository: callers almost always want to
+// distinguish "absent" from "broken", and rarely need to know which collection
+// was absent.
+var ErrNotFound = errors.New("not found")
+
+// Clock supplies the current time.
+//
+// Injected rather than read from the package, so a test can control it. A test
+// that cannot control time is not a test — it is a coin flip that usually
+// lands the same way.
+type Clock interface {
+	Now() time.Time
+}
+
+// IDs mints new identifiers.
+type IDs interface {
+	NewID() string
+}
+
+// Event is something that happened, stated in the past tense.
+type Event struct {
+	Name       string
+	ArticleID  shared.ArticleID
+	Locale     string
+	Slug       string
+	OccurredAt time.Time
+	// Detail carries event-specific fields. Deliberately a plain map: the
+	// alternative is a type per event, and the only consumer today is cache
+	// invalidation, which reads two fields.
+	Detail map[string]string
+}
+
+// EventBus publishes domain events to whoever is listening.
+//
+// Best-effort by contract. Callers that have already committed a state change
+// must not fail because delivery did, so they discard the error — which means
+// an implementation is REQUIRED to report its own failures (log, metric,
+// dead-letter). Returning an error nobody reads and reporting nothing is how a
+// silent failure gets built out of two reasonable-looking halves.
+type EventBus interface {
+	Publish(ctx context.Context, event Event) error
+}
+
+// Cursor is keyset pagination input.
+//
+// Keyset, never offset. An offset query re-scans everything it skips, and on a
+// feed that grows at the top it also silently repeats and drops rows as the
+// reader pages.
+type Cursor struct {
+	// After is the last key from the previous page. Empty means the first page.
+	After string
+	Limit int
+}
+
+// Page is one page of results plus the key to fetch the next.
+type Page[T any] struct {
+	Items []T
+	// NextCursor is empty when there is no further page.
+	NextCursor string
+}
+
+// PublishedQuery selects articles a reader may see.
+type PublishedQuery struct {
+	Locale     string
+	CategoryID shared.CategoryID
+	Cursor     Cursor
+}
+
+// AuthoredQuery selects one author's own work.
+type AuthoredQuery struct {
+	AuthorID shared.UserID
+	Cursor   Cursor
+}
+
+// ArticleRepository stores and retrieves articles.
+type ArticleRepository interface {
+	FindByID(ctx context.Context, id shared.ArticleID) (editorial.Article, error)
+	FindBySlug(ctx context.Context, slug, locale string) (editorial.Article, error)
+	FindManyByIDs(ctx context.Context, ids []shared.ArticleID) ([]editorial.Article, error)
+	// SlugTaken reports whether a slug is already used in a locale. Separate
+	// from FindBySlug because the caller wants a yes/no, and loading a whole
+	// aggregate to answer it is waste on every draft save.
+	SlugTaken(ctx context.Context, slug, locale string) (bool, error)
+	ListPublished(ctx context.Context, q PublishedQuery) (Page[editorial.Article], error)
+	ListAuthoredBy(ctx context.Context, q AuthoredQuery) (Page[editorial.Article], error)
+	ListAwaitingReview(ctx context.Context, cursor Cursor) (Page[editorial.Article], error)
+	// ListDueForPublication returns scheduled articles whose time has come.
+	ListDueForPublication(ctx context.Context, now time.Time) ([]editorial.Article, error)
+	Save(ctx context.Context, article editorial.Article) error
+}
+
+// RevisionRepository stores article history. Append-only by contract: there is
+// deliberately no Update and no Delete.
+type RevisionRepository interface {
+	FindByID(ctx context.Context, id shared.RevisionID) (editorial.Revision, error)
+	FindLatest(ctx context.Context, articleID shared.ArticleID) (editorial.Revision, error)
+	FindManyByIDs(ctx context.Context, ids []shared.RevisionID) ([]editorial.Revision, error)
+	// FindLatestForArticles is the batch form, so a listing is two queries
+	// rather than one per row.
+	FindLatestForArticles(ctx context.Context, ids []shared.ArticleID) ([]editorial.Revision, error)
+	ListFor(ctx context.Context, articleID shared.ArticleID) ([]editorial.Revision, error)
+	Append(ctx context.Context, revision editorial.Revision) error
+}
+
+// CategoryRepository stores sections.
+type CategoryRepository interface {
+	FindBySlug(ctx context.Context, slug, locale string) (editorial.Category, error)
+	ListForLocale(ctx context.Context, locale string) ([]editorial.Category, error)
+	Save(ctx context.Context, category editorial.Category) error
+}
+
+// RoleRepository holds our own role grants.
+//
+// Ours, not the auth library's. Better Auth says who someone is; this is what
+// says what they may do, and keeping it in a collection we own is what lets a
+// revocation land on the very next request.
+type RoleRepository interface {
+	RolesFor(ctx context.Context, userID shared.UserID) ([]identity.Role, error)
+	Replace(ctx context.Context, userID shared.UserID, roles []identity.Role) error
+}
+
+// DirectoryUser is a person as the roles screen shows them.
+type DirectoryUser struct {
+	ID    shared.UserID
+	Email string
+	Name  string
+	Roles []identity.Role
+}
+
+// UserDirectory reads the auth library's user collection, and only reads it.
+type UserDirectory interface {
+	List(ctx context.Context, cursor Cursor) (Page[DirectoryUser], error)
+}

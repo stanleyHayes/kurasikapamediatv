@@ -54,3 +54,4 @@ apps/web/.playwright/
 
 # Go coverage profile
 services/api/coverage.out
+services/api/coverage-app.out

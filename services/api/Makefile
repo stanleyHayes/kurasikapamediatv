@@ -6,15 +6,16 @@
 
 GO ?= go
 COVER_PROFILE := coverage.out
+APP_PROFILE := coverage-app.out
 
-# The domain floor from AGENTS.md. Applied to the whole module rather than
-# per-package: a package-by-package floor lets a thin adapter drag the average
-# up while a rule goes untested.
+# Floors from AGENTS.md. Each ring is measured on its own, so a thin adapter
+# with trivial coverage cannot drag the average up while a rule goes untested.
 DOMAIN_FLOOR := 95.0
+APP_FLOOR := 90.0
 
-.PHONY: verify fmt vet lint test cover clean
+.PHONY: verify fmt vet lint test cover cover-app clean
 
-verify: fmt vet lint cover
+verify: fmt vet lint cover cover-app
 
 ## fmt fails rather than rewrites, so CI cannot silently "fix" a diff.
 fmt:
@@ -48,5 +49,17 @@ cover:
 	awk -v t="$$total" -v f="$(DOMAIN_FLOOR)" 'BEGIN { exit !(t+0 >= f+0) }' || \
 		{ echo "FAIL: domain coverage $$total% is below the $(DOMAIN_FLOOR)% floor"; exit 1; }
 
+## cover-app holds the application ring to its own floor.
+##
+## internal/app/testing is excluded: it is the fakes, exercised entirely by the
+## tests that use them. Counting a test double's own coverage measures nothing.
+cover-app:
+	$(GO) test -race -coverprofile=$(APP_PROFILE) \
+		$$($(GO) list ./internal/app/... | grep -v '/app/testing')
+	@total=$$($(GO) tool cover -func=$(APP_PROFILE) | awk '/^total:/ {gsub(/%/,"",$$3); print $$3}'); \
+	echo "app coverage: $$total% (floor $(APP_FLOOR)%)"; \
+	awk -v t="$$total" -v f="$(APP_FLOOR)" 'BEGIN { exit !(t+0 >= f+0) }' || \
+		{ echo "FAIL: app coverage $$total% is below the $(APP_FLOOR)% floor"; exit 1; }
+
 clean:
-	rm -f $(COVER_PROFILE)
+	rm -f $(COVER_PROFILE) $(APP_PROFILE)
