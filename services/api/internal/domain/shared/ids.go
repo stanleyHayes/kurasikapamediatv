@@ -1,0 +1,91 @@
+package shared
+
+import "errors"
+
+// ErrEmptyID is returned when an identifier would be blank.
+//
+// A blank id is never a valid reference, and letting one through means a query
+// that matches nothing while looking like it matched something.
+var ErrEmptyID = errors.New("id: cannot be empty")
+
+// Distinct named types rather than bare strings.
+//
+// Go's type system will not let an ArticleID be passed where a RevisionID is
+// expected, which is the whole point: ApproveArticle takes both, and swapping
+// them would silently approve the wrong thing. The TypeScript side gets the
+// same protection through branded types.
+type (
+	// ArticleID identifies one article in one locale.
+	ArticleID string
+	// FamilyID ties an article's translations together. A French article is
+	// its own document; the family is what says they are the same story.
+	FamilyID string
+	// RevisionID identifies one immutable snapshot of an article's text.
+	RevisionID string
+	// CategoryID identifies a section.
+	CategoryID string
+	// TagID identifies a tag.
+	TagID string
+	// UserID is Better Auth's user id, as a hex string.
+	//
+	// Better Auth lets Mongo mint the key, so the stored `_id` is an ObjectId
+	// while its API reports `user.id` as hex. Anything joining to that
+	// collection must convert; treating the two as interchangeable produced a
+	// silent, total failure of role lookup once already.
+	UserID string
+	// AssetID identifies a media asset.
+	AssetID string
+)
+
+func (id ArticleID) String() string  { return string(id) }
+func (id FamilyID) String() string   { return string(id) }
+func (id RevisionID) String() string { return string(id) }
+func (id CategoryID) String() string { return string(id) }
+func (id TagID) String() string      { return string(id) }
+func (id UserID) String() string     { return string(id) }
+func (id AssetID) String() string    { return string(id) }
+
+// NewArticleID validates and wraps an article identifier.
+func NewArticleID(raw string) (ArticleID, error) {
+	if raw == "" {
+		return "", ErrEmptyID
+	}
+
+	return ArticleID(raw), nil
+}
+
+// NewFamilyID validates and wraps a family identifier.
+func NewFamilyID(raw string) (FamilyID, error) {
+	if raw == "" {
+		return "", ErrEmptyID
+	}
+
+	return FamilyID(raw), nil
+}
+
+// NewRevisionID validates and wraps a revision identifier.
+func NewRevisionID(raw string) (RevisionID, error) {
+	if raw == "" {
+		return "", ErrEmptyID
+	}
+
+	return RevisionID(raw), nil
+}
+
+// NewCategoryID validates and wraps a category identifier.
+func NewCategoryID(raw string) (CategoryID, error) {
+	if raw == "" {
+		return "", ErrEmptyID
+	}
+
+	return CategoryID(raw), nil
+}
+
+// NewUserID validates and wraps a user identifier.
+func NewUserID(raw string) (UserID, error) {
+	if raw == "" {
+		return "", ErrEmptyID
+	}
+
+	return UserID(raw), nil
+}

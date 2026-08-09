@@ -28,6 +28,29 @@ domain        ──▶ (nothing)
 
 If you need an adapter inside a route, you have found a missing use case. Write the use case.
 
+### The same rule, in Go
+
+The backend is moving to Go — [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md).
+The rings are identical; only the language changes.
+
+```
+services/api/cmd/api             ──▶ adapter ──▶ app ──▶ domain
+services/api/internal/adapter/*  ──▶ app ──▶ domain
+services/api/internal/domain     ──▶ (stdlib only)
+```
+
+- `internal/domain` imports the standard library and **one** exception:
+  `golang.org/x/text`, for Unicode NFC. Go has no normalisation in the stdlib,
+  and slugs must handle Twi `ɛ`/`ɔ` and French accents. Nothing else.
+- `internal/app` imports `domain` only. Ports are Go interfaces, declared by
+  the consumer — `app` defines them, `adapter` implements them.
+- `internal/http` imports `app`, never `adapter`.
+- `cmd/api` is the composition root and may import everything.
+
+Migration is **per bounded context**. The TypeScript packages stay until a
+context's Go use cases pass the ported tests and the web app calls them. Two
+live implementations of the same rules is what to avoid.
+
 ## 3. Size limits
 
 | Rule | Limit |
@@ -46,6 +69,16 @@ One use case per file. One entity per file. One adapter per file. A file at 240 
 - Use hand-written fakes from `packages/application/src/testing/`. Do **not** use `vi.mock`.
 - Adapter tests run against real MongoDB via Testcontainers, never a mocked driver.
 - Coverage floors: domain 95%, application 90%, adapters 80%, web 80%, new code 80%.
+
+### Go gates
+
+`make -C services/api verify` — `gofmt` (fails, never rewrites), `go vet`,
+`golangci-lint`, then `go test -race` with a **95% coverage floor on
+`internal/domain`**. `pnpm verify` runs it, so there is one definition of green.
+
+The floor applies to the domain ring specifically. That is where the rules
+live, and an untested rule is the expensive kind of gap; adapters and transport
+fail loudly enough to be caught elsewhere.
 
 ## 5. Determinism
 

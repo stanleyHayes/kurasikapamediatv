@@ -1,7 +1,7 @@
 # agent_plan.md — what is built, what is available, what is next
 
 > **Status doc, not a design doc.** Every claim here was verified against the
-> repository on 2026-08-08 at `1276bef`. Where something is *not* built, it says
+> repository on 2026-08-09 at `3bebf4a`. Where something is *not* built, it says
 > so plainly. Where something is built but unreachable from the UI, it says that
 > too — that distinction is the point of this file.
 >
@@ -16,11 +16,13 @@
 | | |
 |---|---|
 | Release in progress | **R1 — Foundation & Publishing** (near complete), first R2 slices landed |
-| HEAD | `1276bef` — KUR-25 |
-| Commits | 25 (`KUR-1` … `KUR-25`) |
-| Unit tests | 569 passing — domain 177 · application 171 · adapter-mongo 80 · adapter-anthropic 27 · web 114 |
+| Backend language | **Go** — see [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md). Migration just started. |
+| HEAD | `3bebf4a` — KUR-28 |
+| Commits | 28 (`KUR-1` … `KUR-28`) |
+| Unit tests (TS) | 579 passing — domain 180 · application 178 · adapter-mongo 80 · adapter-anthropic 27 · web 114 |
+| Unit tests (Go) | `services/api` — shared package only so far, 95.2% coverage |
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
-| Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.26% · `next build` 0 |
+| Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.22% · `next build` 0 · `go vet`/`gofmt`/`go test -race` 0 |
 | Deployed | **No.** Nothing is on Vercel or Render yet. Local only. |
 
 Run `pnpm verify` before claiming any task is done. It runs the gates in CI order.
@@ -31,23 +33,44 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 
 Two deployable hexagons over one MongoDB cluster.
 
+**The backend is moving to Go.** [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md)
+supersedes the old split: all business logic goes to `services/api`, and Next.js
+becomes the frontend plus a session and a BFF seam.
+
 ```
-packages/domain          zero dependencies — business rules and invariants
-packages/application     use cases + port interfaces — imports domain only
-packages/adapter-mongo   MongoDB implementations of the repository ports
-packages/adapter-anthropic  AiPort via the AI SDK
+services/api/internal/domain     Go — zero deps (one exception: x/text for NFC)
+services/api/internal/app        Go — use cases + ports
+services/api/internal/adapter/*  Go — mongo, anthropic, cloudinary, resend, ivs
+services/api/cmd/api             Go — composition root + HTTP
+
+apps/web                 Next.js 16 — rendering, Better Auth cookie, BFF
 packages/ui              presentational components
-apps/web                 Next.js 16 — public site + editorial studio
-services/media-svc       EMPTY DIRECTORY. Go service, not started.
 ```
+
+**Still TypeScript, being migrated per bounded context — not deleted yet:**
+
+```
+packages/domain          the rules, in TS. Ported to Go context by context.
+packages/application     use cases, in TS.
+packages/adapter-mongo   MongoDB repositories, in TS.
+packages/adapter-anthropic  AiPort, in TS.
+```
+
+Two live implementations of the same rules is the thing to avoid, so a context
+is cut over only when its Go use cases pass the ported tests AND the web app
+calls them. `editorial` first, since it is the whole of R1.
 
 `apps/web/src/composition/` is the only place allowed to import an `adapter-*`.
 dependency-cruiser enforces this; the rule is `composition-root-is-the-only-door`
 and it has been probe-tested.
 
 Seven bounded contexts: `editorial` · `identity` · `media` · `distribution` ·
-`audience` · `revenue` · `insight`. Only the first four exist in code —
-`media`, `revenue` and `insight` are named in the architecture but have no files.
+`audience` · `revenue` · `insight`. Four exist in TypeScript; `media`,
+`revenue` and `insight` are named in the architecture but have no files in
+either language.
+
+**Go migration progress:** `shared.Slug` ported with tests (95.2% coverage).
+Everything else is still TypeScript only.
 
 ---
 
@@ -117,19 +140,37 @@ above them — see the Suspense rule in CLAUDE.md.
 
 ### 3.7 Design fidelity
 
-Extracted Stitch screens live in `design/screens/`. Four are real:
+The zip holds **81 screens** across desktop/tablet/mobile, light/dark and two
+brand variants. All **21 base desktop screens** are extracted into
+`design/screens/` — that set is the source of truth for implementation.
 
-| Design file | Implemented against it? |
-|---|---|
-| `homepage.html` | ✅ KUR-24 |
-| `kurasikapa_media_article_page.html` | ✅ KUR-25 |
-| `kurasikapa_media_category_listing.html` | ❌ **not yet — section page uses my own layout** |
-| `kurasikapa_admin_editorial_cms.html` | ❌ **not yet — studio uses my own layout** |
-| `kurasikapa_media_homepage.html` | 0 bytes — empty export, ignore |
+| Design | Route | Built to it? |
+|---|---|---|
+| `homepage.html` | `/` | ✅ KUR-24 |
+| `kurasikapa_media_article_page` | `/articles/{slug}` | ✅ KUR-25 |
+| `kurasikapa_media_category_listing` | `/sections/{slug}` | ✅ KUR-26 |
+| `kurasikapa_admin_editorial_cms` | `/studio` | ✅ KUR-27 |
+| `kurasikapa_admin_roles_permissions` | `/studio/people` | ❌ own layout |
+| `kurasikapa_media_user_profile_saved_articles` | `/profile` | ❌ own layout |
+| `about_us_kurasikapa_media_tv` | `/about` | ❌ own layout |
+| `our_team_kurasikapa_media_tv` | `/team` | ❌ own layout |
+| `kurasikapa_admin_ai_content_editor` | `/studio/articles/{id}` | ❌ own layout |
+| `social_media_publishing_kurasikapa_admin` | — | ❌ no route (R2) |
+| `user_management_kurasikapa_admin` | — | ❌ no route |
+| `kurasikapa_media_podcast_library` | — | ❌ no route (R3) |
+| `kurasikapa_media_live_tv_gallery` | — | ❌ no route (R3) |
+| `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
+| `kurasikapa_admin_media_library` | — | ❌ no route (R3) |
+| `kurasikapa_media_membership_donations` | — | ❌ no route (R4) |
+| `support_membership_kurasikapa_media_tv` | — | ❌ no route (R4) |
+| `monetization_dashboard_kurasikapa_admin` | — | ❌ no route (R4) |
+| `kurasikapa_admin_subscriptions_revenue` | — | ❌ no route (R4) |
+| `kurasikapa_admin_analytics_hub` | — | ❌ no route (R5) |
+| `seo_center_kurasikapa_admin` | — | ❌ no route (R5) |
 
-The full 50MB `stitch_kurasikapa_ai_media_platform.zip` (~70 screens) is at the
-repo root and is **not** in Git LFS. Design-system docs are in `design/systems/`;
-the chosen one is **Regal Precision**.
+The full 50MB `stitch_kurasikapa_ai_media_platform.zip` is at the repo root and
+is **not** in Git LFS. Design-system docs are in `design/systems/`; the chosen
+one is **Regal Precision**.
 
 ---
 
@@ -155,7 +196,8 @@ the wiring is missing.
 
 | Item | State |
 |---|---|
-| **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". |
+| **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". Hosting for the Go service is now an open question — Render was chosen for a worker, not for the primary API. |
+| **The Go backend itself** | Just started. One value object ported. This is the largest single piece of outstanding work. |
 | **Audit logs** | Not built. Only the *permission name* `audit:read` exists — there is no audit collection, no use case, no writer. Product rule 4 (append-only audit) is currently unenforced because there is nothing to enforce it on. |
 | **Rich-text editor** | Not built. `editor-fields.tsx` is a plain `<textarea>`. No tiptap/lexical/prosemirror. `ArticleBody` splits on blank lines rather than parsing Markdown — deliberately, since rendering stored HTML without a sanitiser is an injection route. |
 | **Security headers** | `apps/web/proxy.ts` sets **no** CSP, HSTS, X-Content-Type-Options or Referrer-Policy. Docs claim these; the file does not have them. |
@@ -164,7 +206,7 @@ the wiring is missing.
 | **CAPTCHA** | Not built. |
 | **Google Analytics / Search Console** | Not built. No gtag, no GTM. |
 | **Scheduling actually firing** | See §4 — `PublishDueArticles` has no caller. |
-| **Category listing + CMS screens** | Built, but against my layouts rather than the supplied designs. |
+| **Remaining designed screens** | Five built routes still use my layouts rather than the supplied designs — see §3.7. |
 | **Error tracking, backups** | Not configured. |
 
 ### 5.2 R2 — Audience & Distribution
@@ -179,9 +221,14 @@ Search), PWA offline reading.
 
 ### 5.3 R3 — Multimedia
 
-Nothing built. Mux integration, live TV page, VOD library, video and image
-galleries, podcast library with chapters and transcripts, media asset library,
-article-to-audio (TTS), voice-to-article. The `media` bounded context has no files.
+Nothing built. The `media` bounded context has no files in either language.
+Live TV page, VOD library, video and image galleries, podcast library with
+chapters and transcripts, media asset library, article-to-audio (TTS),
+voice-to-article.
+
+Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
+**Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;
+**Cloudinary** for images, VOD and podcasts. Mux is superseded, unbuilt.
 
 Four places in `apps/web` are deliberately holding space for R3 — hero images on
 the homepage and briefing cards (tonal stand-ins), the article hero (omitted, not
@@ -213,8 +260,16 @@ If a task depends on one of these, say so rather than guessing.
   and is in that history. `.mcp.json` is gitignored, but the key is exposed.
 - Decide on Git LFS or shared storage for the 50MB design zip.
 
-**Third-party credentials not yet available:** Mux (R3), Stripe + Paystack (R4),
-Meta Graph API and app review (R2 social publishing).
+**Client — sizing questions from [ADR-0010](docs/decisions/adr-0010-media-stack.md):**
+- **Expected live audience ceiling.** Sizes the Amazon IVS quota request, which
+  is a support ticket measured in days and must be filed weeks before a big
+  broadcast. The default is 15,000 concurrent viewers per region.
+- **Is a 720p default acceptable** for the main broadcast? Roughly halves
+  delivery cost against 1080p and is kinder to West African data budgets.
+- **Chat retention period**, given GDPR and the moderation requirement.
+
+**Third-party credentials not yet available:** AWS (IVS — R3), Cloudinary (R3),
+Resend (R2), Stripe + Paystack (R4), Meta Graph API and app review (R2).
 
 ---
 
@@ -268,15 +323,18 @@ Meta Graph API and app review (R2 social publishing).
 
 Ordered by value per unit of risk, not by release number.
 
-1. **Wire scheduled publishing to a cron.** `SchedulePublication` currently
-   writes a promise the system never keeps — an editor can schedule an article
-   and it will silently never publish. This is a correctness bug wearing a
-   feature's clothes, and the use case already exists.
-2. **Expose `AiPort.translate()` as a Server Action + studio control.** The site
-   is bilingual by design, the adapter is built and tested, and there is no way
-   to produce the French document today.
-3. **Rework the category listing and CMS screens against their `code.html`.**
-   The two remaining supplied designs, following KUR-24 and KUR-25.
+1. **Port the `editorial` bounded context to Go.** It is the whole of R1 and
+   the largest outstanding piece. Everything below is cheaper once the rules
+   live where they are going to live.
+2. **Wire scheduled publishing to a cron.** `SchedulePublication` writes a
+   promise the system never keeps — an editor can schedule an article and it
+   will silently never publish. A correctness bug wearing a feature's clothes.
+   Build it in Go, since that is where the use case is heading.
+3. **Expose `AiPort.translate()`.** The site is bilingual by design, the adapter
+   is built and tested, and there is no way to produce the French document today.
 
 Then close R1 properly: security headers, rate limiting, audit logging, and a
 first deployment.
+
+**Done since this file was written:** category listing (KUR-26) and the
+editorial CMS (KUR-27) now follow their Stitch designs.

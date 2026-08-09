@@ -17,8 +17,10 @@
     "typecheck": "turbo run typecheck",
     "boundaries": "depcruise packages apps --config .dependency-cruiser.cjs",
     "dup": "jscpd",
-    "verify": "pnpm lint && pnpm typecheck && pnpm boundaries && pnpm test && pnpm dup",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "verify": "pnpm lint && pnpm typecheck && pnpm boundaries && pnpm test && pnpm dup && pnpm go:verify",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "go:verify": "make -C services/api verify",
+    "go:test": "make -C services/api test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
