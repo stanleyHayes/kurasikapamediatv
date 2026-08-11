@@ -65,6 +65,21 @@ export async function cachedLatest(locale: string, limit: number): Promise<Artic
   })
 }
 
+/**
+ * Unique-reader ranking for Trending Now.
+ *
+ * Cached on minutes, not invalidated from the reading beacon: a homepage
+ * rebuild on every signed-in pageview would be the expensive kind of freshness.
+ * Publishing still busts `articles-{locale}`, so a takedown leaves the rail.
+ */
+export async function cachedMostRead(locale: string, limit: number): Promise<readonly ArticleView[]> {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(listTag(locale))
+
+  return (await container().listMostRead.execute({ locale, limit })).map(toArticleView)
+}
+
 export interface SectionView {
   readonly name: string
   /**

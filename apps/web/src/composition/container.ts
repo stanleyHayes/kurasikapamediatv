@@ -20,6 +20,7 @@ import {
   type CountReadings,
   type EmailPort,
   type LikeArticle,
+  type ListMostRead,
   type ListReadingHistory,
   type ListPendingComments,
   ListRevisions,
@@ -106,6 +107,7 @@ export interface Container {
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
+  readonly listMostRead: ListMostRead
   readonly browseCategory: BrowseCategory
   readonly listSections: ListSections
   readonly listAuthoredArticles: ListAuthoredArticles

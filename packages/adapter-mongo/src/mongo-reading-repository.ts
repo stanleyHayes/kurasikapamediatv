@@ -1,4 +1,4 @@
-import type { Cursor, Page, ReadingRepository } from '@kurasikapa/application'
+import type { ArticleReadRank, Cursor, Page, ReadingRepository } from '@kurasikapa/application'
 import { Reading, type UserId, articleId, userId } from '@kurasikapa/domain'
 import type { Collection, Db } from 'mongodb'
 import { READINGS, type ReadingDocument } from './documents'
@@ -49,6 +49,18 @@ export class MongoReadingRepository implements ReadingRepository {
 
   async countFor(readerId: UserId): Promise<number> {
     return this.readings.countDocuments({ readerId })
+  }
+
+  async rankByReaders(limit: number): Promise<readonly ArticleReadRank[]> {
+    const rows = await this.readings
+      .aggregate<{ _id: string; readers: number }>([
+        { $group: { _id: '$articleId', readers: { $sum: 1 } } },
+        { $sort: { readers: -1, _id: 1 } },
+        { $limit: limit },
+      ])
+      .toArray()
+
+    return rows.map((row) => ({ articleId: articleId(row._id), readers: row.readers }))
   }
 }
 

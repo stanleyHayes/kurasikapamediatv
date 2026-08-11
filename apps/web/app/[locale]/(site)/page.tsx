@@ -4,7 +4,8 @@ import { BriefingCard } from '@/components/home/briefing-card'
 import { Hero } from '@/components/home/hero'
 import { Trending } from '@/components/home/trending'
 import { Link } from '@/i18n/navigation'
-import { cachedLatest } from '@/read-model/queries'
+import { homeRails, type HomeRails } from '@/read-model/home-rails'
+import { cachedLatest, cachedMostRead } from '@/read-model/queries'
 
 /** Lead + four briefing cards + three trending, per the Stitch composition. */
 const RAIL_SIZE = 8
@@ -25,8 +26,10 @@ export default async function HomePage({
 }
 
 async function Front({ locale }: { locale: string }): Promise<React.ReactElement> {
-  const { items } = await cachedLatest(locale, RAIL_SIZE)
-
+  const [{ items }, mostRead] = await Promise.all([
+    cachedLatest(locale, RAIL_SIZE),
+    cachedMostRead(locale, RAIL_SIZE),
+  ])
   if (items.length === 0) {
     return (
       <p className="text-on-surface-variant py-[var(--spacing-xl)]">
@@ -35,13 +38,10 @@ async function Front({ locale }: { locale: string }): Promise<React.ReactElement
     )
   }
 
-  // The newest story leads; the next four fill the briefing grid; the rest
-  // become the trending rail. One query, sliced — the design's three regions
-  // are one editorial sequence, not three independent feeds.
-  const [lead, ...rest] = items
-  const briefing = rest.slice(0, 4)
-  const trending = rest.slice(4, 7)
+  return <HomeLayout {...homeRails(items, mostRead)} />
+}
 
+function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement {
   return (
     <>
       {lead !== undefined && <Hero article={lead} />}

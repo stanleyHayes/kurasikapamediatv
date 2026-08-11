@@ -62,4 +62,20 @@ describe('MongoReadingRepository', () => {
     expect(next.items.map((r) => r.articleId)).toEqual(['art_a'])
     expect(next.nextCursor).toBeNull()
   })
+
+  it('ranks by unique readers, then article id', async () => {
+    await repo.save(row('usr_1', 'art_hot', '2026-08-11T10:00:00Z'))
+    await repo.save(row('usr_2', 'art_hot', '2026-08-11T11:00:00Z'))
+    await repo.save(row('usr_1', 'art_mid', '2026-08-11T10:00:00Z'))
+    await repo.save(row('usr_2', 'art_mid', '2026-08-11T11:00:00Z'))
+    await repo.save(row('usr_1', 'art_cold', '2026-08-11T12:00:00Z'))
+
+    const ranked = await repo.rankByReaders(10)
+    expect(ranked.map((row) => row.articleId)).toEqual(['art_hot', 'art_mid', 'art_cold'])
+    expect(ranked[0]?.readers).toBe(2)
+    expect((await repo.rankByReaders(2)).map((row) => row.articleId)).toEqual([
+      'art_hot',
+      'art_mid',
+    ])
+  })
 })

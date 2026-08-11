@@ -1,6 +1,6 @@
-import type { Reading, UserId } from '@kurasikapa/domain'
+import type { ArticleId, Reading, UserId } from '@kurasikapa/domain'
 import type { Cursor, Page } from '../ports/pagination'
-import type { ReadingRepository } from '../ports/reading-repository'
+import type { ArticleReadRank, ReadingRepository } from '../ports/reading-repository'
 
 const key = (reader: string, article: string): string => `${reader}:${article}`
 
@@ -29,5 +29,18 @@ export class InMemoryReadingRepository implements ReadingRepository {
 
   countFor(readerId: UserId): Promise<number> {
     return Promise.resolve([...this.rows.values()].filter((row) => row.readerId === readerId).length)
+  }
+
+  rankByReaders(limit: number): Promise<readonly ArticleReadRank[]> {
+    const counts = new Map<string, number>()
+    for (const row of this.rows.values()) {
+      counts.set(row.articleId, (counts.get(row.articleId) ?? 0) + 1)
+    }
+
+    const ranked = [...counts.entries()]
+      .map(([id, readers]) => ({ articleId: id as ArticleId, readers }))
+      .sort((a, b) => b.readers - a.readers || (a.articleId < b.articleId ? -1 : 1))
+
+    return Promise.resolve(ranked.slice(0, limit))
   }
 }

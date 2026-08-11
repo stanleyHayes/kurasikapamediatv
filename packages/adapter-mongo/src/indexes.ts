@@ -108,6 +108,9 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   ])
   await db.collection<ReadingDocument>(READINGS).createIndexes([
     { key: { readerId: 1, readAt: -1, _id: -1 }, name: 'reader_recent_reads' },
+    // Unique-reader ranking for the public most-read rail. One row per
+    // (reader, article), so grouping on articleId is unique readers, not hits.
+    { key: { articleId: 1 }, name: 'article_read_rank' },
   ])
   await db.collection<CommentDocument>(COMMENTS).createIndexes([
     { key: { articleId: 1, state: 1, createdAt: -1, _id: -1 }, name: 'article_visible_recent' },
