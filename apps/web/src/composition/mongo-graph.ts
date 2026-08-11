@@ -5,6 +5,7 @@ import {
   MongoCategoryRepository,
   MongoCommentRepository,
   MongoLikeRepository,
+  MongoReadingRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
   MongoSocialPostRepository,
@@ -13,7 +14,10 @@ import {
 } from '@kurasikapa/adapter-mongo'
 import {
   CountLikes,
+  CountReadings,
   LikeArticle,
+  ListReadingHistory,
+  RecordReading,
   ListPendingComments,
   ListSavedArticles,
   ListVisibleComments,
@@ -29,6 +33,7 @@ import {
   type ClockPort,
   type CommentRepository,
   type LikeRepository,
+  type ReadingRepository,
   type IdPort,
   type RevisionRepository,
   type RoleRepository,
@@ -47,6 +52,7 @@ export interface MongoGraph {
   readonly bookmarks: BookmarkRepository
   readonly comments: CommentRepository
   readonly likes: LikeRepository
+  readonly readings: ReadingRepository
   readonly socialPosts: SocialPostRepository
   readonly audit: AuditLog
   readonly categories: CategoryRepository
@@ -66,6 +72,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     bookmarks: new MongoBookmarkRepository(db),
     comments: new MongoCommentRepository(db),
     likes: new MongoLikeRepository(db),
+    readings: new MongoReadingRepository(db),
     socialPosts: new MongoSocialPostRepository(db),
     audit: new MongoAuditLog(db),
     categories: new MongoCategoryRepository(db),
@@ -106,6 +113,9 @@ export function audienceCommands(
   readonly likeArticle: LikeArticle
   readonly unlikeArticle: UnlikeArticle
   readonly countLikes: CountLikes
+  readonly recordReading: RecordReading
+  readonly listReadingHistory: ListReadingHistory
+  readonly countReadings: CountReadings
 } {
   return {
     saveArticle: new SaveArticle({ bookmarks: graph.bookmarks, articles: graph.articles, clock }),
@@ -121,5 +131,12 @@ export function audienceCommands(
     likeArticle: new LikeArticle({ likes: graph.likes, articles: graph.articles, clock }),
     unlikeArticle: new UnlikeArticle(graph.likes),
     countLikes: new CountLikes(graph.likes),
+    recordReading: new RecordReading({
+      readings: graph.readings,
+      articles: graph.articles,
+      clock,
+    }),
+    listReadingHistory: new ListReadingHistory(graph.readings, graph.articles),
+    countReadings: new CountReadings(graph.readings),
   }
 }

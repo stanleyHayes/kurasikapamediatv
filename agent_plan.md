@@ -94,20 +94,20 @@ packages.
 |---|---|---|
 | `editorial` | `article.ts`, `article-status.ts`, `revision.ts`, `category.ts`, `errors.ts` | Slug freezes after first publication; the Draft→Review→Approved→Scheduled→Published transition table with per-transition permissions; append-only revisions (restore writes *forward*); per-locale category slugs |
 | `identity` | `actor.ts`, `role.ts`, `role-assignment.ts` | 11 roles → permission mapping; self-assignment refused even for super_admin |
-| `audience` | `bookmark.ts`, `comment.ts`, `like.ts` | Refuses to save or like an unpublished article; comments start pending until `comment:moderate` |
+| `audience` | `bookmark.ts`, `comment.ts`, `like.ts`, `reading.ts` | Refuses to save, like or record an unpublished article; comments start pending until `comment:moderate` |
 | `distribution` | `social-post.ts` | Refuses unpublished articles; 5-attempt retry budget |
 | `shared` | `ids.ts`, `slug.ts` | Branded ids; Unicode-aware slugs (handles Twi ɛ/ɔ) |
 
-### 3.2 Application (`packages/application`) — 30 use cases
+### 3.2 Application (`packages/application`) — 33 use cases
 
 - **editorial (16)** — CreateDraft, UpdateDraft, GetDraft, GetPublishedArticle,
   SubmitForReview, ApproveArticle, RejectArticle, SchedulePublication,
   PublishArticle, PublishDueArticles, UnpublishArticle, ListAuthoredArticles,
   ListAwaitingReview, ListPublishedArticles, BrowseCategory, ListSections
 - **identity (3)** — ResolveActor, AssignRoles, ListUsers
-- **audience (11)** — SaveArticle, RemoveSavedArticle, ListSavedArticles, SearchArticles,
+- **audience (14)** — SaveArticle, RemoveSavedArticle, ListSavedArticles, SearchArticles,
   PostComment, ModerateComment, ListVisibleComments, ListPendingComments,
-  LikeArticle, UnlikeArticle, CountLikes
+  LikeArticle, UnlikeArticle, CountLikes, RecordReading, ListReadingHistory, CountReadings
 - **distribution (2)** — QueueSocialPost, PublishDuePosts
 
 Ports live in `packages/application/src/ports/`. Hand-written fakes for all of
@@ -123,6 +123,7 @@ them are in `packages/application/src/testing/` — **never `vi.mock`**.
 | BookmarkRepository | `MongoBookmarkRepository` | wired |
 | CommentRepository | `MongoCommentRepository` | wired — public thread + `/studio/comments` |
 | LikeRepository | `MongoLikeRepository` | wired — count + toggle on the article page |
+| ReadingRepository | `MongoReadingRepository` | wired — recorded after the article response; count on profile |
 | RoleRepository | `MongoRoleRepository` | wired |
 | UserDirectory | `MongoUserDirectory` | wired — **the only file that reads Better Auth's `user` collection** |
 | SearchPort | `MongoTextSearch` | wired — `$text`, *not* Atlas Search (can't run in a Testcontainer) |
@@ -232,7 +233,7 @@ the wiring is missing.
 
 Domain for saved articles, comments and social posts exists (§3). Comments are
 pre-moderated: a reader post stays pending until an editor with `comment:moderate`
-approves it. Likes are live on the article page. Remaining open: reading history,
+approves it. Likes and reading history are live. Remaining open:
 newsletter with double opt-in and digests, breaking-news alerts, push
 notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
 and tokens still blocked), RSS ingest (out is live), trending / most-read / related /

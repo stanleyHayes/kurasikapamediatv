@@ -17,7 +17,9 @@ import {
   BrowseCategory,
   ListAwaitingReview,
   type CountLikes,
+  type CountReadings,
   type LikeArticle,
+  type ListReadingHistory,
   type ListPendingComments,
   ListRevisions,
   type ListVisibleComments,
@@ -33,6 +35,7 @@ import {
   type SocialPublishPort,
   ReadAuditLog,
   type SaveArticle,
+  type RecordReading,
   type UnlikeArticle,
   SearchArticles,
   ListPublishedArticles,
@@ -89,6 +92,9 @@ export interface Container {
   readonly likeArticle: LikeArticle
   readonly unlikeArticle: UnlikeArticle
   readonly countLikes: CountLikes
+  readonly recordReading: RecordReading
+  readonly listReadingHistory: ListReadingHistory
+  readonly countReadings: CountReadings
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle

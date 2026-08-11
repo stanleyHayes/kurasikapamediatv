@@ -62,6 +62,15 @@ export interface BookmarkDocument {
   savedAt: Date
 }
 
+export interface ReadingDocument {
+  /** `${readerId}:${articleId}` — one row per reader per article, last visit wins. */
+  _id: string
+  readerId: string
+  articleId: string
+  locale: string
+  readAt: Date
+}
+
 export interface LikeDocument {
   /** `${readerId}:${articleId}` — a reader cannot like the same article twice. */
   _id: string
@@ -97,6 +106,7 @@ export const ROLE_ASSIGNMENTS = 'role_assignments'
 export const CATEGORIES = 'categories'
 export const BOOKMARKS = 'bookmarks'
 export const LIKES = 'likes'
+export const READINGS = 'readings'
 export const COMMENTS = 'comments'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */

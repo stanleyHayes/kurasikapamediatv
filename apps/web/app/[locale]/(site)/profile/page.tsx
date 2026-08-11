@@ -1,3 +1,4 @@
+import type { Actor } from '@kurasikapa/domain'
 import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
@@ -34,23 +35,7 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
   const actor = await currentActor()
   if (actor === null) redirect(`/${locale}/sign-in`)
 
-  const page = await container().listSavedArticles.execute({ actor })
-
-  const saved: SavedArticleView[] = page.items.map(({ article, savedAt }) => {
-    const props = article.snapshot()
-
-    return {
-      id: props.id,
-      slug: props.slug.value,
-      locale: props.locale,
-      title: props.title,
-      categoryId: props.categoryId,
-      savedAt: savedAt.toISOString(),
-    }
-  })
-
-  // Not cached — this page is the reader's own — so reading the clock here is
-  // legal. The public listings differ because they are prerendered.
+  const library = await loadLibrary(actor)
   const now = new Date().toISOString()
 
   return (
@@ -68,11 +53,11 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className="lg:col-span-8">
-          <SavedList articles={saved} now={now} />
+          <SavedList articles={library.saved} now={now} />
         </div>
 
         <div className="lg:col-span-4">
-          <ReadingSummary count={saved.length} />
+          <ReadingSummary saved={library.saved.length} read={library.read} />
         </div>
       </div>
 
@@ -81,16 +66,30 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
   )
 }
 
-/**
- * The design's "Your Insights" card, showing articles read this week and a top
- * category.
- *
- * Neither figure exists. Reading history is R2 and analytics is R5, and a
- * dashboard number a reader might quote back at us is the worst possible place
- * to invent one. The card keeps its place in the composition and reports the
- * count it can actually source — how many articles they have saved.
- */
-function ReadingSummary({ count }: { count: number }): React.ReactElement {
+async function loadLibrary(actor: Actor): Promise<{ saved: SavedArticleView[]; read: number }> {
+  const graph = container()
+  const [page, readings] = await Promise.all([
+    graph.listSavedArticles.execute({ actor }),
+    graph.countReadings.execute({ actor }),
+  ])
+
+  return {
+    read: readings.count,
+    saved: page.items.map(({ article, savedAt }) => {
+      const props = article.snapshot()
+      return {
+        id: props.id,
+        slug: props.slug.value,
+        locale: props.locale,
+        title: props.title,
+        categoryId: props.categoryId,
+        savedAt: savedAt.toISOString(),
+      }
+    }),
+  }
+}
+
+function ReadingSummary({ saved, read }: { saved: number; read: number }): React.ReactElement {
   return (
     <section className="bg-surface-container-high flex h-[400px] flex-col justify-between rounded-xl p-6">
       <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
@@ -98,13 +97,10 @@ function ReadingSummary({ count }: { count: number }): React.ReactElement {
       </h2>
 
       <div>
-        <p className="text-label-bold text-on-surface-variant uppercase">Articles saved</p>
-        <p className="font-display text-on-surface text-[56px] leading-none font-bold">{count}</p>
+        <p className="text-label-bold text-on-surface-variant uppercase">Articles read</p>
+        <p className="font-display text-on-surface text-[56px] leading-none font-bold">{read}</p>
+        <p className="text-on-surface-variant mt-4 text-sm">{String(saved)} saved</p>
       </div>
-
-      <p className="text-on-surface-variant text-sm">
-        Reading history and category insights arrive with reader accounts.
-      </p>
     </section>
   )
 }

@@ -8,6 +8,7 @@ import { ArticleHeader } from '@/components/article/article-header'
 import { ReadingPanel } from '@/components/article/reading-panel'
 import { ShareButton } from '@/components/article/share-button'
 import { LikeControl } from '@/components/article/like-control'
+import { ReadingBeacon } from '@/components/article/reading-beacon'
 import { SaveControl } from '@/components/article/save-control'
 import { env } from '@/composition/env'
 import { cachedArticle, type ReadableArticle } from '@/read-model/queries'
@@ -119,23 +120,38 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
       */}
 
       <div className="grid grid-cols-1 gap-[var(--spacing-md)] md:grid-cols-12">
-        <div className="md:col-span-2">
-          <div className="sticky top-28 flex flex-row items-center gap-3 md:flex-col md:items-start">
-            <Suspense fallback={null}>
-              <SaveControl articleId={article.id} />
-            </Suspense>
-            <Suspense fallback={null}>
-              <LikeControl articleId={article.id} />
-            </Suspense>
-            <ShareButton title={article.title} />
-          </div>
-        </div>
+        <ArticleRail articleId={article.id} title={article.title} />
 
         <div className="md:col-span-7 md:col-start-3">
           <StoryColumn article={article} locale={locale} />
         </div>
       </div>
     </article>
+  )
+}
+
+function ArticleRail({
+  articleId,
+  title,
+}: {
+  articleId: string
+  title: string
+}): React.ReactElement {
+  return (
+    <div className="md:col-span-2">
+      <div className="sticky top-28 flex flex-row items-center gap-3 md:flex-col md:items-start">
+        <Suspense fallback={null}>
+          <SaveControl articleId={articleId} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <LikeControl articleId={articleId} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <ReadingBeacon articleId={articleId} />
+        </Suspense>
+        <ShareButton title={title} />
+      </div>
+    </div>
   )
 }
 

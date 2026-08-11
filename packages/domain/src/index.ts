@@ -51,6 +51,11 @@ export { InvalidSlug, Slug } from './shared/slug'
 export { Bookmark, CannotSaveUnpublished, type BookmarkProps } from './audience/bookmark'
 export { Like, CannotLikeUnpublished, type LikeProps } from './audience/like'
 export {
+  Reading,
+  CannotRecordUnpublished,
+  type ReadingProps,
+} from './audience/reading'
+export {
   AlreadyDecided,
   CannotCommentUnpublished,
   Comment,

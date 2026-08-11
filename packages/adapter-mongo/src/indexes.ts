@@ -4,6 +4,7 @@ import {
   AUDIT_ENTRIES,
   BOOKMARKS,
   LIKES,
+  READINGS,
   COMMENTS,
   SOCIAL_POSTS,
   CATEGORIES,
@@ -11,6 +12,7 @@ import {
   type ArticleDocument,
   type BookmarkDocument,
   type LikeDocument,
+  type ReadingDocument,
   type CommentDocument,
   type SocialPostDocument,
   type CategoryDocument,
@@ -101,6 +103,9 @@ export async function ensureIndexes(db: Db): Promise<void> {
 async function ensureAudienceIndexes(db: Db): Promise<void> {
   await db.collection<LikeDocument>(LIKES).createIndexes([
     { key: { articleId: 1 }, name: 'article_like_count' },
+  ])
+  await db.collection<ReadingDocument>(READINGS).createIndexes([
+    { key: { readerId: 1, readAt: -1, _id: -1 }, name: 'reader_recent_reads' },
   ])
   await db.collection<CommentDocument>(COMMENTS).createIndexes([
     { key: { articleId: 1, state: 1, createdAt: -1, _id: -1 }, name: 'article_visible_recent' },
