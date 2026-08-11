@@ -31,6 +31,7 @@ export {
   EmptyIdentifier,
   type ArticleId,
   type AssetId,
+  type CommentId,
   type Branded,
   type CategoryId,
   type FamilyId,
@@ -39,6 +40,7 @@ export {
   type UserId,
   articleId,
   assetId,
+  commentId,
   categoryId,
   familyId,
   revisionId,
@@ -47,6 +49,17 @@ export {
 } from './shared/ids'
 export { InvalidSlug, Slug } from './shared/slug'
 export { Bookmark, CannotSaveUnpublished, type BookmarkProps } from './audience/bookmark'
+export {
+  AlreadyDecided,
+  CannotCommentUnpublished,
+  Comment,
+  CommentTooLong,
+  EmptyComment,
+  MAX_COMMENT_BODY,
+  type CommentProps,
+  type CommentState,
+  type NewComment,
+} from './audience/comment'
 export {
   AlreadySent,
   ArticleNotLive,

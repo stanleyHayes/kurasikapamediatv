@@ -4,6 +4,7 @@ import {
   articleId,
   assetId,
   categoryId,
+  commentId,
   familyId,
   revisionId,
   tagId,
@@ -18,6 +19,7 @@ const CONSTRUCTORS = [
   ['tagId', tagId],
   ['userId', userId],
   ['assetId', assetId],
+  ['commentId', commentId],
 ] as const
 
 describe.each(CONSTRUCTORS)('%s', (_name, make) => {

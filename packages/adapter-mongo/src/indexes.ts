@@ -3,11 +3,13 @@ import {
   ARTICLES,
   AUDIT_ENTRIES,
   BOOKMARKS,
+  COMMENTS,
   SOCIAL_POSTS,
   CATEGORIES,
   REVISIONS,
   type ArticleDocument,
   type BookmarkDocument,
+  type CommentDocument,
   type SocialPostDocument,
   type CategoryDocument,
   type RevisionDocument,
@@ -77,6 +79,8 @@ export async function ensureIndexes(db: Db): Promise<void> {
     { key: { state: 1, scheduledAt: 1 }, name: 'social_queue' },
   ])
 
+  await ensureCommentIndexes(db)
+
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.
     { key: { articleId: 1, seq: -1 }, unique: true, name: 'article_seq_unique' },
@@ -89,5 +93,12 @@ export async function ensureIndexes(db: Db): Promise<void> {
     { key: { occurredAt: -1 }, name: 'audit_recent' },
     // "What happened to this article" is the second question anyone asks.
     { key: { subjectId: 1, occurredAt: -1 }, name: 'audit_by_subject' },
+  ])
+}
+
+async function ensureCommentIndexes(db: Db): Promise<void> {
+  await db.collection<CommentDocument>(COMMENTS).createIndexes([
+    { key: { articleId: 1, state: 1, createdAt: -1, _id: -1 }, name: 'article_visible_recent' },
+    { key: { state: 1, createdAt: 1, _id: 1 }, name: 'pending_oldest' },
   ])
 }

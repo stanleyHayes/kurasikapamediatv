@@ -94,18 +94,19 @@ packages.
 |---|---|---|
 | `editorial` | `article.ts`, `article-status.ts`, `revision.ts`, `category.ts`, `errors.ts` | Slug freezes after first publication; the Draft→Review→Approved→Scheduled→Published transition table with per-transition permissions; append-only revisions (restore writes *forward*); per-locale category slugs |
 | `identity` | `actor.ts`, `role.ts`, `role-assignment.ts` | 11 roles → permission mapping; self-assignment refused even for super_admin |
-| `audience` | `bookmark.ts` | Refuses to save an unpublished article |
+| `audience` | `bookmark.ts`, `comment.ts` | Refuses to save an unpublished article; comments start pending until `comment:moderate` |
 | `distribution` | `social-post.ts` | Refuses unpublished articles; 5-attempt retry budget |
 | `shared` | `ids.ts`, `slug.ts` | Branded ids; Unicode-aware slugs (handles Twi ɛ/ɔ) |
 
-### 3.2 Application (`packages/application`) — 23 use cases
+### 3.2 Application (`packages/application`) — 27 use cases
 
 - **editorial (16)** — CreateDraft, UpdateDraft, GetDraft, GetPublishedArticle,
   SubmitForReview, ApproveArticle, RejectArticle, SchedulePublication,
   PublishArticle, PublishDueArticles, UnpublishArticle, ListAuthoredArticles,
   ListAwaitingReview, ListPublishedArticles, BrowseCategory, ListSections
 - **identity (3)** — ResolveActor, AssignRoles, ListUsers
-- **audience (4)** — SaveArticle, RemoveSavedArticle, ListSavedArticles, SearchArticles
+- **audience (8)** — SaveArticle, RemoveSavedArticle, ListSavedArticles, SearchArticles,
+  PostComment, ModerateComment, ListVisibleComments, ListPendingComments
 - **distribution (2)** — QueueSocialPost, PublishDuePosts
 
 Ports live in `packages/application/src/ports/`. Hand-written fakes for all of
@@ -119,6 +120,7 @@ them are in `packages/application/src/testing/` — **never `vi.mock`**.
 | RevisionRepository | `MongoRevisionRepository` | wired |
 | CategoryRepository | `MongoCategoryRepository` | wired |
 | BookmarkRepository | `MongoBookmarkRepository` | wired |
+| CommentRepository | `MongoCommentRepository` | wired — public thread + `/studio/comments` |
 | RoleRepository | `MongoRoleRepository` | wired |
 | UserDirectory | `MongoUserDirectory` | wired — **the only file that reads Better Auth's `user` collection** |
 | SearchPort | `MongoTextSearch` | wired — `$text`, *not* Atlas Search (can't run in a Testcontainer) |
@@ -138,7 +140,8 @@ Adapter tests run against **real MongoDB via Testcontainers**, never a mocked dr
 ### 3.5 Editorial studio (`apps/web/app/[locale]/studio/`)
 
 `/studio` (drafts) · `/studio/articles/{id}` (editor + autosave + AI panel) ·
-`/studio/review` (approval queue) · `/studio/people` (role assignment)
+`/studio/review` (approval queue) · `/studio/comments` (pre-moderation queue) ·
+`/studio/people` (role assignment) · `/studio/social` · `/studio/audit`
 
 Guarded by `studio/layout.tsx`, which wraps `children` rather than checking
 above them — see the Suspense rule in CLAUDE.md.
@@ -146,7 +149,7 @@ above them — see the Suspense rule in CLAUDE.md.
 ### 3.6 Server Actions (`apps/web/src/actions/`)
 
 - `editorial.ts` — createDraft, updateDraft, submitForReview, approve, reject,
-  schedule, publish, unpublish, assignRoles, toggleSaved
+  schedule, publish, unpublish, assignRoles, toggleSaved, postComment, moderateComment
 - `ai.ts` — suggestHeadlines, suggestSeo, suggestTags, summarise, factCheck,
   imagePrompt, detectCategory
 - All inputs validated by Zod schemas in `schemas.ts`; all return `ActionResult`.
@@ -225,8 +228,9 @@ the wiring is missing.
 
 ### 5.2 R2 — Audience & Distribution
 
-Domain for saved articles and social posts exists (§3). Everything else is open:
-reader comments + moderation (**no domain files at all**), likes, reading history,
+Domain for saved articles, comments and social posts exists (§3). Comments are
+pre-moderated: a reader post stays pending until an editor with `comment:moderate`
+approves it. Remaining open: likes, reading history,
 newsletter with double opt-in and digests, breaking-news alerts, push
 notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
 and tokens still blocked), RSS ingest (out is live), trending / most-read / related /

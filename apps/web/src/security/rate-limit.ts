@@ -24,6 +24,12 @@ export const RULES = {
 
   /** Search. Protects the database, which is why it is looser. */
   search: { limit: 60, windowSeconds: 60 },
+
+  /**
+   * Reader comments. Tight and fail-closed: an uncounted comment endpoint
+   * is a spam cannon, and a pending queue nobody can moderate.
+   */
+  comments: { limit: 8, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**
@@ -31,9 +37,9 @@ export const RULES = {
  *
  * This is the decision people get wrong, so it is named rather than implied.
  *
- * `closed` for AI: if Mongo is unreachable we cannot count, and an uncounted
- * AI endpoint is an unbounded bill. Refusing is recoverable; a five-figure
- * invoice is not.
+ * `closed` for AI and comments: if Mongo is unreachable we cannot count.
+ * An uncounted AI endpoint is an unbounded bill; an uncounted comment
+ * endpoint is a spam queue. Refusing is recoverable.
  *
  * `open` for sign-in and search: refusing every sign-in because the counter
  * is down turns a database blip into a total outage, and the thing being

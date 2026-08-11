@@ -34,6 +34,24 @@ export type {
   SocialResult,
   SocialTarget,
 } from './ports/social'
+export type { CommentRepository } from './ports/comment-repository'
+export {
+  PostComment,
+  type PostCommentDeps,
+  type PostCommentInput,
+} from './audience/post-comment'
+export {
+  CommentNotFound,
+  ModerateComment,
+  type ModerateCommentDeps,
+  type ModerateCommentInput,
+} from './audience/moderate-comment'
+export {
+  ListPendingComments,
+  ListVisibleComments,
+  type ListPendingCommentsInput,
+  type ListVisibleCommentsInput,
+} from './audience/list-comments'
 export {
   QueueSocialPost,
   type QueueSocialPostDeps,

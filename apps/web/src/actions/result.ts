@@ -1,5 +1,9 @@
 import {
+  AlreadyDecided,
   CannotAssignOwnRoles,
+  CannotCommentUnpublished,
+  CommentTooLong,
+  EmptyComment,
   IllegalTransition,
   InvalidSlug,
   MissingApprovedRevision,
@@ -11,6 +15,7 @@ import {
 import { RateLimited } from '../security/rate-limit'
 import {
   ArticleNotFound,
+  CommentNotFound,
   RevisionNotFound,
   RevisionNotOfArticle,
   SlugTaken,
@@ -51,6 +56,11 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [CannotAssignOwnRoles, 'cannot_assign_own_roles'],
   [UnknownRole, 'unknown_role'],
   [RateLimited, 'rate_limited'],
+  [CannotCommentUnpublished, 'cannot_comment_unpublished'],
+  [EmptyComment, 'empty_comment'],
+  [CommentTooLong, 'comment_too_long'],
+  [AlreadyDecided, 'already_decided'],
+  [CommentNotFound, 'comment_not_found'],
 ]
 
 export function toActionError(error: unknown): ActionError {

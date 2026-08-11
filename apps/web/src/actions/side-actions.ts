@@ -1,14 +1,17 @@
 'use server'
 
-import type { ArticleId, UserId } from '@kurasikapa/domain'
+import type { ArticleId, CommentId, UserId } from '@kurasikapa/domain'
 import { restoreRevision } from '../bff/restore-revision'
 import { requireActor } from '../composition/actor'
 import { container } from '../composition/container'
+import { RateLimited, callerKey, limit } from '../security/rate-limit'
 import { type ActionResult, attempt } from './result'
 import {
   assignRolesSchema,
   bookmarkSchema,
+  moderateCommentSchema,
   parseInput,
+  postCommentSchema,
   queueSocialPostSchema,
   restoreRevisionSchema,
 } from './schemas'
@@ -93,5 +96,39 @@ export async function restoreRevisionAction(
     return restoreRevision(actor, parsed, (args) =>
       container().restoreRevision.execute(args),
     )
+  })
+}
+
+export async function postCommentAction(
+  input: unknown,
+): Promise<ActionResult<{ id: string; state: string }>> {
+  return attempt(async () => {
+    const parsed = parseInput(postCommentSchema, input)
+    const actor = await requireActor()
+    const graph = container()
+
+    const verdict = await limit(graph.rateLimiter, await callerKey(actor.id), 'comments', 'closed')
+    if (!verdict.allowed) throw new RateLimited(verdict.retryAfterSeconds)
+
+    return graph.postComment.execute({
+      actor,
+      articleId: parsed.articleId as ArticleId,
+      body: parsed.body,
+    })
+  })
+}
+
+export async function moderateCommentAction(
+  input: unknown,
+): Promise<ActionResult<{ state: string }>> {
+  return attempt(async () => {
+    const parsed = parseInput(moderateCommentSchema, input)
+    const actor = await requireActor()
+
+    return container().moderateComment.execute({
+      actor,
+      commentId: parsed.commentId as CommentId,
+      decision: parsed.decision,
+    })
   })
 }

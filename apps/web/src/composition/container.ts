@@ -1,21 +1,9 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
 import { MetaSocialPublisher } from '@kurasikapa/adapter-social'
-import {
-  MongoArticleRepository,
-  MongoBookmarkRepository,
-  MongoAuditLog,
-  MongoRateLimiter,
-  MongoSocialPostRepository,
-  MongoCategoryRepository,
-  MongoRevisionRepository,
-  MongoRoleRepository,
-  MongoUserDirectory,
-  MongoTextSearch,
-} from '@kurasikapa/adapter-mongo'
+import { MongoAuditLog, MongoRateLimiter } from '@kurasikapa/adapter-mongo'
 import {
   type AiPort,
   type SocialPostRepository,
-  type AuditLog,
   type RateLimiter,
   ApproveArticle,
   AssignRoles,
@@ -28,13 +16,17 @@ import {
   ListAuthoredArticles,
   BrowseCategory,
   ListAwaitingReview,
+  type ListPendingComments,
   ListRevisions,
+  type ListVisibleComments,
   RestoreRevision,
   ListSections,
   ListSavedArticles,
   ListUsers,
+  type ModerateComment,
   RemoveSavedArticle,
   QueueSocialPost,
+  type PostComment,
   PublishDuePosts,
   type SocialPublishPort,
   ReadAuditLog,
@@ -50,19 +42,11 @@ import {
   UnpublishArticle,
   UpdateDraft,
 } from '@kurasikapa/application'
-import type {
-  ArticleRepository,
-  BookmarkRepository,
-  UserDirectory,
-  CategoryRepository,
-  SearchPort,
-  RevisionRepository,
-  RoleRepository,
-} from '@kurasikapa/application'
 import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { env } from './env'
 import { mongoDb } from './mongo'
+import { commentCommands, mongoGraph } from './mongo-graph'
 import { registerSubscribers } from './subscribers'
 
 /**
@@ -95,6 +79,10 @@ export interface Container {
   readonly rateLimiter: RateLimiter
   readonly removeSavedArticle: RemoveSavedArticle
   readonly listSavedArticles: ListSavedArticles
+  readonly postComment: PostComment
+  readonly moderateComment: ModerateComment
+  readonly listVisibleComments: ListVisibleComments
+  readonly listPendingComments: ListPendingComments
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -124,38 +112,10 @@ export interface Infrastructure {
   readonly siteUrl?: string | undefined
 }
 
-/**
- * Pure wiring, given infrastructure. Separated from `container()` so a test
- * can build the whole graph over fakes without touching env or the network.
- */
-function mongoGraph(infra: Infrastructure): {
-  readonly articles: ArticleRepository
-  readonly revisions: RevisionRepository
-  readonly roles: RoleRepository
-  readonly search: SearchPort
-  readonly users: UserDirectory
-  readonly bookmarks: BookmarkRepository
-  readonly socialPosts: SocialPostRepository
-  readonly audit: AuditLog
-  readonly categories: CategoryRepository
-} {
-  const db = infra.db
-  return {
-    articles: new MongoArticleRepository({ db, clock: infra.clock }),
-    revisions: new MongoRevisionRepository(db),
-    roles: new MongoRoleRepository(db),
-    search: new MongoTextSearch(db),
-    users: new MongoUserDirectory(db),
-    bookmarks: new MongoBookmarkRepository(db),
-    socialPosts: new MongoSocialPostRepository(db),
-    audit: new MongoAuditLog(db),
-    categories: new MongoCategoryRepository(db),
-  }
-}
-
 export function buildContainer(infra: Infrastructure): Container {
+  const graph = mongoGraph(infra.db, infra.clock)
   const { articles, revisions, roles, search, users, bookmarks, socialPosts, audit, categories } =
-    mongoGraph(infra)
+    graph
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
 
@@ -184,6 +144,7 @@ export function buildContainer(infra: Infrastructure): Container {
     rateLimiter: new MongoRateLimiter(infra.db, clock),
     removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
     listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
+    ...commentCommands(graph.comments, articles, clock, ids),
 
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),

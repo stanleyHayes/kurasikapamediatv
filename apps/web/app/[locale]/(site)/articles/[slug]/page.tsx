@@ -3,12 +3,13 @@ import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { ArticleBody } from '@/components/article/article-body'
+import { CommentThread } from '@/components/article/comment-thread'
 import { ArticleHeader } from '@/components/article/article-header'
 import { ReadingPanel } from '@/components/article/reading-panel'
 import { ShareButton } from '@/components/article/share-button'
 import { SaveControl } from '@/components/article/save-control'
 import { env } from '@/composition/env'
-import { cachedArticle } from '@/read-model/queries'
+import { cachedArticle, type ReadableArticle } from '@/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
 
 interface Params {
@@ -127,22 +128,38 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
         </div>
 
         <div className="md:col-span-7 md:col-start-3">
-          {article.body !== null && (
-            <Suspense fallback={null}>
-              <ReadingPanel
-                articleId={article.id}
-                title={article.title}
-                body={article.body}
-                locale={locale}
-                slug={article.slug}
-              />
-            </Suspense>
-          )}
-
-          <ArticleBody body={article.body} />
+          <StoryColumn article={article} locale={locale} />
         </div>
       </div>
     </article>
+  )
+}
+
+function StoryColumn({
+  article,
+  locale,
+}: {
+  article: ReadableArticle
+  locale: string
+}): React.ReactElement {
+  return (
+    <>
+      {article.body !== null && (
+        <Suspense fallback={null}>
+          <ReadingPanel
+            articleId={article.id}
+            title={article.title}
+            body={article.body}
+            locale={locale}
+            slug={article.slug}
+          />
+        </Suspense>
+      )}
+      <ArticleBody body={article.body} />
+      <Suspense fallback={null}>
+        <CommentThread articleId={article.id} />
+      </Suspense>
+    </>
   )
 }
 

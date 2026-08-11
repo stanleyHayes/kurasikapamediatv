@@ -4,7 +4,9 @@ import {
   createDraftSchema,
   draftBulletsSchema,
   draftPromptSchema,
+  moderateCommentSchema,
   parseInput,
+  postCommentSchema,
   rejectSchema,
   scheduleSchema,
   toneSchema,
@@ -167,6 +169,34 @@ describe('toneSchema', () => {
         locale: 'en',
         tone: 'sarcastic',
       }),
+    ).toThrow(InvalidInput)
+  })
+})
+
+describe('postCommentSchema', () => {
+  it('accepts a remark', () => {
+    expect(parseInput(postCommentSchema, { articleId: 'art_1', body: 'Noted.' }).body).toBe(
+      'Noted.',
+    )
+  })
+
+  it('rejects a blank body', () => {
+    expect(() => parseInput(postCommentSchema, { articleId: 'art_1', body: '  ' })).toThrow(
+      InvalidInput,
+    )
+  })
+})
+
+describe('moderateCommentSchema', () => {
+  it('accepts a decision', () => {
+    expect(
+      parseInput(moderateCommentSchema, { commentId: 'cmt_1', decision: 'approve' }).decision,
+    ).toBe('approve')
+  })
+
+  it('rejects an invented decision', () => {
+    expect(() =>
+      parseInput(moderateCommentSchema, { commentId: 'cmt_1', decision: 'ignore' }),
     ).toThrow(InvalidInput)
   })
 })

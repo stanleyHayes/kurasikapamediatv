@@ -62,6 +62,15 @@ export interface BookmarkDocument {
   savedAt: Date
 }
 
+export interface CommentDocument {
+  _id: string
+  articleId: string
+  readerId: string
+  body: string
+  state: string
+  createdAt: Date
+}
+
 export interface SocialPostDocument {
   _id: string
   articleId: string
@@ -79,6 +88,7 @@ export const REVISIONS = 'article_revisions'
 export const ROLE_ASSIGNMENTS = 'role_assignments'
 export const CATEGORIES = 'categories'
 export const BOOKMARKS = 'bookmarks'
+export const COMMENTS = 'comments'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'

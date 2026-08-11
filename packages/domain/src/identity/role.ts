@@ -36,6 +36,7 @@ export const PERMISSIONS = [
   'campaign:view_own',
   'role:assign',
   'audit:read',
+  'comment:moderate',
 ] as const
 
 export type Permission = (typeof PERMISSIONS)[number]
@@ -49,6 +50,7 @@ const EDITOR_PERMISSIONS: readonly Permission[] = [
   'article:publish',
   'article:unpublish',
   'asset:upload_image',
+  'comment:moderate',
 ]
 
 const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {

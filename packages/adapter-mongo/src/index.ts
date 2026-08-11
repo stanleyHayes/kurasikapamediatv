@@ -2,12 +2,14 @@ export {
   ARTICLES,
   REVISIONS,
   BOOKMARKS,
+  COMMENTS,
   SOCIAL_POSTS,
   CATEGORIES,
   ROLE_ASSIGNMENTS,
   type ArticleDocument,
   type RevisionDocument,
   type BookmarkDocument,
+  type CommentDocument,
   type SocialPostDocument,
   type CategoryDocument,
   type RoleAssignmentDocument,
@@ -29,6 +31,7 @@ export { MongoTextSearch } from './mongo-text-search'
 export { MongoCategoryRepository } from './mongo-category-repository'
 export { MongoUserDirectory } from './mongo-user-directory'
 export { MongoBookmarkRepository } from './mongo-bookmark-repository'
+export { MongoCommentRepository } from './mongo-comment-repository'
 export { MongoSocialPostRepository } from './mongo-social-post-repository'
 export { MongoAuditLog } from './mongo-audit-log'
 export { MongoRateLimiter } from './mongo-rate-limiter'

@@ -1,3 +1,4 @@
+import { MAX_COMMENT_BODY } from '@kurasikapa/domain'
 import { z } from 'zod'
 
 /**
@@ -132,4 +133,14 @@ export const translateSchema = z.object({
 export const restoreRevisionSchema = z.object({
   articleId: id,
   revisionId: id,
+})
+
+export const postCommentSchema = z.object({
+  articleId: id,
+  body: z.string().trim().min(1).max(MAX_COMMENT_BODY),
+})
+
+export const moderateCommentSchema = z.object({
+  commentId: id,
+  decision: z.enum(['approve', 'reject']),
 })

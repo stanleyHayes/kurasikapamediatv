@@ -31,6 +31,11 @@ describe('role permissions', () => {
     expect(permissionsOf(['editor']).has('article:publish')).toBe(true)
   })
 
+  it('lets an editor moderate comments and not a journalist', () => {
+    expect(permissionsOf(['editor']).has('comment:moderate')).toBe(true)
+    expect(permissionsOf(['journalist']).has('comment:moderate')).toBe(false)
+  })
+
   it('gives a guest nothing', () => {
     expect(permissionsOf(['guest']).size).toBe(0)
   })
