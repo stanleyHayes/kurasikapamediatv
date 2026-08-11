@@ -106,6 +106,16 @@ export interface PushSubscriptionDocument {
   subscribedAt: Date
 }
 
+export interface RssSourceDocument {
+  _id: string
+  url: string
+  locale: string
+  categoryId: string
+  etag: string | null
+  lastFetchedAt: Date | null
+  seenGuids: string[]
+}
+
 export interface BreakingAlertDocument {
   /** Article id — one blast per story. */
   _id: string
@@ -137,6 +147,7 @@ export const COMMENTS = 'comments'
 export const NEWSLETTER_SUBSCRIBERS = 'newsletter_subscribers'
 export const BREAKING_ALERTS = 'breaking_alerts'
 export const PUSH_SUBSCRIPTIONS = 'push_subscriptions'
+export const RSS_SOURCES = 'rss_sources'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'

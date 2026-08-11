@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     '@kurasikapa/adapter-social',
     '@kurasikapa/adapter-email',
     '@kurasikapa/adapter-push',
+    '@kurasikapa/adapter-rss',
   ],
 
   typedRoutes: true,

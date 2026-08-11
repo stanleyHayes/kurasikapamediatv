@@ -1,20 +1,7 @@
 export type {
-  AiPort,
-  ArticleContext,
-  BulletRequest,
-  CategoryOption,
-  CategoryRequest,
-  CategorySuggestion,
-  DraftRequest,
-  FactCheckNote,
-  Headline,
-  RewriteRequest,
-  SeoSuggestion,
-  Summary,
-  TagSuggestion,
-  Tone,
-  ToneRequest,
-  TranslateRequest,
+  AiPort, ArticleContext, BulletRequest, CategoryOption, CategoryRequest,
+  CategorySuggestion, DraftRequest, FactCheckNote, Headline, RewriteRequest,
+  SeoSuggestion, Summary, TagSuggestion, Tone, ToneRequest, TranslateRequest,
   TranslatedArticle,
 } from './ports/ai'
 export type { EmbeddingPort } from './ports/embedding'
@@ -252,3 +239,7 @@ export type { PushMessage, PushPort } from './ports/push'
 export type { PushSubscriptionRepository } from './ports/push-subscription-repository'
 export { SubscribePush, type SubscribePushInput } from './audience/subscribe-push'
 export { UnsubscribePush } from './audience/unsubscribe-push'
+export type { RssEntry, RssFeedPort, RssPullResult } from './ports/rss-feed'
+export type { RssSourceRepository } from './ports/rss-source-repository'
+export { RegisterRssSource, type RegisterRssSourceInput } from './distribution/register-rss-source'
+export { IngestRssFeeds, type IngestRssFeedsDeps } from './distribution/ingest-rss-feeds'

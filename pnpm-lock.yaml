@@ -57,6 +57,9 @@ importers:
       '@kurasikapa/adapter-push':
         specifier: workspace:*
         version: link:../../packages/adapter-push
+      '@kurasikapa/adapter-rss':
+        specifier: workspace:*
+        version: link:../../packages/adapter-rss
       '@kurasikapa/adapter-social':
         specifier: workspace:*
         version: link:../../packages/adapter-social
@@ -204,6 +207,28 @@ importers:
         version: 4.1.10(@types/node@26.1.2)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@26.1.2)(jiti@2.7.0)(yaml@2.9.0))
 
   packages/adapter-push:
+    dependencies:
+      '@kurasikapa/application':
+        specifier: workspace:*
+        version: link:../application
+      '@kurasikapa/domain':
+        specifier: workspace:*
+        version: link:../domain
+    devDependencies:
+      '@kurasikapa/config':
+        specifier: workspace:*
+        version: link:../config
+      '@vitest/coverage-v8':
+        specifier: 4.1.10
+        version: 4.1.10(vitest@4.1.10)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.1.2)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@26.1.2)(jiti@2.7.0)(yaml@2.9.0))
+
+  packages/adapter-rss:
     dependencies:
       '@kurasikapa/application':
         specifier: workspace:*

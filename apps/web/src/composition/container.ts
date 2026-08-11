@@ -20,6 +20,10 @@ import {
   type CountReadings,
   type EmailPort,
   type PushPort,
+  type RssFeedPort,
+  type RssSourceRepository,
+  type IngestRssFeeds,
+  type RegisterRssSource,
   type LikeArticle,
   type ListMostRead,
   type ListReadingHistory,
@@ -60,13 +64,14 @@ import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { env } from './env'
 import { mongoDb } from './mongo'
-import { audienceCommands, mongoGraph, newsletterCommands } from './mongo-graph'
+import { audienceCommands, mongoGraph, newsletterCommands, rssCommands } from './mongo-graph'
 import {
   failClosedEmail,
   failClosedPush,
   failClosedSocial,
   metaSocial,
   resendMailer,
+  rssFetcher,
   webPush,
 } from './outbound'
 import { registerSubscribers } from './subscribers'
@@ -117,6 +122,9 @@ export interface Container {
   readonly subscribePush: SubscribePush
   readonly unsubscribePush: UnsubscribePush
   readonly sendBreakingAlert: SendBreakingAlert
+  readonly registerRssSource: RegisterRssSource
+  readonly ingestRssFeeds: IngestRssFeeds
+  readonly rssSources: RssSourceRepository
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -146,6 +154,7 @@ export interface Infrastructure {
   readonly social?: SocialPublishPort | undefined
   readonly email?: EmailPort | undefined
   readonly push?: PushPort | undefined
+  readonly feed?: RssFeedPort | undefined
   readonly siteUrl?: string | undefined
 }
 
@@ -154,9 +163,10 @@ export function buildContainer(infra: Infrastructure): Container {
   const { articles, revisions, roles, search, users, socialPosts, audit, categories } = graph
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
+  const drafts = new CreateDraft({ articles, revisions, clock, ids, events })
 
   return {
-    createDraft: new CreateDraft({ articles, revisions, clock, ids, events }),
+    createDraft: drafts,
     updateDraft: new UpdateDraft({ articles, revisions, clock, ids }),
     submitForReview: new SubmitForReview(write),
     approveArticle: new ApproveArticle({ ...write, revisions }),
@@ -182,6 +192,7 @@ export function buildContainer(infra: Infrastructure): Container {
       graph, email: infra.email ?? failClosedEmail(), push: infra.push ?? failClosedPush(),
       ids, clock, siteUrl: infra.siteUrl ?? 'http://localhost:3000',
     }),
+    ...rssCommands({ graph, feed: infra.feed ?? rssFetcher(), drafts, ids, clock }),
 
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
@@ -223,6 +234,7 @@ export function container(): Container {
     social: metaSocial(),
     email: resendMailer(),
     push: webPush(),
+    feed: rssFetcher(),
     siteUrl: env().APP_URL,
   })
 

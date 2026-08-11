@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/publish-due-posts",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/ingest-rss",
+      "schedule": "0 * * * *"
     }
   ]
 }

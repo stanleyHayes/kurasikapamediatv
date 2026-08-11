@@ -16,6 +16,7 @@ const LIVE = [
   { href: '/studio', label: 'Editorial', icon: '✎' },
   { href: '/studio/review', label: 'Review', icon: '☑' },
   { href: '/studio/social', label: 'Social', icon: '◈' },
+  { href: '/studio/rss', label: 'RSS', icon: '◎' },
   { href: '/studio/comments', label: 'Comments', icon: '¶' },
   { href: '/studio/people', label: 'Users', icon: '☰' },
   { href: '/studio/audit', label: 'Audit', icon: '◫' },

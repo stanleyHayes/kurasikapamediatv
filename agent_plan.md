@@ -227,7 +227,7 @@ the wiring is missing.
 | **Scheduling actually firing** | Article cron live (KUR-34). Social cron live and fail-closed until Meta credentials exist. |
 | **Remaining designed screens** | Five built routes still use my layouts rather than the supplied designs — see §3.7. |
 | ~~**Error tracking**~~ | **DONE.** Locale + global error boundaries; failures go to stderr via `reportError`. A Sentry DSN is still a hosting choice — the boundary no longer swallows. Backups remain Atlas/ops, not code. |
-| **RSS out** | **DONE.** `/{locale}/feed.xml` from the published list. RSS *ingest* is still R2/media-svc. |
+| **RSS out** | **DONE.** `/{locale}/feed.xml` from the published list. RSS ingest is live (KUR-55) as drafts via Next cron — media-svc still does not exist. |
 
 ### 5.2 R2 — Audience & Distribution
 
@@ -240,7 +240,7 @@ wait on a live `RESEND_API_KEY`. **PWA offline reading is live (KUR-51):** insta
 manifest, production service worker, network-first cache of visited articles /
 sections / home. Studio, auth, profile and RSC flights stay on the network.
 Remaining open: Facebook + Instagram publishing (adapter + cron wired; Meta app review
-and tokens still blocked), RSS ingest (out is live), related / recommended (needs
+and tokens still blocked), related / recommended (needs
 `EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search). **Most-read
 is live (KUR-52):** unique-reader ranking from existing reading rows; homepage
 Trending Now prefers that rail and falls back to leftover recency. No embeddings.
@@ -248,7 +248,9 @@ Trending Now prefers that rail and falls back to leftover recency. No embeddings
 mails confirmed subscribers in that locale; Resend unset fails closed; one blast
 per article. **Web Push is live and fail-closed (KUR-54):** VAPID unset hides
 the opt-in; a production service worker shows breaking notices; devices are
-stored per locale and woken from the same editor click.
+stored per locale and woken from the same editor click. **RSS ingest is live
+(KUR-55):** editors register HTTPS feeds at `/studio/rss`; hourly cron opens
+drafts from new items; fetch failures skip the source; nothing auto-publishes.
 
 ### 5.3 R3 — Multimedia
 

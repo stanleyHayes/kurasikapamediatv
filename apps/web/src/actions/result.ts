@@ -5,6 +5,7 @@ import {
   CannotAlertUnpublished,
   InvalidPushEndpoint,
   InvalidPushKey,
+  InvalidRssUrl,
   CannotLikeUnpublished,
   CommentTooLong,
   EmptyComment,
@@ -79,6 +80,7 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [BreakingAlertAlreadySent, 'breaking_alert_already_sent'],
   [InvalidPushEndpoint, 'invalid_push_endpoint'],
   [InvalidPushKey, 'invalid_push_key'],
+  [InvalidRssUrl, 'invalid_rss_url'],
 ]
 
 export function toActionError(error: unknown): ActionError {

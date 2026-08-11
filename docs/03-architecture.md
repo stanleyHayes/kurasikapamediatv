@@ -54,6 +54,7 @@ packages/
   adapter-search/      SearchPort, VectorSearchPort
   adapter-email/       EmailPort
   adapter-push/        PushPort
+  adapter-rss/         RssFeedPort
   adapter-media-svc/   MediaJobPort — HTTP client for the Go service
   ui/                  design system ("Regal Precision") — presentational only
   config/              shared eslint / tsconfig / vitest / dependency-cruiser presets

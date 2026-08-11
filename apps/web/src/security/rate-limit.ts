@@ -47,6 +47,9 @@ export const RULES = {
 
   /** Device push subscribe. Fail-closed so an uncounted endpoint cannot fill Atlas. */
   push: { limit: 8, windowSeconds: 60 },
+
+  /** RSS source registration. Fail-closed so a form cannot flood fetches. */
+  rss: { limit: 8, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**

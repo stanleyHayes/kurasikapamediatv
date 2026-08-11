@@ -95,6 +95,7 @@ export interface SocialPublishPort { publish(p: SocialPost): Promise<SocialResul
 export interface PaymentPort       { checkout(i: CheckoutIntent): Promise<CheckoutSession>; cancel(id: SubscriptionId): Promise<void> }
 export interface EmailPort         { send(m: EmailMessage): Promise<void>; sendBatch(m: EmailMessage[]): Promise<void> }
 export interface PushPort          { send(device: DeviceSubscription, message: PushMessage): Promise<void> }
+export interface RssFeedPort       { pull(source: RssSource): Promise<RssPullResult> }
 export interface MediaJobPort      { enqueue(j: MediaJob): Promise<JobId>; status(id: JobId): Promise<JobStatus> }
 export interface AnalyticsPort     { record(e: AnalyticsEvent): Promise<void> }
 ```
@@ -128,6 +129,10 @@ Unset `RESEND_API_KEY` fails closed. A second blast for the same article is refu
 send. Breaking alerts also fan out to devices in that locale (best-effort beside
 mail). Payload encryption is still empty-body VAPID — the worker shows a
 generic notice until aes128gcm lands.
+
+`IngestRssSource` is live in TypeScript: an editor with `article:publish`
+registers an HTTPS feed; hourly cron pulls items into **drafts** (never
+published). A fetch failure skips that source. Duplicate GUIDs are remembered.
 
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`

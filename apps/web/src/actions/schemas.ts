@@ -30,6 +30,12 @@ export const unsubscribePushSchema = z.object({
   endpoint: z.url(),
 })
 
+export const registerRssSourceSchema = z.object({
+  url: z.url(),
+  locale: z.string().trim().min(2).max(10),
+  categoryId: id,
+})
+
 export const updateDraftSchema = z.object({
   articleId: id,
   title: z.string().trim().min(1).max(300),

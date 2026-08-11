@@ -1,5 +1,6 @@
 import { ResendMailer } from '@kurasikapa/adapter-email'
 import { WebPushSender } from '@kurasikapa/adapter-push'
+import { RssFetcher } from '@kurasikapa/adapter-rss'
 import { MetaSocialPublisher } from '@kurasikapa/adapter-social'
 
 /**
@@ -62,6 +63,10 @@ export function failClosedPush(): WebPushSender {
 
 export function vapidPublicKey(): string | undefined {
   return present(process.env['VAPID_PUBLIC_KEY'])
+}
+
+export function rssFetcher(): RssFetcher {
+  return new RssFetcher({ get: globalThis.fetch.bind(globalThis) })
 }
 
 function present(value: string | undefined): string | undefined {

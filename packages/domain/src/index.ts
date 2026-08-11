@@ -90,6 +90,11 @@ export {
   type BreakingAlertProps,
 } from './distribution/breaking-alert'
 export {
+  InvalidRssUrl,
+  RssSource,
+  type RssSourceProps,
+} from './distribution/rss-source'
+export {
   AlreadySent,
   ArticleNotLive,
   EmptyCaption,

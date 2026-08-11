@@ -8,6 +8,7 @@ import {
   MongoBreakingAlertRepository,
   MongoNewsletterRepository,
   MongoPushSubscriptionRepository,
+  MongoRssSourceRepository,
   MongoReadingRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
@@ -28,6 +29,8 @@ import {
   SubscribePush,
   UnsubscribeNewsletter,
   UnsubscribePush,
+  IngestRssFeeds,
+  RegisterRssSource,
   ListPendingComments,
   ListSavedArticles,
   ListVisibleComments,
@@ -48,6 +51,9 @@ import {
   type NewsletterRepository,
   type PushPort,
   type PushSubscriptionRepository,
+  type CreateDraft,
+  type RssFeedPort,
+  type RssSourceRepository,
   type ReadingRepository,
   type IdPort,
   type RevisionRepository,
@@ -71,6 +77,7 @@ export interface MongoGraph {
   readonly subscriptions: NewsletterRepository
   readonly alerts: BreakingAlertRepository
   readonly devices: PushSubscriptionRepository
+  readonly rssSources: RssSourceRepository
   readonly socialPosts: SocialPostRepository,
   readonly audit: AuditLog
   readonly categories: CategoryRepository
@@ -94,6 +101,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     subscriptions: new MongoNewsletterRepository(db),
     alerts: new MongoBreakingAlertRepository(db),
     devices: new MongoPushSubscriptionRepository(db),
+    rssSources: new MongoRssSourceRepository(db),
     socialPosts: new MongoSocialPostRepository(db),
     audit: new MongoAuditLog(db),
     categories: new MongoCategoryRepository(db),
@@ -201,5 +209,28 @@ export function newsletterCommands(input: {
     }),
     subscribePush: new SubscribePush(devices, input.clock),
     unsubscribePush: new UnsubscribePush(devices),
+  }
+}
+
+export function rssCommands(input: {
+  readonly graph: MongoGraph
+  readonly feed: RssFeedPort
+  readonly drafts: CreateDraft
+  readonly ids: IdPort
+  readonly clock: ClockPort
+}): {
+  readonly registerRssSource: RegisterRssSource
+  readonly ingestRssFeeds: IngestRssFeeds
+  readonly rssSources: RssSourceRepository
+} {
+  return {
+    registerRssSource: new RegisterRssSource(input.graph.rssSources, input.ids),
+    ingestRssFeeds: new IngestRssFeeds({
+      sources: input.graph.rssSources,
+      feed: input.feed,
+      drafts: input.drafts,
+      clock: input.clock,
+    }),
+    rssSources: input.graph.rssSources,
   }
 }
