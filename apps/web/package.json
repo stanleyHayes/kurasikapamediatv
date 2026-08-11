@@ -15,6 +15,7 @@
   "dependencies": {
     "@kurasikapa/adapter-anthropic": "workspace:*",
     "@kurasikapa/adapter-mongo": "workspace:*",
+    "@kurasikapa/adapter-social": "workspace:*",
     "@kurasikapa/application": "workspace:*",
     "@kurasikapa/domain": "workspace:*",
     "better-auth": "1.6.25",

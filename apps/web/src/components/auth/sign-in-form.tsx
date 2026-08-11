@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useLocale } from 'next-intl'
 import { signIn } from '../../lib/auth-client'
 import { SocialButtons } from './social-buttons'
+import { TurnstileField } from './turnstile-field'
 
 export interface SignInFormProps {
   /**
@@ -17,6 +18,7 @@ export interface SignInFormProps {
   /** Absolute path for the OAuth round trip, which leaves the app. */
   readonly callbackURL: string
   readonly providers: readonly ('google' | 'facebook' | 'apple')[]
+  readonly captchaSiteKey?: string | undefined
 }
 
 const FAILED = 'Those details did not match an account.'
@@ -33,43 +35,15 @@ const FIELD =
 export function SignInForm(props: SignInFormProps): React.ReactElement {
   const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
+  const [captcha, setCaptcha] = useState<string | null>(null)
 
   const submit = async (form: FormData): Promise<void> => {
     setError(null)
-
-    // Deliberately one message for every failure — a rejected password, an
-    // unknown address, or a thrown network error. Distinguishing them would
-    // confirm which addresses are registered to anyone who asks.
-    //
-    // try/catch as well as the error field: the client rejects on some
-    // failures rather than resolving with one, and a sign-in form that shows
-    // nothing at all is the worst outcome of the three.
-    try {
-      const result = await signIn.email({
-        email: text(form, 'email'),
-        password: text(form, 'password'),
-      })
-
-      if (result.error) {
-        setError(FAILED)
-        return
-      }
-    } catch {
+    const ok = await attemptEmailSignIn(text(form, 'email'), text(form, 'password'), captcha)
+    if (!ok) {
       setError(FAILED)
       return
     }
-
-    // A full load, not router.push.
-    //
-    // Sign-in lives in the public (site) group and the studio is its own
-    // full-screen shell. Route groups are invisible in the URL, so a
-    // client-side navigation across that boundary left the reader's chrome
-    // mounted over the admin surface — the footer stayed on screen, which an
-    // E2E assertion caught. Crossing between route-group roots is a full page
-    // load by design; making it explicit is the fix.
-    //
-    // The locale prefix is added by hand here because next-intl's router,
-    // which normally supplies it, is exactly what is being bypassed.
     window.location.assign(`/${locale}${props.redirectTo}`)
   }
 
@@ -78,13 +52,14 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
       <form action={submit} className="flex flex-col gap-[var(--spacing-sm)]">
         <Field label="Email" name="email" type="email" autoComplete="email" />
         <Field label="Password" name="password" type="password" autoComplete="current-password" />
-
+        {props.captchaSiteKey !== undefined && (
+          <TurnstileField siteKey={props.captchaSiteKey} onToken={setCaptcha} />
+        )}
         {error !== null && (
           <p role="alert" className="text-error text-sm">
             {error}
           </p>
         )}
-
         <button
           type="submit"
           className="bg-primary text-on-primary text-label-bold mt-2 rounded px-4 py-2 uppercase"
@@ -92,17 +67,28 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
           Sign in
         </button>
       </form>
-
       <SocialButtons providers={props.providers} callbackURL={props.callbackURL} />
     </div>
   )
 }
 
-/**
- * FormData.get returns `string | File | null`. A File where a password should
- * be is a malformed submission, not something to stringify into
- * "[object Object]" and send to the auth endpoint.
- */
+async function attemptEmailSignIn(
+  email: string,
+  password: string,
+  captcha: string | null,
+): Promise<boolean> {
+  try {
+    const result = await signIn.email({
+      email,
+      password,
+      ...(captcha === null ? {} : { fetchOptions: { headers: { 'x-captcha-response': captcha } } }),
+    })
+    return !('error' in result && result.error)
+  } catch {
+    return false
+  }
+}
+
 function text(form: FormData, name: string): string {
   const value = form.get(name)
   return typeof value === 'string' ? value : ''

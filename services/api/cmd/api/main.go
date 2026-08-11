@@ -59,6 +59,7 @@ func run(log *slog.Logger) error {
 	clock := systemClock{}
 	articles := adaptermongo.NewArticleRepository(db, clock)
 	revisions := adaptermongo.NewRevisionRepository(db)
+	categories := adaptermongo.NewCategoryRepository(db)
 	roles := adaptermongo.NewRoleRepository(db)
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
@@ -70,20 +71,36 @@ func run(log *slog.Logger) error {
 	}
 
 	deps := appeditorial.Deps{
-		Articles:  articles,
-		Revisions: revisions,
-		Clock:     clock,
-		IDs:       uuidIDs{},
-		Events:    loggingBus{log: log},
+		Articles:   articles,
+		Revisions:  revisions,
+		Categories: categories,
+		Clock:      clock,
+		IDs:        uuidIDs{},
+		Events:     loggingBus{log: log},
 	}
 
 	handler := kurahttp.NewRouter(kurahttp.Deps{
-		CreateDraft:        appeditorial.NewCreateDraft(deps),
-		PublishArticle:     appeditorial.NewPublishArticle(deps),
-		PublishDueArticles: appeditorial.NewPublishDueArticles(deps),
-		Roles:              roles,
-		Log:                log,
-		CronSecret:         cfg.CronSecret,
+		CreateDraft:           appeditorial.NewCreateDraft(deps),
+		UpdateDraft:           appeditorial.NewUpdateDraft(deps),
+		GetDraft:              appeditorial.NewGetDraft(deps),
+		ListAuthoredArticles:  appeditorial.NewListAuthoredArticles(deps),
+		ListAwaitingReview:    appeditorial.NewListAwaitingReview(deps),
+		ListRevisions:         appeditorial.NewListRevisions(deps),
+		RestoreRevision:       appeditorial.NewRestoreRevision(deps),
+		SubmitForReview:       appeditorial.NewSubmitForReview(deps),
+		ApproveArticle:        appeditorial.NewApproveArticle(deps),
+		RejectArticle:         appeditorial.NewRejectArticle(deps),
+		SchedulePublication:   appeditorial.NewSchedulePublication(deps),
+		PublishArticle:        appeditorial.NewPublishArticle(deps),
+		UnpublishArticle:      appeditorial.NewUnpublishArticle(deps),
+		PublishDueArticles:    appeditorial.NewPublishDueArticles(deps),
+		GetPublishedArticle:   appeditorial.NewGetPublishedArticle(deps),
+		ListPublishedArticles: appeditorial.NewListPublishedArticles(deps),
+		BrowseCategory:        appeditorial.NewBrowseCategory(deps),
+		ListSections:          appeditorial.NewListSections(deps),
+		Roles:                 roles,
+		Log:                   log,
+		CronSecret:            cfg.CronSecret,
 	})
 
 	server := &http.Server{

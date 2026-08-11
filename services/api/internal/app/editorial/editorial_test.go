@@ -29,26 +29,29 @@ func reader() identity.Actor {
 }
 
 type harness struct {
-	deps      app.Deps
-	articles  *faketesting.ArticleStore
-	revisions *faketesting.RevisionStore
-	events    *faketesting.RecordingEventBus
+	deps       app.Deps
+	articles   *faketesting.ArticleStore
+	revisions  *faketesting.RevisionStore
+	categories *faketesting.CategoryStore
+	events     *faketesting.RecordingEventBus
 }
 
 func newHarness(seed ...editorial.Article) harness {
 	articles := faketesting.NewArticleStore(seed...)
 	revisions := faketesting.NewRevisionStore()
+	categories := faketesting.NewCategoryStore()
 	events := &faketesting.RecordingEventBus{}
 
 	return harness{
 		deps: app.Deps{
-			Articles:  articles,
-			Revisions: revisions,
-			Clock:     faketesting.FixedClock{At: now},
-			IDs:       &faketesting.SequentialIDs{},
-			Events:    events,
+			Articles:   articles,
+			Revisions:  revisions,
+			Categories: categories,
+			Clock:      faketesting.FixedClock{At: now},
+			IDs:        &faketesting.SequentialIDs{},
+			Events:     events,
 		},
-		articles: articles, revisions: revisions, events: events,
+		articles: articles, revisions: revisions, categories: categories, events: events,
 	}
 }
 
@@ -275,8 +278,11 @@ func TestPublishDueArticles(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if len(result.Published) != 1 || result.Published[0] != "art_1" {
+		if len(result.Published) != 1 || result.Published[0].ID != "art_1" {
 			t.Errorf("published = %v, want only art_1", result.Published)
+		}
+		if result.Published[0].Slug == "" || result.Published[0].Locale == "" {
+			t.Errorf("published item must carry slug and locale for cache invalidation: %+v", result.Published[0])
 		}
 		if len(result.Failed) != 0 {
 			t.Errorf("failed = %v", result.Failed)
@@ -301,7 +307,7 @@ func TestPublishDueArticles(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		if len(result.Published) != 1 || result.Published[0] != "art_good" {
+		if len(result.Published) != 1 || result.Published[0].ID != "art_good" {
 			t.Errorf("published = %v", result.Published)
 		}
 		if len(result.Failed) != 1 || result.Failed[0].ArticleID != "art_bad" {

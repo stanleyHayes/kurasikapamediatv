@@ -1,6 +1,6 @@
 import { mongodbAdapter } from 'better-auth/adapters/mongodb'
 import { betterAuth } from 'better-auth'
-import { nextCookies } from 'better-auth/next-js'
+import { authPlugins } from './auth-plugins'
 import { socialProviders } from './auth-providers'
 import { env } from './env'
 import { mongoDb } from './mongo'
@@ -62,8 +62,8 @@ function build() {
       useSecureCookies: env().NODE_ENV === 'production',
     },
 
-    // Lets Server Actions set the session cookie.
-    plugins: [nextCookies()],
+    // Lets Server Actions set the session cookie. nextCookies is last.
+    plugins: authPlugins(process.env),
   })
 }
 

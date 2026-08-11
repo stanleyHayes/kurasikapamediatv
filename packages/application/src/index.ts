@@ -183,6 +183,16 @@ export {
 } from './editorial/errors'
 
 export {
+  articlePublished,
+  articleSubmitted,
+  articleApproved,
+  articleRejected,
+  articleScheduled,
+  articleUnpublished,
+  type ArticlePublished,
+} from './editorial/events'
+
+export {
   ListRevisions,
   RestoreRevision,
   type ListRevisionsInput,

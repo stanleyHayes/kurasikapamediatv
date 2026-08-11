@@ -31,11 +31,12 @@ var (
 // most of their dependencies, and threading six arguments through each is how
 // a wiring mistake hides.
 type Deps struct {
-	Articles  ports.ArticleRepository
-	Revisions ports.RevisionRepository
-	Clock     ports.Clock
-	IDs       ports.IDs
-	Events    ports.EventBus
+	Articles   ports.ArticleRepository
+	Revisions  ports.RevisionRepository
+	Categories ports.CategoryRepository
+	Clock      ports.Clock
+	IDs        ports.IDs
+	Events     ports.EventBus
 }
 
 // CreateDraftInput is a request to start a new article.

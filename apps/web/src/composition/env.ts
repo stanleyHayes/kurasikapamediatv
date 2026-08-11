@@ -26,6 +26,17 @@ const schema = z.object({
    * is not a reason to make it so.
    */
   CRON_SECRET: z.string().min(32).optional(),
+
+  /**
+   * Base URL for the Go API (ADR-0009 BFF seam).
+   *
+   * Optional so unit tests and a Next-only local boot still work. When set,
+   * editorial reads and writes call this service instead of the in-process
+   * TypeScript use cases. Public routes need no user header; CMS routes trust
+   * `X-Kurasikapa-User`. The service must not be publicly routable.
+   */
+  API_URL: z.url().optional(),
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 })
 

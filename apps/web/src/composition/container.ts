@@ -1,4 +1,5 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
+import { MetaSocialPublisher } from '@kurasikapa/adapter-social'
 import {
   MongoArticleRepository,
   MongoBookmarkRepository,
@@ -34,6 +35,8 @@ import {
   ListUsers,
   RemoveSavedArticle,
   QueueSocialPost,
+  PublishDuePosts,
+  type SocialPublishPort,
   ReadAuditLog,
   SaveArticle,
   SearchArticles,
@@ -58,6 +61,7 @@ import type {
 } from '@kurasikapa/application'
 import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
+import { env } from './env'
 import { mongoDb } from './mongo'
 import { registerSubscribers } from './subscribers'
 
@@ -83,6 +87,7 @@ export interface Container {
   readonly listUsers: ListUsers
   readonly saveArticle: SaveArticle
   readonly queueSocialPost: QueueSocialPost
+  readonly publishDuePosts: PublishDuePosts
   /** Read side for the publishing queue screen. */
   readonly socialPosts: SocialPostRepository
   readonly readAuditLog: ReadAuditLog
@@ -115,28 +120,43 @@ export interface Infrastructure {
   readonly ids: IdPort
   readonly events: EventBusPort & InProcessEventBus
   readonly ai: AiPort
+  readonly social?: SocialPublishPort | undefined
+  readonly siteUrl?: string | undefined
 }
 
 /**
  * Pure wiring, given infrastructure. Separated from `container()` so a test
  * can build the whole graph over fakes without touching env or the network.
  */
-export function buildContainer(infra: Infrastructure): Container {
-  const articles: ArticleRepository = new MongoArticleRepository({
-    db: infra.db,
-    clock: infra.clock,
-  })
-  const revisions: RevisionRepository = new MongoRevisionRepository(infra.db)
-  const roles: RoleRepository = new MongoRoleRepository(infra.db)
-  const search: SearchPort = new MongoTextSearch(infra.db)
-  const users: UserDirectory = new MongoUserDirectory(infra.db)
-  const bookmarks: BookmarkRepository = new MongoBookmarkRepository(infra.db)
-  const socialPosts: SocialPostRepository = new MongoSocialPostRepository(infra.db)
-  const audit: AuditLog = new MongoAuditLog(infra.db)
-  const categories: CategoryRepository = new MongoCategoryRepository(infra.db)
+function mongoGraph(infra: Infrastructure): {
+  readonly articles: ArticleRepository
+  readonly revisions: RevisionRepository
+  readonly roles: RoleRepository
+  readonly search: SearchPort
+  readonly users: UserDirectory
+  readonly bookmarks: BookmarkRepository
+  readonly socialPosts: SocialPostRepository
+  readonly audit: AuditLog
+  readonly categories: CategoryRepository
+} {
+  const db = infra.db
+  return {
+    articles: new MongoArticleRepository({ db, clock: infra.clock }),
+    revisions: new MongoRevisionRepository(db),
+    roles: new MongoRoleRepository(db),
+    search: new MongoTextSearch(db),
+    users: new MongoUserDirectory(db),
+    bookmarks: new MongoBookmarkRepository(db),
+    socialPosts: new MongoSocialPostRepository(db),
+    audit: new MongoAuditLog(db),
+    categories: new MongoCategoryRepository(db),
+  }
+}
 
+export function buildContainer(infra: Infrastructure): Container {
+  const { articles, revisions, roles, search, users, bookmarks, socialPosts, audit, categories } =
+    mongoGraph(infra)
   const { clock, ids, events } = infra
-  const rateLimiter: RateLimiter = new MongoRateLimiter(infra.db, clock)
   const write = { articles, clock, events }
 
   return {
@@ -153,9 +173,15 @@ export function buildContainer(infra: Infrastructure): Container {
     listUsers: new ListUsers({ users }),
     saveArticle: new SaveArticle({ bookmarks, articles, clock }),
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
+    publishDuePosts: new PublishDuePosts({
+      posts: socialPosts,
+      social: infra.social ?? failClosedSocial(),
+      clock,
+      siteUrl: infra.siteUrl ?? 'http://localhost:3000',
+    }),
     socialPosts,
     readAuditLog: new ReadAuditLog({ audit }),
-    rateLimiter,
+    rateLimiter: new MongoRateLimiter(infra.db, clock),
     removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
     listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
 
@@ -196,6 +222,8 @@ export function container(): Container {
     ids: cryptoIds,
     events,
     ai: new AnthropicAiAdapter(anthropicModels()),
+    social: metaSocial(),
+    siteUrl: env().APP_URL,
   })
 
   return instance
@@ -204,4 +232,26 @@ export function container(): Container {
 /** Test seam. */
 export function resetContainer(): void {
   instance = undefined
+}
+
+function metaSocial(): MetaSocialPublisher {
+  return new MetaSocialPublisher({
+    pageAccessToken: present(process.env['META_PAGE_ACCESS_TOKEN']),
+    pageId: present(process.env['META_PAGE_ID']),
+    igUserId: present(process.env['META_IG_USER_ID']),
+    post: globalThis.fetch.bind(globalThis),
+  })
+}
+
+function failClosedSocial(): MetaSocialPublisher {
+  return new MetaSocialPublisher({
+    pageAccessToken: undefined,
+    pageId: undefined,
+    igUserId: undefined,
+    post: globalThis.fetch.bind(globalThis),
+  })
+}
+
+function present(value: string | undefined): string | undefined {
+  return value !== undefined && value !== '' ? value : undefined
 }

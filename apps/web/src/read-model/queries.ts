@@ -1,6 +1,15 @@
 import { cacheLife, cacheTag } from 'next/cache'
+import { loadPublishedArticle, loadPublishedList, loadSectionPage } from '../bff/load-public'
 import { container } from '../composition/container'
-import { type ArticleView, toArticleView } from './article-view'
+import { env } from '../composition/env'
+import {
+  type ArticleView,
+  type ListedArticleView,
+  type ReadableArticle,
+  toArticleView,
+} from './article-view'
+
+export type { ListedArticleView, ReadableArticle }
 
 /**
  * Cached read paths for the public site.
@@ -18,10 +27,6 @@ export const articleTag = (id: string): string => `article-${id}`
 export const listTag = (locale: string): string => `articles-${locale}`
 export const sectionTag = (slug: string, locale: string): string => `section-${locale}-${slug}`
 
-export interface ReadableArticle extends ArticleView {
-  readonly body: string | null
-}
-
 export async function cachedArticle(
   slug: string,
   locale: string,
@@ -30,11 +35,15 @@ export async function cachedArticle(
   cacheLife('hours')
   cacheTag(listTag(locale))
 
-  const found = await container().getPublishedArticle.execute({ slug, locale })
+  const found = await loadPublishedArticle(slug, locale, env().API_URL, async () => {
+    const loaded = await container().getPublishedArticle.execute({ slug, locale })
+    if (loaded === null) return null
+    return { ...toArticleView(loaded.article), body: loaded.body }
+  })
   if (found === null) return null
 
-  cacheTag(articleTag(found.article.id))
-  return { ...toArticleView(found.article), body: found.body }
+  cacheTag(articleTag(found.id))
+  return found
 }
 
 export interface ArticleListView {
@@ -47,17 +56,13 @@ export async function cachedLatest(locale: string, limit: number): Promise<Artic
   cacheLife('minutes')
   cacheTag(listTag(locale))
 
-  const page = await container().listPublishedArticles.execute({ locale, limit })
-
-  return {
-    items: page.items.map(toArticleView),
-    nextCursor: page.nextCursor,
-  }
-}
-
-/** An article as a listing shows it: the card data plus its standfirst. */
-export interface ListedArticleView extends ArticleView {
-  readonly excerpt: string | null
+  return loadPublishedList({ locale, limit }, env().API_URL, async () => {
+    const page = await container().listPublishedArticles.execute({ locale, limit })
+    return {
+      items: page.items.map(toArticleView),
+      nextCursor: page.nextCursor,
+    }
+  })
 }
 
 export interface SectionView {
@@ -81,19 +86,27 @@ export async function cachedSection(slug: string, locale: string): Promise<Secti
   cacheTag(listTag(locale))
   cacheTag(sectionTag(slug, locale))
 
-  const result = await container().browseCategory.execute({ slug, locale })
+  const result = await loadSectionPage(slug, locale, env().API_URL, async () => {
+    const loaded = await container().browseCategory.execute({ slug, locale })
+    if (loaded === null) return null
+    return {
+      name: loaded.category.nameIn(locale),
+      description: loaded.category.descriptionIn(locale),
+      articles: loaded.articles.items.map(({ article, excerpt }) => ({
+        ...toArticleView(article),
+        excerpt,
+      })),
+    }
+  })
   if (result === null) return null
 
   return {
-    name: result.category.nameIn(locale),
+    name: result.name,
     // Legal here precisely because this function is cached: a non-deterministic
     // value inside 'use cache' is evaluated once per entry, not per request.
     now: new Date().toISOString(),
-    description: result.category.descriptionIn(locale),
-    articles: result.articles.items.map(({ article, excerpt }) => ({
-      ...toArticleView(article),
-      excerpt,
-    })),
+    description: result.description,
+    articles: result.articles,
   }
 }
 

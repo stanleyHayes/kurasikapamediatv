@@ -16,6 +16,7 @@ import {
   SlugTaken,
 } from '@kurasikapa/application'
 import { NotSignedIn } from '../composition/actor'
+import { ApiProblem } from '../bff/problem'
 import { InvalidInput } from './schemas'
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: ActionError }
@@ -53,6 +54,10 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
 ]
 
 export function toActionError(error: unknown): ActionError {
+  if (error instanceof ApiProblem) {
+    return { code: error.type, message: error.message }
+  }
+
   for (const [type, code] of KNOWN) {
     if (error instanceof type) return { code, message: error.message }
   }

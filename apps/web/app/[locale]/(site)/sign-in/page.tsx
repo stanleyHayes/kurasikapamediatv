@@ -24,7 +24,12 @@ export default async function SignInPage({
 
       {/* Server-supplied destination. Taking it from a query string would turn
           this into an open redirect. */}
-      <SignInForm redirectTo="/studio" callbackURL={`/${locale}/studio`} providers={configured} />
+      <SignInForm
+        redirectTo="/studio"
+        callbackURL={`/${locale}/studio`}
+        providers={configured}
+        captchaSiteKey={process.env['NEXT_PUBLIC_TURNSTILE_SITE_KEY']}
+      />
     </section>
   )
 }

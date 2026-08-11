@@ -41,4 +41,14 @@ describe('env', () => {
   it('treats the AI key as optional, so the public site boots without it', () => {
     expect(parse(valid).ANTHROPIC_API_KEY).toBeUndefined()
   })
+
+  it('treats API_URL as optional — unset keeps create-draft on TypeScript', () => {
+    expect(parse(valid).API_URL).toBeUndefined()
+  })
+
+  it('accepts an API_URL when the Go service is reachable', () => {
+    expect(parse({ ...valid, API_URL: 'http://localhost:8080' }).API_URL).toBe(
+      'http://localhost:8080',
+    )
+  })
 })

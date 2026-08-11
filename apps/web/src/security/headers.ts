@@ -43,7 +43,14 @@ export function contentSecurityPolicy(isDev: boolean): string {
 
     // unsafe-eval is dev-only: React uses eval to rebuild server error stacks
     // in the browser. Shipping it would hand an injected string a way to run.
-    ['script-src', "'self'", "'unsafe-inline'", ...(isDev ? ["'unsafe-eval'"] : [])],
+    [
+      'script-src',
+      "'self'",
+      "'unsafe-inline'",
+      'https://www.googletagmanager.com',
+      'https://challenges.cloudflare.com',
+      ...(isDev ? ["'unsafe-eval'"] : []),
+    ],
 
     // Tailwind compiles to a stylesheet, but Next still emits inline style
     // attributes for font loading and view transitions. There is no nonce
@@ -58,13 +65,22 @@ export function contentSecurityPolicy(isDev: boolean): string {
     // host we do not use yet would be theatre.
     ['img-src', "'self'", 'data:', 'blob:', 'https:'],
 
-    ['connect-src', "'self'", ...(isDev ? ['ws:'] : [])],
+    [
+      'connect-src',
+      "'self'",
+      'https://www.google-analytics.com',
+      'https://*.google-analytics.com',
+      'https://www.googletagmanager.com',
+      'https://challenges.cloudflare.com',
+      ...(isDev ? ['ws:'] : []),
+    ],
 
     // No plugins, no embedded frames, and nobody may frame us. Clickjacking a
     // publish button is a real attack on a newsroom.
     ['object-src', "'none'"],
     ['frame-ancestors', "'none'"],
-    ['frame-src', "'none'"],
+    // Turnstile's challenge is an iframe. Nothing else may frame or be framed.
+    ['frame-src', 'https://challenges.cloudflare.com'],
 
     ['base-uri', "'self'"],
     ['form-action', "'self'"],

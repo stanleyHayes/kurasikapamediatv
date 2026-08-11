@@ -57,21 +57,15 @@ func newServer(t *testing.T, granted map[shared.UserID][]identity.Role, seed ...
 	t.Helper()
 
 	deps := appeditorial.Deps{
-		Articles:  faketesting.NewArticleStore(seed...),
-		Revisions: faketesting.NewRevisionStore(),
-		Clock:     faketesting.FixedClock{At: now},
-		IDs:       &faketesting.SequentialIDs{},
-		Events:    &faketesting.RecordingEventBus{},
+		Articles:   faketesting.NewArticleStore(seed...),
+		Revisions:  faketesting.NewRevisionStore(),
+		Categories: faketesting.NewCategoryStore(),
+		Clock:      faketesting.FixedClock{At: now},
+		IDs:        &faketesting.SequentialIDs{},
+		Events:     &faketesting.RecordingEventBus{},
 	}
 
-	return kurahttp.NewRouter(kurahttp.Deps{
-		CreateDraft:        appeditorial.NewCreateDraft(deps),
-		PublishArticle:     appeditorial.NewPublishArticle(deps),
-		PublishDueArticles: appeditorial.NewPublishDueArticles(deps),
-		Roles:              roles{granted: granted},
-		Log:                slog.New(slog.NewTextHandler(io.Discard, nil)),
-		CronSecret:         "s3cret-value-of-known-length-0000",
-	})
+	return routed(deps, granted)
 }
 
 func do(handler http.Handler, req *http.Request) *httptest.ResponseRecorder {

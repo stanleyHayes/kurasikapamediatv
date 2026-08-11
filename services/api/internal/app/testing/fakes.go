@@ -86,6 +86,9 @@ type ArticleStore struct {
 	FailSlugTaken error
 	FailSave      error
 	FailListDue   error
+
+	// LastPublished is the query the last ListPublished call received.
+	LastPublished ports.PublishedQuery
 }
 
 // NewArticleStore seeds a store.
@@ -148,6 +151,7 @@ func (s *ArticleStore) SlugTaken(_ context.Context, slug, locale string) (bool, 
 
 // ListPublished returns visible articles for a locale.
 func (s *ArticleStore) ListPublished(_ context.Context, q ports.PublishedQuery) (ports.Page[editorial.Article], error) {
+	s.LastPublished = q
 	out := []editorial.Article{}
 	for _, a := range s.sorted() {
 		if a.Locale() != q.Locale || !editorial.IsPubliclyVisible(a.Status()) {

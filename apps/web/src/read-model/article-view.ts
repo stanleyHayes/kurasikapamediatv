@@ -16,6 +16,14 @@ export interface ArticleView {
   readonly publishedAt: string | null
 }
 
+export interface ReadableArticle extends ArticleView {
+  readonly body: string | null
+}
+
+export interface ListedArticleView extends ArticleView {
+  readonly excerpt: string | null
+}
+
 export const toArticleView = (article: Article): ArticleView => {
   const props = article.snapshot()
 

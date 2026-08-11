@@ -75,8 +75,14 @@ MongoDB adapter, the HTTP layer and the composition root are done
 `/healthz`, a 403 for an anonymous caller, a 201 that wrote a real article and
 its revision, and the cron guard refusing a wrong secret.
 
-Remaining for the cutover: the BFF seam in Next (calling this service instead
-of its own container), then deleting the TypeScript editorial packages.
+Remaining for the cutover: ~~the BFF seam in Next~~ **done for CMS writes,
+CMS reads, and public-site reads (KUR-45)** — when `API_URL` is set,
+create/update/submit/approve/reject/schedule/publish/unpublish/restore,
+get-draft, authored list, review queue, revision history, cron `publish-due`,
+get-published, list-published, browse-category and list-sections call Go;
+Next still owns session, cache tags and audit (Go's bus only logs). Unset
+`API_URL` keeps the TypeScript path. Then delete the TypeScript editorial
+packages.
 
 ---
 
@@ -117,7 +123,8 @@ them are in `packages/application/src/testing/` — **never `vi.mock`**.
 | UserDirectory | `MongoUserDirectory` | wired — **the only file that reads Better Auth's `user` collection** |
 | SearchPort | `MongoTextSearch` | wired — `$text`, *not* Atlas Search (can't run in a Testcontainer) |
 | AiPort | `AnthropicAiAdapter` | wired — 12 methods, cost-routed opus/sonnet/haiku |
-| SocialPostRepository | `MongoSocialPostRepository` | **built but never instantiated in the container** |
+| SocialPostRepository | `MongoSocialPostRepository` | wired — queue UI at `/studio/social` |
+| SocialPublishPort | `MetaSocialPublisher` | wired, fail-closed without `META_PAGE_ACCESS_TOKEN`; cron `/api/cron/publish-due-posts` |
 | ClockPort / IdPort / EventBusPort | object literals in `composition/ambient.ts` | wired — event bus is in-process, synchronous, no delivery guarantee |
 
 Adapter tests run against **real MongoDB via Testcontainers**, never a mocked driver.
@@ -125,7 +132,7 @@ Adapter tests run against **real MongoDB via Testcontainers**, never a mocked dr
 ### 3.4 Public site (`apps/web/app/[locale]/`)
 
 `/` · `/articles/{slug}` · `/sections/{slug}` · `/search` · `/profile` ·
-`/sign-in` · `/about` · `/team` · `/contact` · `/faq` · `/advertise` ·
+`/sign-in` · `/two-factor` · `/about` · `/team` · `/contact` · `/faq` · `/advertise` ·
 `/careers` · `/legal/{privacy|terms|cookies}` · `/sitemap.xml` · `/robots.txt`
 
 ### 3.5 Editorial studio (`apps/web/app/[locale]/studio/`)
@@ -156,12 +163,12 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_media_article_page` | `/articles/{slug}` | ✅ KUR-25 |
 | `kurasikapa_media_category_listing` | `/sections/{slug}` | ✅ KUR-26 |
 | `kurasikapa_admin_editorial_cms` | `/studio` | ✅ KUR-27 |
-| `kurasikapa_admin_roles_permissions` | `/studio/people` | ❌ own layout |
-| `kurasikapa_media_user_profile_saved_articles` | `/profile` | ❌ own layout |
+| `kurasikapa_admin_roles_permissions` | `/studio/people` | ✅ KUR-33 — adapted (stats + member table; invite/search/drawer omitted) |
+| `kurasikapa_media_user_profile_saved_articles` | `/profile` | ✅ KUR-33 — adapted (bento + account row; membership/insights wait on R2/R4) |
 | `about_us_kurasikapa_media_tv` | `/about` | ✅ KUR-42 — display hero over the client's own copy |
 | `our_team_kurasikapa_media_tv` | `/team` | ◑ KUR-42 — hero done. The design's member grid needs names, roles, bios and portraits the client has **not supplied**; building it would mean inventing journalists. |
 | `kurasikapa_admin_ai_content_editor` | `/studio/articles/{id}` | ✅ KUR-41 — two-pane workspace with a tabbed co-pilot |
-| `social_media_publishing_kurasikapa_admin` | — | ❌ no route (R2) |
+| `social_media_publishing_kurasikapa_admin` | `/studio/social` | ✅ KUR-33 — queue + compose (calendar design not copied; send path needs Meta) |
 | `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |
 | `kurasikapa_media_podcast_library` | — | ❌ no route (R3) |
 | `kurasikapa_media_live_tv_gallery` | — | ❌ no route (R3) |
@@ -188,9 +195,9 @@ the wiring is missing.
 | Capability | Where it lives | What's missing |
 |---|---|---|
 | ~~`AiPort.translate()`~~ | **DONE — KUR-35.** Translate panel in the studio editor. | Needs `ANTHROPIC_API_KEY` to exercise live; unset locally. |
-| **`AiPort.draftFromPrompt` / `draftFromBullets`** | implemented, streaming | `/api/ai/[task]` route exists; the studio editor does not offer "generate". |
+| ~~`AiPort.draftFromPrompt` / `draftFromBullets`~~ | **DONE — KUR-44.** Generate tab in the co-pilot; streams a proposal, editor accepts into the body. | Needs `ANTHROPIC_API_KEY` to exercise live. |
 | ~~`PublishDueArticles`~~ | **DONE — KUR-34.** `/api/cron/publish-due`, triggered by Vercel Cron. | — |
-| **`QueueSocialPost` / `PublishDuePosts`** | use cases built, KUR-22 | `MongoSocialPostRepository` is never instantiated in `container.ts`; no admin queue screen; no `SocialPublishPort` adapter. |
+| ~~**`PublishDuePosts` (social send)**~~ | **DONE.** `MetaSocialPublisher` fail-closed; cron `/api/cron/publish-due-posts`. | Live Graph still needs Meta app review + `META_PAGE_ACCESS_TOKEN` / `META_PAGE_ID`. Unset credentials fail visibly and retry. |
 | ~~Revision history~~ | **DONE — KUR-36.** History panel in the studio editor, with restore. | — |
 | **`ListUsers` beyond roles** | works | Only used by the roles screen. |
 
@@ -203,15 +210,15 @@ the wiring is missing.
 | Item | State |
 |---|---|
 | **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". Hosting for the Go service is now an open question — Render was chosen for a worker, not for the primary API. |
-| **The Go backend itself** | Just started. One value object ported. This is the largest single piece of outstanding work. |
+| **The Go backend itself** | Domain → HTTP serving done (KUR-29 … KUR-43). Editorial BFF cutover done (KUR-45) for CMS writes/reads and public-site reads when `API_URL` is set. Remaining: delete TS editorial packages once a deployed API is the only live path. |
 | ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
-| **Rich-text editor** | Not built. `editor-fields.tsx` is a plain `<textarea>`. No tiptap/lexical/prosemirror. `ArticleBody` splits on blank lines rather than parsing Markdown — deliberately, since rendering stored HTML without a sanitiser is an injection route. |
+| ~~**Rich-text editor**~~ | **DONE.** Textarea + Markdown toolbar (bold/italic/heading/link). `ArticleBody` parses a safe subset into React children — still no HTML, still no sanitiser dependency. |
 | ~~Security headers~~ | **DONE — KUR-37.** CSP and Permissions-Policy added; the rest were already in next.config.ts (my earlier note checked proxy.ts and was wrong). Applied to every route including /api. |
 | ~~Rate limiting~~ | **DONE — KUR-39.** AI endpoints limited via a shared MongoDB counter (fails closed). Auth limited by Better Auth's own limiter, moved to database storage — its in-memory default is per-instance and limits nothing on serverless. Search limited too (fails open — it is the least valuable thing to protect and the most visible to break). |
-| **2FA** | Not built. |
-| **CAPTCHA** | Not built. |
-| **Google Analytics / Search Console** | Not built. No gtag, no GTM. |
-| **Scheduling actually firing** | See §4 — `PublishDueArticles` has no caller. |
+| ~~**2FA**~~ | **DONE.** Better Auth `twoFactor` plugin; verify page at `/[locale]/two-factor`; enable UI on the profile Security card. |
+| ~~**CAPTCHA**~~ | **DONE.** Cloudflare Turnstile, env-gated. Unset keys leave sign-in alone (Playwright still works). |
+| ~~**Google Analytics**~~ | **DONE.** gtag loads only after the consent banner; unset `NEXT_PUBLIC_GA_MEASUREMENT_ID` renders nothing. Search Console still needs the client property. |
+| **Scheduling actually firing** | Article cron live (KUR-34). Social cron live and fail-closed until Meta credentials exist. |
 | **Remaining designed screens** | Five built routes still use my layouts rather than the supplied designs — see §3.7. |
 | **Error tracking, backups** | Not configured. |
 
@@ -220,8 +227,8 @@ the wiring is missing.
 Domain for saved articles and social posts exists (§3). Everything else is open:
 reader comments + moderation (**no domain files at all**), likes, reading history,
 newsletter with double opt-in and digests, breaking-news alerts, push
-notifications, Facebook + Instagram publishing (needs a `SocialPublishPort`
-adapter and Meta app review), RSS in/out, trending / most-read / related /
+notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
+and tokens still blocked), RSS in/out, trending / most-read / related /
 recommended (needs `EmbeddingPort` — **declared, no adapter**, and Atlas Vector
 Search), PWA offline reading.
 
@@ -329,16 +336,19 @@ Resend (R2), Stripe + Paystack (R4), Meta Graph API and app review (R2).
 
 Ordered by value per unit of risk, not by release number.
 
-1. **Port the `editorial` bounded context to Go.** Domain, ports, the first use
-   cases and the Mongo adapter are done (KUR-29 … KUR-32). Remaining: the HTTP
-   layer, the composition root, and the BFF seam in Next.
-2. **Rework the remaining designed screens** — About, Team, the AI content
-   editor and user management still use my layouts. See §3.7.
-3. **Close R1 properly** — security headers, rate limiting, audit logging, and
-   a first deployment. See §5.1.
+1. **Delete TS editorial packages** once a deployed `API_URL` is the only
+   live path (public-site reads are now on Go when it is set).
+2. **Close R1 properly** — first deployment (Vercel + API hosting). Editor
+   Markdown, 2FA, Turnstile and consent-gated GA are in; they need live env
+   values and a production host.
+3. **Social send path** — adapter + cron are live and fail-closed. Flip on
+   when Meta app review and page tokens exist.
 
-Then close R1 properly: security headers, rate limiting, audit logging, and a
-first deployment.
-
-**Done since this file was written:** category listing (KUR-26) and the
-editorial CMS (KUR-27) now follow their Stitch designs.
+**Done since this file was first written:** category listing (KUR-26), editorial
+CMS (KUR-27), profile/roles/social queue (KUR-33), cron publish (KUR-34),
+translate (KUR-35), revision history (KUR-36), security headers (KUR-37), audit
+(KUR-38), rate limits (KUR-39), AI editor shell (KUR-41), About/Team heroes
+(KUR-42), Go HTTP serving (KUR-43), draft generate in the co-pilot (KUR-44),
+editorial CMS BFF cutover (KUR-45: writes, restore, get-draft, lists, cron,
+public reads → Go when `API_URL` is set), Markdown renderer + toolbar, 2FA,
+Turnstile, consent-gated GA, fail-closed social send + cron.

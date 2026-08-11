@@ -60,6 +60,10 @@ export function EditorWorkspace(props: EditorWorkspaceProps): React.ReactElement
     edit(setTitle, headline)
   }
 
+  const onBody = (next: string): void => {
+    edit(setBody, next)
+  }
+
   return (
     <div className="grid min-h-[70vh] grid-cols-1 gap-6 lg:grid-cols-12">
       <div className="flex flex-col gap-[var(--spacing-md)] lg:col-span-8">
@@ -79,7 +83,7 @@ export function EditorWorkspace(props: EditorWorkspaceProps): React.ReactElement
       </div>
 
       <div className="lg:col-span-4">
-        <Copilot {...copilotProps(props, { title, body, onHeadline })} />
+        <Copilot {...copilotProps(props, { title, body, onHeadline, onBody })} />
       </div>
     </div>
   )
@@ -97,6 +101,7 @@ interface Draft {
   readonly title: string
   readonly body: string
   readonly onHeadline: (headline: string) => void
+  readonly onBody: (body: string) => void
 }
 
 function copilotProps(
@@ -112,6 +117,12 @@ function copilotProps(
       locale: props.articleLocale,
       editable: props.editable,
       onUseHeadline: draft.onHeadline,
+    },
+    generate: {
+      locale: props.articleLocale,
+      editable: props.editable,
+      currentBody: body,
+      onUseBody: draft.onBody,
     },
     translate: {
       title,

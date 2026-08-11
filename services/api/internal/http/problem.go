@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	"github.com/kurasikapa/api/internal/app/ports"
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
@@ -53,6 +54,15 @@ func problemFor(err error) Problem {
 			Title:  "That article belongs to another author",
 			Status: http.StatusForbidden,
 		}
+
+	case errors.Is(err, appeditorial.ErrSlugTaken):
+		// 409: the URL is already claimed in this locale. A new title (or a
+		// different locale) is the fix — not a retry of the same payload.
+		return Problem{Type: "slug_taken", Title: err.Error(), Status: http.StatusConflict}
+
+	case errors.Is(err, appeditorial.ErrUntitled):
+		// 400: the title yields no slug. The request itself is the problem.
+		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
 
 	case errors.Is(err, editorial.ErrIllegalTransition),
 		errors.Is(err, editorial.ErrNotEditable),

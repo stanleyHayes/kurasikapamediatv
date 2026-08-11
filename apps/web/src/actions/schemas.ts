@@ -61,6 +61,29 @@ export const rewriteSchema = aiContextSchema.extend({
   instruction: z.string().trim().min(1).max(1000),
 })
 
+/**
+ * Streaming draft generation — prompt or bullets, never both on one schema.
+ *
+ * The port keeps these as separate methods (different prompts, same model),
+ * so the wire shapes stay separate too. Collapsing them into one "mode"
+ * enum would let a client send bullets to the prompt path and spend tokens
+ * on nonsense.
+ */
+export const draftPromptSchema = z.object({
+  prompt: z.string().trim().min(1).max(4000),
+  locale: z.string().trim().min(2).max(10),
+})
+
+export const draftBulletsSchema = z.object({
+  bullets: z.array(z.string().trim().min(1).max(500)).min(1).max(20),
+  locale: z.string().trim().min(2).max(10),
+})
+
+/** The five tones the AiPort accepts — inventing one is a 400, not a model call. */
+export const toneSchema = aiContextSchema.extend({
+  tone: z.enum(['neutral', 'formal', 'conversational', 'urgent', 'analytical']),
+})
+
 export class InvalidInput extends Error {
   constructor(readonly issues: readonly string[]) {
     super(issues.join('; '))

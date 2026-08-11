@@ -13,10 +13,10 @@
  * them here would mean inventing a selection the dashboard does not have.
  */
 const ASSISTS = [
+  { label: 'Gen draft', icon: '✦' },
   { label: 'Gen headline', icon: 'T' },
   { label: 'Rewrite', icon: '✎' },
   { label: 'Summarise', icon: '≡' },
-  { label: 'SEO check', icon: '◎' },
 ] as const
 
 export function AiRail(): React.ReactElement {

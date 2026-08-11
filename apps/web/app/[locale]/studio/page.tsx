@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { type Metric, MetricCards } from '@/components/studio/metric-cards'
 import { PipelineItem } from '@/components/studio/pipeline-item'
 import { AiRail } from '@/components/studio/ai-rail'
+import { loadAuthoredPipeline } from '@/bff/load-studio'
 import { requireActor } from '@/composition/actor'
 import { container } from '@/composition/container'
 import { type DraftView, byWorkflowPriority, toDraftView } from '@/read-model/studio-view'
@@ -34,11 +35,12 @@ export default async function StudioPage({
   // Never cached. A CMS showing an editor stale workflow state is worse than a
   // slower one — they would act on it.
   const actor = await requireActor()
-  const page = await container().listAuthoredArticles.execute({ actor })
-
-  const drafts = page.items
-    .map(({ article, excerpt }) => toDraftView(article, excerpt))
-    .sort(byWorkflowPriority)
+  const drafts = (
+    await loadAuthoredPipeline(actor, async () => {
+      const page = await container().listAuthoredArticles.execute({ actor })
+      return page.items.map(({ article, excerpt }) => toDraftView(article, excerpt))
+    })
+  ).slice().sort(byWorkflowPriority)
 
   // Not cached, so reading the clock here is legal — this render IS the
   // request. The public listings differ because they are prerendered.

@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     '@kurasikapa/application',
     '@kurasikapa/adapter-mongo',
     '@kurasikapa/adapter-anthropic',
+    '@kurasikapa/adapter-social',
   ],
 
   typedRoutes: true,

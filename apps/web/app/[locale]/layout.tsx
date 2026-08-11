@@ -3,6 +3,7 @@ import { Outfit, Playfair_Display } from 'next/font/google'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { AnalyticsRoot } from '@/analytics/analytics-root'
 import { routing } from '@/i18n/routing'
 import '../globals.css'
 
@@ -71,7 +72,10 @@ export default async function LocaleLayout({
       <body className="bg-surface text-on-surface min-h-screen">
         {/* Chrome lives in the (site) group, not here — the studio is a
             full-screen admin shell and must not inherit the masthead. */}
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          {children}
+          <AnalyticsRoot measurementId={process.env['NEXT_PUBLIC_GA_MEASUREMENT_ID'] ?? ''} />
+        </NextIntlClientProvider>
       </body>
     </html>
   )

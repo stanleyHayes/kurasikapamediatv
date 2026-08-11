@@ -1,6 +1,7 @@
 import { ArticleNotFound, SlugTaken } from '@kurasikapa/application'
 import { IllegalTransition, NotPermitted, articleId, userId } from '@kurasikapa/domain'
 import { describe, expect, it } from 'vitest'
+import { ApiProblem } from '../bff/problem'
 import { NotSignedIn } from '../composition/actor'
 import { attempt, toActionError } from './result'
 import { InvalidInput } from './schemas'
@@ -13,6 +14,8 @@ describe('toActionError', () => {
     [new ArticleNotFound(articleId('art_1')), 'article_not_found'],
     [new SlugTaken('budget-2026', 'en'), 'slug_taken'],
     [new InvalidInput(['title: required']), 'invalid_input'],
+    [new ApiProblem('slug_taken', 'Slug is already in use'), 'slug_taken'],
+    [new ApiProblem('not_permitted', 'Not permitted'), 'not_permitted'],
   ])('maps %s to a stable code', (error, code) => {
     // Codes are stable across locales so the UI can translate them; messages
     // are for logs and developers.

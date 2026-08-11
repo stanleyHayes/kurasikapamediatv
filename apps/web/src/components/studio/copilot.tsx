@@ -2,19 +2,22 @@
 
 import { useState } from 'react'
 import { AiPanel, type AiPanelProps } from './ai-panel'
+import { GeneratePanel, type GeneratePanelProps } from './generate-panel'
 import { RevisionHistory, type RevisionView } from './revision-history'
 import { TranslatePanel, type TranslatePanelProps } from './translate-panel'
 
-type Tab = 'assist' | 'translate' | 'history'
+type Tab = 'assist' | 'generate' | 'translate' | 'history'
 
 const TABS: readonly { id: Tab; label: string }[] = [
   { id: 'assist', label: 'Assist' },
+  { id: 'generate', label: 'Generate' },
   { id: 'translate', label: 'Translate' },
   { id: 'history', label: 'History' },
 ]
 
 export interface CopilotProps {
   readonly assist: AiPanelProps
+  readonly generate: GeneratePanelProps
   readonly translate: TranslatePanelProps
   readonly history: {
     readonly articleId: string
@@ -27,15 +30,13 @@ export interface CopilotProps {
 /**
  * The AI Co-Pilot rail from the Stitch content-editor design.
  *
- * Tabs rather than the three stacked panels this replaced. Stacked, the
- * history was below the fold on every article with more than a few versions,
- * and an editor scrolled past the assists to reach it. The design's answer is
- * one pane at a time, and it is the right one — these are three different
- * jobs, and nobody does two at once.
+ * Tabs rather than stacked panels. Stacked, history sat below the fold on
+ * every article with more than a few versions. The design's answer is one
+ * pane at a time — these are different jobs, and nobody does two at once.
  *
- * The tools themselves are unchanged. This is composition, not new capability:
- * every panel behind these tabs already worked, and rearranging them must not
- * quietly become a rewrite of what they do.
+ * Generate is the one assist that does not need an existing draft body: it
+ * streams a proposal from a prompt or notes. Assist / Translate / History
+ * still act on the article already in the editor.
  */
 export function Copilot(props: CopilotProps): React.ReactElement {
   const [tab, setTab] = useState<Tab>('assist')
@@ -71,6 +72,7 @@ export function Copilot(props: CopilotProps): React.ReactElement {
           two-pane workspace usable on a long article. */}
       <div className="flex-1 overflow-y-auto p-4">
         {tab === 'assist' && <AiPanel {...props.assist} />}
+        {tab === 'generate' && <GeneratePanel {...props.generate} />}
         {tab === 'translate' && <TranslatePanel {...props.translate} />}
         {tab === 'history' && (
           <RevisionHistory

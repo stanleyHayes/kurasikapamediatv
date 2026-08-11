@@ -1,23 +1,21 @@
 import { requireActor } from '@/composition/actor'
 import { container } from '@/composition/container'
+import { isStreamingTask, streamForTask } from '@/ai/streaming-task'
+import { InvalidInput } from '@/actions/schemas'
 import { callerKey, limit } from '@/security/rate-limit'
-import { parseInput, rewriteSchema } from '@/actions/schemas'
-
-const STREAMING_TASKS = ['rewrite', 'tone', 'draft'] as const
-type StreamingTask = (typeof STREAMING_TASKS)[number]
-
-const isStreamingTask = (value: string): value is StreamingTask =>
-  (STREAMING_TASKS as readonly string[]).includes(value)
 
 /**
  * Streaming AI assists.
  *
  * A route handler rather than a Server Action because the editor needs tokens
- * as they arrive — watching a rewrite appear is the difference between the
+ * as they arrive — watching a draft appear is the difference between the
  * feature feeling instant and feeling broken.
  *
  * The port yields `AsyncIterable<string>`; converting it to a web stream is the
  * adapter work that belongs exactly here, at the edge of the hexagon.
+ *
+ * Task → method dispatch lives in `streaming-task.ts` so it can be unit-tested
+ * without auth. This file owns only the HTTP concerns.
  */
 export async function POST(
   request: Request,
@@ -44,8 +42,17 @@ export async function POST(
     })
   }
 
-  const input = parseInput(rewriteSchema, await request.json())
-  const stream = container().ai.rewrite(input)
+  let stream: AsyncIterable<string>
+  try {
+    stream = streamForTask(container().ai, task, await request.json())
+  } catch (error) {
+    // Bad input is a client mistake, not a server fault — and must not look
+    // like a model failure, or editors will retry a request that can never work.
+    if (error instanceof InvalidInput) {
+      return new Response(error.message, { status: 400 })
+    }
+    throw error
+  }
 
   return new Response(toWebStream(stream), {
     headers: {

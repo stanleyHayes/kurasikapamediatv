@@ -46,8 +46,17 @@ type PublishDueResult struct {
 	// Tagged because this crosses the wire. Without tags Go emits
 	// "Published"/"Failed", which is inconsistent with every other response
 	// and the sort of thing a client works around rather than reports.
-	Published []shared.ArticleID `json:"published"`
-	Failed    []PublishFailure   `json:"failed"`
+	Published []PublishedItem  `json:"published"`
+	Failed    []PublishFailure `json:"failed"`
+}
+
+// PublishedItem is enough for the Next BFF to invalidate caches and write an
+// audit entry without a second round-trip. Id alone was not: listing rails are
+// tagged by locale.
+type PublishedItem struct {
+	ID     shared.ArticleID `json:"id"`
+	Slug   string           `json:"slug"`
+	Locale string           `json:"locale"`
 }
 
 // PublishFailure names one article that could not be published, and why.
@@ -84,10 +93,11 @@ func (uc PublishDueArticles) Execute(ctx context.Context, actor identity.Actor) 
 	// Initialised to empty slices, not nil. nil marshals to `null`, and a
 	// client doing `failed.length` on null crashes — "nothing failed" is a
 	// fact worth stating positively rather than as an absence.
-	result := PublishDueResult{Published: []shared.ArticleID{}, Failed: []PublishFailure{}}
+	result := PublishDueResult{Published: []PublishedItem{}, Failed: []PublishFailure{}}
 
 	for _, article := range due {
-		if _, err := publishAndAnnounce(ctx, uc.deps, article, actor, now); err != nil {
+		published, err := publishAndAnnounce(ctx, uc.deps, article, actor, now)
+		if err != nil {
 			result.Failed = append(result.Failed, PublishFailure{
 				ArticleID: article.ID(),
 				Reason:    err.Error(),
@@ -96,7 +106,11 @@ func (uc PublishDueArticles) Execute(ctx context.Context, actor identity.Actor) 
 			continue
 		}
 
-		result.Published = append(result.Published, article.ID())
+		result.Published = append(result.Published, PublishedItem{
+			ID:     published.ID(),
+			Slug:   published.Slug().String(),
+			Locale: published.Locale(),
+		})
 	}
 
 	return result, nil

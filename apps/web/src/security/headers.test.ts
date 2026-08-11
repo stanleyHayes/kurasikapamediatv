@@ -25,9 +25,9 @@ describe('contentSecurityPolicy', () => {
     expect(directives(false).get('frame-ancestors')).toBe("'none'")
   })
 
-  it('allows no plugins and no embedded frames', () => {
+  it('allows no plugins and only the Turnstile challenge frame', () => {
     expect(directives(false).get('object-src')).toBe("'none'")
-    expect(directives(false).get('frame-src')).toBe("'none'")
+    expect(directives(false).get('frame-src')).toBe('https://challenges.cloudflare.com')
   })
 
   it('confines form posts and base URIs to this origin', () => {
@@ -45,8 +45,15 @@ describe('contentSecurityPolicy', () => {
   })
 
   it('opens no websocket in production', () => {
-    expect(directives(false).get('connect-src')).toBe("'self'")
+    expect(directives(false).get('connect-src')).not.toContain('ws:')
     expect(directives(true).get('connect-src')).toContain('ws:')
+  })
+
+  it('names the analytics and Turnstile hosts rather than opening https:', () => {
+    const connect = directives(false).get('connect-src') ?? ''
+    expect(connect).toContain('https://www.google-analytics.com')
+    expect(connect).toContain('https://challenges.cloudflare.com')
+    expect(directives(false).get('script-src')).toContain('https://www.googletagmanager.com')
   })
 })
 

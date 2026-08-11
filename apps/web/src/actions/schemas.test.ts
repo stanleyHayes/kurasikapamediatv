@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   InvalidInput,
   createDraftSchema,
+  draftBulletsSchema,
+  draftPromptSchema,
   parseInput,
   rejectSchema,
   scheduleSchema,
+  toneSchema,
   unpublishSchema,
 } from './schemas'
 
@@ -101,5 +104,69 @@ describe('scheduleSchema', () => {
     expect(() =>
       parseInput(scheduleSchema, { articleId: 'art_1', at: '2020-01-01T00:00:00.000Z' }),
     ).not.toThrow()
+  })
+})
+
+describe('draftPromptSchema', () => {
+  it('accepts a prompt and locale', () => {
+    const parsed = parseInput(draftPromptSchema, {
+      prompt: 'Ghana cedi rally after rate cut',
+      locale: 'en',
+    })
+
+    expect(parsed.prompt).toBe('Ghana cedi rally after rate cut')
+  })
+
+  it('rejects an empty prompt — that is a blank cheque to the model', () => {
+    expect(() => parseInput(draftPromptSchema, { prompt: '  ', locale: 'en' })).toThrow(
+      InvalidInput,
+    )
+  })
+})
+
+describe('draftBulletsSchema', () => {
+  it('accepts a non-empty bullet list', () => {
+    const parsed = parseInput(draftBulletsSchema, {
+      bullets: ['Rate cut', 'Cedi rally'],
+      locale: 'fr',
+    })
+
+    expect(parsed.bullets).toEqual(['Rate cut', 'Cedi rally'])
+  })
+
+  it('rejects an empty list — nothing to expand', () => {
+    expect(() => parseInput(draftBulletsSchema, { bullets: [], locale: 'en' })).toThrow(
+      InvalidInput,
+    )
+  })
+
+  it('rejects blank bullets', () => {
+    expect(() =>
+      parseInput(draftBulletsSchema, { bullets: ['Rate cut', '  '], locale: 'en' }),
+    ).toThrow(InvalidInput)
+  })
+})
+
+describe('toneSchema', () => {
+  it('accepts a known tone on an article context', () => {
+    const parsed = parseInput(toneSchema, {
+      title: 'Budget',
+      body: 'The minister…',
+      locale: 'en',
+      tone: 'urgent',
+    })
+
+    expect(parsed.tone).toBe('urgent')
+  })
+
+  it('rejects an invented tone — the port only knows five', () => {
+    expect(() =>
+      parseInput(toneSchema, {
+        title: 'Budget',
+        body: 'The minister…',
+        locale: 'en',
+        tone: 'sarcastic',
+      }),
+    ).toThrow(InvalidInput)
   })
 })

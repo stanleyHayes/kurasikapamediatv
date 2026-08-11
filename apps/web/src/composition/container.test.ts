@@ -39,6 +39,7 @@ describe('buildContainer', () => {
     expect(c.publishArticle).toBeDefined()
     expect(c.unpublishArticle).toBeDefined()
     expect(c.publishDueArticles).toBeDefined()
+    expect(c.publishDuePosts).toBeDefined()
   })
 
   it('wires the reader-facing queries', () => {

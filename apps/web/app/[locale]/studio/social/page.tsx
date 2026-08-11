@@ -3,8 +3,11 @@ import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { SocialComposer } from '@/components/studio/social-composer'
 import { SocialQueue, type QueuedPostView } from '@/components/studio/social-queue'
+import { loadPublishedList } from '@/bff/load-public'
 import { requireActor } from '@/composition/actor'
 import { container } from '@/composition/container'
+import { env } from '@/composition/env'
+import { toArticleView } from '@/read-model/article-view'
 
 /**
  * The social publishing hub, per the Stitch admin design.
@@ -46,13 +49,16 @@ export default async function SocialPage({
 
   const [queue, published] = await Promise.all([
     container().socialPosts.listQueue({ limit: 50 }),
-    container().listPublishedArticles.execute({ locale, limit: 50 }),
+    loadPublishedList({ locale, limit: 50 }, env().API_URL, async () => {
+      const page = await container().listPublishedArticles.execute({ locale, limit: 50 })
+      return { items: page.items.map(toArticleView), nextCursor: page.nextCursor }
+    }),
   ])
 
   const posts = queue.items.map(toQueuedPostView)
   const articles = published.items.map((article) => ({
-    id: article.snapshot().id,
-    title: article.snapshot().title,
+    id: article.id,
+    title: article.title,
   }))
 
   return (

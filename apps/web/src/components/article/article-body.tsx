@@ -1,13 +1,11 @@
+import { MarkdownView } from '../../content/markdown-view'
+
 /**
  * Renders the approved revision's prose.
  *
- * Splits on blank lines rather than parsing Markdown. A real Markdown renderer
- * lands with the CMS editor work; rendering raw HTML from a revision without
- * one would be an injection route straight through the newsroom, and the
- * questionnaire's contributed-copy features make that a live concern rather
- * than a theoretical one.
- *
- * Every paragraph is escaped by React. Nothing here uses dangerouslySetInnerHTML.
+ * Bodies are Markdown text. MarkdownView parses a safe subset into React
+ * children — never HTML — so a contributed tag cannot execute. There is no
+ * dangerouslySetInnerHTML on this path.
  */
 export function ArticleBody({ body }: { body: string | null }): React.ReactElement {
   if (body === null || body.trim() === '') {
@@ -18,21 +16,5 @@ export function ArticleBody({ body }: { body: string | null }): React.ReactEleme
     )
   }
 
-  const paragraphs = body
-    .split(/\n\s*\n/u)
-    .map((p) => p.trim())
-    .filter((p) => p !== '')
-
-  return (
-    <div className="max-w-[68ch]">
-      {paragraphs.map((text) => (
-        <p
-          key={text.slice(0, 48)}
-          className="text-on-surface mb-6 text-[length:var(--text-body-lg)] leading-relaxed"
-        >
-          {text}
-        </p>
-      ))}
-    </div>
-  )
+  return <MarkdownView source={body} />
 }

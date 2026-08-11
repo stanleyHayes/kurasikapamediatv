@@ -18,7 +18,10 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   // lives in schemas.ts, result.ts and cache-invalidation.ts, all covered here.
   'src/actions/editorial.ts',
   'src/actions/ai.ts',
+  'src/actions/side-actions.ts',
   'src/composition/subscribers.ts',
+  'src/composition/announce-published.ts',
+  'src/composition/announce-transition.ts',
   // Presentational only — no branching worth a unit test. Covered by the
   // Playwright journeys, which is where markup belongs under test.
   'src/components/**/*.tsx',

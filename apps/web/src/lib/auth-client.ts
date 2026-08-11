@@ -1,6 +1,7 @@
 'use client'
 
 import { createAuthClient } from 'better-auth/react'
+import { twoFactorClient } from 'better-auth/client/plugins'
 
 /**
  * Browser-side auth client.
@@ -12,6 +13,15 @@ import { createAuthClient } from 'better-auth/react'
  * No baseURL: same-origin is correct, and hardcoding one breaks preview
  * deployments, which live on a different host every time.
  */
-export const authClient = createAuthClient()
+export const authClient = createAuthClient({
+  plugins: [
+    twoFactorClient({
+      onTwoFactorRedirect: () => {
+        const locale = window.location.pathname.split('/')[1] ?? 'en'
+        window.location.assign(`/${locale}/two-factor`)
+      },
+    }),
+  ],
+})
 
 export const { signIn, signUp, signOut, useSession } = authClient
