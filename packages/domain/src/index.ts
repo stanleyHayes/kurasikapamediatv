@@ -68,6 +68,12 @@ export {
   type NewsletterState,
 } from './audience/newsletter'
 export {
+  DeviceSubscription,
+  InvalidPushEndpoint,
+  InvalidPushKey,
+  type DeviceSubscriptionProps,
+} from './audience/device-subscription'
+export {
   AlreadyDecided,
   CannotCommentUnpublished,
   Comment,

@@ -20,6 +20,7 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   'src/actions/ai.ts',
   'src/actions/side-actions.ts',
   'src/actions/newsletter-actions.ts',
+  'src/actions/push.ts',
   'src/composition/subscribers.ts',
   'src/composition/announce-published.ts',
   'src/composition/announce-transition.ts',
@@ -27,6 +28,9 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   // Playwright journeys, which is where markup belongs under test.
   'src/components/**/*.tsx',
   'src/pwa/service-worker-register.tsx',
+  // Opt-in is gated on production SW + Notification; covered by the policy
+  // unit tests and the fail-closed VAPID path in outbound.test.ts.
+  'src/pwa/push-opt-in.tsx',
 ])
 
 export default mergeConfig(

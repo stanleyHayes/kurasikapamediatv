@@ -1,6 +1,7 @@
 import {
   Actor,
   CannotAlertUnpublished,
+  DeviceSubscription,
   NewsletterSubscription,
   NotPermitted,
   articleId,
@@ -12,10 +13,12 @@ import { ConfirmNewsletter } from '../audience/confirm-newsletter'
 import { EmailDeliveryFailed, SubscribeNewsletter } from '../audience/subscribe-newsletter'
 import { ArticleNotFound } from '../editorial/errors'
 import { FailClosedEmail, RecordingEmail } from '../testing/fake-email'
+import { FailClosedPush, RecordingPush } from '../testing/fake-push'
 import { FakeClock, SequentialIds } from '../testing/fakes'
 import { InMemoryArticleRepository } from '../testing/in-memory-article-repository'
 import { InMemoryBreakingAlertRepository } from '../testing/in-memory-breaking-alert-repository'
 import { InMemoryNewsletterRepository } from '../testing/in-memory-newsletter-repository'
+import { InMemoryPushSubscriptionRepository } from '../testing/in-memory-push-subscription-repository'
 import { BreakingAlertAlreadySent, SendBreakingAlert } from './send-breaking-alert'
 
 const NOW = new Date('2026-08-11T12:00:00Z')
@@ -29,15 +32,21 @@ const wiring = (
   articles = [live()],
 ): {
   readonly email: RecordingEmail
+  readonly push: RecordingPush
+  readonly devices: InMemoryPushSubscriptionRepository
   readonly send: SendBreakingAlert
   readonly confirm: ConfirmNewsletter
   readonly subscribe: SubscribeNewsletter
 } => {
   const subscriptions = new InMemoryNewsletterRepository()
+  const devices = new InMemoryPushSubscriptionRepository()
   const email = new RecordingEmail()
+  const push = new RecordingPush()
   const ids = new SequentialIds('tok')
   return {
     email,
+    push,
+    devices,
     subscribe: new SubscribeNewsletter({
       subscriptions,
       email,
@@ -50,6 +59,8 @@ const wiring = (
       subscriptions,
       alerts: new InMemoryBreakingAlertRepository(),
       email,
+      devices,
+      push,
       clock: new FakeClock(NOW),
       siteUrl: 'http://localhost:3000',
     }),
@@ -129,12 +140,60 @@ describe('SendBreakingAlert', () => {
       subscriptions,
       alerts: new InMemoryBreakingAlertRepository(),
       email: new FailClosedEmail(),
+      devices: new InMemoryPushSubscriptionRepository(),
+      push: new RecordingPush(),
       clock: new FakeClock(NOW),
       siteUrl: 'http://localhost:3000',
     })
 
     await expect(send.execute({ actor: EDITOR, articleId: articleId('art_1') })).rejects.toThrow(
       EmailDeliveryFailed,
+    )
+  })
+
+  it('wakes devices subscribed in this locale', async () => {
+    const { send, devices, push } = wiring()
+    await devices.save(
+      DeviceSubscription.subscribe({
+        endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
+        p256dh: 'k',
+        auth: 'a',
+        locale: 'en',
+        now: NOW,
+      }),
+    )
+
+    await send.execute({ actor: EDITOR, articleId: articleId('art_1') })
+
+    expect(push.sent).toHaveLength(1)
+    expect(push.sent[0]?.message.url).toContain('/en/articles/budget-2026')
+  })
+
+  it('still latches when push is unset', async () => {
+    const devices = new InMemoryPushSubscriptionRepository()
+    await devices.save(
+      DeviceSubscription.subscribe({
+        endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
+        p256dh: 'k',
+        auth: 'a',
+        locale: 'en',
+        now: NOW,
+      }),
+    )
+    const send = new SendBreakingAlert({
+      articles: new InMemoryArticleRepository([live()]),
+      subscriptions: new InMemoryNewsletterRepository(),
+      alerts: new InMemoryBreakingAlertRepository(),
+      email: new RecordingEmail(),
+      devices,
+      push: new FailClosedPush(),
+      clock: new FakeClock(NOW),
+      siteUrl: 'http://localhost:3000',
+    })
+
+    await send.execute({ actor: EDITOR, articleId: articleId('art_1') })
+    await expect(send.execute({ actor: EDITOR, articleId: articleId('art_1') })).rejects.toThrow(
+      BreakingAlertAlreadySent,
     )
   })
 })

@@ -3,6 +3,8 @@ import {
   CannotAssignOwnRoles,
   CannotCommentUnpublished,
   CannotAlertUnpublished,
+  InvalidPushEndpoint,
+  InvalidPushKey,
   CannotLikeUnpublished,
   CommentTooLong,
   EmptyComment,
@@ -75,6 +77,8 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [EmailDeliveryFailed, 'email_delivery_failed'],
   [CannotAlertUnpublished, 'cannot_alert_unpublished'],
   [BreakingAlertAlreadySent, 'breaking_alert_already_sent'],
+  [InvalidPushEndpoint, 'invalid_push_endpoint'],
+  [InvalidPushKey, 'invalid_push_key'],
 ]
 
 export function toActionError(error: unknown): ActionError {

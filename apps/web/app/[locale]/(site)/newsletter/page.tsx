@@ -1,7 +1,9 @@
 import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { NewsletterForm } from '@/components/newsletter/newsletter-form'
+import { vapidPublicKey } from '@/composition/outbound'
 import { Link } from '@/i18n/navigation'
+import { PushOptIn } from '@/pwa/push-opt-in'
 
 interface Params {
   params: Promise<{ locale: string }>
@@ -29,6 +31,7 @@ async function Body({ params }: Params): Promise<React.ReactElement> {
         confirm the address — the same integrity rule as everything else we publish.
       </p>
       <NewsletterForm locale={locale} />
+      <PushOptIn locale={locale} vapidPublicKey={vapidPublicKey()} />
       <p className="text-on-surface-variant mt-8 text-sm">
         Already subscribed?{' '}
         <Link href="/newsletter/unsubscribe" className="text-secondary underline">

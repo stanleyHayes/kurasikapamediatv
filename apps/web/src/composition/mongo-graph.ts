@@ -7,6 +7,7 @@ import {
   MongoLikeRepository,
   MongoBreakingAlertRepository,
   MongoNewsletterRepository,
+  MongoPushSubscriptionRepository,
   MongoReadingRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
@@ -24,7 +25,9 @@ import {
   RecordReading,
   SendBreakingAlert,
   SubscribeNewsletter,
+  SubscribePush,
   UnsubscribeNewsletter,
+  UnsubscribePush,
   ListPendingComments,
   ListSavedArticles,
   ListVisibleComments,
@@ -43,6 +46,8 @@ import {
   type LikeRepository,
   type BreakingAlertRepository,
   type NewsletterRepository,
+  type PushPort,
+  type PushSubscriptionRepository,
   type ReadingRepository,
   type IdPort,
   type RevisionRepository,
@@ -65,6 +70,7 @@ export interface MongoGraph {
   readonly readings: ReadingRepository
   readonly subscriptions: NewsletterRepository
   readonly alerts: BreakingAlertRepository
+  readonly devices: PushSubscriptionRepository
   readonly socialPosts: SocialPostRepository,
   readonly audit: AuditLog
   readonly categories: CategoryRepository
@@ -87,6 +93,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     readings: new MongoReadingRepository(db),
     subscriptions: new MongoNewsletterRepository(db),
     alerts: new MongoBreakingAlertRepository(db),
+    devices: new MongoPushSubscriptionRepository(db),
     socialPosts: new MongoSocialPostRepository(db),
     audit: new MongoAuditLog(db),
     categories: new MongoCategoryRepository(db),
@@ -160,6 +167,7 @@ export function audienceCommands(
 export function newsletterCommands(input: {
   readonly graph: MongoGraph
   readonly email: EmailPort
+  readonly push: PushPort
   readonly ids: IdPort
   readonly clock: ClockPort
   readonly siteUrl: string
@@ -168,8 +176,10 @@ export function newsletterCommands(input: {
   readonly confirmNewsletter: ConfirmNewsletter
   readonly unsubscribeNewsletter: UnsubscribeNewsletter
   readonly sendBreakingAlert: SendBreakingAlert
+  readonly subscribePush: SubscribePush
+  readonly unsubscribePush: UnsubscribePush
 } {
-  const { subscriptions, articles, alerts } = input.graph
+  const { subscriptions, articles, alerts, devices } = input.graph
   return {
     subscribeNewsletter: new SubscribeNewsletter({
       subscriptions,
@@ -184,8 +194,12 @@ export function newsletterCommands(input: {
       subscriptions,
       alerts,
       email: input.email,
+      devices,
+      push: input.push,
       clock: input.clock,
       siteUrl: input.siteUrl,
     }),
+    subscribePush: new SubscribePush(devices, input.clock),
+    unsubscribePush: new UnsubscribePush(devices),
   }
 }

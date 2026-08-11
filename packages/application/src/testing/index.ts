@@ -16,6 +16,8 @@ export { InMemoryReadingRepository } from './in-memory-reading-repository'
 export { InMemoryNewsletterRepository } from './in-memory-newsletter-repository'
 export { InMemoryBreakingAlertRepository } from './in-memory-breaking-alert-repository'
 export { FailClosedEmail, RecordingEmail } from './fake-email'
+export { FailClosedPush, RecordingPush } from './fake-push'
+export { InMemoryPushSubscriptionRepository } from './in-memory-push-subscription-repository'
 export { FakeSearch } from './fake-search'
 export { InMemoryCategoryRepository } from './in-memory-category-repository'
 export {

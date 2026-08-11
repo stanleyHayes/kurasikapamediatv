@@ -19,6 +19,7 @@ import {
   type CountLikes,
   type CountReadings,
   type EmailPort,
+  type PushPort,
   type LikeArticle,
   type ListMostRead,
   type ListReadingHistory,
@@ -40,8 +41,10 @@ import {
   type RecordReading,
   type SendBreakingAlert,
   type SubscribeNewsletter,
+  type SubscribePush,
   type UnlikeArticle,
   type UnsubscribeNewsletter,
+  type UnsubscribePush,
   SearchArticles,
   ListPublishedArticles,
   PublishArticle,
@@ -58,7 +61,14 @@ import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { env } from './env'
 import { mongoDb } from './mongo'
 import { audienceCommands, mongoGraph, newsletterCommands } from './mongo-graph'
-import { failClosedEmail, failClosedSocial, metaSocial, resendMailer } from './outbound'
+import {
+  failClosedEmail,
+  failClosedPush,
+  failClosedSocial,
+  metaSocial,
+  resendMailer,
+  webPush,
+} from './outbound'
 import { registerSubscribers } from './subscribers'
 
 /**
@@ -104,6 +114,8 @@ export interface Container {
   readonly subscribeNewsletter: SubscribeNewsletter
   readonly confirmNewsletter: ConfirmNewsletter
   readonly unsubscribeNewsletter: UnsubscribeNewsletter
+  readonly subscribePush: SubscribePush
+  readonly unsubscribePush: UnsubscribePush
   readonly sendBreakingAlert: SendBreakingAlert
 
   // Queries
@@ -133,6 +145,7 @@ export interface Infrastructure {
   readonly ai: AiPort
   readonly social?: SocialPublishPort | undefined
   readonly email?: EmailPort | undefined
+  readonly push?: PushPort | undefined
   readonly siteUrl?: string | undefined
 }
 
@@ -166,11 +179,8 @@ export function buildContainer(infra: Infrastructure): Container {
     rateLimiter: new MongoRateLimiter(infra.db, clock),
     ...audienceCommands(graph, clock, ids),
     ...newsletterCommands({
-      graph,
-      email: infra.email ?? failClosedEmail(),
-      ids,
-      clock,
-      siteUrl: infra.siteUrl ?? 'http://localhost:3000',
+      graph, email: infra.email ?? failClosedEmail(), push: infra.push ?? failClosedPush(),
+      ids, clock, siteUrl: infra.siteUrl ?? 'http://localhost:3000',
     }),
 
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
@@ -212,6 +222,7 @@ export function container(): Container {
     ai: new AnthropicAiAdapter(anthropicModels()),
     social: metaSocial(),
     email: resendMailer(),
+    push: webPush(),
     siteUrl: env().APP_URL,
   })
 

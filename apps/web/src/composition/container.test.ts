@@ -46,6 +46,7 @@ describe('buildContainer', () => {
     expect(c.recordReading).toBeDefined()
     expect(c.subscribeNewsletter).toBeDefined()
     expect(c.sendBreakingAlert).toBeDefined()
+    expect(c.subscribePush).toBeDefined()
   })
 
   it('wires the reader-facing queries', () => {

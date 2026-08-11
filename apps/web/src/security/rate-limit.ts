@@ -44,6 +44,9 @@ export const RULES = {
    * Breaking-news blasts. Fail-closed and tight: one click mails the list.
    */
   breaking: { limit: 5, windowSeconds: 60 },
+
+  /** Device push subscribe. Fail-closed so an uncounted endpoint cannot fill Atlas. */
+  push: { limit: 8, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**

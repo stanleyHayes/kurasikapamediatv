@@ -7,6 +7,7 @@ export {
   COMMENTS,
   NEWSLETTER_SUBSCRIBERS,
   BREAKING_ALERTS,
+  PUSH_SUBSCRIPTIONS,
   SOCIAL_POSTS,
   CATEGORIES,
   ROLE_ASSIGNMENTS,
@@ -18,6 +19,7 @@ export {
   type CommentDocument,
   type NewsletterDocument,
   type BreakingAlertDocument,
+  type PushSubscriptionDocument,
   type SocialPostDocument,
   type CategoryDocument,
   type RoleAssignmentDocument,
@@ -44,6 +46,7 @@ export { MongoReadingRepository } from './mongo-reading-repository'
 export { MongoCommentRepository } from './mongo-comment-repository'
 export { MongoNewsletterRepository } from './mongo-newsletter-repository'
 export { MongoBreakingAlertRepository } from './mongo-breaking-alert-repository'
+export { MongoPushSubscriptionRepository } from './mongo-push-subscription-repository'
 export { MongoSocialPostRepository } from './mongo-social-post-repository'
 export { MongoAuditLog } from './mongo-audit-log'
 export { MongoRateLimiter } from './mongo-rate-limiter'

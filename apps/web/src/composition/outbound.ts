@@ -1,4 +1,5 @@
 import { ResendMailer } from '@kurasikapa/adapter-email'
+import { WebPushSender } from '@kurasikapa/adapter-push'
 import { MetaSocialPublisher } from '@kurasikapa/adapter-social'
 
 /**
@@ -39,6 +40,28 @@ export function failClosedEmail(): ResendMailer {
     from: 'Kurasikapa Media <news@kurasikapa.tv>',
     post: globalThis.fetch.bind(globalThis),
   })
+}
+
+export function webPush(): WebPushSender {
+  return new WebPushSender({
+    publicKey: present(process.env['VAPID_PUBLIC_KEY']),
+    privateKey: present(process.env['VAPID_PRIVATE_KEY']),
+    subject: 'mailto:news@kurasikapa.tv',
+    post: globalThis.fetch.bind(globalThis),
+  })
+}
+
+export function failClosedPush(): WebPushSender {
+  return new WebPushSender({
+    publicKey: undefined,
+    privateKey: undefined,
+    subject: 'mailto:news@kurasikapa.tv',
+    post: globalThis.fetch.bind(globalThis),
+  })
+}
+
+export function vapidPublicKey(): string | undefined {
+  return present(process.env['VAPID_PUBLIC_KEY'])
 }
 
 function present(value: string | undefined): string | undefined {

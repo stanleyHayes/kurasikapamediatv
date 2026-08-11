@@ -98,6 +98,14 @@ export interface NewsletterDocument {
   confirmedAt: Date | null
 }
 
+export interface PushSubscriptionDocument {
+  _id: string
+  p256dh: string
+  auth: string
+  locale: string
+  subscribedAt: Date
+}
+
 export interface BreakingAlertDocument {
   /** Article id — one blast per story. */
   _id: string
@@ -128,6 +136,7 @@ export const READINGS = 'readings'
 export const COMMENTS = 'comments'
 export const NEWSLETTER_SUBSCRIBERS = 'newsletter_subscribers'
 export const BREAKING_ALERTS = 'breaking_alerts'
+export const PUSH_SUBSCRIPTIONS = 'push_subscriptions'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'

@@ -94,6 +94,7 @@ export interface StreamPort        { createLive(i: LiveInput): Promise<LiveStrea
 export interface SocialPublishPort { publish(p: SocialPost): Promise<SocialResult>; schedule(p: SocialPost, at: Date): Promise<SocialResult> }
 export interface PaymentPort       { checkout(i: CheckoutIntent): Promise<CheckoutSession>; cancel(id: SubscriptionId): Promise<void> }
 export interface EmailPort         { send(m: EmailMessage): Promise<void>; sendBatch(m: EmailMessage[]): Promise<void> }
+export interface PushPort          { send(device: DeviceSubscription, message: PushMessage): Promise<void> }
 export interface MediaJobPort      { enqueue(j: MediaJob): Promise<JobId>; status(id: JobId): Promise<JobStatus> }
 export interface AnalyticsPort     { record(e: AnalyticsEvent): Promise<void> }
 ```
@@ -122,6 +123,11 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 `SendBreakingAlert` is live in TypeScript: an editor with `article:publish` mails
 confirmed subscribers in that article's locale. Publishing does not send it.
 Unset `RESEND_API_KEY` fails closed. A second blast for the same article is refused.
+
+`PushPort` is live and fail-closed: unset VAPID keys hide the opt-in and refuse
+send. Breaking alerts also fan out to devices in that locale (best-effort beside
+mail). Payload encryption is still empty-body VAPID — the worker shows a
+generic notice until aes128gcm lands.
 
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
