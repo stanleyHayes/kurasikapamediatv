@@ -24,6 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const locale of routing.locales) {
     entries.push({ url: `${base}/${locale}`, changeFrequency: 'hourly', priority: 1 })
+    entries.push({ url: `${base}/${locale}/feed.xml`, changeFrequency: 'hourly', priority: 0.6 })
     entries.push({ url: `${base}/${locale}/search`, changeFrequency: 'monthly', priority: 0.3 })
     await appendSections(entries, locale, base, apiUrl)
     await appendArticles(entries, locale, base, apiUrl)

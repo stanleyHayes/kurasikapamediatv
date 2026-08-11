@@ -220,7 +220,8 @@ the wiring is missing.
 | ~~**Google Analytics**~~ | **DONE.** gtag loads only after the consent banner; unset `NEXT_PUBLIC_GA_MEASUREMENT_ID` renders nothing. Search Console still needs the client property. |
 | **Scheduling actually firing** | Article cron live (KUR-34). Social cron live and fail-closed until Meta credentials exist. |
 | **Remaining designed screens** | Five built routes still use my layouts rather than the supplied designs — see §3.7. |
-| **Error tracking, backups** | Not configured. |
+| ~~**Error tracking**~~ | **DONE.** Locale + global error boundaries; failures go to stderr via `reportError`. A Sentry DSN is still a hosting choice — the boundary no longer swallows. Backups remain Atlas/ops, not code. |
+| **RSS out** | **DONE.** `/{locale}/feed.xml` from the published list. RSS *ingest* is still R2/media-svc. |
 
 ### 5.2 R2 — Audience & Distribution
 
@@ -228,7 +229,7 @@ Domain for saved articles and social posts exists (§3). Everything else is open
 reader comments + moderation (**no domain files at all**), likes, reading history,
 newsletter with double opt-in and digests, breaking-news alerts, push
 notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
-and tokens still blocked), RSS in/out, trending / most-read / related /
+and tokens still blocked), RSS ingest (out is live), trending / most-read / related /
 recommended (needs `EmbeddingPort` — **declared, no adapter**, and Atlas Vector
 Search), PWA offline reading.
 
