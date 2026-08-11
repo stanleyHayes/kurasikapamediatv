@@ -251,3 +251,5 @@ export {
 } from './audience/subscribe-newsletter'
 export { ConfirmNewsletter } from './audience/confirm-newsletter'
 export { UnsubscribeNewsletter } from './audience/unsubscribe-newsletter'
+export type { BreakingAlertRepository } from './ports/breaking-alert-repository'
+export { BreakingAlertAlreadySent, SendBreakingAlert, type SendBreakingAlertDeps, type SendBreakingAlertInput } from './distribution/send-breaking-alert'

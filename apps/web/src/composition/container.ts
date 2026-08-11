@@ -38,6 +38,7 @@ import {
   ReadAuditLog,
   type SaveArticle,
   type RecordReading,
+  type SendBreakingAlert,
   type SubscribeNewsletter,
   type UnlikeArticle,
   type UnsubscribeNewsletter,
@@ -103,6 +104,7 @@ export interface Container {
   readonly subscribeNewsletter: SubscribeNewsletter
   readonly confirmNewsletter: ConfirmNewsletter
   readonly unsubscribeNewsletter: UnsubscribeNewsletter
+  readonly sendBreakingAlert: SendBreakingAlert
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -164,7 +166,7 @@ export function buildContainer(infra: Infrastructure): Container {
     rateLimiter: new MongoRateLimiter(infra.db, clock),
     ...audienceCommands(graph, clock, ids),
     ...newsletterCommands({
-      subscriptions: graph.subscriptions,
+      graph,
       email: infra.email ?? failClosedEmail(),
       ids,
       clock,

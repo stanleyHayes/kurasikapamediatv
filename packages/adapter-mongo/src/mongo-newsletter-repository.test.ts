@@ -41,6 +41,28 @@ describe('MongoNewsletterRepository', () => {
     expect(await repo.findByToken('missing')).toBeNull()
   })
 
+  it('lists only confirmed subscribers for a locale', async () => {
+    const en = NewsletterSubscription.request({
+      id: 'sub_en',
+      email: 'en@kurasikapa.tv',
+      locales: ['en'],
+      cadence: 'daily',
+      token: 'tok_en',
+    }).confirm('tok_en', new Date('2026-08-11T12:00:00Z'))
+    const fr = NewsletterSubscription.request({
+      id: 'sub_fr',
+      email: 'fr@kurasikapa.tv',
+      locales: ['fr'],
+      cadence: 'weekly',
+      token: 'tok_fr',
+    }).confirm('tok_fr', new Date('2026-08-11T12:00:00Z'))
+    await repo.save(en)
+    await repo.save(fr)
+    await repo.save(pending())
+
+    expect((await repo.listConfirmed('en')).map((row) => row.email)).toEqual(['en@kurasikapa.tv'])
+  })
+
   it('replaces the token on the same address', async () => {
     await repo.save(pending())
     await repo.save(pending().retoken('tok_2'))

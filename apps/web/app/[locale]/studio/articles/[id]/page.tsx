@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { loadStudioDraft } from '@/bff/load-studio'
+import { BreakingAlertButton } from '@/components/studio/breaking-alert-button'
 import { EditorWorkspace } from '@/components/studio/editor-workspace'
 import { StatusBadge } from '@/components/studio/status-badge'
 import { requireActor } from '@/composition/actor'
@@ -51,6 +52,8 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
         revisions={draft.revisions}
         uiLocale={locale}
       />
+
+      {draft.status === 'published' && <BreakingAlertButton articleId={draft.id} />}
     </>
   )
 }

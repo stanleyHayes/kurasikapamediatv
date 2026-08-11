@@ -79,6 +79,11 @@ export {
   type NewComment,
 } from './audience/comment'
 export {
+  BreakingAlert,
+  CannotAlertUnpublished,
+  type BreakingAlertProps,
+} from './distribution/breaking-alert'
+export {
   AlreadySent,
   ArticleNotLive,
   EmptyCaption,

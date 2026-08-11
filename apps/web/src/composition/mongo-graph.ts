@@ -5,6 +5,7 @@ import {
   MongoCategoryRepository,
   MongoCommentRepository,
   MongoLikeRepository,
+  MongoBreakingAlertRepository,
   MongoNewsletterRepository,
   MongoReadingRepository,
   MongoRevisionRepository,
@@ -21,6 +22,7 @@ import {
   ListMostRead,
   ListReadingHistory,
   RecordReading,
+  SendBreakingAlert,
   SubscribeNewsletter,
   UnsubscribeNewsletter,
   ListPendingComments,
@@ -39,6 +41,7 @@ import {
   type CommentRepository,
   type EmailPort,
   type LikeRepository,
+  type BreakingAlertRepository,
   type NewsletterRepository,
   type ReadingRepository,
   type IdPort,
@@ -61,6 +64,7 @@ export interface MongoGraph {
   readonly likes: LikeRepository
   readonly readings: ReadingRepository
   readonly subscriptions: NewsletterRepository
+  readonly alerts: BreakingAlertRepository
   readonly socialPosts: SocialPostRepository,
   readonly audit: AuditLog
   readonly categories: CategoryRepository
@@ -82,6 +86,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     likes: new MongoLikeRepository(db),
     readings: new MongoReadingRepository(db),
     subscriptions: new MongoNewsletterRepository(db),
+    alerts: new MongoBreakingAlertRepository(db),
     socialPosts: new MongoSocialPostRepository(db),
     audit: new MongoAuditLog(db),
     categories: new MongoCategoryRepository(db),
@@ -153,7 +158,7 @@ export function audienceCommands(
 }
 
 export function newsletterCommands(input: {
-  readonly subscriptions: NewsletterRepository
+  readonly graph: MongoGraph
   readonly email: EmailPort
   readonly ids: IdPort
   readonly clock: ClockPort
@@ -162,15 +167,25 @@ export function newsletterCommands(input: {
   readonly subscribeNewsletter: SubscribeNewsletter
   readonly confirmNewsletter: ConfirmNewsletter
   readonly unsubscribeNewsletter: UnsubscribeNewsletter
+  readonly sendBreakingAlert: SendBreakingAlert
 } {
+  const { subscriptions, articles, alerts } = input.graph
   return {
     subscribeNewsletter: new SubscribeNewsletter({
-      subscriptions: input.subscriptions,
+      subscriptions,
       email: input.email,
       ids: input.ids,
       siteUrl: input.siteUrl,
     }),
-    confirmNewsletter: new ConfirmNewsletter(input.subscriptions, input.clock),
-    unsubscribeNewsletter: new UnsubscribeNewsletter(input.subscriptions),
+    confirmNewsletter: new ConfirmNewsletter(subscriptions, input.clock),
+    unsubscribeNewsletter: new UnsubscribeNewsletter(subscriptions),
+    sendBreakingAlert: new SendBreakingAlert({
+      articles,
+      subscriptions,
+      alerts,
+      email: input.email,
+      clock: input.clock,
+      siteUrl: input.siteUrl,
+    }),
   }
 }

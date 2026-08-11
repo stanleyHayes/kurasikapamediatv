@@ -2,6 +2,7 @@ import {
   AlreadyDecided,
   CannotAssignOwnRoles,
   CannotCommentUnpublished,
+  CannotAlertUnpublished,
   CannotLikeUnpublished,
   CommentTooLong,
   EmptyComment,
@@ -19,6 +20,7 @@ import {
 import { RateLimited } from '../security/rate-limit'
 import {
   ArticleNotFound,
+  BreakingAlertAlreadySent,
   CommentNotFound,
   EmailDeliveryFailed,
   RevisionNotFound,
@@ -71,6 +73,8 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [EmptyLocales, 'empty_locales'],
   [InvalidConfirmation, 'invalid_confirmation'],
   [EmailDeliveryFailed, 'email_delivery_failed'],
+  [CannotAlertUnpublished, 'cannot_alert_unpublished'],
+  [BreakingAlertAlreadySent, 'breaking_alert_already_sent'],
 ]
 
 export function toActionError(error: unknown): ActionError {

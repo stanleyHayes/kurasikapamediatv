@@ -119,6 +119,10 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 
+`SendBreakingAlert` is live in TypeScript: an editor with `article:publish` mails
+confirmed subscribers in that article's locale. Publishing does not send it.
+Unset `RESEND_API_KEY` fails closed. A second blast for the same article is refused.
+
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
 

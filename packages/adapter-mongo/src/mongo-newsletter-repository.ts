@@ -24,6 +24,11 @@ export class MongoNewsletterRepository implements NewsletterRepository {
     return doc === null ? null : toDomain(doc)
   }
 
+  async listConfirmed(locale: string): Promise<readonly NewsletterSubscription[]> {
+    const docs = await this.rows.find({ state: 'confirmed', locales: locale }).toArray()
+    return docs.map(toDomain)
+  }
+
   async save(subscription: NewsletterSubscription): Promise<void> {
     const props = subscription.snapshot()
     await this.rows.updateOne(

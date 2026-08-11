@@ -239,12 +239,15 @@ unsubscribe; Resend unset → `EmailDeliveryFailed`, nothing mailed. Digests sti
 wait on a live `RESEND_API_KEY`. **PWA offline reading is live (KUR-51):** installable
 manifest, production service worker, network-first cache of visited articles /
 sections / home. Studio, auth, profile and RSC flights stay on the network.
-Remaining open: breaking-news alerts, push
+Remaining open: push
 notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
 and tokens still blocked), RSS ingest (out is live), related / recommended (needs
 `EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search). **Most-read
 is live (KUR-52):** unique-reader ranking from existing reading rows; homepage
 Trending Now prefers that rail and falls back to leftover recency. No embeddings.
+**Breaking-news alerts are live (KUR-53):** editor click on a published article
+mails confirmed subscribers in that locale; Resend unset fails closed; one blast
+per article.
 
 ### 5.3 R3 — Multimedia
 

@@ -1,4 +1,10 @@
-import { ArticleNotFound, CommentNotFound, EmailDeliveryFailed, SlugTaken } from '@kurasikapa/application'
+import {
+  ArticleNotFound,
+  BreakingAlertAlreadySent,
+  CommentNotFound,
+  EmailDeliveryFailed,
+  SlugTaken,
+} from '@kurasikapa/application'
 import {
   CannotLikeUnpublished,
   EmptyComment,
@@ -28,6 +34,7 @@ describe('toActionError', () => {
     [new CommentNotFound(commentId('cmt_1')), 'comment_not_found'],
     [new InvalidEmail('nope'), 'invalid_email'],
     [new EmailDeliveryFailed(), 'email_delivery_failed'],
+    [new BreakingAlertAlreadySent(articleId('art_1')), 'breaking_alert_already_sent'],
     [new ApiProblem('slug_taken', 'Slug is already in use'), 'slug_taken'],
     [new ApiProblem('not_permitted', 'Not permitted'), 'not_permitted'],
   ])('maps %s to a stable code', (error, code) => {

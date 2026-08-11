@@ -39,6 +39,11 @@ export const RULES = {
    * signup endpoint is a spam cannon against the mailer.
    */
   newsletter: { limit: 8, windowSeconds: 60 },
+
+  /**
+   * Breaking-news blasts. Fail-closed and tight: one click mails the list.
+   */
+  breaking: { limit: 5, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**

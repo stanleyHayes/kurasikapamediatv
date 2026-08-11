@@ -108,6 +108,10 @@ export class NewsletterSubscription {
     return this.props.token
   }
 
+  get locales(): readonly string[] {
+    return this.props.locales
+  }
+
   snapshot(): NewsletterProps {
     return this.props
   }

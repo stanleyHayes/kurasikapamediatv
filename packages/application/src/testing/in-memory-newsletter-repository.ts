@@ -12,6 +12,14 @@ export class InMemoryNewsletterRepository implements NewsletterRepository {
     return Promise.resolve([...this.rows.values()].find((row) => row.token === token) ?? null)
   }
 
+  listConfirmed(locale: string): Promise<readonly NewsletterSubscription[]> {
+    return Promise.resolve(
+      [...this.rows.values()].filter(
+        (row) => row.state === 'confirmed' && row.locales.includes(locale),
+      ),
+    )
+  }
+
   save(subscription: NewsletterSubscription): Promise<void> {
     this.rows.set(subscription.email, subscription)
     return Promise.resolve()

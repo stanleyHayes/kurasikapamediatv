@@ -45,6 +45,7 @@ describe('buildContainer', () => {
     expect(c.likeArticle).toBeDefined()
     expect(c.recordReading).toBeDefined()
     expect(c.subscribeNewsletter).toBeDefined()
+    expect(c.sendBreakingAlert).toBeDefined()
   })
 
   it('wires the reader-facing queries', () => {
