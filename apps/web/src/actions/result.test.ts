@@ -1,5 +1,6 @@
 import { ArticleNotFound, CommentNotFound, SlugTaken } from '@kurasikapa/application'
 import {
+  CannotLikeUnpublished,
   EmptyComment,
   IllegalTransition,
   NotPermitted,
@@ -22,6 +23,7 @@ describe('toActionError', () => {
     [new SlugTaken('budget-2026', 'en'), 'slug_taken'],
     [new InvalidInput(['title: required']), 'invalid_input'],
     [new EmptyComment(), 'empty_comment'],
+    [new CannotLikeUnpublished(articleId('art_1')), 'cannot_like_unpublished'],
     [new CommentNotFound(commentId('cmt_1')), 'comment_not_found'],
     [new ApiProblem('slug_taken', 'Slug is already in use'), 'slug_taken'],
     [new ApiProblem('not_permitted', 'Not permitted'), 'not_permitted'],

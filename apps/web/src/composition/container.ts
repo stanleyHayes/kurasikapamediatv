@@ -16,21 +16,24 @@ import {
   ListAuthoredArticles,
   BrowseCategory,
   ListAwaitingReview,
+  type CountLikes,
+  type LikeArticle,
   type ListPendingComments,
   ListRevisions,
   type ListVisibleComments,
   RestoreRevision,
   ListSections,
-  ListSavedArticles,
+  type ListSavedArticles,
   ListUsers,
   type ModerateComment,
-  RemoveSavedArticle,
+  type RemoveSavedArticle,
   QueueSocialPost,
   type PostComment,
   PublishDuePosts,
   type SocialPublishPort,
   ReadAuditLog,
-  SaveArticle,
+  type SaveArticle,
+  type UnlikeArticle,
   SearchArticles,
   ListPublishedArticles,
   PublishArticle,
@@ -46,7 +49,7 @@ import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { env } from './env'
 import { mongoDb } from './mongo'
-import { commentCommands, mongoGraph } from './mongo-graph'
+import { audienceCommands, mongoGraph } from './mongo-graph'
 import { registerSubscribers } from './subscribers'
 
 /**
@@ -83,6 +86,9 @@ export interface Container {
   readonly moderateComment: ModerateComment
   readonly listVisibleComments: ListVisibleComments
   readonly listPendingComments: ListPendingComments
+  readonly likeArticle: LikeArticle
+  readonly unlikeArticle: UnlikeArticle
+  readonly countLikes: CountLikes
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -114,8 +120,7 @@ export interface Infrastructure {
 
 export function buildContainer(infra: Infrastructure): Container {
   const graph = mongoGraph(infra.db, infra.clock)
-  const { articles, revisions, roles, search, users, bookmarks, socialPosts, audit, categories } =
-    graph
+  const { articles, revisions, roles, search, users, socialPosts, audit, categories } = graph
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
 
@@ -131,7 +136,6 @@ export function buildContainer(infra: Infrastructure): Container {
     publishDueArticles: new PublishDueArticles(write),
     assignRoles: new AssignRoles({ roles, clock, events }),
     listUsers: new ListUsers({ users }),
-    saveArticle: new SaveArticle({ bookmarks, articles, clock }),
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
     publishDuePosts: new PublishDuePosts({
       posts: socialPosts,
@@ -142,9 +146,7 @@ export function buildContainer(infra: Infrastructure): Container {
     socialPosts,
     readAuditLog: new ReadAuditLog({ audit }),
     rateLimiter: new MongoRateLimiter(infra.db, clock),
-    removeSavedArticle: new RemoveSavedArticle({ bookmarks, articles }),
-    listSavedArticles: new ListSavedArticles({ bookmarks, articles }),
-    ...commentCommands(graph.comments, articles, clock, ids),
+    ...audienceCommands(graph, clock, ids),
 
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),

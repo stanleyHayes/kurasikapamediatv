@@ -49,6 +49,7 @@ export {
 } from './shared/ids'
 export { InvalidSlug, Slug } from './shared/slug'
 export { Bookmark, CannotSaveUnpublished, type BookmarkProps } from './audience/bookmark'
+export { Like, CannotLikeUnpublished, type LikeProps } from './audience/like'
 export {
   AlreadyDecided,
   CannotCommentUnpublished,

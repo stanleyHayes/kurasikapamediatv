@@ -2,6 +2,7 @@ export {
   ARTICLES,
   REVISIONS,
   BOOKMARKS,
+  LIKES,
   COMMENTS,
   SOCIAL_POSTS,
   CATEGORIES,
@@ -9,6 +10,7 @@ export {
   type ArticleDocument,
   type RevisionDocument,
   type BookmarkDocument,
+  type LikeDocument,
   type CommentDocument,
   type SocialPostDocument,
   type CategoryDocument,
@@ -31,6 +33,7 @@ export { MongoTextSearch } from './mongo-text-search'
 export { MongoCategoryRepository } from './mongo-category-repository'
 export { MongoUserDirectory } from './mongo-user-directory'
 export { MongoBookmarkRepository } from './mongo-bookmark-repository'
+export { MongoLikeRepository } from './mongo-like-repository'
 export { MongoCommentRepository } from './mongo-comment-repository'
 export { MongoSocialPostRepository } from './mongo-social-post-repository'
 export { MongoAuditLog } from './mongo-audit-log'

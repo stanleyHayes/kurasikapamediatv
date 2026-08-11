@@ -99,6 +99,25 @@ export async function restoreRevisionAction(
   })
 }
 
+export async function toggleLikeAction(
+  input: unknown,
+  liked: boolean,
+): Promise<ActionResult<{ liked: boolean; count: number }>> {
+  return attempt(async () => {
+    const { articleId } = parseInput(bookmarkSchema, input)
+    const actor = await requireActor()
+    const graph = container()
+    const target = articleId as ArticleId
+
+    const verdict = await limit(graph.rateLimiter, await callerKey(actor.id), 'likes', 'closed')
+    if (!verdict.allowed) throw new RateLimited(verdict.retryAfterSeconds)
+
+    return liked
+      ? graph.unlikeArticle.execute({ actor, articleId: target })
+      : graph.likeArticle.execute({ actor, articleId: target })
+  })
+}
+
 export async function postCommentAction(
   input: unknown,
 ): Promise<ActionResult<{ id: string; state: string }>> {

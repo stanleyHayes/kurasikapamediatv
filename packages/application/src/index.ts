@@ -35,6 +35,18 @@ export type {
   SocialTarget,
 } from './ports/social'
 export type { CommentRepository } from './ports/comment-repository'
+export type { LikeRepository } from './ports/like-repository'
+export {
+  LikeArticle,
+  type LikeArticleDeps,
+  type LikeArticleInput,
+} from './audience/like-article'
+export { UnlikeArticle, type UnlikeArticleInput } from './audience/unlike-article'
+export {
+  CountLikes,
+  type CountLikesInput,
+  type CountLikesResult,
+} from './audience/count-likes'
 export {
   PostComment,
   type PostCommentDeps,

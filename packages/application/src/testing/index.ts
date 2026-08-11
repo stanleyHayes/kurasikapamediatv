@@ -11,6 +11,7 @@ export { InMemoryRoleRepository } from './in-memory-role-repository'
 export { InMemoryUserDirectory } from './in-memory-user-directory'
 export { InMemoryBookmarkRepository } from './in-memory-bookmark-repository'
 export { InMemoryCommentRepository } from './in-memory-comment-repository'
+export { InMemoryLikeRepository } from './in-memory-like-repository'
 export { FakeSearch } from './fake-search'
 export { InMemoryCategoryRepository } from './in-memory-category-repository'
 export {

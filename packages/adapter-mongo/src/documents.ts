@@ -62,6 +62,14 @@ export interface BookmarkDocument {
   savedAt: Date
 }
 
+export interface LikeDocument {
+  /** `${readerId}:${articleId}` — a reader cannot like the same article twice. */
+  _id: string
+  readerId: string
+  articleId: string
+  likedAt: Date
+}
+
 export interface CommentDocument {
   _id: string
   articleId: string
@@ -88,6 +96,7 @@ export const REVISIONS = 'article_revisions'
 export const ROLE_ASSIGNMENTS = 'role_assignments'
 export const CATEGORIES = 'categories'
 export const BOOKMARKS = 'bookmarks'
+export const LIKES = 'likes'
 export const COMMENTS = 'comments'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */

@@ -30,6 +30,9 @@ export const RULES = {
    * is a spam cannon, and a pending queue nobody can moderate.
    */
   comments: { limit: 8, windowSeconds: 60 },
+
+  /** Likes. Fail-closed so an outage cannot inflate a public count. */
+  likes: { limit: 30, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**
