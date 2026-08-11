@@ -30,6 +30,10 @@ describe('contentSecurityPolicy', () => {
     expect(directives(false).get('frame-src')).toBe('https://challenges.cloudflare.com')
   })
 
+  it('confines service workers to this origin', () => {
+    expect(directives(false).get('worker-src')).toBe("'self'")
+  })
+
   it('confines form posts and base URIs to this origin', () => {
     // A rewritten <base> turns every relative URL into an attacker's, and a
     // form-action elsewhere turns the sign-in form into a credential drop.

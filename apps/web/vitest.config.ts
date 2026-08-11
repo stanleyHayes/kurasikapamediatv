@@ -26,6 +26,7 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   // Presentational only — no branching worth a unit test. Covered by the
   // Playwright journeys, which is where markup belongs under test.
   'src/components/**/*.tsx',
+  'src/pwa/service-worker-register.tsx',
 ])
 
 export default mergeConfig(

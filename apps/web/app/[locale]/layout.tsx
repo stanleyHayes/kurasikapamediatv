@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Outfit, Playfair_Display } from 'next/font/google'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
@@ -29,6 +29,10 @@ const outfit = Outfit({
   variable: '--font-outfit',
 })
 
+export const viewport: Viewport = {
+  themeColor: '#131b2e',
+}
+
 export function generateStaticParams(): { locale: string }[] {
   return routing.locales.map((locale) => ({ locale }))
 }
@@ -50,6 +54,7 @@ export async function generateMetadata({
     },
     openGraph: { type: 'website', siteName: 'Kurasikapa Media TV', locale },
     twitter: { card: 'summary_large_image' },
+    appleWebApp: { capable: true, title: 'Kurasikapa', statusBarStyle: 'black-translucent' },
   }
 }
 

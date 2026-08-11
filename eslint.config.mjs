@@ -54,6 +54,9 @@ export default tseslint.config(
       '**/node_modules/**',
       'services/media-svc/**',
       'stitch_kurasikapa_ai_media_platform/**',
+      // Worker globals (`self`, `caches`) are not in the app ESLint env.
+      // Path rules are tested in `apps/web/src/pwa/offline-policy.test.ts`.
+      'apps/web/public/sw.js',
     ],
   },
 

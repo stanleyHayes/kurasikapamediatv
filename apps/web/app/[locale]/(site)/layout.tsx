@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
+import { ServiceWorkerRegister } from '@/pwa/service-worker-register'
 
 /**
  * The public site's chrome.
@@ -31,6 +32,7 @@ export default async function SiteLayout({
       <main className="pt-20">{children}</main>
 
       <SiteFooter />
+      <ServiceWorkerRegister />
     </>
   )
 }

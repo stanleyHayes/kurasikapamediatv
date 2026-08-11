@@ -82,6 +82,10 @@ export function contentSecurityPolicy(isDev: boolean): string {
     // Turnstile's challenge is an iframe. Nothing else may frame or be framed.
     ['frame-src', 'https://challenges.cloudflare.com'],
 
+    // Same-origin workers only. The offline reader is a service worker; a
+    // blob: or data: worker would be a way to run a script we did not serve.
+    ['worker-src', "'self'"],
+
     ['base-uri', "'self'"],
     ['form-action', "'self'"],
     ['upgrade-insecure-requests'],

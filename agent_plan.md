@@ -236,11 +236,14 @@ pre-moderated: a reader post stays pending until an editor with `comment:moderat
 approves it. Likes and reading history are live. Newsletter **double opt-in is live
 and fail-closed** (KUR-50): subscribe at `/[locale]/newsletter`, confirm link,
 unsubscribe; Resend unset → `EmailDeliveryFailed`, nothing mailed. Digests still
-wait on a live `RESEND_API_KEY`. Remaining open: breaking-news alerts, push
+wait on a live `RESEND_API_KEY`. **PWA offline reading is live (KUR-51):** installable
+manifest, production service worker, network-first cache of visited articles /
+sections / home. Studio, auth, profile and RSC flights stay on the network.
+Remaining open: breaking-news alerts, push
 notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
 and tokens still blocked), RSS ingest (out is live), trending / most-read / related /
 recommended (needs `EmbeddingPort` — **declared, no adapter**, and Atlas Vector
-Search), PWA offline reading.
+Search).
 
 ### 5.3 R3 — Multimedia
 
