@@ -88,6 +88,16 @@ export interface CommentDocument {
   createdAt: Date
 }
 
+export interface NewsletterDocument {
+  _id: string
+  email: string
+  locales: string[]
+  cadence: string
+  state: string
+  token: string | null
+  confirmedAt: Date | null
+}
+
 export interface SocialPostDocument {
   _id: string
   articleId: string
@@ -108,6 +118,7 @@ export const BOOKMARKS = 'bookmarks'
 export const LIKES = 'likes'
 export const READINGS = 'readings'
 export const COMMENTS = 'comments'
+export const NEWSLETTER_SUBSCRIBERS = 'newsletter_subscribers'
 export const SOCIAL_POSTS = 'social_posts'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'

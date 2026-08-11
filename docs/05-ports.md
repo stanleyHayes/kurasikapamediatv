@@ -26,7 +26,8 @@ export interface ArticleRepository {
 ```
 
 Same shape for `RevisionRepository`, `CategoryRepository`, `TagRepository`, `UserRepository`,
-`AssetRepository`, `SubscriptionRepository`, `AdCampaignRepository`, `CommentRepository`.
+`AssetRepository`, `SubscriptionRepository`, `AdCampaignRepository`, `CommentRepository`,
+`LikeRepository`, `ReadingRepository`, `NewsletterRepository`.
 
 `Page<T>` is cursor-based, never offset — offset pagination on a growing news archive degrades.
 
@@ -87,7 +88,7 @@ export interface StreamPort        { createLive(i: LiveInput): Promise<LiveStrea
                                      uploadVod(i: VodInput): Promise<Asset>; playbackUrl(id: AssetId): Promise<string> }
 export interface SocialPublishPort { publish(p: SocialPost): Promise<SocialResult>; schedule(p: SocialPost, at: Date): Promise<SocialResult> }
 export interface PaymentPort       { checkout(i: CheckoutIntent): Promise<CheckoutSession>; cancel(id: SubscriptionId): Promise<void> }
-export interface EmailPort         { send(m: EmailMessage): Promise<void>; sendBatch(m: EmailMessage[]): Promise<BatchResult> }
+export interface EmailPort         { send(m: EmailMessage): Promise<void>; sendBatch(m: EmailMessage[]): Promise<void> }
 export interface MediaJobPort      { enqueue(j: MediaJob): Promise<JobId>; status(id: JobId): Promise<JobStatus> }
 export interface AnalyticsPort     { record(e: AnalyticsEvent): Promise<void> }
 ```
@@ -113,7 +114,8 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 
-**audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment`
+**audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
+`SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
 
 **revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `ServePlacement`
 

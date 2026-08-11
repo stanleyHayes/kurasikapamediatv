@@ -52,10 +52,8 @@ export function Trending({ articles }: { articles: readonly ArticleView[] }): Re
 /**
  * The newsletter CTA from the design.
  *
- * Deliberately a link to the newsletter page rather than an inline form:
- * newsletter signup is R2 (double opt-in, digests), and a field that silently
- * does nothing is worse than an honest link. The panel's place in the layout
- * is held so the composition matches.
+ * A link to the double-opt-in page rather than an inline field on every rail:
+ * confirmation mail and rate limits live on one route, not three copies.
  */
 function NewsletterPanel(): React.ReactElement {
   return (
@@ -65,7 +63,7 @@ function NewsletterPanel(): React.ReactElement {
         Curated journalism delivered to your inbox.
       </p>
       <Link
-        href="/contact"
+        href="/newsletter"
         className="bg-secondary-container text-on-secondary-container text-label-bold inline-block rounded px-4 py-2 uppercase"
       >
         Subscribe

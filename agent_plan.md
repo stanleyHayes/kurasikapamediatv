@@ -233,8 +233,10 @@ the wiring is missing.
 
 Domain for saved articles, comments and social posts exists (§3). Comments are
 pre-moderated: a reader post stays pending until an editor with `comment:moderate`
-approves it. Likes and reading history are live. Remaining open:
-newsletter with double opt-in and digests, breaking-news alerts, push
+approves it. Likes and reading history are live. Newsletter **double opt-in is live
+and fail-closed** (KUR-50): subscribe at `/[locale]/newsletter`, confirm link,
+unsubscribe; Resend unset → `EmailDeliveryFailed`, nothing mailed. Digests still
+wait on a live `RESEND_API_KEY`. Remaining open: breaking-news alerts, push
 notifications, Facebook + Instagram publishing (adapter + cron wired; Meta app review
 and tokens still blocked), RSS ingest (out is live), trending / most-read / related /
 recommended (needs `EmbeddingPort` — **declared, no adapter**, and Atlas Vector

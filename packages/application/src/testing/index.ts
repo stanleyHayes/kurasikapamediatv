@@ -13,6 +13,8 @@ export { InMemoryBookmarkRepository } from './in-memory-bookmark-repository'
 export { InMemoryCommentRepository } from './in-memory-comment-repository'
 export { InMemoryLikeRepository } from './in-memory-like-repository'
 export { InMemoryReadingRepository } from './in-memory-reading-repository'
+export { InMemoryNewsletterRepository } from './in-memory-newsletter-repository'
+export { FailClosedEmail, RecordingEmail } from './fake-email'
 export { FakeSearch } from './fake-search'
 export { InMemoryCategoryRepository } from './in-memory-category-repository'
 export {

@@ -48,6 +48,9 @@ importers:
       '@kurasikapa/adapter-anthropic':
         specifier: workspace:*
         version: link:../../packages/adapter-anthropic
+      '@kurasikapa/adapter-email':
+        specifier: workspace:*
+        version: link:../../packages/adapter-email
       '@kurasikapa/adapter-mongo':
         specifier: workspace:*
         version: link:../../packages/adapter-mongo
@@ -136,6 +139,25 @@ importers:
       zod:
         specifier: 4.4.3
         version: 4.4.3
+    devDependencies:
+      '@kurasikapa/config':
+        specifier: workspace:*
+        version: link:../config
+      '@vitest/coverage-v8':
+        specifier: 4.1.10
+        version: 4.1.10(vitest@4.1.10)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.1.2)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@26.1.2)(jiti@2.7.0)(yaml@2.9.0))
+
+  packages/adapter-email:
+    dependencies:
+      '@kurasikapa/application':
+        specifier: workspace:*
+        version: link:../application
     devDependencies:
       '@kurasikapa/config':
         specifier: workspace:*

@@ -9,6 +9,7 @@ import {
   postCommentSchema,
   rejectSchema,
   scheduleSchema,
+  subscribeNewsletterSchema,
   toneSchema,
   unpublishSchema,
 } from './schemas'
@@ -197,6 +198,28 @@ describe('moderateCommentSchema', () => {
   it('rejects an invented decision', () => {
     expect(() =>
       parseInput(moderateCommentSchema, { commentId: 'cmt_1', decision: 'ignore' }),
+    ).toThrow(InvalidInput)
+  })
+})
+
+describe('subscribeNewsletterSchema', () => {
+  it('accepts a daily English signup', () => {
+    expect(
+      parseInput(subscribeNewsletterSchema, {
+        email: 'editor@kurasikapa.tv',
+        locales: ['en'],
+        cadence: 'daily',
+      }).cadence,
+    ).toBe('daily')
+  })
+
+  it('rejects an empty locale list', () => {
+    expect(() =>
+      parseInput(subscribeNewsletterSchema, {
+        email: 'editor@kurasikapa.tv',
+        locales: [],
+        cadence: 'daily',
+      }),
     ).toThrow(InvalidInput)
   })
 })

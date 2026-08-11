@@ -1,5 +1,4 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
-import { MetaSocialPublisher } from '@kurasikapa/adapter-social'
 import { MongoAuditLog, MongoRateLimiter } from '@kurasikapa/adapter-mongo'
 import {
   type AiPort,
@@ -16,8 +15,10 @@ import {
   ListAuthoredArticles,
   BrowseCategory,
   ListAwaitingReview,
+  type ConfirmNewsletter,
   type CountLikes,
   type CountReadings,
+  type EmailPort,
   type LikeArticle,
   type ListReadingHistory,
   type ListPendingComments,
@@ -36,7 +37,9 @@ import {
   ReadAuditLog,
   type SaveArticle,
   type RecordReading,
+  type SubscribeNewsletter,
   type UnlikeArticle,
+  type UnsubscribeNewsletter,
   SearchArticles,
   ListPublishedArticles,
   PublishArticle,
@@ -52,7 +55,8 @@ import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { env } from './env'
 import { mongoDb } from './mongo'
-import { audienceCommands, mongoGraph } from './mongo-graph'
+import { audienceCommands, mongoGraph, newsletterCommands } from './mongo-graph'
+import { failClosedEmail, failClosedSocial, metaSocial, resendMailer } from './outbound'
 import { registerSubscribers } from './subscribers'
 
 /**
@@ -95,6 +99,9 @@ export interface Container {
   readonly recordReading: RecordReading
   readonly listReadingHistory: ListReadingHistory
   readonly countReadings: CountReadings
+  readonly subscribeNewsletter: SubscribeNewsletter
+  readonly confirmNewsletter: ConfirmNewsletter
+  readonly unsubscribeNewsletter: UnsubscribeNewsletter
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -121,6 +128,7 @@ export interface Infrastructure {
   readonly events: EventBusPort & InProcessEventBus
   readonly ai: AiPort
   readonly social?: SocialPublishPort | undefined
+  readonly email?: EmailPort | undefined
   readonly siteUrl?: string | undefined
 }
 
@@ -153,6 +161,13 @@ export function buildContainer(infra: Infrastructure): Container {
     readAuditLog: new ReadAuditLog({ audit }),
     rateLimiter: new MongoRateLimiter(infra.db, clock),
     ...audienceCommands(graph, clock, ids),
+    ...newsletterCommands({
+      subscriptions: graph.subscriptions,
+      email: infra.email ?? failClosedEmail(),
+      ids,
+      clock,
+      siteUrl: infra.siteUrl ?? 'http://localhost:3000',
+    }),
 
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
@@ -192,6 +207,7 @@ export function container(): Container {
     events,
     ai: new AnthropicAiAdapter(anthropicModels()),
     social: metaSocial(),
+    email: resendMailer(),
     siteUrl: env().APP_URL,
   })
 
@@ -201,26 +217,4 @@ export function container(): Container {
 /** Test seam. */
 export function resetContainer(): void {
   instance = undefined
-}
-
-function metaSocial(): MetaSocialPublisher {
-  return new MetaSocialPublisher({
-    pageAccessToken: present(process.env['META_PAGE_ACCESS_TOKEN']),
-    pageId: present(process.env['META_PAGE_ID']),
-    igUserId: present(process.env['META_IG_USER_ID']),
-    post: globalThis.fetch.bind(globalThis),
-  })
-}
-
-function failClosedSocial(): MetaSocialPublisher {
-  return new MetaSocialPublisher({
-    pageAccessToken: undefined,
-    pageId: undefined,
-    igUserId: undefined,
-    post: globalThis.fetch.bind(globalThis),
-  })
-}
-
-function present(value: string | undefined): string | undefined {
-  return value !== undefined && value !== '' ? value : undefined
 }

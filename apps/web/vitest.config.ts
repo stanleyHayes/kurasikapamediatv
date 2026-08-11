@@ -19,6 +19,7 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   'src/actions/editorial.ts',
   'src/actions/ai.ts',
   'src/actions/side-actions.ts',
+  'src/actions/newsletter-actions.ts',
   'src/composition/subscribers.ts',
   'src/composition/announce-published.ts',
   'src/composition/announce-transition.ts',

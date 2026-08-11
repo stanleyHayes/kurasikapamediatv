@@ -5,7 +5,10 @@ import {
   CannotLikeUnpublished,
   CommentTooLong,
   EmptyComment,
+  EmptyLocales,
   IllegalTransition,
+  InvalidConfirmation,
+  InvalidEmail,
   InvalidSlug,
   MissingApprovedRevision,
   NotOwnArticle,
@@ -17,6 +20,7 @@ import { RateLimited } from '../security/rate-limit'
 import {
   ArticleNotFound,
   CommentNotFound,
+  EmailDeliveryFailed,
   RevisionNotFound,
   RevisionNotOfArticle,
   SlugTaken,
@@ -63,6 +67,10 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [CommentTooLong, 'comment_too_long'],
   [AlreadyDecided, 'already_decided'],
   [CommentNotFound, 'comment_not_found'],
+  [InvalidEmail, 'invalid_email'],
+  [EmptyLocales, 'empty_locales'],
+  [InvalidConfirmation, 'invalid_confirmation'],
+  [EmailDeliveryFailed, 'email_delivery_failed'],
 ]
 
 export function toActionError(error: unknown): ActionError {

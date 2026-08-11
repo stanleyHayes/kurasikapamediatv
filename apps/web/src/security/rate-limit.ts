@@ -33,6 +33,12 @@ export const RULES = {
 
   /** Likes. Fail-closed so an outage cannot inflate a public count. */
   likes: { limit: 30, windowSeconds: 60 },
+
+  /**
+   * Newsletter subscribe/confirm/unsubscribe. Fail-closed: an uncounted
+   * signup endpoint is a spam cannon against the mailer.
+   */
+  newsletter: { limit: 8, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**

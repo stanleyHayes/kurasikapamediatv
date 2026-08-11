@@ -248,3 +248,13 @@ export type { AuditLog } from './ports/audit'
 export { auditEntryFor } from './insight/audit-events'
 export { ReadAuditLog, type ReadAuditLogInput, type ReadAuditLogDeps } from './insight/read-audit-log'
 export type { RateLimiter, RateLimitRule, RateLimitVerdict } from './ports/rate-limit'
+export type { EmailMessage, EmailPort } from './ports/email'
+export type { NewsletterRepository } from './ports/newsletter-repository'
+export {
+  EmailDeliveryFailed,
+  SubscribeNewsletter,
+  type SubscribeNewsletterDeps,
+  type SubscribeNewsletterInput,
+} from './audience/subscribe-newsletter'
+export { ConfirmNewsletter } from './audience/confirm-newsletter'
+export { UnsubscribeNewsletter } from './audience/unsubscribe-newsletter'

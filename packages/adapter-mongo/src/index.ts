@@ -5,6 +5,7 @@ export {
   LIKES,
   READINGS,
   COMMENTS,
+  NEWSLETTER_SUBSCRIBERS,
   SOCIAL_POSTS,
   CATEGORIES,
   ROLE_ASSIGNMENTS,
@@ -14,6 +15,7 @@ export {
   type LikeDocument,
   type ReadingDocument,
   type CommentDocument,
+  type NewsletterDocument,
   type SocialPostDocument,
   type CategoryDocument,
   type RoleAssignmentDocument,
@@ -38,6 +40,7 @@ export { MongoBookmarkRepository } from './mongo-bookmark-repository'
 export { MongoLikeRepository } from './mongo-like-repository'
 export { MongoReadingRepository } from './mongo-reading-repository'
 export { MongoCommentRepository } from './mongo-comment-repository'
+export { MongoNewsletterRepository } from './mongo-newsletter-repository'
 export { MongoSocialPostRepository } from './mongo-social-post-repository'
 export { MongoAuditLog } from './mongo-audit-log'
 export { MongoRateLimiter } from './mongo-rate-limiter'

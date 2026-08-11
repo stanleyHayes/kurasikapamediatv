@@ -1,4 +1,4 @@
-import { MAX_COMMENT_BODY } from '@kurasikapa/domain'
+import { CADENCES, MAX_COMMENT_BODY } from '@kurasikapa/domain'
 import { z } from 'zod'
 
 /**
@@ -143,4 +143,14 @@ export const postCommentSchema = z.object({
 export const moderateCommentSchema = z.object({
   commentId: id,
   decision: z.enum(['approve', 'reject']),
+})
+
+export const subscribeNewsletterSchema = z.object({
+  email: z.string().trim().min(3).max(254),
+  locales: z.array(z.enum(['en', 'fr'])).min(1).max(2),
+  cadence: z.enum(CADENCES),
+})
+
+export const unsubscribeNewsletterSchema = z.object({
+  email: z.string().trim().min(3).max(254),
 })

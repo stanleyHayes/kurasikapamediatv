@@ -56,6 +56,18 @@ export {
   type ReadingProps,
 } from './audience/reading'
 export {
+  CADENCES,
+  EmptyLocales,
+  InvalidConfirmation,
+  InvalidEmail,
+  NewsletterSubscription,
+  NEWSLETTER_STATES,
+  normaliseEmail,
+  type Cadence,
+  type NewsletterProps,
+  type NewsletterState,
+} from './audience/newsletter'
+export {
   AlreadyDecided,
   CannotCommentUnpublished,
   Comment,

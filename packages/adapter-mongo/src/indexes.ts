@@ -6,6 +6,7 @@ import {
   LIKES,
   READINGS,
   COMMENTS,
+  NEWSLETTER_SUBSCRIBERS,
   SOCIAL_POSTS,
   CATEGORIES,
   REVISIONS,
@@ -14,6 +15,7 @@ import {
   type LikeDocument,
   type ReadingDocument,
   type CommentDocument,
+  type NewsletterDocument,
   type SocialPostDocument,
   type CategoryDocument,
   type RevisionDocument,
@@ -110,5 +112,9 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   await db.collection<CommentDocument>(COMMENTS).createIndexes([
     { key: { articleId: 1, state: 1, createdAt: -1, _id: -1 }, name: 'article_visible_recent' },
     { key: { state: 1, createdAt: 1, _id: 1 }, name: 'pending_oldest' },
+  ])
+  await db.collection<NewsletterDocument>(NEWSLETTER_SUBSCRIBERS).createIndexes([
+    { key: { email: 1 }, unique: true, name: 'subscriber_email_unique' },
+    { key: { token: 1 }, unique: true, sparse: true, name: 'subscriber_token_unique' },
   ])
 }

@@ -72,10 +72,8 @@ function TrendingWidget({
 /**
  * The subscription CTA.
  *
- * The design draws an email field and a Subscribe button. Newsletter signup is
- * R2 — double opt-in, digests, delivery — and a field that silently discards
- * an address is worse than one that isn't there, so the panel links to contact
- * instead. The composition and its place in the rail are held.
+ * The design draws an email field here. Signup still goes through
+ * `/newsletter` so confirmation mail and rate limits have one door.
  */
 function SubscribePanel(): React.ReactElement {
   return (
@@ -94,7 +92,7 @@ function SubscribePanel(): React.ReactElement {
         </p>
 
         <Link
-          href="/contact"
+          href="/newsletter"
           className="text-label-bold bg-secondary-container text-on-secondary-container w-full rounded-md py-3 font-bold tracking-wider uppercase transition-transform hover:scale-[1.02]"
         >
           Subscribe

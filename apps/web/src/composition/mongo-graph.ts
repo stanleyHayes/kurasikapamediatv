@@ -5,6 +5,7 @@ import {
   MongoCategoryRepository,
   MongoCommentRepository,
   MongoLikeRepository,
+  MongoNewsletterRepository,
   MongoReadingRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
@@ -13,11 +14,14 @@ import {
   MongoUserDirectory,
 } from '@kurasikapa/adapter-mongo'
 import {
+  ConfirmNewsletter,
   CountLikes,
   CountReadings,
   LikeArticle,
   ListReadingHistory,
   RecordReading,
+  SubscribeNewsletter,
+  UnsubscribeNewsletter,
   ListPendingComments,
   ListSavedArticles,
   ListVisibleComments,
@@ -32,7 +36,9 @@ import {
   type CategoryRepository,
   type ClockPort,
   type CommentRepository,
+  type EmailPort,
   type LikeRepository,
+  type NewsletterRepository,
   type ReadingRepository,
   type IdPort,
   type RevisionRepository,
@@ -53,7 +59,8 @@ export interface MongoGraph {
   readonly comments: CommentRepository
   readonly likes: LikeRepository
   readonly readings: ReadingRepository
-  readonly socialPosts: SocialPostRepository
+  readonly subscriptions: NewsletterRepository
+  readonly socialPosts: SocialPostRepository,
   readonly audit: AuditLog
   readonly categories: CategoryRepository
 }
@@ -73,6 +80,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     comments: new MongoCommentRepository(db),
     likes: new MongoLikeRepository(db),
     readings: new MongoReadingRepository(db),
+    subscriptions: new MongoNewsletterRepository(db),
     socialPosts: new MongoSocialPostRepository(db),
     audit: new MongoAuditLog(db),
     categories: new MongoCategoryRepository(db),
@@ -138,5 +146,28 @@ export function audienceCommands(
     }),
     listReadingHistory: new ListReadingHistory(graph.readings, graph.articles),
     countReadings: new CountReadings(graph.readings),
+  }
+}
+
+export function newsletterCommands(input: {
+  readonly subscriptions: NewsletterRepository
+  readonly email: EmailPort
+  readonly ids: IdPort
+  readonly clock: ClockPort
+  readonly siteUrl: string
+}): {
+  readonly subscribeNewsletter: SubscribeNewsletter
+  readonly confirmNewsletter: ConfirmNewsletter
+  readonly unsubscribeNewsletter: UnsubscribeNewsletter
+} {
+  return {
+    subscribeNewsletter: new SubscribeNewsletter({
+      subscriptions: input.subscriptions,
+      email: input.email,
+      ids: input.ids,
+      siteUrl: input.siteUrl,
+    }),
+    confirmNewsletter: new ConfirmNewsletter(input.subscriptions, input.clock),
+    unsubscribeNewsletter: new UnsubscribeNewsletter(input.subscriptions),
   }
 }
