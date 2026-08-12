@@ -41,6 +41,12 @@ export const RULES = {
   newsletter: { limit: 8, windowSeconds: 60 },
 
   /**
+   * Contact form. Fail-closed: an uncounted inbox endpoint is a spam cannon
+   * against the newsroom address.
+   */
+  contact: { limit: 5, windowSeconds: 60 },
+
+  /**
    * Breaking-news blasts. Fail-closed and tight: one click mails the list.
    */
   breaking: { limit: 5, windowSeconds: 60 },

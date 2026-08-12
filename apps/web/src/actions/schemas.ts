@@ -176,3 +176,9 @@ export const subscribeNewsletterSchema = z.object({
 export const unsubscribeNewsletterSchema = z.object({
   email: z.string().trim().min(3).max(254),
 })
+
+export const contactMessageSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().min(3).max(254),
+  message: z.string().trim().min(1).max(4000),
+})

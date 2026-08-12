@@ -230,6 +230,13 @@ export type { RateLimiter, RateLimitRule, RateLimitVerdict } from './ports/rate-
 export type { EmailMessage, EmailPort } from './ports/email'
 export type { NewsletterRepository } from './ports/newsletter-repository'
 export { EmailDeliveryFailed, SubscribeNewsletter, type SubscribeNewsletterDeps, type SubscribeNewsletterInput } from './audience/subscribe-newsletter'
+export {
+  ContactMessageTooLong,
+  EmptyContactMessage,
+  SubmitContactMessage,
+  type SubmitContactMessageDeps,
+  type SubmitContactMessageInput,
+} from './audience/submit-contact-message'
 export { ConfirmNewsletter } from './audience/confirm-newsletter'
 export { UnsubscribeNewsletter } from './audience/unsubscribe-newsletter'
 export type { BreakingAlertRepository } from './ports/breaking-alert-repository'

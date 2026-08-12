@@ -65,6 +65,11 @@ export function vapidPublicKey(): string | undefined {
   return present(process.env['VAPID_PUBLIC_KEY'])
 }
 
+/** Newsroom inbox for the contact form. Override via CONTACT_TO_EMAIL. */
+export function newsroomAddress(): string {
+  return present(process.env['CONTACT_TO_EMAIL']) ?? 'kurasikapamediatv@yahoo.com'
+}
+
 export function rssFetcher(): RssFetcher {
   return new RssFetcher({ get: globalThis.fetch.bind(globalThis) })
 }

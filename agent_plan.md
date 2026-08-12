@@ -17,8 +17,8 @@
 |---|---|
 | Release in progress | **R1 — Foundation & Publishing** (near complete), first R2 slices landed |
 | Backend language | **Go** — see [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md). Migration just started. |
-| HEAD | `f122bcf` — KUR-60 |
-| Commits | 60 (`KUR-1` … `KUR-60`) |
+| HEAD | `3bfc065` — KUR-61 (local; push KUR-60…62) |
+| Commits | 62 (`KUR-1` … `KUR-62`) |
 | Unit tests (TS) | 912 passing — domain 233 · application 271 · adapter-mongo 115 · adapter-anthropic 28 · web 265 |
 | Unit tests (Go) | `services/api` — editorial domain + app + HTTP, 97.3% domain / 90.2% app |
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
@@ -261,6 +261,9 @@ the opt-in; a production service worker shows breaking notices; devices are
 stored per locale and woken from the same editor click. **RSS ingest is live
 (KUR-55):** editors register HTTPS feeds at `/studio/rss`; hourly cron opens
 drafts from new items; fetch failures skip the source; nothing auto-publishes.
+**Contact form is live and fail-closed (KUR-62):** `/[locale]/contact` mails
+the newsroom via `SubmitContactMessage`; unset Resend → honest delivery
+failure; rate-limited; nothing is persisted.
 
 ### 5.3 R3 — Multimedia
 
@@ -385,7 +388,7 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
 
 ---
 
-## 10. Sweep on 2026-08-12 (HEAD `f122bcf`)
+## 10. Sweep on 2026-08-12 (through KUR-62)
 
 ### Fixed
 - `packages/adapter-mongo/src/mongo-comment-repository.test.ts` — typed the
@@ -395,11 +398,13 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
 - `services/api/Dockerfile` — multi-stage distroless build added so the API can
   deploy.
 - `.env.example` — removed superseded Mux keys; added ADR-0010 placeholders for
-  Amazon IVS + Cloudinary.
+  Amazon IVS + Cloudinary; `CONTACT_TO_EMAIL` for the newsroom inbox.
 - `.raven/manifest.json`, `CLAUDE.md`, `docs/03-architecture.md`,
   `docs/04-data-model.md`, `docs/01-brd.md`, `docs/06-roadmap.md`,
   `docs/07-quality-gates.md` — updated stale `services/media-svc` / Mux
   references to `services/api` + Amazon IVS + Cloudinary.
+- **KUR-62** — public contact form: `SubmitContactMessage` + fail-closed Resend
+  path, rate limit, standing page + form on `/contact`.
 
 ### Green locally
 - `pnpm lint` ✅

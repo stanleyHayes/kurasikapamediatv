@@ -28,6 +28,7 @@ import {
   RecordReading,
   SendBreakingAlert,
   SendNewsletterDigest,
+  SubmitContactMessage,
   SubscribeNewsletter,
   SubscribePush,
   UnsubscribeNewsletter,
@@ -176,14 +177,7 @@ export function audienceCommands(
   }
 }
 
-export function newsletterCommands(input: {
-  readonly graph: MongoGraph
-  readonly email: EmailPort
-  readonly push: PushPort
-  readonly ids: IdPort
-  readonly clock: ClockPort
-  readonly siteUrl: string
-}): {
+interface NewsletterCommands {
   readonly subscribeNewsletter: SubscribeNewsletter
   readonly confirmNewsletter: ConfirmNewsletter
   readonly unsubscribeNewsletter: UnsubscribeNewsletter
@@ -191,7 +185,18 @@ export function newsletterCommands(input: {
   readonly sendNewsletterDigest: SendNewsletterDigest
   readonly subscribePush: SubscribePush
   readonly unsubscribePush: UnsubscribePush
-} {
+  readonly submitContactMessage: SubmitContactMessage
+}
+
+export function newsletterCommands(input: {
+  readonly graph: MongoGraph
+  readonly email: EmailPort
+  readonly push: PushPort
+  readonly ids: IdPort
+  readonly clock: ClockPort
+  readonly siteUrl: string
+  readonly newsroomTo: string
+}): NewsletterCommands {
   const { subscriptions, articles, alerts, devices, digests } = input.graph
   return {
     subscribeNewsletter: new SubscribeNewsletter({
@@ -222,5 +227,9 @@ export function newsletterCommands(input: {
     }),
     subscribePush: new SubscribePush(devices, input.clock),
     unsubscribePush: new UnsubscribePush(devices),
+    submitContactMessage: new SubmitContactMessage({
+      email: input.email,
+      newsroomTo: input.newsroomTo,
+    }),
   }
 }

@@ -20,6 +20,7 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   'src/actions/ai.ts',
   'src/actions/side-actions.ts',
   'src/actions/newsletter-actions.ts',
+  'src/actions/contact-actions.ts',
   'src/actions/push.ts',
   'src/actions/rss.ts',
   // Cron routes only call use cases; cadence parsing is tiny.

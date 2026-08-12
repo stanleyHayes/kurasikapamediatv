@@ -9,6 +9,7 @@ import {
   postCommentSchema,
   rejectSchema,
   scheduleSchema,
+  contactMessageSchema,
   subscribeNewsletterSchema,
   toneSchema,
   unpublishSchema,
@@ -219,6 +220,28 @@ describe('subscribeNewsletterSchema', () => {
         email: 'editor@kurasikapa.tv',
         locales: [],
         cadence: 'daily',
+      }),
+    ).toThrow(InvalidInput)
+  })
+})
+
+describe('contactMessageSchema', () => {
+  it('accepts a complete note', () => {
+    expect(
+      parseInput(contactMessageSchema, {
+        name: 'Ama Mensah',
+        email: 'ama@example.com',
+        message: 'Please correct the figure.',
+      }).name,
+    ).toBe('Ama Mensah')
+  })
+
+  it('rejects an empty message', () => {
+    expect(() =>
+      parseInput(contactMessageSchema, {
+        name: 'Ama',
+        email: 'ama@example.com',
+        message: '',
       }),
     ).toThrow(InvalidInput)
   })

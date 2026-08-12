@@ -45,6 +45,7 @@ describe('buildContainer', () => {
     expect(c.likeArticle).toBeDefined()
     expect(c.recordReading).toBeDefined()
     expect(c.subscribeNewsletter).toBeDefined()
+    expect(c.submitContactMessage).toBeDefined()
     expect(c.sendBreakingAlert).toBeDefined()
     expect(c.subscribePush).toBeDefined()
     expect(c.sendNewsletterDigest).toBeDefined()
