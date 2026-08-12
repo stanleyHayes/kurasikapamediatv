@@ -1,3 +1,4 @@
+import { publicBylineName } from '@kurasikapa/application'
 import type { ArticleView, ListedArticleView, ReadableArticle } from '../read-model/article-view'
 import { ApiProblem } from './problem'
 import {
@@ -52,6 +53,7 @@ export async function loadPublishedArticle(
     return {
       ...toArticleViewFromDto(publicArticleFrom(raw.article)),
       body: typeof raw.body === 'string' ? raw.body : null,
+      authorName: publicBylineName(typeof raw.article.authorName === 'string' ? raw.article.authorName : ''),
     }
   })
 }

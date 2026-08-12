@@ -39,7 +39,10 @@ export async function cachedArticle(
   const found = await loadPublishedArticle(slug, locale, env().API_URL, async () => {
     const loaded = await container().getPublishedArticle.execute({ slug, locale })
     if (loaded === null) return null
-    return { ...toArticleView(loaded.article), body: loaded.body }
+    const authorName = await container().resolvePublicByline.execute({
+      userId: loaded.article.authorId,
+    })
+    return { ...toArticleView(loaded.article), body: loaded.body, authorName }
   })
   if (found === null) return null
 

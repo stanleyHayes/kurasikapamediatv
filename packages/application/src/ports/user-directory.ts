@@ -19,4 +19,9 @@ export interface DirectoryUser {
  */
 export interface UserDirectory {
   list(cursor: Cursor): Promise<Page<DirectoryUser>>
+  /**
+   * One user, or null. Invalid ids (fixture strings that are not ObjectIds)
+   * are not found — never a driver error on the public article path.
+   */
+  findById(id: UserId): Promise<DirectoryUser | null>
 }

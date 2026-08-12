@@ -38,6 +38,11 @@ plus Atlas Vector Search.
 
 `Page<T>` is cursor-based, never offset — offset pagination on a growing news archive degrades.
 
+`UserDirectory.findById` returns the auth-library account or null. Invalid ids
+(fixture strings that are not ObjectIds) miss rather than throw — the public
+article path cannot 500 because a seed used `usr_author`. The byline use case
+returns a display name only; emails never appear on the article page.
+
 ### Ambient ports
 
 These exist so the domain stays pure and every test is deterministic.

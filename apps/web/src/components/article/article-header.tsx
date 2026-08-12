@@ -1,4 +1,4 @@
-import type { ArticleView } from '../../read-model/article-view'
+import type { ReadableArticle } from '../../read-model/article-view'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 
@@ -9,14 +9,11 @@ const readingMinutes = (body: string | null): number =>
 /**
  * The centred article header from the Stitch design: chip row, display-lg
  * headline, then a byline row separated by vertical rules.
+ *
+ * The byline is the directory display name when we have one. Missing names
+ * keep the house line rather than inventing a journalist.
  */
-export function ArticleHeader({
-  article,
-  body,
-}: {
-  article: ArticleView
-  body: string | null
-}): React.ReactElement {
+export function ArticleHeader({ article }: { article: ReadableArticle }): React.ReactElement {
   return (
     <header className="mx-auto mb-8 max-w-4xl text-center">
       <div className="mb-6 flex justify-center gap-2">
@@ -30,11 +27,13 @@ export function ArticleHeader({
       </h1>
 
       <div className="text-on-surface-variant mt-8 flex items-center justify-center gap-6">
-        <span className="text-label-bold uppercase">Kurasikapa Newsroom</span>
+        <span className="text-label-bold uppercase">
+          {article.authorName ?? 'Kurasikapa Newsroom'}
+        </span>
 
         <span aria-hidden className="bg-outline-variant h-8 w-px" />
 
-        <span className="text-label-bold uppercase">{readingMinutes(body)} min read</span>
+        <span className="text-label-bold uppercase">{readingMinutes(article.body)} min read</span>
 
         {article.publishedAt !== null && (
           <>

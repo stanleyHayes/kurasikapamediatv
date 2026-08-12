@@ -18,6 +18,8 @@ export interface ArticleView {
 
 export interface ReadableArticle extends ArticleView {
   readonly body: string | null
+  /** Directory display name, or null when we cannot source one honestly. */
+  readonly authorName: string | null
 }
 
 export interface ListedArticleView extends ArticleView {

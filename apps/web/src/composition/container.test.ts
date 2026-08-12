@@ -58,6 +58,7 @@ describe('buildContainer', () => {
     expect(c.listPublishedArticles).toBeDefined()
     expect(c.listMostRead).toBeDefined()
     expect(c.listRelatedArticles).toBeDefined()
+    expect(c.resolvePublicByline).toBeDefined()
   })
 
   it('exposes the AI port for interactive editor streaming', () => {

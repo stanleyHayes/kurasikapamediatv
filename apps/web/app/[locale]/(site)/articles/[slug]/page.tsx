@@ -111,7 +111,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
         dangerouslySetInnerHTML={{ __html: asScriptContent(jsonLd) }}
       />
 
-      <ArticleHeader article={article} body={article.body} />
+      <ArticleHeader article={article} />
 
       {/*
         The design puts a full-bleed hero image here. Articles carry no image

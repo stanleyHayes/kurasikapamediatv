@@ -45,7 +45,7 @@ describe('load public path', () => {
     )
 
     expect(viaTypeScript).not.toHaveBeenCalled()
-    expect(found).toMatchObject({ id: 'art_1', body: 'Approved text.' })
+    expect(found).toMatchObject({ id: 'art_1', body: 'Approved text.', authorName: null })
   })
 
   it('rethrows a non-404 API problem', async () => {

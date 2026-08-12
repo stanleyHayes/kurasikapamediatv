@@ -9,6 +9,7 @@ export interface PublicArticleDto {
   readonly title: string
   readonly categoryId: string
   readonly publishedAt: string | null
+  readonly authorName?: string | null | undefined
 }
 
 export interface PublishedDto {

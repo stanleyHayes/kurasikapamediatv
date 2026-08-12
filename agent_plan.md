@@ -98,13 +98,13 @@ packages.
 | `distribution` | `social-post.ts` | Refuses unpublished articles; 5-attempt retry budget |
 | `shared` | `ids.ts`, `slug.ts` | Branded ids; Unicode-aware slugs (handles Twi ɛ/ɔ) |
 
-### 3.2 Application (`packages/application`) — 33 use cases
+### 3.2 Application (`packages/application`) — 34 use cases
 
 - **editorial (16)** — CreateDraft, UpdateDraft, GetDraft, GetPublishedArticle,
   SubmitForReview, ApproveArticle, RejectArticle, SchedulePublication,
   PublishArticle, PublishDueArticles, UnpublishArticle, ListAuthoredArticles,
   ListAwaitingReview, ListPublishedArticles, BrowseCategory, ListSections
-- **identity (3)** — ResolveActor, AssignRoles, ListUsers
+- **identity (4)** — ResolveActor, AssignRoles, ListUsers, ResolvePublicByline
 - **audience (14)** — SaveArticle, RemoveSavedArticle, ListSavedArticles, SearchArticles,
   PostComment, ModerateComment, ListVisibleComments, ListPendingComments,
   LikeArticle, UnlikeArticle, CountLikes, RecordReading, ListReadingHistory, CountReadings
@@ -125,7 +125,7 @@ them are in `packages/application/src/testing/` — **never `vi.mock`**.
 | LikeRepository | `MongoLikeRepository` | wired — count + toggle on the article page |
 | ReadingRepository | `MongoReadingRepository` | wired — recorded after the article response; count on profile |
 | RoleRepository | `MongoRoleRepository` | wired |
-| UserDirectory | `MongoUserDirectory` | wired — **the only file that reads Better Auth's `user` collection** |
+| UserDirectory | `MongoUserDirectory` | wired — **the only file that reads Better Auth's `user` collection**; `findById` feeds public bylines |
 | SearchPort | `MongoTextSearch` | wired — `$text`, *not* Atlas Search (can't run in a Testcontainer) |
 | AiPort | `AnthropicAiAdapter` | wired — 12 methods, cost-routed opus/sonnet/haiku |
 | SocialPostRepository | `MongoSocialPostRepository` | wired — queue UI at `/studio/social` |
@@ -205,7 +205,7 @@ the wiring is missing.
 | ~~`PublishDueArticles`~~ | **DONE — KUR-34.** `/api/cron/publish-due`, triggered by Vercel Cron. | — |
 | ~~**`PublishDuePosts` (social send)**~~ | **DONE.** `MetaSocialPublisher` fail-closed; cron `/api/cron/publish-due-posts`. | Live Graph still needs Meta app review + `META_PAGE_ACCESS_TOKEN` / `META_PAGE_ID`. Unset credentials fail visibly and retry. |
 | ~~Revision history~~ | **DONE — KUR-36.** History panel in the studio editor, with restore. | — |
-| **`ListUsers` beyond roles** | works | Only used by the roles screen. |
+| ~~**`ListUsers` beyond roles**~~ | **DONE — KUR-59.** `findById` feeds named bylines on the article page. The people screen remains the roles directory. | — |
 
 ---
 
@@ -246,7 +246,10 @@ Remaining open: Facebook + Instagram publishing (adapter + cron wired; Meta app 
 and tokens still blocked), semantic related / recommended (needs
 `EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search).
 **Category-based related is live (KUR-57):** same-section siblings on the
-article page; empty when the section has no other published stories. **Most-read
+article page; empty when the section has no other published stories.
+**Named bylines are live (KUR-59):** the article page uses the directory
+display name; missing or email-like names keep the house line, and JSON-LD
+omits `author` rather than inventing a journalist. **Most-read
 is live (KUR-52):** unique-reader ranking from existing reading rows; homepage
 Trending Now prefers that rail and falls back to leftover recency. No embeddings.
 **Breaking-news alerts are live (KUR-53):** editor click on a published article

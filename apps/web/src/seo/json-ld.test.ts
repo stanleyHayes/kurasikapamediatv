@@ -50,6 +50,20 @@ describe('newsArticleJsonLd', () => {
     expect(json).not.toHaveProperty('dateModified')
   })
 
+  it('omits the author rather than inventing a journalist', () => {
+    expect(newsArticleJsonLd(article, publisher, canonical)).not.toHaveProperty('author')
+  })
+
+  it('names the author only when the directory supplied a display name', () => {
+    const json = newsArticleJsonLd(
+      { ...article, authorName: 'Ama Mensah' },
+      publisher,
+      canonical,
+    )
+
+    expect(json['author']).toEqual({ '@type': 'Person', name: 'Ama Mensah' })
+  })
+
   it('reflects the French locale on a translation', () => {
     const fr = newsArticleJsonLd({ ...article, locale: 'fr' }, publisher, canonical)
 

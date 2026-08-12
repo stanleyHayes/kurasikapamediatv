@@ -35,6 +35,7 @@ import {
   ListSections,
   type ListSavedArticles,
   ListUsers,
+  ResolvePublicByline,
   type ModerateComment,
   type RemoveSavedArticle,
   QueueSocialPost,
@@ -99,6 +100,7 @@ export interface Container {
   readonly publishDueArticles: PublishDueArticles
   readonly assignRoles: AssignRoles
   readonly listUsers: ListUsers
+  readonly resolvePublicByline: ResolvePublicByline
   readonly saveArticle: SaveArticle
   readonly queueSocialPost: QueueSocialPost
   readonly publishDuePosts: PublishDuePosts
@@ -183,6 +185,7 @@ export function buildContainer(infra: Infrastructure): Container {
     publishDueArticles: new PublishDueArticles(write),
     assignRoles: new AssignRoles({ roles, clock, events }),
     listUsers: new ListUsers({ users }),
+    resolvePublicByline: new ResolvePublicByline(users),
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
     publishDuePosts: new PublishDuePosts({
       posts: socialPosts, social: infra.social ?? failClosedSocial(), clock, siteUrl,

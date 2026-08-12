@@ -1,5 +1,5 @@
 import type { Cursor, DirectoryUser, Page, UserDirectory } from '@kurasikapa/application'
-import { ROLES, type Role, userId } from '@kurasikapa/domain'
+import { ROLES, type Role, type UserId, userId } from '@kurasikapa/domain'
 import { ObjectId, type Collection, type Db } from 'mongodb'
 import { ROLE_ASSIGNMENTS, type RoleAssignmentDocument } from './documents'
 
@@ -75,6 +75,22 @@ export class MongoUserDirectory implements UserDirectory {
     }
   }
 
+  async findById(id: UserId): Promise<DirectoryUser | null> {
+    const oid = objectIdOf(id)
+    if (oid === null) return null
+
+    const doc = await this.users.findOne({ _id: oid })
+    if (doc === null) return null
+
+    const roles = await this.rolesFor([hex(doc._id)])
+    return {
+      id: userId(hex(doc._id)),
+      email: doc.email,
+      name: doc.name,
+      roles: roles.get(hex(doc._id)) ?? [],
+    }
+  }
+
   private async rolesFor(ids: readonly string[]): Promise<Map<string, Role[]>> {
     if (ids.length === 0) return new Map()
 
@@ -85,5 +101,14 @@ export class MongoUserDirectory implements UserDirectory {
       // not resurface here as a live grant.
       docs.map((doc) => [doc._id, doc.roles.filter((r): r is Role => KNOWN.has(r))]),
     )
+  }
+}
+
+/** Fixture ids like `usr_author` must miss, not throw, on the public path. */
+function objectIdOf(id: UserId): ObjectId | null {
+  try {
+    return ObjectId.createFromHexString(id)
+  } catch {
+    return null
   }
 }

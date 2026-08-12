@@ -88,6 +88,7 @@ export {
   type ListUsersDeps,
   type ListUsersInput,
 } from './identity/list-users'
+export { ResolvePublicByline, publicBylineName, type ResolvePublicBylineInput } from './identity/resolve-public-byline'
 export {
   ListSections,
   type ListSectionsDeps,

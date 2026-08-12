@@ -94,3 +94,23 @@ describe('list', () => {
     expect(page).toEqual({ items: [], nextCursor: null })
   })
 })
+
+describe('findById', () => {
+  it('returns the named account', async () => {
+    await addUser(oid(1), 'editor@kurasikapa.tv')
+    await roles.replace(userId(oid(1)), ['editor'])
+
+    const found = await directory.findById(userId(oid(1)))
+
+    expect(found?.name).toBe('editor@kurasikapa.tv')
+    expect(found?.roles).toEqual(['editor'])
+  })
+
+  it('returns null for a missing account', async () => {
+    expect(await directory.findById(userId(oid(9)))).toBeNull()
+  })
+
+  it('returns null for a fixture id that is not an ObjectId', async () => {
+    expect(await directory.findById(userId('usr_author'))).toBeNull()
+  })
+})

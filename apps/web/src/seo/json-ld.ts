@@ -18,7 +18,7 @@ export interface Publisher {
  * engines act on it.
  */
 export function newsArticleJsonLd(
-  article: ArticleView,
+  article: ArticleView & { readonly authorName?: string | null },
   publisher: Publisher,
   canonical: string,
 ): Record<string, unknown> {
@@ -42,6 +42,10 @@ export function newsArticleJsonLd(
   if (article.publishedAt !== null) {
     json['datePublished'] = article.publishedAt
     json['dateModified'] = article.publishedAt
+  }
+
+  if (typeof article.authorName === 'string' && article.authorName !== '') {
+    json['author'] = { '@type': 'Person', name: article.authorName }
   }
 
   return json
