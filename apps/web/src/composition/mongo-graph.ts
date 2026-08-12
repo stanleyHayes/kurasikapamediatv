@@ -24,6 +24,7 @@ import {
   LikeArticle,
   ListMostRead,
   ListReadingHistory,
+  ListRelatedArticles,
   RecordReading,
   SendBreakingAlert,
   SendNewsletterDigest,
@@ -147,6 +148,7 @@ export function audienceCommands(
   readonly listReadingHistory: ListReadingHistory
   readonly countReadings: CountReadings
   readonly listMostRead: ListMostRead
+  readonly listRelatedArticles: ListRelatedArticles
 } {
   return {
     saveArticle: new SaveArticle({ bookmarks: graph.bookmarks, articles: graph.articles, clock }),
@@ -170,6 +172,7 @@ export function audienceCommands(
     listReadingHistory: new ListReadingHistory(graph.readings, graph.articles),
     countReadings: new CountReadings(graph.readings),
     listMostRead: new ListMostRead(graph.readings, graph.articles),
+    listRelatedArticles: new ListRelatedArticles(graph.articles),
   }
 }
 

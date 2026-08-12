@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache'
+import { articleId } from '@kurasikapa/domain'
 import { loadPublishedArticle, loadPublishedList, loadSectionPage } from '../bff/load-public'
 import { container } from '../composition/container'
 import { env } from '../composition/env'
@@ -78,6 +79,25 @@ export async function cachedMostRead(locale: string, limit: number): Promise<rea
   cacheTag(listTag(locale))
 
   return (await container().listMostRead.execute({ locale, limit })).map(toArticleView)
+}
+
+/**
+ * Same-section siblings for the article page. Category co-occurrence only —
+ * EmbeddingPort has no adapter yet, so this is not semantic relatedness.
+ */
+export async function cachedRelated(
+  id: string,
+  locale: string,
+  limit: number,
+): Promise<readonly ArticleView[]> {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(listTag(locale))
+  cacheTag(articleTag(id))
+
+  return (
+    await container().listRelatedArticles.execute({ articleId: articleId(id), limit })
+  ).map(toArticleView)
 }
 
 export interface SectionView {

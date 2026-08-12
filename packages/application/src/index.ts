@@ -36,6 +36,7 @@ export {
 } from './audience/count-likes'
 export type { ArticleReadRank, ReadingRepository } from './ports/reading-repository'
 export { ListMostRead, type ListMostReadInput } from './audience/list-most-read'
+export { ListRelatedArticles, type ListRelatedArticlesInput } from './audience/list-related-articles'
 export { RecordReading, type RecordReadingDeps, type RecordReadingInput } from './audience/record-reading'
 export { ListReadingHistory, type ListReadingHistoryInput, type ReadArticle } from './audience/list-reading-history'
 export { CountReadings } from './audience/count-readings'

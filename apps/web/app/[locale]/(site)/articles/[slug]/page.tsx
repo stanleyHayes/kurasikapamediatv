@@ -6,6 +6,7 @@ import { ArticleBody } from '@/components/article/article-body'
 import { CommentThread } from '@/components/article/comment-thread'
 import { ArticleHeader } from '@/components/article/article-header'
 import { ReadingPanel } from '@/components/article/reading-panel'
+import { RelatedArticles } from '@/components/article/related-articles'
 import { ShareButton } from '@/components/article/share-button'
 import { LikeControl } from '@/components/article/like-control'
 import { ReadingBeacon } from '@/components/article/reading-beacon'
@@ -176,6 +177,9 @@ function StoryColumn({
         </Suspense>
       )}
       <ArticleBody body={article.body} />
+      <Suspense fallback={null}>
+        <RelatedArticles articleId={article.id} locale={locale} />
+      </Suspense>
       <Suspense fallback={null}>
         <CommentThread articleId={article.id} />
       </Suspense>

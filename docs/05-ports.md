@@ -31,8 +31,10 @@ Same shape for `RevisionRepository`, `CategoryRepository`, `TagRepository`, `Use
 
 `ReadingRepository` has no `findById` — a reader's history is not id-addressable.
 It does expose `rankByReaders(limit)`: unique readers per article, no identities.
-That powers the public most-read rail. Related / recommended still need
-`EmbeddingPort`, which is declared and has no adapter.
+That powers the public most-read rail. Category-based related articles are live
+(`ListRelatedArticles` — same section, same locale). Semantic related /
+recommended still need `EmbeddingPort`, which is declared and has no adapter,
+plus Atlas Vector Search.
 
 `Page<T>` is cursor-based, never offset — offset pagination on a growing news archive degrades.
 

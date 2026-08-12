@@ -242,8 +242,10 @@ unset Resend fails closed. **PWA offline reading is live (KUR-51):** installable
 manifest, production service worker, network-first cache of visited articles /
 sections / home. Studio, auth, profile and RSC flights stay on the network.
 Remaining open: Facebook + Instagram publishing (adapter + cron wired; Meta app review
-and tokens still blocked), related / recommended (needs
-`EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search). **Most-read
+and tokens still blocked), semantic related / recommended (needs
+`EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search).
+**Category-based related is live (KUR-57):** same-section siblings on the
+article page; empty when the section has no other published stories. **Most-read
 is live (KUR-52):** unique-reader ranking from existing reading rows; homepage
 Trending Now prefers that rail and falls back to leftover recency. No embeddings.
 **Breaking-news alerts are live (KUR-53):** editor click on a published article

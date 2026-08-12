@@ -26,6 +26,7 @@ import {
   type RegisterRssSource,
   type LikeArticle,
   type ListMostRead,
+  type ListRelatedArticles,
   type ListReadingHistory,
   type ListPendingComments,
   ListRevisions,
@@ -133,6 +134,7 @@ export interface Container {
   readonly getPublishedArticle: GetPublishedArticle
   readonly listPublishedArticles: ListPublishedArticles
   readonly listMostRead: ListMostRead
+  readonly listRelatedArticles: ListRelatedArticles
   readonly browseCategory: BrowseCategory
   readonly listSections: ListSections
   readonly listAuthoredArticles: ListAuthoredArticles
