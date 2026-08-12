@@ -2,6 +2,7 @@ import type {
   AiPort,
   ArticleContext,
   BulletRequest,
+  CaptionRequest,
   CategoryRequest,
   CategorySuggestion,
   DraftRequest,
@@ -9,6 +10,7 @@ import type {
   Headline,
   RewriteRequest,
   SeoSuggestion,
+  SocialCaption,
   Summary,
   TagSuggestion,
   ToneRequest,
@@ -26,6 +28,7 @@ export interface FakeAiScript {
   readonly translation?: TranslatedArticle
   readonly notes?: readonly FactCheckNote[]
   readonly imagePrompt?: string
+  readonly socialCaption?: SocialCaption
 }
 
 const DEFAULTS = {
@@ -38,6 +41,7 @@ const DEFAULTS = {
   translation: { locale: 'fr', title: 'Un Titre', body: 'Un corps.' },
   notes: [{ claim: 'A claim', concern: 'Unsourced', suggestedSource: 'Official release' }],
   imagePrompt: 'A wide editorial photograph.',
+  socialCaption: { caption: 'A proposed caption.', hashtags: ['news'] },
 } as const satisfies Required<FakeAiScript>
 
 async function* emit(parts: readonly string[]): AsyncIterable<string> {
@@ -119,5 +123,9 @@ export class FakeAi implements AiPort {
 
   imagePrompt(input: ArticleContext): Promise<string> {
     return Promise.resolve(this.record('imagePrompt', input, this.script.imagePrompt))
+  }
+
+  socialCaption(input: CaptionRequest): Promise<SocialCaption> {
+    return Promise.resolve(this.record('socialCaption', input, this.script.socialCaption))
   }
 }

@@ -98,7 +98,7 @@ packages.
 | `distribution` | `social-post.ts` | Refuses unpublished articles; 5-attempt retry budget |
 | `shared` | `ids.ts`, `slug.ts` | Branded ids; Unicode-aware slugs (handles Twi ɛ/ɔ) |
 
-### 3.2 Application (`packages/application`) — 34 use cases
+### 3.2 Application (`packages/application`) — 35 use cases
 
 - **editorial (16)** — CreateDraft, UpdateDraft, GetDraft, GetPublishedArticle,
   SubmitForReview, ApproveArticle, RejectArticle, SchedulePublication,
@@ -108,7 +108,7 @@ packages.
 - **audience (14)** — SaveArticle, RemoveSavedArticle, ListSavedArticles, SearchArticles,
   PostComment, ModerateComment, ListVisibleComments, ListPendingComments,
   LikeArticle, UnlikeArticle, CountLikes, RecordReading, ListReadingHistory, CountReadings
-- **distribution (2)** — QueueSocialPost, PublishDuePosts
+- **distribution (3)** — QueueSocialPost, PublishDuePosts, ProposeSocialCaption
 
 Ports live in `packages/application/src/ports/`. Hand-written fakes for all of
 them are in `packages/application/src/testing/` — **never `vi.mock`**.
@@ -242,10 +242,12 @@ stories from the window; empty windows latch so quiet days do not retry;
 unset Resend fails closed. **PWA offline reading is live (KUR-51):** installable
 manifest, production service worker, network-first cache of visited articles /
 sections / home. Studio, auth, profile and RSC flights stay on the network.
-Remaining open: Facebook + Instagram publishing (adapter + cron wired; Meta app review
+Remaining open: Facebook + Instagram **send** (adapter + cron wired; Meta app review
 and tokens still blocked), semantic related / recommended (needs
 `EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search).
-**Category-based related is live (KUR-57):** same-section siblings on the
+**AI social captions are live (KUR-60):** `ProposeSocialCaption` loads the
+approved body and returns a caption + hashtags proposal into the compose
+form — nothing is queued until an editor schedules. **Category-based related is live (KUR-57):** same-section siblings on the
 article page; empty when the section has no other published stories.
 **Named bylines are live (KUR-59):** the article page uses the directory
 display name; missing or email-like names keep the house line, and JSON-LD

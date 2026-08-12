@@ -1,6 +1,7 @@
 import {
   ArticleNotFound,
   BreakingAlertAlreadySent,
+  CaptionNeedsBody,
   CommentNotFound,
   EmailDeliveryFailed,
   SlugTaken,
@@ -27,6 +28,7 @@ describe('toActionError', () => {
     [new NotPermitted(userId('usr_1'), 'article:publish'), 'not_permitted'],
     [new IllegalTransition(articleId('art_1'), 'publish', 'draft'), 'illegal_transition'],
     [new ArticleNotFound(articleId('art_1')), 'article_not_found'],
+    [new CaptionNeedsBody(articleId('art_1')), 'caption_needs_body'],
     [new SlugTaken('budget-2026', 'en'), 'slug_taken'],
     [new InvalidInput(['title: required']), 'invalid_input'],
     [new EmptyComment(), 'empty_comment'],

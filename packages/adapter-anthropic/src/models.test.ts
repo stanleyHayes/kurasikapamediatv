@@ -26,6 +26,7 @@ describe('model routing', () => {
     expect(idOf(models.for('classify'))).toBe(MODELS.cheap)
     expect(idOf(models.for('seo'))).toBe(MODELS.cheap)
     expect(idOf(models.for('summarise'))).toBe(MODELS.cheap)
+    expect(idOf(models.for('social'))).toBe(MODELS.cheap)
   })
 
   it('honours a per-task override, so cost can be tuned without a deploy', () => {

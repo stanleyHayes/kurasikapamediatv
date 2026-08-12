@@ -132,6 +132,11 @@ export const queueSocialPostSchema = z.object({
   scheduledAt: z.iso.datetime(),
 })
 
+export const proposeSocialCaptionSchema = z.object({
+  articleId: id,
+  platform: z.enum(['facebook', 'instagram']),
+})
+
 /**
  * Requesting a translation proposal.
  *

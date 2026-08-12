@@ -24,6 +24,7 @@ import { RateLimited } from '../security/rate-limit'
 import {
   ArticleNotFound,
   BreakingAlertAlreadySent,
+  CaptionNeedsBody,
   CommentNotFound,
   EmailDeliveryFailed,
   RevisionNotFound,
@@ -59,6 +60,7 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [MissingApprovedRevision, 'missing_approved_revision'],
   [ScheduleInPast, 'schedule_in_past'],
   [ArticleNotFound, 'article_not_found'],
+  [CaptionNeedsBody, 'caption_needs_body'],
   [RevisionNotFound, 'revision_not_found'],
   [RevisionNotOfArticle, 'revision_not_of_article'],
   [SlugTaken, 'slug_taken'],

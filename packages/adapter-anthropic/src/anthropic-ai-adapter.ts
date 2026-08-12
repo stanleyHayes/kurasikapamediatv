@@ -2,6 +2,7 @@ import type {
   AiPort,
   ArticleContext,
   BulletRequest,
+  CaptionRequest,
   CategoryRequest,
   CategorySuggestion,
   DraftRequest,
@@ -9,6 +10,7 @@ import type {
   Headline,
   RewriteRequest,
   SeoSuggestion,
+  SocialCaption,
   Summary,
   TagSuggestion,
   ToneRequest,
@@ -24,6 +26,7 @@ import {
   headlinesSchema,
   imagePromptSchema,
   seoSchema,
+  socialCaptionSchema,
   summarySchema,
   tagsSchema,
   translationSchema,
@@ -156,5 +159,14 @@ export class AnthropicAiAdapter implements AiPort {
     })
 
     return prompt
+  }
+
+  async socialCaption(input: CaptionRequest): Promise<SocialCaption> {
+    return objectOf({
+      model: this.models.for('social'),
+      system: SYSTEM.social,
+      prompt: PROMPT.social(input),
+      schema: socialCaptionSchema,
+    })
   }
 }

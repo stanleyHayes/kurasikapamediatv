@@ -33,6 +33,7 @@ export const SYSTEM = {
   translate: `${HOUSE} Translate faithfully. Keep proper nouns, quotes and numbers exact. Localise idiom, never meaning.`,
   factcheck: `${HOUSE} Identify claims that need a second source. Flag concerns; do not assert what is true.`,
   image: `${HOUSE} Describe a photograph or illustration that could accompany the article without depicting real identifiable people or fabricated events.`,
+  social: `${HOUSE} Write a social post for the named platform. Stay faithful to the article. Hashtags must be topics the article actually covers.`,
 } as const
 
 const context = (input: ArticleContext): string =>
@@ -72,4 +73,7 @@ export const PROMPT = {
 
   image: (i: ArticleContext): string =>
     `${context(i)}\n\nWrite one image-generation prompt for a featured image.`,
+
+  social: (i: ArticleContext & { platform: string }): string =>
+    `${context(i)}\n\nPropose a ${i.platform} caption and up to 5 hashtags (labels only, no #).`,
 } as const

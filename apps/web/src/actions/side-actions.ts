@@ -1,6 +1,7 @@
 'use server'
 
 import type { ArticleId, CommentId, UserId } from '@kurasikapa/domain'
+import type { SocialCaption } from '@kurasikapa/application'
 import { restoreRevision } from '../bff/restore-revision'
 import { requireActor } from '../composition/actor'
 import { container } from '../composition/container'
@@ -12,6 +13,7 @@ import {
   moderateCommentSchema,
   parseInput,
   postCommentSchema,
+  proposeSocialCaptionSchema,
   queueSocialPostSchema,
   restoreRevisionSchema,
 } from './schemas'
@@ -78,6 +80,27 @@ export async function queueSocialPostAction(
     })
 
     return { queued: result.queued.length }
+  })
+}
+
+/**
+ * AI caption proposal for the compose form. Persists nothing — the editor
+ * must still paste into the caption field and schedule.
+ */
+export async function proposeSocialCaptionAction(
+  input: unknown,
+): Promise<ActionResult<SocialCaption>> {
+  return attempt(async () => {
+    const parsed = parseInput(proposeSocialCaptionSchema, input)
+    const actor = await requireActor()
+    const verdict = await limit(container().rateLimiter, await callerKey(actor.id), 'ai', 'closed')
+    if (!verdict.allowed) throw new RateLimited(verdict.retryAfterSeconds)
+
+    return container().proposeSocialCaption.execute({
+      actor,
+      articleId: parsed.articleId as ArticleId,
+      platform: parsed.platform,
+    })
   })
 }
 

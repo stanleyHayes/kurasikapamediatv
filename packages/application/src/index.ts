@@ -1,7 +1,7 @@
 export type {
-  AiPort, ArticleContext, BulletRequest, CategoryOption, CategoryRequest,
+  AiPort, ArticleContext, BulletRequest, CaptionRequest, CategoryOption, CategoryRequest,
   CategorySuggestion, DraftRequest, FactCheckNote, Headline, RewriteRequest,
-  SeoSuggestion, Summary, TagSuggestion, Tone, ToneRequest, TranslateRequest,
+  SeoSuggestion, SocialCaption, Summary, TagSuggestion, Tone, ToneRequest, TranslateRequest,
   TranslatedArticle,
 } from './ports/ai'
 export type { EmbeddingPort } from './ports/embedding'
@@ -63,11 +63,8 @@ export {
   type QueueSocialPostInput,
   type QueueSocialPostResult,
 } from './distribution/queue-social-post'
-export {
-  PublishDuePosts,
-  type PublishDuePostsDeps,
-  type PublishDuePostsResult,
-} from './distribution/publish-due-posts'
+export { CaptionNeedsBody, ProposeSocialCaption, type ProposeSocialCaptionDeps, type ProposeSocialCaptionInput } from './distribution/propose-social-caption'
+export { PublishDuePosts, type PublishDuePostsDeps, type PublishDuePostsResult } from './distribution/publish-due-posts'
 export type { RoleRepository } from './ports/role-repository'
 export {
   SaveArticle,

@@ -16,6 +16,7 @@ export type AiTask =
   | 'translate'
   | 'factcheck'
   | 'image'
+  | 'social'
 
 export interface ModelResolver {
   for(task: AiTask): LanguageModel
@@ -51,6 +52,7 @@ const ROUTING: Readonly<Record<AiTask, keyof typeof MODELS>> = {
   classify: 'cheap',
   summarise: 'cheap',
   image: 'cheap',
+  social: 'cheap',
 }
 
 /**

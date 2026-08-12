@@ -39,6 +39,7 @@ import {
   type ModerateComment,
   type RemoveSavedArticle,
   QueueSocialPost,
+  ProposeSocialCaption,
   type PostComment,
   PublishDuePosts,
   type SocialPublishPort,
@@ -103,6 +104,7 @@ export interface Container {
   readonly resolvePublicByline: ResolvePublicByline
   readonly saveArticle: SaveArticle
   readonly queueSocialPost: QueueSocialPost
+  readonly proposeSocialCaption: ProposeSocialCaption
   readonly publishDuePosts: PublishDuePosts
   /** Read side for the publishing queue screen. */
   readonly socialPosts: SocialPostRepository
@@ -187,6 +189,7 @@ export function buildContainer(infra: Infrastructure): Container {
     listUsers: new ListUsers({ users }),
     resolvePublicByline: new ResolvePublicByline(users),
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
+    proposeSocialCaption: new ProposeSocialCaption({ articles, revisions, ai: infra.ai }),
     publishDuePosts: new PublishDuePosts({
       posts: socialPosts, social: infra.social ?? failClosedSocial(), clock, siteUrl,
     }),

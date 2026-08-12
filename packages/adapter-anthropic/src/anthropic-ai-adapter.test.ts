@@ -110,6 +110,18 @@ describe('structured methods', () => {
     expect(await adapter.imagePrompt(article)).toBe('A wide shot of parliament at dusk.')
   })
 
+  it('returns a social caption proposal', async () => {
+    const adapter = adapterReturning({
+      caption: 'Budget clears parliament overnight.',
+      hashtags: ['budget', 'ghana'],
+    })
+
+    expect(await adapter.socialCaption({ ...article, platform: 'facebook' })).toEqual({
+      caption: 'Budget clears parliament overnight.',
+      hashtags: ['budget', 'ghana'],
+    })
+  })
+
   it('stamps the target locale on a translation', async () => {
     // The model returns title and body; the locale is ours to assert, not its
     // to claim — a model that echoed the wrong locale would misfile the article.

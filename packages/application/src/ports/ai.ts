@@ -45,6 +45,16 @@ export interface FactCheckNote {
   readonly suggestedSource: string
 }
 
+export interface SocialCaption {
+  readonly caption: string
+  /** Topic tags without the leading # — the UI formats them for the platform. */
+  readonly hashtags: readonly string[]
+}
+
+export interface CaptionRequest extends ArticleContext {
+  readonly platform: 'facebook' | 'instagram'
+}
+
 export interface TranslatedArticle {
   readonly locale: string
   readonly title: string
@@ -105,4 +115,5 @@ export interface AiPort {
   translate(input: TranslateRequest): Promise<TranslatedArticle>
   factCheck(input: ArticleContext): Promise<readonly FactCheckNote[]>
   imagePrompt(input: ArticleContext): Promise<string>
+  socialCaption(input: CaptionRequest): Promise<SocialCaption>
 }
