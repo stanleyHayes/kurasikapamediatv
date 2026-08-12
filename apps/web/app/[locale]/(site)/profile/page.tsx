@@ -3,6 +3,10 @@ import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { AccountCards } from '@/components/profile/account-cards'
+import {
+  ReadingHistory,
+  type ReadArticleView,
+} from '@/components/profile/reading-history'
 import { SavedList, type SavedArticleView } from '@/components/profile/saved-list'
 import { currentActor } from '@/composition/actor'
 import { container } from '@/composition/container'
@@ -46,7 +50,7 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
             Your reading
           </h1>
           <p className="text-on-surface-variant mt-2">
-            Everything you have saved, in the order you saved it.
+            Saved stories and recent visits, private to this account.
           </p>
         </div>
       </header>
@@ -57,24 +61,42 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
         </div>
 
         <div className="lg:col-span-4">
-          <ReadingSummary saved={library.saved.length} read={library.read} />
+          <ReadingSummary saved={library.saved.length} read={library.readCount} />
         </div>
       </div>
+
+      <ReadingHistory articles={library.history} now={now} />
 
       <AccountCards />
     </>
   )
 }
 
-async function loadLibrary(actor: Actor): Promise<{ saved: SavedArticleView[]; read: number }> {
+async function loadLibrary(actor: Actor): Promise<{
+  saved: SavedArticleView[]
+  history: ReadArticleView[]
+  readCount: number
+}> {
   const graph = container()
-  const [page, readings] = await Promise.all([
+  const [page, readings, history] = await Promise.all([
     graph.listSavedArticles.execute({ actor }),
     graph.countReadings.execute({ actor }),
+    graph.listReadingHistory.execute({ actor, limit: 20 }),
   ])
 
   return {
-    read: readings.count,
+    readCount: readings.count,
+    history: history.items.map(({ article, readAt }) => {
+      const props = article.snapshot()
+      return {
+        id: props.id,
+        slug: props.slug.value,
+        locale: props.locale,
+        title: props.title,
+        categoryId: props.categoryId,
+        readAt: readAt.toISOString(),
+      }
+    }),
     saved: page.items.map(({ article, savedAt }) => {
       const props = article.snapshot()
       return {

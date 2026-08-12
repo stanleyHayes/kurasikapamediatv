@@ -233,7 +233,8 @@ the wiring is missing.
 
 Domain for saved articles, comments and social posts exists (§3). Comments are
 pre-moderated: a reader post stays pending until an editor with `comment:moderate`
-approves it. Likes and reading history are live. Newsletter **double opt-in is live
+approves it. Likes and reading history are live — profile shows the saved library, a read
+count, and a **Recently read** trail from `ListReadingHistory` (KUR-58). Newsletter **double opt-in is live
 and fail-closed** (KUR-50): subscribe at `/[locale]/newsletter`, confirm link,
 unsubscribe; Resend unset → `EmailDeliveryFailed`, nothing mailed. **Digests are
 live and fail-closed (KUR-56):** daily/weekly cron mails confirmed subscribers
