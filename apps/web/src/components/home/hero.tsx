@@ -6,7 +6,7 @@ import type { ArticleView } from '../../read-model/article-view'
  * from the surface colour, badge row, display-lg headline, CTA.
  *
  * The design fills this with photography. There is no media pipeline until R3
- * (media library, Mux), so the panel uses the tonal gradient the design system
+ * (Cloudinary asset library), so the panel uses the tonal gradient the design system
  * already specifies for depth. It is a stand-in for the image, not a different
  * design — the composition, type scale and overlay all match.
  *

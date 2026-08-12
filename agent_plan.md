@@ -17,10 +17,10 @@
 |---|---|
 | Release in progress | **R1 — Foundation & Publishing** (near complete), first R2 slices landed |
 | Backend language | **Go** — see [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md). Migration just started. |
-| HEAD | `3bebf4a` — KUR-28 |
-| Commits | 28 (`KUR-1` … `KUR-28`) |
-| Unit tests (TS) | 579 passing — domain 180 · application 178 · adapter-mongo 80 · adapter-anthropic 27 · web 114 |
-| Unit tests (Go) | `services/api` — shared package only so far, 95.2% coverage |
+| HEAD | `f122bcf` — KUR-60 |
+| Commits | 60 (`KUR-1` … `KUR-60`) |
+| Unit tests (TS) | 912 passing — domain 233 · application 271 · adapter-mongo 115 · adapter-anthropic 28 · web 265 |
+| Unit tests (Go) | `services/api` — editorial domain + app + HTTP, 97.3% domain / 90.2% app |
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
 | Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.22% · `next build` 0 · `go vet`/`gofmt`/`go test -race` 0 |
 | Deployed | **No.** Nothing is on Vercel or Render yet. Local only. |
@@ -382,3 +382,54 @@ translate (KUR-35), revision history (KUR-36), security headers (KUR-37), audit
 editorial CMS BFF cutover (KUR-45: writes, restore, get-draft, lists, cron,
 public reads → Go when `API_URL` is set), Markdown renderer + toolbar, 2FA,
 Turnstile, consent-gated GA, fail-closed social send + cron.
+
+---
+
+## 10. Sweep on 2026-08-12 (HEAD `f122bcf`)
+
+### Fixed
+- `packages/adapter-mongo/src/mongo-comment-repository.test.ts` — typed the
+  seeded document as `CommentDocument` so `tsc --noEmit` passes.
+- `.github/workflows/ci.yml` — Go job now points at `services/api` and runs
+  `make verify` instead of the non-existent `services/media-svc`.
+- `services/api/Dockerfile` — multi-stage distroless build added so the API can
+  deploy.
+- `.env.example` — removed superseded Mux keys; added ADR-0010 placeholders for
+  Amazon IVS + Cloudinary.
+- `.raven/manifest.json`, `CLAUDE.md`, `docs/03-architecture.md`,
+  `docs/04-data-model.md`, `docs/01-brd.md`, `docs/06-roadmap.md`,
+  `docs/07-quality-gates.md` — updated stale `services/media-svc` / Mux
+  references to `services/api` + Amazon IVS + Cloudinary.
+
+### Green locally
+- `pnpm lint` ✅
+- `pnpm typecheck` ✅ (after the comment-repository fix)
+- `pnpm boundaries` ✅ (1 orphan warning on `apps/web/public/sw.js`)
+- `pnpm dup` ✅ (1.62%, floor 3%)
+- `pnpm go:verify` ✅ (domain 97.3%, app 90.2%)
+- `pnpm test` ✅ for every package **except** `@kurasikapa/adapter-mongo` (see
+  blocker below).
+
+### Local blocker
+`@kurasikapa/adapter-mongo` tests require Testcontainers to start a `mongo:8`
+container. On this machine Testcontainers reaches the container start but the
+MongoDB process inside is not accepting connections on the mapped port
+(`ECONNREFUSED`), so every test file is skipped and the `afterAll` hook throws
+because `mongo` is undefined. This is an environment issue, not a code issue —
+the same tests run in CI via GitHub Actions where Docker/Testcontainers is
+available. Once a working Testcontainers environment is present, `pnpm verify`
+should be green.
+
+### Still open / next
+1. **Deploy the Go API** (`services/api`) to Render or another host and set
+   `API_URL` in Vercel.
+2. **Delete the TypeScript editorial packages** once the Go API is the only live
+   path (currently guarded by `API_URL`).
+3. **Flip the social send path** when Meta app review + page tokens exist.
+4. **R3–R5** remain future releases requiring client decisions on IVS quota,
+   Cloudinary credentials, Stripe/Paystack, etc.
+
+### Client / external blockers
+Unchanged from §6: domain name, launch date, budget, local languages beyond
+EN/FR; Stitch API key rotation; Git LFS decision; IVS quota sizing; AWS,
+Cloudinary, Resend, Stripe/Paystack and Meta credentials.

@@ -20,22 +20,33 @@
                     └───────────▲─────────────┘
                                 │ ports
                     ┌───────────┴─────────────┐
-   webhooks ───────▶│  Render — media-svc     │──▶ Mux (live/VOD)
-   cron     ───────▶│  Go 1.26                │──▶ Meta Graph API
-                    └─────────────────────────┘──▶ Anthropic (batch)
+                                │ HTTP / JSON
+                    ┌───────────▼─────────────┐
+                    │  Render — services/api  │
+   cron     ───────▶│  Go 1.26                │
+                    │  domain + use cases     │
+                    └───────────┬─────────────┘
+                                │ ports
+                    ┌───────────▼─────────────┐
+                    │  MongoDB Atlas          │
+                    │  + Atlas Search         │
+                    │  + Atlas Vector Search  │
+                    └─────────────────────────┘
 ```
 
-**Line of responsibility.** Anything a reader waits on runs on Vercel. Anything slow, scheduled, streaming, or fan-out runs in Go on Render.
+**Line of responsibility.** Next.js owns rendering and the browser session;
+every business decision lives in Go. Public-site reads are cached on Vercel and
+revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 
 | Concern | Home | Why |
 |---|---|---|
 | Public pages, article reads, search UI | `apps/web` | Cache Components make these near-static |
-| Editorial CMS, auth, RBAC, drafts | `apps/web` | Interactive, session-bound, short requests |
-| Interactive AI (rewrite, headline, SEO) | `apps/web` | Streams to the editor, sub-30s |
-| Live TV, VOD, transcode orchestration | `media-svc` | Long-lived, Mux webhook consumer |
-| Social fan-out, scheduled publishing | `media-svc` | Retryable queue work, not request-scoped |
-| Bulk AI (translate archive, re-tag, TTS) | `media-svc` | Minutes-to-hours, must survive redeploys |
-| RSS ingest, sitemap generation, digests | `media-svc` | Cron-driven |
+| Editorial CMS, auth, RBAC, drafts | `apps/web` | Renders UI; rules enforced by `services/api` |
+| Interactive AI (rewrite, headline, SEO) | `apps/web` | RSC streams to the editor, sub-30s |
+| CMS writes, publish, schedule, transitions | `services/api` | Authorisation lives in the domain |
+| Social fan-out, scheduled publishing | `services/api` | Retryable queue work, not request-scoped |
+| RSS ingest, sitemap generation, digests | `services/api` | Cron-driven |
+| Live TV, VOD, transcode orchestration | `services/api` | Long-lived, Amazon IVS + Cloudinary (R3) |
 
 ---
 
@@ -63,11 +74,11 @@ apps/web/
   app/                 Next.js routes = DRIVING adapters. Thin. No business logic.
   src/composition/     the ONLY place adapters may be imported. Builds the use-case registry.
 
-services/media-svc/
-  cmd/server/          main.go — HTTP + worker entrypoint
-  internal/domain/     Go mirror of the shared vocabulary (media + distribution contexts)
+services/api/
+  cmd/api/             main.go — HTTP + composition root
+  internal/domain/     Go entities and invariants. stdlib only (x/text for NFC).
   internal/app/        use cases + port interfaces
-  internal/adapters/   mongo, mux, meta, anthropic, s3
+  internal/adapter/    mongo, anthropic, cloudinary, resend, ivs
 ```
 
 ### The dependency rule, as code
@@ -104,9 +115,15 @@ Seven contexts, each a folder inside `packages/domain`. They share IDs, never in
 
 ## 4. Why two hexagons and not one
 
-The Go service is a **separate hexagon**, not a shared library. It has its own domain package covering only `media` and `distribution`. The two communicate over an explicit HTTP contract behind `MediaJobPort`.
+The Go service is a **separate hexagon**, not a shared library. It owns the
+editorial domain today and will host each bounded context as it is ported from
+TypeScript. The TypeScript side keeps the BFF seam in `apps/web/src/bff/`, but
+business rules are enforced in Go, not in Next.js.
 
-This is deliberate: a shared cross-language domain model is a fiction that costs more than it saves. What we share is the *contract*, generated from one OpenAPI document into both a TypeScript client and Go server stubs.
+This is deliberate: a shared cross-language domain model is a fiction that costs
+more than it saves. During migration the two implementations must not both serve
+production; a context is cut over only when its Go use cases pass the ported
+tests and the web app calls them.
 
 ---
 

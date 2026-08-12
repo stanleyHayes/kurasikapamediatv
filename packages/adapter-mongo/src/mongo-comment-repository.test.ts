@@ -1,6 +1,7 @@
 import { Comment, articleId, commentId, userId } from '@kurasikapa/domain'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { MongoCommentRepository } from './mongo-comment-repository'
+import { type CommentDocument } from './documents'
 import { type MongoHarness, startMongo } from './testing/mongo-harness'
 
 let mongo: MongoHarness
@@ -92,7 +93,7 @@ describe('MongoCommentRepository', () => {
   })
 
   it('refuses an unknown stored state', async () => {
-    await mongo.db.collection('comments').insertOne({
+    await mongo.db.collection<CommentDocument>('comments').insertOne({
       _id: 'cmt_bad',
       articleId: 'art_1',
       readerId: 'usr_reader',

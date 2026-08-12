@@ -26,7 +26,7 @@ If a file is fighting the 250-line limit, it is doing two jobs. Split it by resp
 `dependency-cruiser` encodes the table in [03-architecture.md](03-architecture.md#the-dependency-rule-as-code) as forbidden rules:
 
 - `domain-is-pure` — `packages/domain` may not import anything outside itself.
-- `application-knows-no-tech` — `packages/application` may not import `mongodb`, `next`, `@ai-sdk/*`, `stripe`, `@mux/*`, or any `adapter-*`.
+- `application-knows-no-tech` — `packages/application` may not import `mongodb`, `next`, `@ai-sdk/*`, `stripe`, `@aws-sdk/*`, `cloudinary`, `@mux/*`, or any `adapter-*`.
 - `routes-use-cases-only` — `apps/web/app/**` may not import `adapter-*`.
 - `adapters-are-siblings` — no `adapter-*` may import another `adapter-*`.
 - `no-circular` — no cycles anywhere.

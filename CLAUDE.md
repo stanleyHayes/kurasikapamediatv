@@ -7,14 +7,14 @@
 An AI-native publishing platform for a France-registered television, radio and online media house. Two deployable hexagons sharing one MongoDB Atlas cluster:
 
 - `apps/web` — Next.js 16 on Vercel. Public site + editorial CMS.
-- `services/media-svc` — Go 1.26 on Render. Streaming, queues, batch AI, cron.
+- `services/api` — Go 1.26 on Render. Domain, use cases, adapters, HTTP/JSON API.
 
 Full scope is ~200 features across five releases. Currently in **R1 — Foundation & Publishing**.
 
 ## Commands
 
 ```bash
-pnpm dev              # web + media-svc + local Mongo replica set
+pnpm dev              # web + local Mongo replica set (api is a separate Go process)
 pnpm test             # vitest, all workspaces
 pnpm test:watch       # TDD loop
 pnpm lint             # eslint, type-aware
@@ -34,10 +34,13 @@ pnpm test:e2e         # playwright
 | A business rule or invariant | `packages/domain/<context>/` | nothing |
 | Orchestration across repositories | `packages/application/<context>/` | domain |
 | A port interface | `packages/application/src/ports/` | domain |
-| Anything touching MongoDB, Anthropic, Mux, Stripe | `packages/adapter-*/` | application, domain |
+| Anything touching MongoDB, Anthropic, Cloudinary, Stripe | `packages/adapter-*/` | application, domain |
+| A Go business rule or invariant | `services/api/internal/domain/<context>/` | stdlib only |
+| A Go use case or port | `services/api/internal/app/<context>/` | internal/domain |
+| A Go adapter | `services/api/internal/adapter/<tech>/` | internal/app |
 | A page, route handler or Server Action | `apps/web/app/` | application, domain, ui |
 | Adapter wiring | `apps/web/src/composition/` | everything |
-| A presentational component | `packages/ui/` | nothing app-specific |
+| BFF seam to the Go API | `apps/web/src/bff/` | application, domain, ui |
 
 Seven bounded contexts: `editorial` · `identity` · `media` · `distribution` · `audience` · `revenue` · `insight`.
 

@@ -20,7 +20,7 @@
     "boundary_enforcement": "dependency-cruiser",
     "hexagons": [
       "apps/web",
-      "services/media-svc"
+      "services/api"
     ]
   },
   "stack": {
@@ -36,18 +36,17 @@
     "frontend": "next@16 (App Router, Cache Components, RSC)",
     "styling": "tailwindcss@4",
     "backend": [
-      "next@16 route-handlers + server-actions (driving adapter)",
-      "go@1.26 media service (streaming, transcode, batch, queues)"
+      "go@1.26 api service (domain, use cases, adapters, HTTP/JSON API)",
+      "next@16 frontend (rendering, session, BFF seam to api)"
     ],
     "db": "mongodb-atlas@6 (Atlas Search + Atlas Vector Search)",
     "cloud": [
       "vercel",
       "render"
     ],
-    "infra": "vercel (web) + render (go service) + mongodb-atlas (data)",
+    "infra": "vercel (web) + render (go api service) + mongodb-atlas (data)",
     "libraries": {
       "@ai-sdk/anthropic": "4.0.27",
-      "@mux/mux-node": "14.1.1",
       "@playwright/test": "1.62.1",
       "@testcontainers/mongodb": "12.0.4",
       "ai": "7.0.47",

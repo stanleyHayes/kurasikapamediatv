@@ -39,7 +39,7 @@ PWA offline reading.
 
 ## R3 — Multimedia  *(the TV station comes online)*
 
-Mux integration · Live TV page with schedule and low-latency playback · VOD library ·
+Amazon IVS live broadcast + real-time stages · Cloudinary VOD / podcast / image library ·
 video gallery · podcast library with player, chapters and transcripts · image gallery ·
 media asset library with optimisation and CDN · article-to-audio (TTS) · voice-to-article.
 

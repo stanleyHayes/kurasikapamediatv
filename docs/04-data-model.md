@@ -59,9 +59,9 @@ erDiagram
 | `tags` | flat | `slug`, `names{locale}`, `usageCount` |
 | `role_assignments` | our RBAC, keyed by the auth user id | `roles[]` |
 | `user` `session` `account` `verification` | Better Auth | managed by the library — **do not hand-edit**. Roles live in `role_assignments`, ours. |
-| `assets` | images, audio, video | `kind`, `storageKey`, `muxAssetId`, `width`, `height`, `alt{locale}` |
+| `assets` | images, audio, video | `kind`, `storageKey`, `providerAssetId`, `width`, `height`, `alt{locale}` |
 | `podcasts` / `episodes` | audio series | `episodes.assetId`, `duration`, `transcript` |
-| `live_streams` | Live TV | `muxStreamId`, `state`, `startedAt`, `viewerPeak` |
+| `live_streams` | Live TV | `providerStreamId`, `state`, `startedAt`, `viewerPeak` |
 | `social_posts` | outbound queue | `articleId`, `platform`, `caption`, `scheduledAt`, `state`, `attempts` |
 | `newsletter_subscribers` | digests | `email`, `locales[]`, `cadence`, `confirmedAt` |
 | `rss_sources` | syndication in | `url`, `lastFetchedAt`, `etag` |

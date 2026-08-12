@@ -53,7 +53,7 @@ Consequence: locale is modelled at the article level with independent publish st
 |---|---|---|
 | Logo | Provided | In the Stitch package |
 | Colour palette | Provided | Formalised as "Regal Precision" — navy + champagne |
-| Videos | Provided | Migrate to Mux in R3 |
+| Videos | Provided | Cloudinary VOD + Amazon IVS live at R3 |
 | Brand guidelines | **Missing** | Derived from the Stitch design systems; needs client confirmation |
 | Typography | **Missing** | Playfair Display + Outfit, from the design set |
 | Icons, photography | **Missing** | Material Symbols + a licensed stock account required |

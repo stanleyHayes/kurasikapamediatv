@@ -104,25 +104,18 @@ jobs:
   go:
     name: Go service
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('services/media-svc/go.mod') != '' }}
+    if: ${{ hashFiles('services/api/go.mod') != '' }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version: '1.26'
-          cache-dependency-path: services/media-svc/go.sum
-      - name: Vet
-        run: go vet ./...
-        working-directory: services/media-svc
-      - name: Lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          working-directory: services/media-svc
-      - name: Test
-        run: go test -race -coverprofile=coverage.out ./...
-        working-directory: services/media-svc
+          cache-dependency-path: services/api/go.sum
+      - name: Verify
+        run: make verify
+        working-directory: services/api
       - name: Vulnerabilities
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
           govulncheck ./...
-        working-directory: services/media-svc
+        working-directory: services/api
