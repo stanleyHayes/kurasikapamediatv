@@ -124,6 +124,17 @@ export interface BreakingAlertDocument {
   sentAt: Date
 }
 
+export interface NewsletterDigestDocument {
+  /** `${cadence}:${locale}:${periodKey}` — one send per period. */
+  _id: string
+  cadence: string
+  locale: string
+  periodKey: string
+  sentAt: Date
+  articleCount: number
+  recipientCount: number
+}
+
 export interface SocialPostDocument {
   _id: string
   articleId: string
@@ -146,6 +157,7 @@ export const READINGS = 'readings'
 export const COMMENTS = 'comments'
 export const NEWSLETTER_SUBSCRIBERS = 'newsletter_subscribers'
 export const BREAKING_ALERTS = 'breaking_alerts'
+export const NEWSLETTER_DIGESTS = 'newsletter_digests'
 export const PUSH_SUBSCRIPTIONS = 'push_subscriptions'
 export const RSS_SOURCES = 'rss_sources'
 export const SOCIAL_POSTS = 'social_posts'

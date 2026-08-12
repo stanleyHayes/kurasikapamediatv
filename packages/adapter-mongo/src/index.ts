@@ -7,6 +7,7 @@ export {
   COMMENTS,
   NEWSLETTER_SUBSCRIBERS,
   BREAKING_ALERTS,
+  NEWSLETTER_DIGESTS,
   PUSH_SUBSCRIPTIONS,
   RSS_SOURCES,
   SOCIAL_POSTS,
@@ -20,6 +21,7 @@ export {
   type CommentDocument,
   type NewsletterDocument,
   type BreakingAlertDocument,
+  type NewsletterDigestDocument,
   type PushSubscriptionDocument,
   type RssSourceDocument,
   type SocialPostDocument,
@@ -48,6 +50,7 @@ export { MongoReadingRepository } from './mongo-reading-repository'
 export { MongoCommentRepository } from './mongo-comment-repository'
 export { MongoNewsletterRepository } from './mongo-newsletter-repository'
 export { MongoBreakingAlertRepository } from './mongo-breaking-alert-repository'
+export { MongoNewsletterDigestRepository } from './mongo-newsletter-digest-repository'
 export { MongoPushSubscriptionRepository } from './mongo-push-subscription-repository'
 export { MongoRssSourceRepository } from './mongo-rss-source-repository'
 export { MongoSocialPostRepository } from './mongo-social-post-repository'

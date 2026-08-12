@@ -20,6 +20,7 @@ export { FailClosedPush, RecordingPush } from './fake-push'
 export { InMemoryPushSubscriptionRepository } from './in-memory-push-subscription-repository'
 export { FailClosedRssFeed, RecordingRssFeed } from './fake-rss'
 export { InMemoryRssSourceRepository } from './in-memory-rss-source-repository'
+export { InMemoryNewsletterDigestRepository } from './in-memory-newsletter-digest-repository'
 export { FakeSearch } from './fake-search'
 export { InMemoryCategoryRepository } from './in-memory-category-repository'
 export {

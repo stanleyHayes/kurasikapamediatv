@@ -12,6 +12,14 @@
     {
       "path": "/api/cron/ingest-rss",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/send-digest/daily",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/send-digest/weekly",
+      "schedule": "0 8 * * 1"
     }
   ]
 }

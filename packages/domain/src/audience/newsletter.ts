@@ -112,6 +112,10 @@ export class NewsletterSubscription {
     return this.props.locales
   }
 
+  get cadence(): Cadence {
+    return this.props.cadence
+  }
+
   snapshot(): NewsletterProps {
     return this.props
   }

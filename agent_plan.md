@@ -235,8 +235,10 @@ Domain for saved articles, comments and social posts exists (§3). Comments are
 pre-moderated: a reader post stays pending until an editor with `comment:moderate`
 approves it. Likes and reading history are live. Newsletter **double opt-in is live
 and fail-closed** (KUR-50): subscribe at `/[locale]/newsletter`, confirm link,
-unsubscribe; Resend unset → `EmailDeliveryFailed`, nothing mailed. Digests still
-wait on a live `RESEND_API_KEY`. **PWA offline reading is live (KUR-51):** installable
+unsubscribe; Resend unset → `EmailDeliveryFailed`, nothing mailed. **Digests are
+live and fail-closed (KUR-56):** daily/weekly cron mails confirmed subscribers
+stories from the window; empty windows latch so quiet days do not retry;
+unset Resend fails closed. **PWA offline reading is live (KUR-51):** installable
 manifest, production service worker, network-first cache of visited articles /
 sections / home. Studio, auth, profile and RSC flights stay on the network.
 Remaining open: Facebook + Instagram publishing (adapter + cron wired; Meta app review

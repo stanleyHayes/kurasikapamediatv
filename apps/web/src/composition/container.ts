@@ -44,6 +44,7 @@ import {
   type SaveArticle,
   type RecordReading,
   type SendBreakingAlert,
+  type SendNewsletterDigest,
   type SubscribeNewsletter,
   type SubscribePush,
   type UnlikeArticle,
@@ -64,7 +65,8 @@ import type { Db } from 'mongodb'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { env } from './env'
 import { mongoDb } from './mongo'
-import { audienceCommands, mongoGraph, newsletterCommands, rssCommands } from './mongo-graph'
+import { audienceCommands, mongoGraph, newsletterCommands } from './mongo-graph'
+import { rssCommands } from './rss-graph'
 import {
   failClosedEmail,
   failClosedPush,
@@ -122,6 +124,7 @@ export interface Container {
   readonly subscribePush: SubscribePush
   readonly unsubscribePush: UnsubscribePush
   readonly sendBreakingAlert: SendBreakingAlert
+  readonly sendNewsletterDigest: SendNewsletterDigest
   readonly registerRssSource: RegisterRssSource
   readonly ingestRssFeeds: IngestRssFeeds
   readonly rssSources: RssSourceRepository
@@ -160,10 +163,11 @@ export interface Infrastructure {
 
 export function buildContainer(infra: Infrastructure): Container {
   const graph = mongoGraph(infra.db, infra.clock)
-  const { articles, revisions, roles, search, users, socialPosts, audit, categories } = graph
+  const { articles, revisions, roles, users, socialPosts, audit } = graph
   const { clock, ids, events } = infra
   const write = { articles, clock, events }
   const drafts = new CreateDraft({ articles, revisions, clock, ids, events })
+  const siteUrl = infra.siteUrl ?? 'http://localhost:3000'
 
   return {
     createDraft: drafts,
@@ -179,10 +183,7 @@ export function buildContainer(infra: Infrastructure): Container {
     listUsers: new ListUsers({ users }),
     queueSocialPost: new QueueSocialPost({ posts: socialPosts, articles, clock, ids }),
     publishDuePosts: new PublishDuePosts({
-      posts: socialPosts,
-      social: infra.social ?? failClosedSocial(),
-      clock,
-      siteUrl: infra.siteUrl ?? 'http://localhost:3000',
+      posts: socialPosts, social: infra.social ?? failClosedSocial(), clock, siteUrl,
     }),
     socialPosts,
     readAuditLog: new ReadAuditLog({ audit }),
@@ -190,10 +191,37 @@ export function buildContainer(infra: Infrastructure): Container {
     ...audienceCommands(graph, clock, ids),
     ...newsletterCommands({
       graph, email: infra.email ?? failClosedEmail(), push: infra.push ?? failClosedPush(),
-      ids, clock, siteUrl: infra.siteUrl ?? 'http://localhost:3000',
+      ids, clock, siteUrl,
     }),
-    ...rssCommands({ graph, feed: infra.feed ?? rssFetcher(), drafts, ids, clock }),
+    ...rssCommands({
+      sources: graph.rssSources, feed: infra.feed ?? rssFetcher(), drafts, ids, clock,
+    }),
+    ...editorialQueries(graph, clock, ids),
+    ai: infra.ai,
+    events: infra.events,
+  }
+}
 
+function editorialQueries(
+  graph: ReturnType<typeof mongoGraph>,
+  clock: ClockPort,
+  ids: IdPort,
+): Pick<
+  Container,
+  | 'getPublishedArticle'
+  | 'listPublishedArticles'
+  | 'browseCategory'
+  | 'listSections'
+  | 'listAuthoredArticles'
+  | 'getDraft'
+  | 'listRevisions'
+  | 'restoreRevision'
+  | 'listAwaitingReview'
+  | 'searchArticles'
+  | 'resolveActor'
+> {
+  const { articles, revisions, search, roles, categories } = graph
+  return {
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
     listPublishedArticles: new ListPublishedArticles({ articles }),
     browseCategory: new BrowseCategory({ categories, articles, revisions }),
@@ -205,9 +233,6 @@ export function buildContainer(infra: Infrastructure): Container {
     listAwaitingReview: new ListAwaitingReview({ articles }),
     searchArticles: new SearchArticles({ search }),
     resolveActor: new ResolveActor({ roles }),
-
-    ai: infra.ai,
-    events: infra.events,
   }
 }
 

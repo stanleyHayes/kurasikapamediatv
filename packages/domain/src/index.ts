@@ -95,6 +95,12 @@ export {
   type RssSourceProps,
 } from './distribution/rss-source'
 export {
+  InvalidDigestLocale,
+  NewsletterDigest,
+  digestId,
+  type NewsletterDigestProps,
+} from './distribution/newsletter-digest'
+export {
   AlreadySent,
   ArticleNotLive,
   EmptyCaption,

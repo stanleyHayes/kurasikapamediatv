@@ -8,6 +8,7 @@ import {
   COMMENTS,
   NEWSLETTER_SUBSCRIBERS,
   BREAKING_ALERTS,
+  NEWSLETTER_DIGESTS,
   PUSH_SUBSCRIPTIONS,
   RSS_SOURCES,
   SOCIAL_POSTS,
@@ -20,6 +21,7 @@ import {
   type CommentDocument,
   type NewsletterDocument,
   type BreakingAlertDocument,
+  type NewsletterDigestDocument,
   type PushSubscriptionDocument,
   type RssSourceDocument,
   type SocialPostDocument,
@@ -129,6 +131,9 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   ])
   await db.collection<BreakingAlertDocument>(BREAKING_ALERTS).createIndexes([
     { key: { sentAt: -1 }, name: 'breaking_recent' },
+  ])
+  await db.collection<NewsletterDigestDocument>(NEWSLETTER_DIGESTS).createIndexes([
+    { key: { sentAt: -1 }, name: 'digest_recent' },
   ])
   await db.collection<PushSubscriptionDocument>(PUSH_SUBSCRIPTIONS).createIndexes([
     { key: { locale: 1 }, name: 'push_by_locale' },

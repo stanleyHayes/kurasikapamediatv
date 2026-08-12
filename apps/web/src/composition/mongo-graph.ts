@@ -6,6 +6,7 @@ import {
   MongoCommentRepository,
   MongoLikeRepository,
   MongoBreakingAlertRepository,
+  MongoNewsletterDigestRepository,
   MongoNewsletterRepository,
   MongoPushSubscriptionRepository,
   MongoRssSourceRepository,
@@ -25,12 +26,11 @@ import {
   ListReadingHistory,
   RecordReading,
   SendBreakingAlert,
+  SendNewsletterDigest,
   SubscribeNewsletter,
   SubscribePush,
   UnsubscribeNewsletter,
   UnsubscribePush,
-  IngestRssFeeds,
-  RegisterRssSource,
   ListPendingComments,
   ListSavedArticles,
   ListVisibleComments,
@@ -49,10 +49,9 @@ import {
   type LikeRepository,
   type BreakingAlertRepository,
   type NewsletterRepository,
+  type NewsletterDigestRepository,
   type PushPort,
   type PushSubscriptionRepository,
-  type CreateDraft,
-  type RssFeedPort,
   type RssSourceRepository,
   type ReadingRepository,
   type IdPort,
@@ -76,6 +75,7 @@ export interface MongoGraph {
   readonly readings: ReadingRepository
   readonly subscriptions: NewsletterRepository
   readonly alerts: BreakingAlertRepository
+  readonly digests: NewsletterDigestRepository
   readonly devices: PushSubscriptionRepository
   readonly rssSources: RssSourceRepository
   readonly socialPosts: SocialPostRepository,
@@ -100,6 +100,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     readings: new MongoReadingRepository(db),
     subscriptions: new MongoNewsletterRepository(db),
     alerts: new MongoBreakingAlertRepository(db),
+    digests: new MongoNewsletterDigestRepository(db),
     devices: new MongoPushSubscriptionRepository(db),
     rssSources: new MongoRssSourceRepository(db),
     socialPosts: new MongoSocialPostRepository(db),
@@ -184,10 +185,11 @@ export function newsletterCommands(input: {
   readonly confirmNewsletter: ConfirmNewsletter
   readonly unsubscribeNewsletter: UnsubscribeNewsletter
   readonly sendBreakingAlert: SendBreakingAlert
+  readonly sendNewsletterDigest: SendNewsletterDigest
   readonly subscribePush: SubscribePush
   readonly unsubscribePush: UnsubscribePush
 } {
-  const { subscriptions, articles, alerts, devices } = input.graph
+  const { subscriptions, articles, alerts, devices, digests } = input.graph
   return {
     subscribeNewsletter: new SubscribeNewsletter({
       subscriptions,
@@ -207,30 +209,15 @@ export function newsletterCommands(input: {
       clock: input.clock,
       siteUrl: input.siteUrl,
     }),
+    sendNewsletterDigest: new SendNewsletterDigest({
+      articles,
+      subscriptions,
+      digests,
+      email: input.email,
+      clock: input.clock,
+      siteUrl: input.siteUrl,
+    }),
     subscribePush: new SubscribePush(devices, input.clock),
     unsubscribePush: new UnsubscribePush(devices),
-  }
-}
-
-export function rssCommands(input: {
-  readonly graph: MongoGraph
-  readonly feed: RssFeedPort
-  readonly drafts: CreateDraft
-  readonly ids: IdPort
-  readonly clock: ClockPort
-}): {
-  readonly registerRssSource: RegisterRssSource
-  readonly ingestRssFeeds: IngestRssFeeds
-  readonly rssSources: RssSourceRepository
-} {
-  return {
-    registerRssSource: new RegisterRssSource(input.graph.rssSources, input.ids),
-    ingestRssFeeds: new IngestRssFeeds({
-      sources: input.graph.rssSources,
-      feed: input.feed,
-      drafts: input.drafts,
-      clock: input.clock,
-    }),
-    rssSources: input.graph.rssSources,
   }
 }

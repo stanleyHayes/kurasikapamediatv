@@ -94,6 +94,7 @@ export interface StreamPort        { createLive(i: LiveInput): Promise<LiveStrea
 export interface SocialPublishPort { publish(p: SocialPost): Promise<SocialResult>; schedule(p: SocialPost, at: Date): Promise<SocialResult> }
 export interface PaymentPort       { checkout(i: CheckoutIntent): Promise<CheckoutSession>; cancel(id: SubscriptionId): Promise<void> }
 export interface EmailPort         { send(m: EmailMessage): Promise<void>; sendBatch(m: EmailMessage[]): Promise<void> }
+export interface NewsletterDigestRepository { findById(id: string): Promise<NewsletterDigest | null>; save(d: NewsletterDigest): Promise<void> }
 export interface PushPort          { send(device: DeviceSubscription, message: PushMessage): Promise<void> }
 export interface RssFeedPort       { pull(source: RssSource): Promise<RssPullResult> }
 export interface MediaJobPort      { enqueue(j: MediaJob): Promise<JobId>; status(id: JobId): Promise<JobStatus> }
@@ -133,6 +134,10 @@ generic notice until aes128gcm lands.
 `IngestRssSource` is live in TypeScript: an editor with `article:publish`
 registers an HTTPS feed; hourly cron pulls items into **drafts** (never
 published). A fetch failure skips that source. Duplicate GUIDs are remembered.
+
+`SendNewsletterDigest` is live: daily and weekly Vercel crons mail confirmed
+subscribers for each launch locale. Unset Resend fails closed. One latch per
+cadence+locale+period so a second tick does not double-mail.
 
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
