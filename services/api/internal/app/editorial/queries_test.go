@@ -158,3 +158,41 @@ func TestListAuthoredAndReview(t *testing.T) {
 		}
 	})
 }
+
+func TestAuthoredListSurfacesTimestamps(t *testing.T) {
+	t.Parallel()
+
+	// The studio header shows "published" and "scheduled" badges from these
+	// fields; a list that drops them quietly misreports every article's state.
+	at := now
+	revID := shared.RevisionID("rev_1")
+	live := editorial.Reconstitute(editorial.ArticleState{
+		ID: "art_live", Locale: "en", Slug: shared.SlugFrom("live-story"),
+		Title: "Live", AuthorID: "usr_author", Status: editorial.StatusPublished,
+		ApprovedRevisionID: &revID, PublishedAt: &at,
+	})
+	scheduled := editorial.Reconstitute(editorial.ArticleState{
+		ID: "art_sched", Locale: "en", Slug: shared.SlugFrom("sched-story"),
+		Title: "Sched", AuthorID: "usr_author", Status: editorial.StatusScheduled,
+		ApprovedRevisionID: &revID, ScheduledAt: &at,
+	})
+	h := newHarness(live, scheduled)
+
+	got, err := app.NewListAuthoredArticles(h.deps).Execute(context.Background(), app.ListInput{
+		Actor: author(),
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	byID := map[string]app.StudioArticle{}
+	for _, item := range got.Items {
+		byID[item.ID] = item
+	}
+	if byID["art_live"].PublishedAt == nil {
+		t.Errorf("published article lost its timestamp: %+v", byID["art_live"])
+	}
+	if byID["art_sched"].ScheduledAt == nil {
+		t.Errorf("scheduled article lost its timestamp: %+v", byID["art_sched"])
+	}
+}

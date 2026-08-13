@@ -488,6 +488,22 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   `if: hashFiles(...)`: `hashFiles` is step-level only, so the whole workflow
   file failed to parse and every CI run since KUR-61 had died with zero jobs.
   `actionlint` is clean.
+- `services/api` — Go test files raising app+http coverage from 90.2% to
+  94.2% (floor 90%): `internal/http/handler_errors_test.go` (new; error
+  branches), `internal/app/editorial/slug_guard_test.go` (new),
+  `internal/app/editorial/queries_test.go` (extended), and Fail* branches in
+  the `internal/app/testing` fakes. `make verify` is green: domain 97.3%,
+  app 94.2%.
+- `turbo.json` + `.github/workflows/ci.yml` — the Build step failed with
+  `Invalid environment: MONGODB_URI, BETTER_AUTH_SECRET`: Turborepo 2.x
+  defaults to strict env mode, so the step's env never reached `next build`,
+  and the Build step set no `BETTER_AUTH_SECRET` at all (locally the build
+  passes because a gitignored `apps/web/.env.local` supplies both). The
+  `build` task now declares `passThroughEnv: [MONGODB_URI, MONGODB_DB,
+  BETTER_AUTH_SECRET]` (pass-through, not `env`, so values don't churn the
+  cache hash), and the CI Build step sets a 45-char dummy secret. Verified
+  locally with `apps/web/.env.local` temporarily renamed: `pnpm build
+  --filter=@kurasikapa/web` passes on the CI env alone.
 
 ### Green locally
 - `pnpm lint` ✅

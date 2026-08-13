@@ -11,6 +11,9 @@ import (
 // CategoryStore is an in-memory CategoryRepository.
 type CategoryStore struct {
 	items []editorial.Category
+
+	// FailList injects a read failure, like ArticleStore's Fail* fields.
+	FailList error
 }
 
 // NewCategoryStore seeds a store.
@@ -35,6 +38,10 @@ func (s *CategoryStore) FindBySlug(_ context.Context, slug, locale string) (edit
 
 // ListForLocale returns navigation for a locale, in editorial order.
 func (s *CategoryStore) ListForLocale(_ context.Context, locale string) ([]editorial.Category, error) {
+	if s.FailList != nil {
+		return nil, s.FailList
+	}
+
 	out := []editorial.Category{}
 	for _, c := range s.items {
 		if c.CoversLocale(locale) {

@@ -83,9 +83,12 @@ func (b *RecordingEventBus) Names() []string {
 type ArticleStore struct {
 	items map[shared.ArticleID]editorial.Article
 
-	FailSlugTaken error
-	FailSave      error
-	FailListDue   error
+	FailSlugTaken     error
+	FailFindBySlug    error
+	FailListPublished error
+	FailListAuthored  error
+	FailSave          error
+	FailListDue       error
 
 	// LastPublished is the query the last ListPublished call received.
 	LastPublished ports.PublishedQuery
@@ -113,6 +116,10 @@ func (s *ArticleStore) FindByID(_ context.Context, id shared.ArticleID) (editori
 
 // FindBySlug returns the article at a slug in a locale.
 func (s *ArticleStore) FindBySlug(_ context.Context, slug, locale string) (editorial.Article, error) {
+	if s.FailFindBySlug != nil {
+		return editorial.Article{}, s.FailFindBySlug
+	}
+
 	for _, a := range s.sorted() {
 		if a.Slug().String() == slug && a.Locale() == locale {
 			return a, nil
@@ -151,6 +158,10 @@ func (s *ArticleStore) SlugTaken(_ context.Context, slug, locale string) (bool, 
 
 // ListPublished returns visible articles for a locale.
 func (s *ArticleStore) ListPublished(_ context.Context, q ports.PublishedQuery) (ports.Page[editorial.Article], error) {
+	if s.FailListPublished != nil {
+		return ports.Page[editorial.Article]{}, s.FailListPublished
+	}
+
 	s.LastPublished = q
 	out := []editorial.Article{}
 	for _, a := range s.sorted() {
@@ -168,6 +179,10 @@ func (s *ArticleStore) ListPublished(_ context.Context, q ports.PublishedQuery) 
 
 // ListAuthoredBy returns one author's own work.
 func (s *ArticleStore) ListAuthoredBy(_ context.Context, q ports.AuthoredQuery) (ports.Page[editorial.Article], error) {
+	if s.FailListAuthored != nil {
+		return ports.Page[editorial.Article]{}, s.FailListAuthored
+	}
+
 	out := []editorial.Article{}
 	for _, a := range s.sorted() {
 		if a.AuthorID() == q.AuthorID {

@@ -66,6 +66,9 @@ jobs:
         env:
           MONGODB_URI: mongodb://127.0.0.1:27017/kurasikapa_ci
           MONGODB_DB: kurasikapa_ci
+          # Composition env validation (apps/web/src/composition/env.ts) runs at
+          # prerender; this only signs nothing — the build never serves a request.
+          BETTER_AUTH_SECRET: ci-build-secret-not-a-real-credential-0123456789
 
       - name: Install Playwright browser
         run: pnpm --filter @kurasikapa/web exec playwright install chromium --with-deps
