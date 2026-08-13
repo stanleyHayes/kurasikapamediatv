@@ -11,8 +11,8 @@ import { ShareButton } from '@/components/article/share-button'
 import { LikeControl } from '@/components/article/like-control'
 import { ReadingBeacon } from '@/components/article/reading-beacon'
 import { SaveControl } from '@/components/article/save-control'
-import { env } from '@/composition/env'
-import { cachedArticle, type ReadableArticle } from '@/read-model/queries'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
 
 interface Params {

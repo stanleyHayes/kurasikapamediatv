@@ -2,8 +2,8 @@
 
 import { MAX_COMMENT_BODY } from '@kurasikapa/domain'
 import { useState, useTransition } from 'react'
-import { callAction } from '../../actions/call'
-import { postCommentAction } from '../../actions/side-actions'
+import { callAction } from '@kurasikapa/web-kit/actions/call'
+import { postCommentAction } from '../../actions/reader-actions'
 
 export function CommentForm({ articleId }: { articleId: string }): React.ReactElement {
   const composer = useComposer(articleId)

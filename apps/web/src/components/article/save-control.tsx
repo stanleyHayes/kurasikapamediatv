@@ -1,5 +1,5 @@
-import { currentActor } from '../../composition/actor'
-import { container } from '../../composition/container'
+import { currentActor } from '@kurasikapa/web-kit/composition/actor'
+import { container } from '@kurasikapa/web-kit/composition/container'
 import { SaveButton } from '../save-button'
 
 /**

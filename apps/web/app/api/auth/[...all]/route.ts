@@ -1,5 +1,5 @@
 import { toNextJsHandler } from 'better-auth/next-js'
-import { auth } from '@/composition/auth'
+import { auth } from '@kurasikapa/web-kit/composition/auth'
 
 /**
  * Better Auth's own endpoints. This is the one route that talks to the auth

@@ -1,5 +1,5 @@
 import { cacheLife } from 'next/cache'
-import { Link } from '../i18n/navigation'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 /**
  * Every standing page is reachable from here.

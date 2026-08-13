@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next'
-import { loadPublishedList, loadSections } from '@/bff/load-public'
-import { container } from '@/composition/container'
-import { env } from '@/composition/env'
-import { routing } from '@/i18n/routing'
-import { toArticleView, type ArticleView } from '@/read-model/article-view'
+import { loadPublishedList, loadSections } from '@kurasikapa/web-kit/bff/load-public'
+import { container } from '@kurasikapa/web-kit/composition/container'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { routing } from '@kurasikapa/web-kit/i18n/routing'
+import { toArticleView, type ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 
 /** Sitemaps cap at 50,000 URLs; we page well inside that and stop. */
 const PAGE_SIZE = 50

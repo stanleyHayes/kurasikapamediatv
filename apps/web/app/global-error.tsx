@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { ErrorPanel } from '@/components/error-panel'
-import { reportError } from '@/observability/report-error'
+import { reportError } from '@kurasikapa/web-kit/observability/report-error'
 import './globals.css'
 
 /**

@@ -1,5 +1,5 @@
-import { Link } from '../../i18n/navigation'
-import type { ArticleView } from '../../read-model/article-view'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 

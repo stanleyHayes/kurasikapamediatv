@@ -1,4 +1,4 @@
-import type { ReadableArticle } from '../../read-model/article-view'
+import type { ReadableArticle } from '@kurasikapa/web-kit/read-model/article-view'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 

@@ -1,4 +1,4 @@
-import { Link } from '../../i18n/navigation'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { TwoFactorSettings } from '../auth/two-factor-settings'
 
 /**

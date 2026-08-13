@@ -1,4 +1,4 @@
-import { Link } from '../i18n/navigation'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 /**
  * The fixed top bar from the Stitch homepage.

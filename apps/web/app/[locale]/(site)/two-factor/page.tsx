@@ -1,5 +1,7 @@
 import { setRequestLocale } from 'next-intl/server'
 import { TwoFactorForm } from '@/components/auth/two-factor-form'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { studioUrl } from '@kurasikapa/web-kit/composition/origins'
 
 export default async function TwoFactorPage({
   params,
@@ -17,7 +19,9 @@ export default async function TwoFactorPage({
       <p className="text-on-surface-variant mb-[var(--spacing-md)]">
         Enter the code from your authenticator app to finish signing in.
       </p>
-      <TwoFactorForm />
+      {/* Server-supplied, and absolute: the studio is its own deployment
+          (ADR-0011). */}
+      <TwoFactorForm destination={`${studioUrl(env())}/${locale}`} />
     </section>
   )
 }

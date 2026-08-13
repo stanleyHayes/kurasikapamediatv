@@ -8,8 +8,8 @@ import {
   type ReadArticleView,
 } from '@/components/profile/reading-history'
 import { SavedList, type SavedArticleView } from '@/components/profile/saved-list'
-import { currentActor } from '@/composition/actor'
-import { container } from '@/composition/container'
+import { currentActor } from '@kurasikapa/web-kit/composition/actor'
+import { container } from '@kurasikapa/web-kit/composition/container'
 
 interface Params {
   params: Promise<{ locale: string }>

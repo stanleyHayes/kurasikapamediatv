@@ -1,6 +1,6 @@
 import { articleId as asArticleId } from '@kurasikapa/domain'
-import { container } from '../../composition/container'
-import { toCommentView } from '../../read-model/comment-view'
+import { container } from '@kurasikapa/web-kit/composition/container'
+import { toCommentView } from '@kurasikapa/web-kit/read-model/comment-view'
 import { CommentForm } from './comment-form'
 
 export async function CommentThread({

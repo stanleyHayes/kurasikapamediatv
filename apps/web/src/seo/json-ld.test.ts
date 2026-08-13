@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArticleView } from '../read-model/article-view'
+import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { asScriptContent, newsArticleJsonLd, organisationJsonLd } from './json-ld'
 
 const publisher = { name: 'Kurasikapa Media TV', url: 'https://kurasikapa.tv' }

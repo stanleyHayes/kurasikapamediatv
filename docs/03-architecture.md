@@ -90,8 +90,9 @@ services/api/
 | `packages/domain` | *(nothing)* | everything |
 | `packages/application` | `domain` | any `adapter-*`, `next`, `mongodb` |
 | `packages/adapter-*` | `application`, `domain` | another `adapter-*`, `apps/*` |
-| `apps/web/app/**` | `application`, `domain`, `ui` | any `adapter-*` |
-| `apps/web/src/composition/**` | everything | — |
+| `apps/*/app/**` | `web-kit`, `application`, `domain`, `ui` | any `adapter-*`, the other app |
+| `packages/ui` | *(react only)* | `application`, `adapter-*`, `web-kit` |
+| `packages/web-kit/src/composition/**` | everything | — |
 
 That last row is the escape hatch, and it is deliberately one directory. If a route handler wants Mongo, it has to go through a use case. There is no second way in.
 
@@ -117,7 +118,7 @@ Seven contexts, each a folder inside `packages/domain`. They share IDs, never in
 
 The Go service is a **separate hexagon**, not a shared library. It owns the
 editorial domain today and will host each bounded context as it is ported from
-TypeScript. The TypeScript side keeps the BFF seam in `apps/web/src/bff/`, but
+TypeScript. The TypeScript side keeps the BFF seam in `packages/web-kit/src/bff/`, but
 business rules are enforced in Go, not in Next.js.
 
 This is deliberate: a shared cross-language domain model is a fiction that costs

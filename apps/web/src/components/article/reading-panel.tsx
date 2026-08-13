@@ -1,5 +1,5 @@
-import { Link } from '../../i18n/navigation'
-import { cachedTakeaways } from '../../read-model/queries'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import { cachedTakeaways } from '@kurasikapa/web-kit/read-model/queries'
 
 /**
  * The "AI Enhanced Reading" panel from the Stitch article design.

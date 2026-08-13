@@ -1,5 +1,5 @@
-import { Link } from '../../i18n/navigation'
-import { RelativeTime } from '../section/relative-time'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import { RelativeTime } from '@kurasikapa/ui/relative-time'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 

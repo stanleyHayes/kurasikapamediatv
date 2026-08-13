@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+/*
+ * The studio renders the same design system as the public site — same tokens,
+ * same type scale, same rhythm. Only the shell differs.
+ *
+ * The Tailwind import stays HERE, in each app: v4 anchors content detection on
+ * the file that imports it, so a shared entry point would scan the package
+ * instead of this app.
+ */
+@import '@kurasikapa/web-kit/styles/theme.css';
+
+/* Shared presentational components live outside this app's scan root. */
+@source '../../../packages/ui/src';

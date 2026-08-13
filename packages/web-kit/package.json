@@ -1,0 +1,38 @@
+{
+  "name": "@kurasikapa/web-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./styles/theme.css": "./src/styles/theme.css",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@kurasikapa/adapter-anthropic": "workspace:*",
+    "@kurasikapa/adapter-email": "workspace:*",
+    "@kurasikapa/adapter-mongo": "workspace:*",
+    "@kurasikapa/adapter-push": "workspace:*",
+    "@kurasikapa/adapter-rss": "workspace:*",
+    "@kurasikapa/adapter-social": "workspace:*",
+    "@kurasikapa/application": "workspace:*",
+    "@kurasikapa/domain": "workspace:*",
+    "better-auth": "1.6.25",
+    "mongodb": "6.21.0",
+    "next": "16.2.12",
+    "next-intl": "4.13.4",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@kurasikapa/config": "workspace:*",
+    "@types/react": "19.2.18",
+    "@vitest/coverage-v8": "4.1.10",
+    "react": "19.2.8",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

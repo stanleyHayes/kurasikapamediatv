@@ -2,6 +2,17 @@ import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 import { EDITOR, seed, seedEditor } from './seed'
 
+/**
+ * The one suite that spans both deployments.
+ *
+ * `baseURL` is the public site; the studio answers on its own origin, so its
+ * URLs are absolute. That asymmetry is the point — these journeys exist to
+ * prove the handover between the two deployments still works: the session
+ * cookie reaches the studio, the studio's guard sends an anonymous visitor
+ * back to the site, and the site sends an editor forward to the studio.
+ */
+const STUDIO = process.env['STUDIO_URL'] ?? 'http://127.0.0.1:31743/studio'
+
 test.beforeAll(async ({ baseURL }) => {
   await seed()
   await seedEditor(baseURL ?? '')
@@ -13,7 +24,7 @@ async function signIn(page: Page): Promise<void> {
   await page.getByLabel('Email').fill(EDITOR.email)
   await page.getByLabel('Password').fill(EDITOR.password)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.waitForURL(/\/en\/studio/u)
+  await page.waitForURL(`${STUDIO}/en`)
 }
 
 /**
@@ -26,13 +37,14 @@ test.describe('studio access', () => {
     // Sending them home would leave them guessing how to get back. Sending a
     // signed-in but unauthorised reader to sign-in would be worse — a form
     // that cannot help, since they are already who they are.
-    await page.goto('/en/studio')
+    // Across origins now: the studio bounces them onto the SITE's sign-in.
+    await page.goto(`${STUDIO}/en`)
 
     await expect(page).toHaveURL(/\/en\/sign-in$/u)
   })
 
   test('an anonymous visitor is sent to sign in from the review queue too', async ({ page }) => {
-    await page.goto('/en/studio/review')
+    await page.goto(`${STUDIO}/en/review`)
 
     await expect(page).toHaveURL(/\/en\/sign-in$/u)
   })
@@ -41,8 +53,9 @@ test.describe('studio access', () => {
     const response = await page.goto('/robots.txt')
     const body = (await response?.text()) ?? ''
 
-    expect(body).toContain('/en/studio/')
-    expect(body).toContain('/fr/studio/')
+    // One prefix, not one per locale: the studio's basePath comes before the
+    // locale now (`/studio/en/...`), so `/en/studio/` would match nothing.
+    expect(body).toContain('/studio/')
   })
 })
 
@@ -66,9 +79,9 @@ test.describe('signed in', () => {
 
   test('the review queue opens for someone who may approve', async ({ page }) => {
     await signIn(page)
-    await page.goto('/en/studio/review')
+    await page.goto(`${STUDIO}/en/review`)
 
-    await expect(page).toHaveURL(/\/studio\/review$/u)
+    await expect(page).toHaveURL(`${STUDIO}/en/review`)
   })
 
   test('signing out ends the session, not just the page', async ({ page }) => {
@@ -77,8 +90,10 @@ test.describe('signed in', () => {
     await page.waitForURL(/\/en$/u)
 
     // Returning to the studio must require signing in again. A sign-out that
-    // only navigates away leaves the session alive.
-    await page.goto('/en/studio')
+    // only navigates away leaves the session alive — and now that sign-out is
+    // a server action on a different origin from the form that signed in,
+    // "the cookie was actually cleared" is worth proving, not assuming.
+    await page.goto(`${STUDIO}/en`)
     await expect(page).toHaveURL(/\/sign-in$/u)
   })
 })

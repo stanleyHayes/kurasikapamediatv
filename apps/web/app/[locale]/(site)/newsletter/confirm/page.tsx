@@ -1,9 +1,9 @@
 import { InvalidConfirmation } from '@kurasikapa/domain'
 import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
-import { container } from '@/composition/container'
-import { Link } from '@/i18n/navigation'
-import { callerKey, limit } from '@/security/rate-limit'
+import { container } from '@kurasikapa/web-kit/composition/container'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import { callerKey, limit } from '@kurasikapa/web-kit/security/rate-limit'
 
 interface Props {
   params: Promise<{ locale: string }>

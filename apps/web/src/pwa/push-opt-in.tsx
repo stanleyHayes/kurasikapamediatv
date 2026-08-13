@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { subscribePushAction } from '../actions/push'
-import { callAction } from '../actions/call'
+import { callAction } from '@kurasikapa/web-kit/actions/call'
 import { shouldRegisterServiceWorker } from './offline-policy'
 
 export function PushOptIn({

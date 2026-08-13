@@ -1,4 +1,4 @@
-import type { ArticleView } from '../read-model/article-view'
+import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 
 export interface Publisher {
   readonly name: string

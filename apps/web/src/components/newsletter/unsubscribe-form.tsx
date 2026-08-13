@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { callAction } from '../../actions/call'
+import { callAction } from '@kurasikapa/web-kit/actions/call'
 import { unsubscribeNewsletterAction } from '../../actions/newsletter-actions'
 import { newsletterCopy } from './newsletter-copy'
 

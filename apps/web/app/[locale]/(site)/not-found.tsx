@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { Link } from '@/i18n/navigation'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 /**
  * noindex lives HERE, not on the pages that call notFound().

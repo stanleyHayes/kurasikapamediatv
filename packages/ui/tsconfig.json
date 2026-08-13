@@ -1,0 +1,13 @@
+{
+  "extends": "../config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    // React only. No "node": this package renders and must not reach for a
+    // filesystem or a process — the ui-is-presentational rule in prose.
+    "types": ["react"]
+  },
+  "include": ["src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

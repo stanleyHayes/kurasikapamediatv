@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { callAction } from '../../actions/call'
-import { toggleLikeAction } from '../../actions/side-actions'
+import { callAction } from '@kurasikapa/web-kit/actions/call'
+import { toggleLikeAction } from '../../actions/reader-actions'
 
 export function LikeButton({
   articleId,

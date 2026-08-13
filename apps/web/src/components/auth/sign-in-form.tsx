@@ -1,21 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { useLocale } from 'next-intl'
 import { signIn } from '../../lib/auth-client'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
 
 export interface SignInFormProps {
   /**
-   * Locale-free path. next-intl adds the prefix.
+   * Where a successful sign-in lands. An ABSOLUTE url, because the studio is
+   * a separate deployment and may be on a different origin (ADR-0011).
    *
-   * A literal union rather than a string: `typedRoutes` rejects an arbitrary
-   * string, and more usefully, a destination taken from a query string would
-   * turn this form into an open redirect.
+   * Still supplied by the server, never read from the query string — that is
+   * what keeps this form from becoming an open redirect. It stopped being a
+   * literal union when the destination stopped being a path this app owns.
    */
-  readonly redirectTo: '/studio'
-  /** Absolute path for the OAuth round trip, which leaves the app. */
+  readonly destination: string
+  /** Absolute URL for the OAuth round trip, which leaves the app. */
   readonly callbackURL: string
   readonly providers: readonly ('google' | 'facebook' | 'apple')[]
   readonly captchaSiteKey?: string | undefined
@@ -33,7 +33,6 @@ const FIELD =
  * sign-in page.
  */
 export function SignInForm(props: SignInFormProps): React.ReactElement {
-  const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
   const [captcha, setCaptcha] = useState<string | null>(null)
 
@@ -44,7 +43,7 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
       setError(FAILED)
       return
     }
-    window.location.assign(`/${locale}${props.redirectTo}`)
+    window.location.assign(props.destination)
   }
 
   return (

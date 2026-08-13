@@ -1,7 +1,7 @@
 import { after } from 'next/server'
 import { articleId as asArticleId } from '@kurasikapa/domain'
-import { currentActor } from '../../composition/actor'
-import { container } from '../../composition/container'
+import { currentActor } from '@kurasikapa/web-kit/composition/actor'
+import { container } from '@kurasikapa/web-kit/composition/container'
 
 /**
  * Notes that this signed-in reader opened the article.

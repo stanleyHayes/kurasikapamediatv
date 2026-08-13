@@ -46,6 +46,91 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(@types/node@26.1.2)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@26.1.2)(jiti@2.7.0)(yaml@2.9.0))
 
+  apps/studio:
+    dependencies:
+      '@kurasikapa/adapter-anthropic':
+        specifier: workspace:*
+        version: link:../../packages/adapter-anthropic
+      '@kurasikapa/adapter-email':
+        specifier: workspace:*
+        version: link:../../packages/adapter-email
+      '@kurasikapa/adapter-mongo':
+        specifier: workspace:*
+        version: link:../../packages/adapter-mongo
+      '@kurasikapa/adapter-push':
+        specifier: workspace:*
+        version: link:../../packages/adapter-push
+      '@kurasikapa/adapter-rss':
+        specifier: workspace:*
+        version: link:../../packages/adapter-rss
+      '@kurasikapa/adapter-social':
+        specifier: workspace:*
+        version: link:../../packages/adapter-social
+      '@kurasikapa/application':
+        specifier: workspace:*
+        version: link:../../packages/application
+      '@kurasikapa/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@kurasikapa/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@kurasikapa/web-kit':
+        specifier: workspace:*
+        version: link:../../packages/web-kit
+      better-auth:
+        specifier: 1.6.25
+        version: 1.6.25(mongodb@6.21.0)(next@16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(vitest@4.1.10)
+      mongodb:
+        specifier: 6.21.0
+        version: 6.21.0
+      next:
+        specifier: 16.2.12
+        version: 16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      next-intl:
+        specifier: 4.13.4
+        version: 4.13.4(next@16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
+      react-dom:
+        specifier: 19.2.8
+        version: 19.2.8(react@19.2.8)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@kurasikapa/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@tailwindcss/postcss':
+        specifier: 4.3.3
+        version: 4.3.3
+      '@testing-library/react':
+        specifier: 16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@types/react':
+        specifier: 19.2.18
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: 19.2.4
+        version: 19.2.4(@types/react@19.2.18)
+      '@vitest/coverage-v8':
+        specifier: 4.1.10
+        version: 4.1.10(vitest@4.1.10)
+      happy-dom:
+        specifier: 20.11.1
+        version: 20.11.1
+      tailwindcss:
+        specifier: 4.3.3
+        version: 4.3.3
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.1.2)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@26.1.2)(jiti@2.7.0)(yaml@2.9.0))
+
   apps/web:
     dependencies:
       '@kurasikapa/adapter-anthropic':
@@ -72,6 +157,12 @@ importers:
       '@kurasikapa/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@kurasikapa/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@kurasikapa/web-kit':
+        specifier: workspace:*
+        version: link:../../packages/web-kit
       better-auth:
         specifier: 1.6.25
         version: 1.6.25(mongodb@6.21.0)(next@16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(vitest@4.1.10)
@@ -304,6 +395,82 @@ importers:
       '@vitest/coverage-v8':
         specifier: 4.1.10
         version: 4.1.10(vitest@4.1.10)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.1.2)(@vitest/coverage-v8@4.1.10)(happy-dom@20.11.1)(vite@8.2.0(@types/node@26.1.2)(jiti@2.7.0)(yaml@2.9.0))
+
+  packages/ui:
+    devDependencies:
+      '@kurasikapa/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: 19.2.18
+        version: 19.2.18
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
+  packages/web-kit:
+    dependencies:
+      '@kurasikapa/adapter-anthropic':
+        specifier: workspace:*
+        version: link:../adapter-anthropic
+      '@kurasikapa/adapter-email':
+        specifier: workspace:*
+        version: link:../adapter-email
+      '@kurasikapa/adapter-mongo':
+        specifier: workspace:*
+        version: link:../adapter-mongo
+      '@kurasikapa/adapter-push':
+        specifier: workspace:*
+        version: link:../adapter-push
+      '@kurasikapa/adapter-rss':
+        specifier: workspace:*
+        version: link:../adapter-rss
+      '@kurasikapa/adapter-social':
+        specifier: workspace:*
+        version: link:../adapter-social
+      '@kurasikapa/application':
+        specifier: workspace:*
+        version: link:../application
+      '@kurasikapa/domain':
+        specifier: workspace:*
+        version: link:../domain
+      better-auth:
+        specifier: 1.6.25
+        version: 1.6.25(mongodb@6.21.0)(next@16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(vitest@4.1.10)
+      mongodb:
+        specifier: 6.21.0
+        version: 6.21.0
+      next:
+        specifier: 16.2.12
+        version: 16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      next-intl:
+        specifier: 4.13.4
+        version: 4.13.4(next@16.2.12(@playwright/test@1.62.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@kurasikapa/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: 19.2.18
+        version: 19.2.18
+      '@vitest/coverage-v8':
+        specifier: 4.1.10
+        version: 4.1.10(vitest@4.1.10)
+      react:
+        specifier: 19.2.8
+        version: 19.2.8
       typescript:
         specifier: 5.9.3
         version: 5.9.3

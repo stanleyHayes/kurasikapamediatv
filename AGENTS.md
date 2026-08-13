@@ -16,15 +16,25 @@ Mandated by the Neurodyne AI-Native Operations Manual (§ AI Governance).
 Dependencies point **inward**. This is enforced by `pnpm boundaries` in CI.
 
 ```
-apps/web/app  ──▶ application ──▶ domain
-adapter-*     ──▶ application ──▶ domain
-domain        ──▶ (nothing)
+apps/web    ─┐
+             ├─▶ web-kit ──▶ application ──▶ domain
+apps/studio ─┘      │
+                    └──────▶ adapter-*  ──▶ application ──▶ domain
+ui           ──▶ (react only)
+domain       ──▶ (nothing)
 ```
 
 - `packages/domain` imports nothing. No `mongodb`, no `next`, no `zod`, no `date-fns`. Nothing.
 - `packages/application` imports `domain` only. Never a driver, framework or SDK.
 - Route handlers and Server Actions import **use cases**, never adapters.
-- `apps/web/src/composition/` is the only directory allowed to import `adapter-*`.
+- `packages/web-kit/src/composition/` is the only directory allowed to import `adapter-*`.
+  It is the composition root for **both** apps — it moved out of `apps/web/src`
+  when the studio became its own deployment ([ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md)).
+- `packages/ui` renders and nothing else. It may not import `application`,
+  `adapter-*` or `web-kit`.
+- **`apps/web` and `apps/studio` may never import each other.** They are separate
+  deployments; one import makes neither shippable alone. Shared runtime goes to
+  `web-kit`, shared markup to `ui`.
 
 If you need an adapter inside a route, you have found a missing use case. Write the use case.
 

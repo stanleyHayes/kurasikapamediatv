@@ -1,5 +1,5 @@
-import { Link } from '../../i18n/navigation'
-import type { ListedArticleView } from '../../read-model/queries'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import type { ListedArticleView } from '@kurasikapa/web-kit/read-model/queries'
 
 /**
  * The section sidebar: a trending widget and the subscription CTA, per the

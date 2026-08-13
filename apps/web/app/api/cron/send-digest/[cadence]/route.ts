@@ -1,10 +1,10 @@
 import { CADENCES, type Cadence } from '@kurasikapa/domain'
 import { DigestAlreadySent } from '@kurasikapa/application'
-import { container } from '@/composition/container'
-import { isAuthorisedCron } from '@/composition/cron-auth'
-import { digestPeriodKey, digestWindowStart } from '@/composition/digest-period'
-import { env } from '@/composition/env'
-import { systemClock } from '@/composition/ambient'
+import { container } from '@kurasikapa/web-kit/composition/container'
+import { isAuthorisedCron } from '@kurasikapa/web-kit/composition/cron-auth'
+import { digestPeriodKey, digestWindowStart } from '@kurasikapa/web-kit/composition/digest-period'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { systemClock } from '@kurasikapa/web-kit/composition/ambient'
 
 const LOCALES = ['en', 'fr'] as const
 

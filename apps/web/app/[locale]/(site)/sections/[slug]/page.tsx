@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { LeadStory } from '@/components/section/lead-story'
 import { SectionCard } from '@/components/section/section-card'
 import { SectionSidebar } from '@/components/section/section-sidebar'
-import { cachedSection } from '@/read-model/queries'
+import { cachedSection } from '@kurasikapa/web-kit/read-model/queries'
 
 interface Params {
   params: Promise<{ locale: string; slug: string }>

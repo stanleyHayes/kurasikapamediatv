@@ -1,9 +1,9 @@
 'use server'
 
-import { container } from '../composition/container'
-import { RateLimited, callerKey, limit } from '../security/rate-limit'
-import { type ActionResult, attempt } from './result'
-import { contactMessageSchema, parseInput } from './schemas'
+import { container } from '@kurasikapa/web-kit/composition/container'
+import { RateLimited, callerKey, limit } from '@kurasikapa/web-kit/security/rate-limit'
+import { type ActionResult, attempt } from '@kurasikapa/web-kit/actions/result'
+import { contactMessageSchema, parseInput } from '@kurasikapa/web-kit/actions/schemas'
 
 export async function submitContactMessageAction(
   input: unknown,

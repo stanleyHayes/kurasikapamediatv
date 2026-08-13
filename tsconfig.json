@@ -7,11 +7,15 @@
       "@kurasikapa/domain": ["./packages/domain/src/index.ts"],
       "@kurasikapa/domain/testing": ["./packages/domain/src/testing/builders.ts"],
       "@kurasikapa/application": ["./packages/application/src/index.ts"],
+      "@kurasikapa/application/testing": ["./packages/application/src/testing/index.ts"],
+      "@kurasikapa/web-kit/*": ["./packages/web-kit/src/*"],
+      "@kurasikapa/ui/*": ["./packages/ui/src/*"],
       "@kurasikapa/config/vitest": ["./packages/config/vitest.base.ts"]
     }
   },
   "include": [
     "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx",
     "packages/*/vitest.config.ts",
     "packages/config/*.ts",
     "apps/*/src/**/*.ts"

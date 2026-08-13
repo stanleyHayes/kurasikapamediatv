@@ -4,17 +4,25 @@
 
 ## What this is
 
-An AI-native publishing platform for a France-registered television, radio and online media house. Two deployable hexagons sharing one MongoDB Atlas cluster:
+An AI-native publishing platform for a France-registered television, radio and online media house. Three deployables sharing one MongoDB Atlas cluster:
 
-- `apps/web` — Next.js 16 on Vercel. Public site + editorial CMS.
+- `apps/web` — Next.js 16 on Vercel. The public site.
+- `apps/studio` — Next.js 16 on Vercel, `basePath: /studio`. The editorial CMS.
 - `services/api` — Go 1.26 on Render. Domain, use cases, adapters, HTTP/JSON API.
+
+The two Next apps ship independently — see [ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md)
+for why, and for the two supported URL/cookie shapes. They share
+`packages/web-kit` (composition root, BFF seam, read models, i18n, security)
+and `packages/ui` (presentational components). `pnpm boundaries` fails if
+either app imports the other.
 
 Full scope is ~200 features across five releases. Currently in **R1 — Foundation & Publishing**.
 
 ## Commands
 
 ```bash
-pnpm dev              # web + local Mongo replica set (api is a separate Go process)
+pnpm dev              # web on :3000 and studio on :3001, in parallel
+                      # (Mongo and the Go api are separate processes — see below)
 pnpm test             # vitest, all workspaces
 pnpm test:watch       # TDD loop
 pnpm lint             # eslint, type-aware
@@ -38,9 +46,17 @@ pnpm test:e2e         # playwright
 | A Go business rule or invariant | `services/api/internal/domain/<context>/` | stdlib only |
 | A Go use case or port | `services/api/internal/app/<context>/` | internal/domain |
 | A Go adapter | `services/api/internal/adapter/<tech>/` | internal/app |
-| A page, route handler or Server Action | `apps/web/app/` | application, domain, ui |
-| Adapter wiring | `apps/web/src/composition/` | everything |
-| BFF seam to the Go API | `apps/web/src/bff/` | application, domain, ui |
+| A reader-facing page, route or Server Action | `apps/web/app/` | web-kit, application, domain, ui |
+| A newsroom page, route or Server Action | `apps/studio/app/` | web-kit, application, domain, ui |
+| Adapter wiring | `packages/web-kit/src/composition/` | everything |
+| BFF seam to the Go API | `packages/web-kit/src/bff/` | application, domain |
+| A read model / view mapper | `packages/web-kit/src/read-model/` | application, domain |
+| A component **both** apps render | `packages/ui/src/` | react only |
+
+Anything shared between the two apps goes in a package, never imported across
+`apps/*` — `pnpm boundaries` fails the build on that. When in doubt, duplicate:
+a premature shared component re-couples two deployments that were deliberately
+separated. See [ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md).
 
 Seven bounded contexts: `editorial` · `identity` · `media` · `distribution` · `audience` · `revenue` · `insight`.
 
@@ -102,7 +118,21 @@ Do not "upgrade to latest". Check the peer range first — [ADR-0007](docs/decis
 
 ## Local MongoDB
 
-Transactions require a replica set. `pnpm dev` starts a **single-node replica set**, not a standalone `mongod`. A standalone will pass most tests and then fail on publish.
+Transactions require a replica set. Run a **single-node replica set**, not a
+standalone `mongod` — a standalone passes most tests and then fails on publish.
+`pnpm dev` does not start it; bring it up yourself and point `MONGODB_URI` at it.
+
+## Running both apps locally
+
+`pnpm dev` starts the public site on `:3000` and the studio on `:3001`. The
+studio's basePath is part of its URL, so it answers at
+`http://localhost:3001/studio/en`, not `http://localhost:3001/en`.
+
+Cookies are scoped by host and ignore the port, so a session created on
+`localhost:3000` reaches `localhost:3001` and sign-in works across the two
+without any extra configuration. That convenience does **not** exist in
+production on separate hosts — that is what `COOKIE_DOMAIN` is for. See
+[ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md) § Deployment shapes.
 
 ## Open questions for the client
 

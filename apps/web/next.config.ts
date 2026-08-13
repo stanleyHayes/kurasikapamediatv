@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
-import { securityHeaders } from './src/security/headers'
+import { securityHeaders } from '@kurasikapa/web-kit/security/headers'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
@@ -10,9 +10,18 @@ const nextConfig: NextConfig = {
   // See docs/03-architecture.md § 5.
   cacheComponents: true,
 
-  // The domain and application packages ship as TypeScript source, not builds.
+  /*
+   * The workspace packages ship as TypeScript source, not builds.
+   *
+   * The adapters are listed even though this app never imports one — the
+   * boundary rule forbids it. They arrive transitively through
+   * @kurasikapa/web-kit, which holds the composition root, and the bundler
+   * would treat their .ts source as opaque node_modules without this.
+   */
   transpilePackages: [
     '@kurasikapa/domain',
+    '@kurasikapa/web-kit',
+    '@kurasikapa/ui',
     '@kurasikapa/application',
     '@kurasikapa/adapter-mongo',
     '@kurasikapa/adapter-anthropic',

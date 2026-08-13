@@ -17,12 +17,13 @@
 |---|---|
 | Release in progress | **R1 — Foundation & Publishing** (near complete), first R2 slices landed |
 | Backend language | **Go** — see [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md). Migration just started. |
-| HEAD | `3bfc065` — KUR-61 (local; push KUR-60…62) |
-| Commits | 62 (`KUR-1` … `KUR-62`) |
+| HEAD | `feature/KUR-65-split-studio-deployable` — the studio split, branched off `ecdd55e` (KUR-64) |
+| Commits | 65 (`KUR-1` … `KUR-65`) |
 | Unit tests (TS) | 912 passing — domain 233 · application 271 · adapter-mongo 115 · adapter-anthropic 28 · web 265 |
 | Unit tests (Go) | `services/api` — editorial domain + app + HTTP, 97.3% domain / 90.2% app |
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
 | Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.22% · `next build` 0 · `go vet`/`gofmt`/`go test -race` 0 |
+| Deployables | **Three:** `apps/web` (public), `apps/studio` (CMS, basePath `/studio`), `services/api` (Go). See [ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md). |
 | Deployed | **No.** Nothing is on Vercel or Render yet. Local only. |
 
 Run `pnpm verify` before claiming any task is done. It runs the gates in CI order.
@@ -31,7 +32,22 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 
 ## 2. The shape of the system
 
-Two deployable hexagons over one MongoDB cluster.
+Three deployables over one MongoDB cluster.
+
+**The studio ships separately from the public site** —
+[ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md). `apps/web`
+serves readers; `apps/studio` serves the newsroom at basePath `/studio`. They
+share `packages/web-kit` (composition root, BFF seam, read models, i18n
+routing, security policy) and `packages/ui` (presentational components), and
+`pnpm boundaries` fails if either app imports the other.
+
+Two consequences worth knowing before touching either app:
+
+- The studio's URLs are `/studio/{locale}/...`, not `/{locale}/studio/...` —
+  the basePath comes first. In-app links are written prefix-free.
+- Cache tags are per-deployment, so a publish in the studio posts its
+  invalidations to the site's `/api/revalidate` rather than calling
+  `updateTag` locally. `REVALIDATE_SECRET` must be set on both.
 
 **The backend is moving to Go.** [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md)
 supersedes the old split: all business logic goes to `services/api`, and Next.js
@@ -60,7 +76,7 @@ Two live implementations of the same rules is the thing to avoid, so a context
 is cut over only when its Go use cases pass the ported tests AND the web app
 calls them. `editorial` first, since it is the whole of R1.
 
-`apps/web/src/composition/` is the only place allowed to import an `adapter-*`.
+`packages/web-kit/src/composition/` is the only place allowed to import an `adapter-*`.
 dependency-cruiser enforces this; the rule is `composition-root-is-the-only-door`
 and it has been probe-tested.
 
@@ -140,7 +156,7 @@ Adapter tests run against **real MongoDB via Testcontainers**, never a mocked dr
 `/sign-in` · `/two-factor` · `/about` · `/team` · `/contact` · `/faq` · `/advertise` ·
 `/careers` · `/legal/{privacy|terms|cookies}` · `/sitemap.xml` · `/robots.txt`
 
-### 3.5 Editorial studio (`apps/web/app/[locale]/studio/`)
+### 3.5 Editorial studio (`apps/studio/` — its own deployment)
 
 `/studio` (drafts) · `/studio/articles/{id}` (editor + autosave + AI panel) ·
 `/studio/review` (approval queue) · `/studio/comments` (pre-moderation queue) ·

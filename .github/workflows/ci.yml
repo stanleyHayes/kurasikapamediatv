@@ -61,21 +61,28 @@ jobs:
       # Its own gate. `tsc --noEmit` passing is not evidence the app builds:
       # this step caught three prerender defects that typecheck and unit tests
       # both missed. See ADR-0008.
+      # Builds BOTH deployables — apps/web and apps/studio. Turbo runs them in
+      # parallel; a break in either is a red build, which is the point of
+      # splitting them without splitting the gate.
       - name: Build
         run: pnpm build
         env:
           MONGODB_URI: mongodb://127.0.0.1:27017/kurasikapa_ci
           MONGODB_DB: kurasikapa_ci
-          # Composition env validation (apps/web/src/composition/env.ts) runs at
-          # prerender; this only signs nothing — the build never serves a request.
+          # Composition env validation (packages/web-kit/src/composition/env.ts)
+          # runs at prerender; this signs nothing — the build never serves a
+          # request.
           BETTER_AUTH_SECRET: ci-build-secret-not-a-real-credential-0123456789
 
       - name: Install Playwright browser
         run: pnpm --filter @kurasikapa/web exec playwright install chromium --with-deps
 
-      # Runs against the production build above. Cache Components, PPR and
-      # Server Action serialisation all behave differently under `next dev`,
-      # so a journey that only passes there proves the dev server works.
+      # Runs against production builds of both apps — the Playwright config
+      # boots the public site AND the studio, because the editorial journeys
+      # cross from one deployment to the other and that handover is exactly
+      # what the split could break. Cache Components, PPR and Server Action
+      # serialisation all behave differently under `next dev`, so a journey
+      # that only passes there proves the dev server works.
       - name: E2E journeys + accessibility
         run: pnpm --filter @kurasikapa/web test:e2e
         env:

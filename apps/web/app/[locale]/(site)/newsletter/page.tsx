@@ -1,8 +1,8 @@
 import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { NewsletterForm } from '@/components/newsletter/newsletter-form'
-import { vapidPublicKey } from '@/composition/outbound'
-import { Link } from '@/i18n/navigation'
+import { vapidPublicKey } from '@kurasikapa/web-kit/composition/outbound'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { PushOptIn } from '@/pwa/push-opt-in'
 
 interface Params {

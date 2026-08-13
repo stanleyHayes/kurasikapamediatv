@@ -4,7 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { AnalyticsRoot } from '@/analytics/analytics-root'
-import { routing } from '@/i18n/routing'
+import { routing } from '@kurasikapa/web-kit/i18n/routing'
 import '../globals.css'
 
 /**

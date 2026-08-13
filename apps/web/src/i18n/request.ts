@@ -1,5 +1,5 @@
 import { getRequestConfig } from 'next-intl/server'
-import { isSupportedLocale, routing } from './routing'
+import { isSupportedLocale, routing } from '@kurasikapa/web-kit/i18n/routing'
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale

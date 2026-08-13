@@ -3,9 +3,9 @@ import { Suspense } from 'react'
 import { BriefingCard } from '@/components/home/briefing-card'
 import { Hero } from '@/components/home/hero'
 import { Trending } from '@/components/home/trending'
-import { Link } from '@/i18n/navigation'
-import { homeRails, type HomeRails } from '@/read-model/home-rails'
-import { cachedLatest, cachedMostRead } from '@/read-model/queries'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import { homeRails, type HomeRails } from '@kurasikapa/web-kit/read-model/home-rails'
+import { cachedLatest, cachedMostRead } from '@kurasikapa/web-kit/read-model/queries'
 
 /** Lead + four briefing cards + three trending, per the Stitch composition. */
 const RAIL_SIZE = 8

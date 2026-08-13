@@ -1,6 +1,6 @@
-import { Link } from '../../i18n/navigation'
-import type { ListedArticleView } from '../../read-model/queries'
-import { RelativeTime } from './relative-time'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import type { ListedArticleView } from '@kurasikapa/web-kit/read-model/queries'
+import { RelativeTime } from '@kurasikapa/ui/relative-time'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 

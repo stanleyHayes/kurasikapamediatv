@@ -22,6 +22,8 @@
     "@kurasikapa/adapter-social": "workspace:*",
     "@kurasikapa/application": "workspace:*",
     "@kurasikapa/domain": "workspace:*",
+    "@kurasikapa/ui": "workspace:*",
+    "@kurasikapa/web-kit": "workspace:*",
     "better-auth": "1.6.25",
     "mongodb": "6.21.0",
     "next": "16.2.12",

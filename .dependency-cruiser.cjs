@@ -33,20 +33,35 @@ module.exports = {
       name: 'routes-use-cases-only',
       severity: 'error',
       comment:
-        'apps/web/app may not import an adapter. Route handlers and Server Actions call use cases. ' +
+        'No app route may import an adapter. Route handlers and Server Actions call use cases. ' +
         'If you need an adapter here, you have found a missing use case.',
-      from: { path: '^apps/web/app/' },
+      from: { path: '^apps/[^/]+/app/' },
       to: { path: '^packages/adapter-' },
     },
     {
       name: 'composition-root-is-the-only-door',
       severity: 'error',
       comment:
-        'Only apps/web/src/composition may import an adapter. Everything else in the app — ' +
-        'read models, components, actions — goes through a use case. Without this rule, ' +
-        'a helper module under src/ becomes a second, undocumented composition root.',
-      from: { path: '^apps/web/src/', pathNot: '^apps/web/src/composition/' },
+        'Only packages/web-kit/src/composition may import an adapter. It moved there from ' +
+        'apps/web/src when the studio became its own deployment (ADR-0011) — two apps wiring ' +
+        'the same graph twice is the thing this rule exists to prevent. Everything else — ' +
+        'read models, components, actions, either app — goes through a use case.',
+      from: {
+        path: '^(apps/[^/]+/src|packages/web-kit/src)/',
+        pathNot: '^packages/web-kit/src/composition/',
+      },
       to: { path: '^packages/adapter-' },
+    },
+    {
+      name: 'deployables-are-independent',
+      severity: 'error',
+      comment:
+        'apps/web and apps/studio are separate deployments. Neither may import the other — ' +
+        'a single import is enough to make one undeployable without the other, which is ' +
+        'exactly the coupling ADR-0011 removed. Shared code goes to packages/web-kit ' +
+        '(runtime) or packages/ui (presentation).',
+      from: { path: '^apps/([^/]+)/' },
+      to: { path: '^apps/(?!$1)([^/]+)/' },
     },
     {
       name: 'adapters-are-siblings',
@@ -66,9 +81,12 @@ module.exports = {
     {
       name: 'ui-is-presentational',
       severity: 'error',
-      comment: 'packages/ui renders. It does not know about use cases, ports or adapters.',
+      comment:
+        'packages/ui renders. It does not know about use cases, ports, adapters or the ' +
+        'composition root — a component that reaches into web-kit has stopped being ' +
+        'presentational and belongs in the app that needs it.',
       from: { path: '^packages/ui/' },
-      to: { path: '^packages/(application|adapter-)' },
+      to: { path: '^packages/(application|adapter-|web-kit)' },
     },
     {
       name: 'no-circular',

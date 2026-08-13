@@ -128,9 +128,11 @@ export default tseslint.config(
     },
   },
 
-  // The composition root is the one place allowed to know everything.
+  // The composition root is the one place allowed to know everything. It moved
+  // to packages/web-kit when the studio became its own deployment (ADR-0011):
+  // two apps, one wiring.
   {
-    files: ['apps/web/src/composition/**/*.ts'],
+    files: ['packages/web-kit/src/composition/**/*.ts'],
     rules: {
       'no-restricted-globals': 'off',
       'no-restricted-properties': 'off',

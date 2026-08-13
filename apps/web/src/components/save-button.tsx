@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { callAction } from '../actions/call'
-import { toggleSavedAction } from '../actions/side-actions'
+import { callAction } from '@kurasikapa/web-kit/actions/call'
+import { toggleSavedAction } from '../actions/reader-actions'
 
 /**
  * Optimistic in appearance, honest in fact.

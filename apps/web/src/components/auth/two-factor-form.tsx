@@ -1,18 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { useLocale } from 'next-intl'
 import { authClient } from '../../lib/auth-client'
 
 const FIELD =
   'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface rounded border px-3 py-2 outline-none transition-colors'
 
 /**
- * Completes a sign-in that stopped for TOTP. A full load after success
- * crosses the public/studio route-group boundary — same reason as SignInForm.
+ * Completes a sign-in that stopped for TOTP.
+ *
+ * A full load after success, not a client navigation: the destination is the
+ * studio, which is a separate deployment now and may be on another origin.
+ * `destination` is server-supplied for the same reason SignInForm's is —
+ * reading it from the query string would make this an open redirect.
  */
-export function TwoFactorForm(): React.ReactElement {
-  const locale = useLocale()
+export function TwoFactorForm({ destination }: { destination: string }): React.ReactElement {
   const [error, setError] = useState<string | null>(null)
 
   const submit = async (form: FormData): Promise<void> => {
@@ -34,7 +36,7 @@ export function TwoFactorForm(): React.ReactElement {
       return
     }
 
-    window.location.assign(`/${locale}/studio`)
+    window.location.assign(destination)
   }
 
   return (

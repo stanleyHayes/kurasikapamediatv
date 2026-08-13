@@ -47,6 +47,7 @@ stitch_kurasikapa_ai_media_platform.zip
 
 # next-intl / next generated
 apps/web/next-env.d.ts
+apps/studio/next-env.d.ts
 # Playwright
 apps/web/test-results/
 apps/web/playwright-report/

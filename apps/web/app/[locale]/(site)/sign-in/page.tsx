@@ -1,6 +1,8 @@
 import { setRequestLocale } from 'next-intl/server'
 import { SignInForm } from '@/components/auth/sign-in-form'
-import { socialProviders } from '@/composition/auth-providers'
+import { socialProviders } from '@kurasikapa/web-kit/composition/auth-providers'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { studioUrl } from '@kurasikapa/web-kit/composition/origins'
 
 /**
  * The provider list is computed on the server from configured credentials, so
@@ -23,10 +25,13 @@ export default async function SignInPage({
       </h1>
 
       {/* Server-supplied destination. Taking it from a query string would turn
-          this into an open redirect. */}
+          this into an open redirect.
+
+          Absolute, because the studio is a separate deployment now and may
+          answer on another origin — see ADR-0011. */}
       <SignInForm
-        redirectTo="/studio"
-        callbackURL={`/${locale}/studio`}
+        destination={`${studioUrl(env())}/${locale}`}
+        callbackURL={`${studioUrl(env())}/${locale}`}
         providers={configured}
         captchaSiteKey={process.env['NEXT_PUBLIC_TURNSTILE_SITE_KEY']}
       />

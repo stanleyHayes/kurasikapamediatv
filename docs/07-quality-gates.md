@@ -27,11 +27,14 @@ If a file is fighting the 250-line limit, it is doing two jobs. Split it by resp
 
 - `domain-is-pure` — `packages/domain` may not import anything outside itself.
 - `application-knows-no-tech` — `packages/application` may not import `mongodb`, `next`, `@ai-sdk/*`, `stripe`, `@aws-sdk/*`, `cloudinary`, `@mux/*`, or any `adapter-*`.
-- `routes-use-cases-only` — `apps/web/app/**` may not import `adapter-*`.
+- `routes-use-cases-only` — `apps/*/app/**` may not import `adapter-*`.
+- `deployables-are-independent` — `apps/web` and `apps/studio` may not import each other.
+- `ui-is-presentational` — `packages/ui` may not import `application`, `adapter-*` or `web-kit`.
 - `adapters-are-siblings` — no `adapter-*` may import another `adapter-*`.
 - `no-circular` — no cycles anywhere.
 
-The one legal exception is `apps/web/src/composition/**`. That is the composition root and it is allowed to know everything.
+The one legal exception is `packages/web-kit/src/composition/**`. That is the composition root — shared by both
+deployables since [ADR-0011](decisions/adr-0011-studio-is-its-own-deployment.md) — and it is allowed to know everything.
 
 ---
 
@@ -111,7 +114,8 @@ Local gates are not a placeholder for Sonar — they are the same rules, enforce
 - CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
   `Permissions-Policy` set in `next.config.ts` — **not** in `proxy.ts`, whose
   matcher excludes `/api` and would miss the auth and AI endpoints. The policy
-  lives in `apps/web/src/security/headers.ts` so it is testable.
+  lives in `packages/web-kit/src/security/headers.ts` so it is testable, and
+  both apps' `next.config.ts` read the same object.
 - CSP uses `'unsafe-inline'` for scripts rather than a nonce, **deliberately**.
   Nonces force every page dynamic and are incompatible with Partial
   Prerendering, which is this application's caching architecture. Upgrade path

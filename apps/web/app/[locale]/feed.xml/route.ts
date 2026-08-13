@@ -1,6 +1,6 @@
-import { systemClock } from '@/composition/ambient'
-import { env } from '@/composition/env'
-import { cachedLatest } from '@/read-model/queries'
+import { systemClock } from '@kurasikapa/web-kit/composition/ambient'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { cachedLatest } from '@kurasikapa/web-kit/read-model/queries'
 import { rssXml } from '@/syndication/rss'
 
 /**

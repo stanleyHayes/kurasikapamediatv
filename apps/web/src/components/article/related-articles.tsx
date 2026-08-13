@@ -1,5 +1,5 @@
 import { ArticleCard } from '@/components/article-card'
-import { cachedRelated } from '@/read-model/queries'
+import { cachedRelated } from '@kurasikapa/web-kit/read-model/queries'
 
 const RELATED_LIMIT = 4
 
