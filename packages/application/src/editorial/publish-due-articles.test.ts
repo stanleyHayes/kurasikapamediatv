@@ -1,8 +1,8 @@
-import { articleId, familyId } from '@kurasikapa/domain'
+import { articleId, familyId, revisionId } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { Slug } from '@kurasikapa/domain'
 import { describe, expect, it } from 'vitest'
-import { EARLIER, LATER, NOW, harness, theSystem } from '../testing/harness'
+import { EARLIER, LATER, NOW, aRevision, harness, theSystem } from '../testing/harness'
 import { PublishDueArticles } from './publish-due-articles'
 
 const due = (id: string, at = EARLIER): ReturnType<typeof anApprovedArticle> =>
@@ -14,9 +14,17 @@ const due = (id: string, at = EARLIER): ReturnType<typeof anApprovedArticle> =>
     scheduledAt: at,
   })
 
+/** A due article can only publish if it has the history every article starts with. */
+const historyOf = (id: string): ReturnType<typeof aRevision> =>
+  aRevision({ id: revisionId(`rev_${id}`), articleId: articleId(id) })
+
 describe('PublishDueArticles', () => {
   it('publishes everything whose moment has arrived', async () => {
-    const h = harness({ now: NOW, articles: [due('art_1'), due('art_2')] })
+    const h = harness({
+      now: NOW,
+      articles: [due('art_1'), due('art_2')],
+      revisions: [historyOf('art_1'), historyOf('art_2')],
+    })
     const result = await new PublishDueArticles(h).execute({ actor: theSystem })
 
     expect(result.published).toHaveLength(2)
@@ -47,7 +55,11 @@ describe('PublishDueArticles', () => {
   })
 
   it('emits one event per published article', async () => {
-    const h = harness({ now: NOW, articles: [due('art_1'), due('art_2')] })
+    const h = harness({
+      now: NOW,
+      articles: [due('art_1'), due('art_2')],
+      revisions: [historyOf('art_1'), historyOf('art_2')],
+    })
     await new PublishDueArticles(h).execute({ actor: theSystem })
 
     expect(h.events.names()).toEqual(['article.published', 'article.published'])
@@ -70,7 +82,11 @@ describe('PublishDueArticles — one bad article must not strand the batch', () 
   })
 
   it('publishes the healthy ones and reports the failure', async () => {
-    const h = harness({ now: NOW, articles: [brokenlyScheduled, due('art_ok')] })
+    const h = harness({
+      now: NOW,
+      articles: [brokenlyScheduled, due('art_ok')],
+      revisions: [historyOf('art_ok')],
+    })
     const result = await new PublishDueArticles(h).execute({ actor: theSystem })
 
     expect(result.published).toEqual([articleId('art_ok')])

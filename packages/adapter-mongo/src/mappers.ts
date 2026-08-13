@@ -62,6 +62,8 @@ export const revisionToDomain = (doc: RevisionDocument): Revision =>
     body: doc.body,
     authorId: userId(doc.authorId),
     createdAt: doc.createdAt,
+    // Records written before triggers existed have none; do not invent one.
+    ...(doc.trigger === undefined ? {} : { trigger: doc.trigger }),
   })
 
 export const revisionToDocument = (revision: Revision): RevisionDocument => {
@@ -75,5 +77,6 @@ export const revisionToDocument = (revision: Revision): RevisionDocument => {
     body: props.body,
     authorId: props.authorId,
     createdAt: props.createdAt,
+    ...(props.trigger === undefined ? {} : { trigger: props.trigger }),
   }
 }

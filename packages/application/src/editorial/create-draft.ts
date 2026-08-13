@@ -70,7 +70,13 @@ export class CreateDraft implements UseCase<CreateDraftInput, CreateDraftResult>
     const now = this.deps.clock.now()
     const revision = mintRevision(
       this.deps,
-      { articleId: article.id, title: input.title, body: input.body, authorId: input.actor.id },
+      {
+        articleId: article.id,
+        title: input.title,
+        body: input.body,
+        authorId: input.actor.id,
+        trigger: 'create',
+      },
       null,
     )
 

@@ -1,13 +1,17 @@
 import type { Actor, ArticleId, ArticleStatus } from '@kurasikapa/domain'
-import type { ClockPort, EventBusPort } from '../ports/ambient'
+import type { ClockPort, EventBusPort, IdPort } from '../ports/ambient'
 import type { ArticleRepository } from '../ports/article-repository'
+import type { RevisionRepository } from '../ports/revision-repository'
 import type { UseCase } from '../ports/use-case'
 import { ArticleNotFound } from './errors'
 import { articleSubmitted } from './events'
+import { mintTransitionRevision } from './revisions'
 
 export interface SubmitForReviewDeps {
   readonly articles: ArticleRepository
+  readonly revisions: RevisionRepository
   readonly clock: ClockPort
+  readonly ids: IdPort
   readonly events: EventBusPort
 }
 
@@ -30,7 +34,11 @@ export class SubmitForReview implements UseCase<SubmitForReviewInput, Transition
 
     const submitted = article.submitForReview(input.actor)
 
+    // Save, then record the transition, then announce — the same order
+    // CreateDraft uses, so history never claims a transition that did not
+    // persist and no subscriber runs before the history entry exists.
     await this.deps.articles.save(submitted)
+    await mintTransitionRevision(this.deps, submitted.id, input.actor.id, 'submit')
     await this.deps.events.publish(
       articleSubmitted({
         articleId: submitted.id,

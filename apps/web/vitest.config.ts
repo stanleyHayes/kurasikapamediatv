@@ -1,38 +1,39 @@
 import { COVERAGE_FLOORS, baseConfig } from '@kurasikapa/config/vitest'
 import { defineConfig, mergeConfig } from 'vitest/config'
 
+/**
+ * The public site.
+ *
+ * Most of what this app used to be measured on — the composition root, the BFF
+ * seam, read models, locale routing, the security policy — moved to
+ * @kurasikapa/web-kit when the studio became its own deployment (ADR-0011),
+ * and is measured there against the same floor. What is left here is the
+ * reader-facing surface, so the exclusions below are shorter than they were:
+ * the entries for modules that no longer live in this app were removed rather
+ * than left to rot into a list nobody trusts.
+ */
 const base = baseConfig(COVERAGE_FLOORS.web, [
-  // `use cache` is a compiler directive. These functions only exist as written
-  // once Next has transformed them, so they cannot run under a plain Vitest
-  // process. They are covered by the Playwright journeys instead.
-  'src/read-model/queries.ts',
-  // Locale routing is configuration handed to next-intl, not logic of ours.
-  'src/i18n/**',
-  // Vendor configuration, and building it opens a connection. Exercised by the
-  // build and by the auth E2E journey; the logic we own is in auth-providers.ts.
-  'src/composition/auth.ts',
-  // next/headers only resolves inside a request. The branch that matters —
-  // roles resolving to an Actor — is tested in the application layer.
-  'src/composition/actor.ts',
-  // Server Actions and subscriber wiring only run inside Next. Their logic
-  // lives in schemas.ts, result.ts and cache-invalidation.ts, all covered here.
-  'src/actions/editorial.ts',
-  'src/actions/ai.ts',
-  'src/actions/side-actions.ts',
+  // Server Actions only run inside Next. Their logic lives in web-kit's
+  // schemas.ts and result.ts, both covered there.
+  'src/actions/reader-actions.ts',
   'src/actions/newsletter-actions.ts',
   'src/actions/contact-actions.ts',
   'src/actions/push.ts',
-  'src/actions/rss.ts',
-  // Cron routes only call use cases; cadence parsing is tiny.
-  'src/composition/subscribers.ts',
-  'src/composition/announce-published.ts',
-  'src/composition/announce-transition.ts',
+  // Vendor client construction, browser-only — the same category as web-kit's
+  // composition/auth.ts. Exercised by the auth E2E journey.
+  'src/lib/auth-client.ts',
+  // Configuration handed to next-intl, and it only resolves inside a request.
+  // The routing it reads is web-kit's, and is measured there.
+  'src/i18n/request.ts',
   // Presentational only — no branching worth a unit test. Covered by the
   // Playwright journeys, which is where markup belongs under test.
   'src/components/**/*.tsx',
+  'src/content/markdown-view.tsx',
+  'src/content/standing-route.tsx',
+  'src/analytics/**/*.tsx',
   'src/pwa/service-worker-register.tsx',
   // Opt-in is gated on production SW + Notification; covered by the policy
-  // unit tests and the fail-closed VAPID path in outbound.test.ts.
+  // unit tests and the fail-closed VAPID path in web-kit's outbound.test.ts.
   'src/pwa/push-opt-in.tsx',
 ])
 

@@ -15,6 +15,7 @@ export type AiTask =
   | 'summarise'
   | 'translate'
   | 'factcheck'
+  | 'grammar'
   | 'image'
   | 'social'
 
@@ -45,6 +46,8 @@ const ROUTING: Readonly<Record<AiTask, keyof typeof MODELS>> = {
   headline: 'balanced',
   // Fact-checking is the one place a miss is a correction, not an annoyance.
   factcheck: 'best',
+  // Editors apply grammar fixes word by word; a sloppy suggestion wastes their time.
+  grammar: 'balanced',
   // Translation carries the brand into another language; worth the tokens.
   translate: 'balanced',
   // Mechanical. A cheap model is indistinguishable here.

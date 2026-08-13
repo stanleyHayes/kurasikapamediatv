@@ -1,6 +1,6 @@
 export type {
   AiPort, ArticleContext, BulletRequest, CaptionRequest, CategoryOption, CategoryRequest,
-  CategorySuggestion, DraftRequest, FactCheckNote, Headline, RewriteRequest,
+  CategorySuggestion, DraftRequest, FactCheckNote, GrammarIssue, Headline, RewriteRequest,
   SeoSuggestion, SocialCaption, Summary, TagSuggestion, Tone, ToneRequest, TranslateRequest,
   TranslatedArticle,
 } from './ports/ai'
@@ -64,6 +64,7 @@ export {
   type QueueSocialPostResult,
 } from './distribution/queue-social-post'
 export { CaptionNeedsBody, ProposeSocialCaption, type ProposeSocialCaptionDeps, type ProposeSocialCaptionInput } from './distribution/propose-social-caption'
+export { ProposeSocialSummary, type ProposeSocialSummaryDeps, type ProposeSocialSummaryInput } from './distribution/propose-social-summary'
 export { PublishDuePosts, type PublishDuePostsDeps, type PublishDuePostsResult } from './distribution/publish-due-posts'
 export type { RoleRepository } from './ports/role-repository'
 export {
@@ -198,6 +199,7 @@ export {
 
 export {
   ArticleNotFound,
+  RevisionHistoryMissing,
   RevisionNotFound,
   RevisionNotOfArticle,
   SlugTaken,

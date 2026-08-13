@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 /**
@@ -14,9 +15,23 @@ const SECTIONS = [
   { href: '/sections/education', label: 'Education' },
 ] as const
 
-function SectionNav({ liveLabel }: { liveLabel: string }): React.ReactElement {
+function SectionNav({
+  liveLabel,
+  newsLabel,
+}: {
+  liveLabel: string
+  newsLabel: string
+}): React.ReactElement {
   return (
     <ul className="hidden gap-6 md:flex">
+      <li>
+        <Link
+          href="/news"
+          className="text-label-bold text-on-surface-variant hover:text-secondary uppercase transition-colors"
+        >
+          {newsLabel}
+        </Link>
+      </li>
       {SECTIONS.map((s) => (
         <li key={s.href}>
           <Link
@@ -64,7 +79,19 @@ function ReaderActions(): React.ReactElement {
   )
 }
 
-export function SiteHeader({ liveLabel }: { liveLabel: string }): React.ReactElement {
+/**
+ * The news label comes from the messages catalog — it is the one nav entry
+ * that is not a hard-coded section slug, and French is a launch locale. The
+ * header can read it directly: the layout above it is already locale-dynamic
+ * for `liveLabel`, so no prerendered shell is disturbed.
+ */
+export async function SiteHeader({
+  liveLabel,
+}: {
+  liveLabel: string
+}): Promise<React.ReactElement> {
+  const t = await getTranslations('nav')
+
   return (
     <header className="border-outline-variant bg-surface/90 fixed top-0 z-50 w-full border-b backdrop-blur">
       <nav
@@ -79,7 +106,7 @@ export function SiteHeader({ liveLabel }: { liveLabel: string }): React.ReactEle
             Kurasikapa
           </Link>
 
-          <SectionNav liveLabel={liveLabel} />
+          <SectionNav liveLabel={liveLabel} newsLabel={t('news')} />
         </div>
 
         <ReaderActions />

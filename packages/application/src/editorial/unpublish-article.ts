@@ -1,14 +1,18 @@
 import type { Actor, ArticleId } from '@kurasikapa/domain'
-import type { ClockPort, EventBusPort } from '../ports/ambient'
+import type { ClockPort, EventBusPort, IdPort } from '../ports/ambient'
 import type { ArticleRepository } from '../ports/article-repository'
+import type { RevisionRepository } from '../ports/revision-repository'
 import type { UseCase } from '../ports/use-case'
 import { ArticleNotFound } from './errors'
 import { articleUnpublished } from './events'
+import { mintTransitionRevision } from './revisions'
 import type { TransitionResult } from './submit-for-review'
 
 export interface UnpublishArticleDeps {
   readonly articles: ArticleRepository
+  readonly revisions: RevisionRepository
   readonly clock: ClockPort
+  readonly ids: IdPort
   readonly events: EventBusPort
 }
 
@@ -35,6 +39,7 @@ export class UnpublishArticle implements UseCase<UnpublishArticleInput, Transiti
     const pulled = article.unpublish(input.actor)
 
     await this.deps.articles.save(pulled)
+    await mintTransitionRevision(this.deps, pulled.id, input.actor.id, 'unpublish')
     await this.deps.events.publish(
       articleUnpublished(
         {

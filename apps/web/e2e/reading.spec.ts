@@ -120,9 +120,30 @@ test.describe('sections', () => {
 /**
  * WCAG 2.2 AA is a commitment in docs/01-brd.md § 5, not an aspiration.
  * Checked on every public page a reader can reach.
+ *
+ * One run per path, not per test: the sweep covers the distinct public paths
+ * the journeys visit — both locales' homepages and sections, an article,
+ * search, contact, sign-in — plus the static reader pages (about, newsletter)
+ * no journey asserts on but every reader can still open. Error boundaries
+ * (unknown article, draft URL) are excluded on purpose: they render the same
+ * chrome inside a not-found boundary, so they would audit the same layout
+ * twice for no new signal.
  */
+const SWEPT_PATHS = [
+  '/en',
+  '/fr',
+  `/en/articles/${PUBLISHED.slug}`,
+  '/en/sections/business',
+  '/fr/sections/economie',
+  '/en/search',
+  '/en/contact',
+  '/en/about',
+  '/en/newsletter',
+  '/en/sign-in',
+]
+
 test.describe('accessibility', () => {
-  for (const path of ['/en', `/en/articles/${PUBLISHED.slug}`, '/en/sections/business', '/en/search', '/en/contact']) {
+  for (const path of SWEPT_PATHS) {
     test(`${path} has no WCAG 2.2 AA violations`, async ({ page }) => {
       await page.goto(path)
 

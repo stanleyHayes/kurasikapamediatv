@@ -1,7 +1,8 @@
-import { articleId, revisionId } from '@kurasikapa/domain'
+import { Revision, articleId, revisionId, userId } from '@kurasikapa/domain'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { REVISIONS, type RevisionDocument } from './documents'
 import { MongoRevisionRepository } from './mongo-revision-repository'
-import { revision } from './testing/fixtures'
+import { NOW, revision } from './testing/fixtures'
 import { type MongoHarness, startMongo } from './testing/mongo-harness'
 
 let mongo: MongoHarness
@@ -32,6 +33,40 @@ describe('append and read back', () => {
 
   it('returns null for an unknown id', async () => {
     expect(await repo.findById(revisionId('rev_missing'))).toBeNull()
+  })
+})
+
+describe('trigger', () => {
+  it('round trips the transition that caused the revision', async () => {
+    const original = Revision.append(
+      {
+        id: revisionId('rev_1'),
+        articleId: ARTICLE,
+        title: 'Budget 2026',
+        body: 'body',
+        authorId: userId('usr_author'),
+        createdAt: NOW,
+        trigger: 'publish',
+      },
+      null,
+    )
+    await repo.append(original)
+
+    expect((await repo.findById(revisionId('rev_1')))?.trigger).toBe('publish')
+  })
+
+  it('reads a pre-trigger document as having no trigger rather than inventing one', async () => {
+    await mongo.db.collection<RevisionDocument>(REVISIONS).insertOne({
+      _id: 'rev_legacy',
+      articleId: 'art_1',
+      seq: 1,
+      title: 'Budget 2026',
+      body: 'body',
+      authorId: 'usr_author',
+      createdAt: NOW,
+    })
+
+    expect((await repo.findById(revisionId('rev_legacy')))?.trigger).toBeUndefined()
   })
 })
 

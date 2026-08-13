@@ -1,5 +1,11 @@
 export { Article, type ArticleProps, type NewArticle } from './editorial/article'
-export { NonMonotonicSequence, Revision, type RevisionProps } from './editorial/revision'
+export {
+  NonMonotonicSequence,
+  Revision,
+  type NewRevision,
+  type RevisionProps,
+  type RevisionTrigger,
+} from './editorial/revision'
 export { Category, LocaleNotCovered, type CategoryProps } from './editorial/category'
 export {
   ARTICLE_STATUSES,
@@ -108,9 +114,11 @@ export {
   POST_STATES,
   SchedulePostInPast,
   SocialPost,
+  captionForPlatform,
   socialPostId,
   type NewSocialPost,
   type Platform,
+  type PlatformCaptions,
   type PostState,
   type SocialPostId,
   type SocialPostProps,

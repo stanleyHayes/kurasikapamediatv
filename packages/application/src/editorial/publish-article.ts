@@ -1,14 +1,18 @@
 import type { Actor, Article, ArticleId } from '@kurasikapa/domain'
-import type { ClockPort, EventBusPort } from '../ports/ambient'
+import type { ClockPort, EventBusPort, IdPort } from '../ports/ambient'
 import type { ArticleRepository } from '../ports/article-repository'
+import type { RevisionRepository } from '../ports/revision-repository'
 import type { UseCase } from '../ports/use-case'
 import { ArticleNotFound } from './errors'
 import { articlePublished } from './events'
+import { mintTransitionRevision } from './revisions'
 import type { TransitionResult } from './submit-for-review'
 
 export interface PublishArticleDeps {
   readonly articles: ArticleRepository
+  readonly revisions: RevisionRepository
   readonly clock: ClockPort
+  readonly ids: IdPort
   readonly events: EventBusPort
 }
 
@@ -48,6 +52,7 @@ export async function publishAndAnnounce(
   const published = article.publish(actor, now)
 
   await deps.articles.save(published)
+  await mintTransitionRevision(deps, published.id, actor.id, 'publish')
 
   // The article IS published by this point. A failing subscriber must not turn
   // that into an error, for two reasons that both bite:

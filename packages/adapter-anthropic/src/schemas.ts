@@ -73,6 +73,18 @@ export const imagePromptSchema = z.object({
   prompt: z.string().min(1).max(600),
 })
 
+export const grammarSchema = z.object({
+  issues: z
+    .array(
+      z.object({
+        excerpt: z.string().min(1),
+        problem: z.string().min(1),
+        suggestion: z.string().min(1),
+      }),
+    )
+    .max(50),
+})
+
 export const socialCaptionSchema = z.object({
   caption: z.string().min(1).max(2200),
   hashtags: z.array(z.string().min(1).max(40)).max(8),

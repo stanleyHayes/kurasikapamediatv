@@ -116,22 +116,6 @@ export function parseInput<T>(schema: z.ZodType<T>, input: unknown): T {
   throw new InvalidInput(result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`))
 }
 
-/**
- * Queueing a social post.
- *
- * Platforms is a non-empty array of known values — an empty selection is a
- * request to do nothing, and accepting it would create a "queued" state the
- * fan-out worker can never resolve. `scheduledAt` is validated as a datetime
- * string here and turned into a Date at the boundary; the domain refuses a
- * past time, so this only has to guarantee the shape.
- */
-export const queueSocialPostSchema = z.object({
-  articleId: z.string().min(1),
-  platforms: z.array(z.enum(['facebook', 'instagram'])).min(1),
-  caption: z.string().trim().min(1).max(2200),
-  scheduledAt: z.iso.datetime(),
-})
-
 export const proposeSocialCaptionSchema = z.object({
   articleId: id,
   platform: z.enum(['facebook', 'instagram']),

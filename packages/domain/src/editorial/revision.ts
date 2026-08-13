@@ -1,4 +1,12 @@
 import type { ArticleId, RevisionId, UserId } from '../shared/ids'
+import type { Transition } from './article-status'
+
+/**
+ * What caused a revision: an authorial act ('create', 'edit', 'restore') or a
+ * workflow transition. PRD §3 — every transition writes a revision, and the
+ * entry is only an audit trail if it says which transition it was.
+ */
+export type RevisionTrigger = 'create' | 'edit' | 'restore' | Transition
 
 export interface RevisionProps {
   readonly id: RevisionId
@@ -8,6 +16,16 @@ export interface RevisionProps {
   readonly body: string
   readonly authorId: UserId
   readonly createdAt: Date
+  /**
+   * Optional only because records written before triggers existed have none.
+   * Every revision minted today carries one — `append` refuses to go without.
+   */
+  readonly trigger?: RevisionTrigger
+}
+
+/** What `append` takes: everything but the sequence, trigger included. */
+export type NewRevision = Omit<RevisionProps, 'seq' | 'trigger'> & {
+  readonly trigger: RevisionTrigger
 }
 
 export class NonMonotonicSequence extends Error {
@@ -34,7 +52,7 @@ export class Revision {
     return new Revision(props)
   }
 
-  static append(input: Omit<RevisionProps, 'seq'>, previous: Revision | null): Revision {
+  static append(input: NewRevision, previous: Revision | null): Revision {
     const seq = previous === null ? 1 : previous.seq + 1
     return new Revision({ ...input, seq })
   }
@@ -51,6 +69,7 @@ export class Revision {
       body: this.props.body,
       authorId: actorId,
       createdAt: now,
+      trigger: 'restore',
     })
   }
 
@@ -61,6 +80,7 @@ export class Revision {
   get body(): string { return this.props.body }
   get authorId(): UserId { return this.props.authorId }
   get createdAt(): Date { return this.props.createdAt }
+  get trigger(): RevisionTrigger | undefined { return this.props.trigger }
 
   snapshot(): RevisionProps {
     return this.props

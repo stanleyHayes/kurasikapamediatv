@@ -84,6 +84,54 @@ describe('QueueSocialPost', () => {
     const queue = await d.posts.listQueue({ limit: 10 })
     expect(queue.items).toEqual([])
   })
+
+  it('gives each platform its own caption when overrides are provided', async () => {
+    const d = queueDeps()
+
+    await new QueueSocialPost(d).execute({
+      ...request,
+      captions: { instagram: 'Budget 2026 in sixty seconds.' },
+    })
+
+    const queue = await d.posts.listQueue({ limit: 10 })
+    const byPlatform = Object.fromEntries(queue.items.map((p) => [p.platform, p.caption]))
+    expect(byPlatform).toEqual({
+      facebook: 'Budget 2026 explained.',
+      instagram: 'Budget 2026 in sixty seconds.',
+    })
+  })
+
+  it('treats a blank override as no override', async () => {
+    const d = queueDeps()
+
+    await new QueueSocialPost(d).execute({ ...request, captions: { facebook: '  ' } })
+
+    const queue = await d.posts.listQueue({ limit: 10 })
+    expect(queue.items.map((p) => p.caption)).toEqual([
+      'Budget 2026 explained.',
+      'Budget 2026 explained.',
+    ])
+  })
+})
+
+describe('QueueSocialPost — publish now', () => {
+  it('queues a post whose moment has already arrived, and the worker sends it', async () => {
+    // "Publish now" is not a special path: it is a schedule of right now,
+    // due immediately, picked up on the fan-out worker's next pass.
+    const d = queueDeps()
+    await new QueueSocialPost(d).execute({ ...request, scheduledAt: NOW })
+    const social = new RecordingSocial()
+
+    const result = await new PublishDuePosts({
+      posts: d.posts,
+      social,
+      clock: d.clock,
+      siteUrl: 'https://kurasikapa.tv',
+    }).execute()
+
+    expect(result.sent).toHaveLength(2)
+    expect(social.published).toHaveLength(2)
+  })
 })
 
 describe('PublishDuePosts', () => {

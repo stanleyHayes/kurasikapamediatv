@@ -1,5 +1,5 @@
-import type { BlockNode, InlineNode } from './markdown'
-import { parseMarkdown } from './markdown'
+import type { BlockNode, InlineNode } from '@kurasikapa/web-kit/content/markdown'
+import { parseMarkdown } from '@kurasikapa/web-kit/content/markdown'
 
 const BODY = 'text-on-surface mb-6 text-[length:var(--text-body-lg)] leading-relaxed'
 const HEAD = 'font-display text-on-surface mb-4 font-semibold tracking-[-0.02em]'

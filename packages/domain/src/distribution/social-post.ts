@@ -63,6 +63,30 @@ export interface NewSocialPost {
 }
 
 /**
+ * Per-platform captions, keyed by platform. Only the platforms that differ
+ * need an entry — a missing or blank one means "use the shared caption".
+ */
+export type PlatformCaptions = Partial<Record<Platform, string>>
+
+/**
+ * The caption one platform gets: its own when one was written, the shared
+ * caption otherwise.
+ *
+ * Facebook and Instagram reward different writing, so the PRD asks for
+ * per-platform captions. But making every post require two captions means the
+ * second one is usually skipped or a copy-paste of the first — so the shared
+ * caption stays the floor and an override is exactly that.
+ */
+export const captionForPlatform = (
+  platform: Platform,
+  captions: PlatformCaptions | undefined,
+  shared: string,
+): string => {
+  const own = captions?.[platform] ?? ''
+  return own.trim() === '' ? shared : own
+}
+
+/**
  * One outbound post about one article.
  *
  * The rule that matters: a post may only reference a **published** article.

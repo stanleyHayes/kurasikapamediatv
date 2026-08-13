@@ -1,4 +1,13 @@
-import { Actor, type Article, type Revision, type Role, userId } from '@kurasikapa/domain'
+import {
+  Actor,
+  type Article,
+  Revision,
+  type RevisionProps,
+  type Role,
+  articleId,
+  revisionId,
+  userId,
+} from '@kurasikapa/domain'
 import { FakeClock, RecordingEventBus, SequentialIds } from './fakes'
 import { InMemoryArticleRepository } from './in-memory-article-repository'
 import { InMemoryRevisionRepository } from './in-memory-revision-repository'
@@ -22,6 +31,24 @@ export const aSubscriber = actor(['subscriber'], EDITOR_ID)
 /** An author who did not write the article under test. */
 export const aStranger = actor(['author'], STRANGER_ID)
 export const theSystem = actor(['administrator'], SYSTEM_ID)
+
+/**
+ * The revision every transition test needs: an article that can transition
+ * was created with a revision 1, so a transition without one is corruption,
+ * not a case worth supporting.
+ */
+export const aRevision = (overrides: Partial<RevisionProps> = {}): Revision =>
+  Revision.reconstitute({
+    id: revisionId('rev_1'),
+    articleId: articleId('art_1'),
+    seq: 1,
+    title: 'Budget 2026',
+    body: 'body',
+    authorId: AUTHOR_ID,
+    createdAt: NOW,
+    trigger: 'create',
+    ...overrides,
+  })
 
 export interface Harness {
   readonly articles: InMemoryArticleRepository

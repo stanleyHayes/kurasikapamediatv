@@ -100,6 +100,58 @@ jobs:
         if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@v6
 
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    services:
+      # Same reasoning as the quality job: the build prerenders against the
+      # database, and the seeded article has to exist BEFORE that build or the
+      # homepage audits an empty site.
+      mongo:
+        image: mongo:8
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      MONGODB_URI: mongodb://127.0.0.1:27017/kurasikapa_lighthouse
+      MONGODB_DB: kurasikapa_lighthouse
+      # Same rationale as the quality job's build secret — 32 chars is the
+      # validator's floor, and this value signs nothing.
+      BETTER_AUTH_SECRET: ci-lighthouse-secret-not-a-real-credential-012
+      APP_URL: http://127.0.0.1:31923
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The same fixtures the journeys use (e2e/prebuild-seed.ts explains why
+      # the seed must precede the build): without them the article URL audits
+      # a not-found page and the homepage renders "Nothing published yet".
+      - name: Seed the audit fixtures
+        run: node e2e/prebuild-seed.ts
+        working-directory: apps/web
+
+      - name: Build
+        run: pnpm build
+
+      # Assertions live in .github/lighthouse/lighthouserc.json. Performance is
+      # warn-level: LCP/INP are field targets (docs/02-prd.md § 8), and a lab
+      # score on a cold CI box is a proxy — failing a PR on it would train
+      # people to ignore the job. Accessibility is error-level because the axe
+      # sweep (same axe-core engine) already passes clean on these pages.
+      - name: Audit the homepage and one article
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./.github/lighthouse/lighthouserc.json
+          uploadArtifacts: true
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest

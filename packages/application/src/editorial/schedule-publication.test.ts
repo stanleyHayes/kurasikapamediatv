@@ -6,7 +6,7 @@ import {
 } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { EARLIER, LATER, NOW, aJournalist, anEditor, harness } from '../testing/harness'
+import { EARLIER, LATER, NOW, aJournalist, aRevision, anEditor, harness } from '../testing/harness'
 import { ArticleNotFound } from './errors'
 import { SchedulePublication } from './schedule-publication'
 
@@ -14,7 +14,7 @@ const target = articleId('art_1')
 
 describe('SchedulePublication', () => {
   it('schedules an approved article', async () => {
-    const h = harness({ articles: [anApprovedArticle()] })
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
     const result = await new SchedulePublication(h).execute({
       actor: anEditor,
       articleId: target,
@@ -26,10 +26,19 @@ describe('SchedulePublication', () => {
   })
 
   it('announces the scheduled moment', async () => {
-    const h = harness({ articles: [anApprovedArticle()] })
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
     await new SchedulePublication(h).execute({ actor: anEditor, articleId: target, at: LATER })
 
     expect(h.events.last()).toMatchObject({ name: 'article.scheduled', scheduledAt: LATER })
+  })
+
+  it('appends a revision recording the scheduling', async () => {
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
+    await new SchedulePublication(h).execute({ actor: anEditor, articleId: target, at: LATER })
+
+    const entry = (await h.revisions.listFor(target)).at(-1)!
+    expect(entry.seq).toBe(2)
+    expect(entry.trigger).toBe('schedule')
   })
 
   it('judges "past" against the injected clock', async () => {
@@ -41,7 +50,7 @@ describe('SchedulePublication', () => {
   })
 
   it('accepts a moment that becomes future after the clock rewinds', async () => {
-    const h = harness({ now: EARLIER, articles: [anApprovedArticle()] })
+    const h = harness({ now: EARLIER, articles: [anApprovedArticle()], revisions: [aRevision()] })
     const result = await new SchedulePublication(h).execute({
       actor: anEditor,
       articleId: target,

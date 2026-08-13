@@ -3,6 +3,7 @@
 import type {
   CategorySuggestion,
   FactCheckNote,
+  GrammarIssue,
   Headline,
   SeoSuggestion,
   Summary,
@@ -67,15 +68,37 @@ export async function factCheckAction(
   return assist(input, (ctx) => container().ai.factCheck(ctx))
 }
 
+export async function grammarCheckAction(
+  input: unknown,
+): Promise<ActionResult<readonly GrammarIssue[]>> {
+  return assist(input, (ctx) => container().ai.grammarCheck(ctx))
+}
+
 export async function imagePromptAction(input: unknown): Promise<ActionResult<string>> {
   return assist(input, (ctx) => container().ai.imagePrompt(ctx))
 }
 
+/**
+ * Suggests the section an article belongs to.
+ *
+ * The options come from listSections HERE, on the server, never from the
+ * client: the model may only pick a category that exists, and a
+ * browser-supplied list is exactly how an invented one would slip in.
+ */
 export async function detectCategoryAction(
   input: unknown,
-  options: readonly { slug: string; label: string }[],
 ): Promise<ActionResult<readonly CategorySuggestion[]>> {
-  return assist(input, (ctx) => container().ai.detectCategory({ ...ctx, options }))
+  return assist(input, async (ctx) => {
+    const sections = await container().listSections.execute({ locale: ctx.locale })
+    const options = sections
+      .filter((section) => section.coversLocale(ctx.locale))
+      .map((section) => ({
+        slug: section.slugIn(ctx.locale).toString(),
+        label: section.nameIn(ctx.locale),
+      }))
+
+    return container().ai.detectCategory({ ...ctx, options })
+  })
 }
 
 /**

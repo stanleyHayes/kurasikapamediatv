@@ -7,6 +7,7 @@ import type {
   CategorySuggestion,
   DraftRequest,
   FactCheckNote,
+  GrammarIssue,
   Headline,
   RewriteRequest,
   SeoSuggestion,
@@ -23,6 +24,7 @@ import { PROMPT, SYSTEM } from './prompts'
 import {
   categorySchema,
   factCheckSchema,
+  grammarSchema,
   headlinesSchema,
   imagePromptSchema,
   seoSchema,
@@ -148,6 +150,17 @@ export class AnthropicAiAdapter implements AiPort {
     })
 
     return notes
+  }
+
+  async grammarCheck(input: ArticleContext): Promise<readonly GrammarIssue[]> {
+    const { issues } = await objectOf({
+      model: this.models.for('grammar'),
+      system: SYSTEM.grammar,
+      prompt: PROMPT.grammar(input),
+      schema: grammarSchema,
+    })
+
+    return issues
   }
 
   async imagePrompt(input: ArticleContext): Promise<string> {

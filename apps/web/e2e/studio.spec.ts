@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { EDITOR, seed, seedEditor } from './seed'
+import { MongoClient } from 'mongodb'
+import { DRAFT, EDITOR, seed, seedEditor } from './seed'
 
 /**
  * The one suite that spans both deployments.
@@ -97,6 +98,102 @@ test.describe('signed in', () => {
     await expect(page).toHaveURL(/\/sign-in$/u)
   })
 })
+
+test.describe('workflow transitions', () => {
+  test('an editor moves a draft through review and approval to scheduled', async ({ page }) => {
+    // Re-seeded here rather than only in the file's beforeAll: a CI retry must
+    // find the draft a draft again, not whatever the failed attempt left behind.
+    // The revision is what an approval approves — without one the Approve
+    // button deliberately does not render.
+    await resetDraft()
+    await resetSignInAllowance()
+    await signIn(page)
+
+    await page.goto(`${STUDIO}/en/articles/${DRAFT._id}`)
+
+    await page.getByRole('button', { name: 'Submit for review' }).click()
+    await expect(page.getByText('In review')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Approve' }).click()
+    await expect(page.getByText('Approved', { exact: true })).toBeVisible()
+
+    await page.getByLabel('Publication date and time').fill(inOneDay())
+    await page.getByRole('button', { name: 'Schedule' }).click()
+    await expect(page.getByText('Scheduled')).toBeVisible()
+  })
+})
+
+/** Local shapes, not the adapter's — the same discipline as seed.ts. */
+const URI =
+  process.env['MONGODB_URI'] ?? 'mongodb://127.0.0.1:37017/kurasikapa_e2e?directConnection=true'
+const DB = process.env['MONGODB_DB'] ?? 'kurasikapa_e2e'
+
+interface DraftRevision {
+  readonly _id: string
+  readonly articleId: string
+  readonly seq: number
+  readonly title: string
+  readonly body: string
+  readonly authorId: string
+  readonly createdAt: Date
+}
+
+/**
+ * The seeded draft plus one revision of it, written directly to MongoDB for
+ * the reason seed.ts gives: a journey cannot use the thing under test to
+ * create its own fixtures. Revision ids are looked up by the UI, never
+ * assumed — the test drives the buttons, not the wire shape.
+ */
+async function resetDraft(): Promise<void> {
+  const client = new MongoClient(URI)
+  await client.connect()
+  const db = client.db(DB)
+
+  const articles = db.collection<typeof DRAFT>('articles')
+  await articles.deleteOne({ _id: DRAFT._id })
+  await articles.insertOne({ ...DRAFT })
+
+  const revisions = db.collection<DraftRevision>('article_revisions')
+  await revisions.deleteMany({ articleId: DRAFT._id })
+  await revisions.insertOne({
+    _id: 'e2e_draft_rev',
+    articleId: DRAFT._id,
+    seq: 1,
+    title: DRAFT.title,
+    body: 'The scoop, written but not yet published.',
+    authorId: DRAFT.authorId,
+    createdAt: new Date('2026-08-04T09:00:00Z'),
+  })
+
+  await client.close()
+}
+
+/**
+ * Better Auth rate-limits credential endpoints in the database — measured at
+ * three sign-ins per minute, stricter than the app's own limiter
+ * (composition/auth.ts documents why it is left that way). This file signs in
+ * through the real form once per signed-in test, so the fourth journey would
+ * be refused for doing nothing wrong. Clearing the counter keeps each journey
+ * about its own subject, not about the tests that ran before it.
+ */
+async function resetSignInAllowance(): Promise<void> {
+  const client = new MongoClient(URI)
+  await client.connect()
+  await client.db(DB).collection('rateLimit').deleteMany({})
+  await client.close()
+}
+
+/**
+ * Tomorrow, wall-clock, in the `YYYY-MM-DDTHH:mm` shape a `datetime-local`
+ * input accepts. A day of slack keeps the domain's "not in the past" guard
+ * green regardless of which zone the runner sits in.
+ */
+function inOneDay(): string {
+  const date = new Date(Date.now() + 86_400_000)
+  const pad = (value: number): string => String(value).padStart(2, '0')
+  const day = `${String(date.getFullYear())}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  return `${day}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
 
 test.describe('failed sign-in', () => {
   test('a wrong password does not reveal whether the account exists', async ({ page }) => {

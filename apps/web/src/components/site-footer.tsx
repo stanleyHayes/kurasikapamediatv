@@ -1,4 +1,5 @@
 import { cacheLife } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 /**
@@ -28,7 +29,11 @@ const LINKS = [
  * so only the year is cached — which is the right decomposition anyway: cache
  * the thing that changes with time, not the markup around it.
  */
-export function SiteFooter(): React.ReactElement {
+export async function SiteFooter(): Promise<React.ReactElement> {
+  // The one translated link: News is a nav string, and French is a launch
+  // locale. The standing pages above keep their English labels for now.
+  const t = await getTranslations('nav')
+
   return (
     <footer className="border-outline-variant bg-surface-container-lowest mt-[var(--spacing-xl)] border-t">
       <div className="mx-auto flex max-w-[var(--container-page)] flex-col items-center gap-6 px-6 py-12 text-center">
@@ -36,6 +41,11 @@ export function SiteFooter(): React.ReactElement {
 
         <nav aria-label="Site information">
           <ul className="text-on-surface-variant flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+            <li>
+              <Link href="/news" className="hover:text-primary transition-colors">
+                {t('news')}
+              </Link>
+            </li>
             {LINKS.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="hover:text-primary transition-colors">
