@@ -105,6 +105,16 @@ jobs:
     name: Go service
     runs-on: ubuntu-latest
     if: ${{ hashFiles('services/api/go.mod') != '' }}
+    services:
+      # The adapter suite runs against a real MongoDB (make integration), the
+      # same way the TS adapters use Testcontainers. Standalone is enough:
+      # nothing here opens a transaction.
+      mongo:
+        image: mongo:8
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
@@ -114,6 +124,13 @@ jobs:
       - name: Verify
         run: make verify
         working-directory: services/api
+      - name: Integration tests against a real MongoDB
+        run: make integration
+        working-directory: services/api
+        env:
+          # KURA_REQUIRE_MONGO (set by the target) makes a missing service a
+          # failure, never a silent skip.
+          KURA_TEST_MONGO_URI: mongodb://127.0.0.1:27017/?directConnection=true
       - name: Vulnerabilities
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest

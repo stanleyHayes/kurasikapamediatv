@@ -477,6 +477,14 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   never empty at deploy.
 - `services/api/Makefile` — the integration hint now mentions `rs.initiate()`;
   `docs/operations/deploy-api.md` notes the API self-provisions its indexes.
+- `pnpm-workspace.yaml` — security overrides after `pnpm audit` flagged 4
+  high-severity findings on main: `sharp@0.35.0` (libvips CVEs; next declares
+  `^0.34.5`, verified compatible), `postcss@8.5.25` (sourceMappingURL reads;
+  next bundled 8.4.31), `nanoid@3.3.17` (inside postcss's existing `^3.3.x`).
+  All respect `minimumReleaseAge`; `pnpm audit` is now fully clean.
+- `.github/workflows/ci.yml` — the Go job gains a mongo:8 service and runs
+  `make integration`, so the adapter suite (incl. the EnsureIndexes tests)
+  executes in CI instead of only locally.
 
 ### Green locally
 - `pnpm lint` ✅

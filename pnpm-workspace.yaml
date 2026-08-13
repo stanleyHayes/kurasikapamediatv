@@ -28,6 +28,19 @@ overrides:
   typescript: 5.9.3
   # @auth/mongodb-adapter@3 peers "^6" — driver v7 breaks Auth.js.
   mongodb: 6.21.0
+  # Security overrides (CI runs pnpm audit --audit-level=high).
+  #
+  # next@16.2.12 declares optional sharp "^0.34.5"; 0.34.x carries high-severity
+  # libvips CVEs (GHSA-f88m-g3jw-g9cj). sharp is loaded lazily by next/image
+  # through a stable API, and 0.35.0 is the patched line Next itself moved to.
+  sharp: 0.35.0
+  # next@16.2.12 bundles postcss 8.4.31; high-severity sourceMappingURL reads
+  # (GHSA-6g55-p6wh-862q, GHSA-r28c-9q8g-f849) are fixed in the 8.5 line.
+  postcss: 8.5.25
+  # GHSA-2v37-7h3g-55p8 (infinite loop on zero size); 3.3.17 is inside the
+  # ^3.3.x range postcss already declares. 3.3.18 is younger than
+  # minimumReleaseAge.
+  nanoid: 3.3.17
 
 # Install scripts are denied by default; each exception is a decision.
 #

@@ -27,7 +27,7 @@ Recording the obsolete reason rather than deleting it: a pin whose justification
 
 | Package | Pin | Note |
 |---|---|---|
-| `next` | 16.3.0 | Cache Components require 16+ |
+| `next` | 16.2.12 | Cache Components require 16+ |
 | `react` | 19.2.8 | matches Next 16 |
 | `eslint` | 10.8.1 | `typescript-eslint@8` supports `^10` |
 | `vitest` | 4.1.10 | |
@@ -36,9 +36,21 @@ Recording the obsolete reason rather than deleting it: a pin whose justification
 | Node | 26.x | |
 | Go | 1.26 | |
 
+## Security overrides (2026-08-13)
+
+`pnpm audit` flagged four high-severity findings, all reachable only through `next@16.2.12`. CI runs `pnpm audit --audit-level=high`, so these fail the build; the overrides live in `pnpm-workspace.yaml` beside the pins above.
+
+| Package | Pin | Advisory | Peer-range check |
+|---|---|---|---|
+| `sharp` | 0.35.0 | libvips CVEs (GHSA-f88m-g3jw-g9cj) | next declares optional `^0.34.5`; sharp is loaded lazily by `next/image` through a stable API, 0.35.0 is the line Next itself moved to. Verified by build + a native resize smoke test. |
+| `postcss` | 8.5.25 | sourceMappingURL reads (GHSA-6g55-p6wh-862q, GHSA-r28c-9q8g-f849) | next bundled 8.4.31; 8.5.x is the same major line. Verified by a full production build. |
+| `nanoid` | 3.3.17 | GHSA-2v37-7h3g-55p8 | inside the `^3.3.x` range postcss already declares. 3.3.18 was younger than `minimumReleaseAge` at pin time. |
+
+Every pin is the newest patched version that also clears the 7-day `minimumReleaseAge` window.
+
 ## Consequences
 
-**Good.** The dependency graph installs clean with no peer overrides, and full type-aware linting works from commit one.
+**Good.** Full type-aware linting works from commit one, and the audit gate is clean.
 
 **Cost.** We are behind latest on two packages and must track both upgrade paths. Both are recorded in `.raven/manifest.json` under `stack.pinned_reasons`, so the reason survives after everyone has forgotten it.
 
