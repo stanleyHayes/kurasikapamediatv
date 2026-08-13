@@ -18,6 +18,7 @@ describe('model routing', () => {
     expect(idOf(models.for('rewrite'))).toBe(MODELS.balanced)
     expect(idOf(models.for('headline'))).toBe(MODELS.balanced)
     expect(idOf(models.for('translate'))).toBe(MODELS.balanced)
+    expect(idOf(models.for('grammar'))).toBe(MODELS.balanced)
   })
 
   it('sends mechanical work to the cheap model', () => {

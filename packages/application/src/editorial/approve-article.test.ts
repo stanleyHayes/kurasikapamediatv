@@ -17,6 +17,7 @@ const revisionFor = (article = target, id = approved): Revision =>
       body: 'body',
       authorId: userId('usr_author'),
       createdAt: NOW,
+      trigger: 'edit',
     },
     null,
   )
@@ -41,6 +42,21 @@ describe('ApproveArticle', () => {
     await new ApproveArticle(h).execute({ actor: anEditor, articleId: target, revisionId: approved })
 
     expect(h.events.last()).toMatchObject({ name: 'article.approved', revisionId: approved })
+  })
+
+  it('appends a history entry for the approval without moving the pinned revision', async () => {
+    // The approve revision is a record that the transition happened — the
+    // approved text is still the revision the editor pointed at.
+    const h = harness({ articles: [inReview()], revisions: [revisionFor()] })
+    await new ApproveArticle(h).execute({ actor: anEditor, articleId: target, revisionId: approved })
+
+    const history = await h.revisions.listFor(target)
+    expect(history).toHaveLength(2)
+
+    const entry = history.at(-1)!
+    expect(entry.seq).toBe(2)
+    expect(entry.trigger).toBe('approve')
+    expect((await h.articles.findById(target))?.snapshot().approvedRevisionId).toBe(approved)
   })
 
   it('reports an unknown article', async () => {

@@ -5,6 +5,7 @@ import { loadStudioDraft } from '@/bff/load-studio'
 import { BreakingAlertButton } from '@/components/studio/breaking-alert-button'
 import { EditorWorkspace } from '@/components/studio/editor-workspace'
 import { StatusBadge } from '@/components/studio/status-badge'
+import { TransitionControls } from '@/components/studio/transition-controls'
 import { requireActor } from '@/composition/actor'
 import { ArticleNotFound } from '@kurasikapa/application'
 
@@ -39,6 +40,19 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
         <StatusBadge status={draft.status} />
         <span className="text-on-surface-variant text-label-bold uppercase">{draft.locale}</span>
       </div>
+
+      {/*
+        `owned` is derived, not loaded: the studio read model carries no
+        authorId, and anyone on this page without `article:edit_any` got here
+        through `assertReadableBy` — which only the author passes.
+      */}
+      <TransitionControls
+        articleId={draft.id}
+        status={draft.status}
+        roles={actor.roles}
+        owned={!actor.can('article:edit_any')}
+        latestRevisionId={draft.revisions[0]?.id ?? null}
+      />
 
       <EditorWorkspace
         articleId={draft.id}

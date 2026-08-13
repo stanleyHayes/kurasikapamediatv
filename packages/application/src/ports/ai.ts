@@ -45,6 +45,15 @@ export interface FactCheckNote {
   readonly suggestedSource: string
 }
 
+export interface GrammarIssue {
+  /** The exact words flagged, quoted so the editor can find them in the draft. */
+  readonly excerpt: string
+  /** What is wrong with them. */
+  readonly problem: string
+  /** The proposed fix. Still a proposal — the editor applies it by hand. */
+  readonly suggestion: string
+}
+
 export interface SocialCaption {
   readonly caption: string
   /** Topic tags without the leading # — the UI formats them for the platform. */
@@ -114,6 +123,7 @@ export interface AiPort {
   summarise(input: ArticleContext): Promise<Summary>
   translate(input: TranslateRequest): Promise<TranslatedArticle>
   factCheck(input: ArticleContext): Promise<readonly FactCheckNote[]>
+  grammarCheck(input: ArticleContext): Promise<readonly GrammarIssue[]>
   imagePrompt(input: ArticleContext): Promise<string>
   socialCaption(input: CaptionRequest): Promise<SocialCaption>
 }

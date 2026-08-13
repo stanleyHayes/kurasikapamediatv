@@ -21,6 +21,15 @@ const SECTIONS = [
   { _id: 'cat_sports', parentId: null, slugs: { en: 'sports', fr: 'sports' }, names: { en: 'Sports', fr: 'Sports' }, descriptions: { en: 'Results, athletes and the business of the game.', fr: 'Résultats, athlètes et la face commerciale du sport.' }, order: 5 },
   { _id: 'cat_technology', parentId: null, slugs: { en: 'technology', fr: 'technologie' }, names: { en: 'Technology', fr: 'Technologie' }, descriptions: { en: 'Connectivity, startups and the tools changing daily life.', fr: 'Connectivité, startups et les outils qui changent le quotidien.' }, order: 6 },
   { _id: 'cat_health', parentId: null, slugs: { en: 'health', fr: 'sante' }, names: { en: 'Health', fr: 'Santé' }, descriptions: { en: 'Clinics, campaigns and the state of public health.', fr: 'Cliniques, campagnes et l’état de la santé publique.' }, order: 7 },
+  // The PRD's eight category pages: Entertainment and Lifestyle complete the
+  // set, and their absence left /sections/entertainment answering 404.
+  { _id: 'cat_entertainment', parentId: null, slugs: { en: 'entertainment', fr: 'divertissement' }, names: { en: 'Entertainment', fr: 'Divertissement' }, descriptions: { en: 'Film, music and the stages where a culture performs itself.', fr: 'Cinéma, musique et les scènes où une culture se met en spectacle.' }, order: 8 },
+  { _id: 'cat_lifestyle', parentId: null, slugs: { en: 'lifestyle', fr: 'art-de-vivre' }, names: { en: 'Lifestyle', fr: 'Art de vivre' }, descriptions: { en: 'Food, fashion and the small choices that make a life.', fr: "Cuisine, mode et les petits choix qui font une vie." }, order: 9 },
+  // Opinion and Editorial are categories like any other — the PRD gives them
+  // the same template and distinguishes them by byline treatment alone, which
+  // lives in the article header, not in the data.
+  { _id: 'cat_opinion', parentId: null, slugs: { en: 'opinion', fr: 'opinion' }, names: { en: 'Opinion', fr: 'Opinion' }, descriptions: { en: 'Argued views from contributors, clearly marked as their own.', fr: "Des points de vue argumentés de contributeurs, clairement présentés comme les leurs." }, order: 10 },
+  { _id: 'cat_editorial', parentId: null, slugs: { en: 'editorial', fr: 'editorial' }, names: { en: 'Editorial', fr: 'Éditorial' }, descriptions: { en: 'The considered position of this newsroom on the questions of the week.', fr: "La position réfléchie de cette rédaction sur les questions de la semaine." }, order: 11 },
 ]
 
 interface Story {
@@ -61,6 +70,22 @@ const STORIES: Story[] = [
   { id: 'a21', locale: 'fr', slug: 'formation-des-enseignants-la-promotion-double', title: "Formation des enseignants : la promotion double d'effectif", category: 'cat_education', daysAgo: 6 },
   { id: 'a22', locale: 'fr', slug: 'la-vaccination-atteint-la-moitie-de-son-objectif', title: "La campagne de vaccination atteint la moitié de son objectif", category: 'cat_health', daysAgo: 8 },
   { id: 'a23', locale: 'fr', slug: 'le-haut-debit-rural-relie-son-centieme-village', title: 'Le haut débit rural relie son centième village', category: 'cat_technology', daysAgo: 11 },
+  // Demo headlines for the four sections added above — plausible desk copy,
+  // none of it claiming to be a real story, a real festival or a real person.
+  { id: 'a24', locale: 'en', slug: 'film-festival-opens-with-record-local-entries', title: 'Film Festival Opens With a Record Number of Local Entries', category: 'cat_entertainment', daysAgo: 1 },
+  { id: 'a25', locale: 'en', slug: 'highlife-veteran-announces-farewell-tour', title: 'Highlife Veteran Announces a Farewell Tour', category: 'cat_entertainment', daysAgo: 4 },
+  { id: 'a26', locale: 'fr', slug: 'le-festival-du-film-ouvre-avec-un-nombre-record-de-productions-locales', title: 'Le festival du film ouvre avec un nombre record de productions locales', category: 'cat_entertainment', daysAgo: 2 },
+  { id: 'a27', locale: 'en', slug: 'rooftop-gardens-turn-city-concrete-into-harvest', title: 'Rooftop Gardens Turn City Concrete Into Harvest', category: 'cat_lifestyle', daysAgo: 2 },
+  { id: 'a28', locale: 'en', slug: 'slow-food-movement-finds-a-home-in-the-old-quarter', title: 'The Slow Food Movement Finds a Home in the Old Quarter', category: 'cat_lifestyle', daysAgo: 6 },
+  { id: 'a29', locale: 'fr', slug: 'les-jardins-sur-les-toits-transforment-le-beton-en-recoltes', title: 'Les jardins sur les toits transforment le béton en récoltes', category: 'cat_lifestyle', daysAgo: 3 },
+  // Opinion and Editorial headlines argue a position rather than report an
+  // event — the distinction the byline treatment exists to make visible.
+  { id: 'a30', locale: 'en', slug: 'open-budgets-are-only-half-the-job', title: 'Open Budgets Are Only Half the Job', category: 'cat_opinion', daysAgo: 1 },
+  { id: 'a31', locale: 'en', slug: 'the-media-freedom-bill-deserves-a-slower-reading', title: 'The Media Freedom Bill Deserves a Slower Reading', category: 'cat_opinion', daysAgo: 5 },
+  { id: 'a32', locale: 'fr', slug: 'les-budgets-ouverts-ne-sont-que-la-moitie-du-travail', title: 'Les budgets ouverts ne sont que la moitié du travail', category: 'cat_opinion', daysAgo: 2 },
+  { id: 'a33', locale: 'en', slug: 'a-free-press-is-public-infrastructure', title: 'A Free Press Is Public Infrastructure', category: 'cat_editorial', daysAgo: 0 },
+  { id: 'a34', locale: 'en', slug: 'what-the-exam-results-do-not-say', title: 'What the Exam Results Do Not Say', category: 'cat_editorial', daysAgo: 3 },
+  { id: 'a35', locale: 'fr', slug: 'une-presse-libre-est-une-infrastructure-publique', title: 'Une presse libre est une infrastructure publique', category: 'cat_editorial', daysAgo: 1 },
   { id: 'd1', locale: 'en', slug: 'unpublished-draft-not-for-readers', title: 'Draft — Not Visible To Readers', category: 'cat_politics', daysAgo: 0, status: 'draft' },
   { id: 'r1', locale: 'en', slug: 'awaiting-an-editors-approval', title: "In Review — Awaiting an Editor's Approval", category: 'cat_business', daysAgo: 0, status: 'in_review' },
   { id: 's1', locale: 'en', slug: 'scheduled-goes-live-friday-morning', title: 'Scheduled — Goes Live on Friday Morning', category: 'cat_technology', daysAgo: 0, status: 'scheduled', inDays: 2 },

@@ -32,6 +32,7 @@ export const SYSTEM = {
   summarise: `${HOUSE} Summarise only what the article states.`,
   translate: `${HOUSE} Translate faithfully. Keep proper nouns, quotes and numbers exact. Localise idiom, never meaning.`,
   factcheck: `${HOUSE} Identify claims that need a second source. Flag concerns; do not assert what is true.`,
+  grammar: `${HOUSE} Flag grammar, spelling and punctuation only. Quote the exact words at fault and propose a fix for each. Never change meaning, register or facts.`,
   image: `${HOUSE} Describe a photograph or illustration that could accompany the article without depicting real identifiable people or fabricated events.`,
   social: `${HOUSE} Write a social post for the named platform. Stay faithful to the article. Hashtags must be topics the article actually covers.`,
 } as const
@@ -70,6 +71,9 @@ export const PROMPT = {
 
   factcheck: (i: ArticleContext): string =>
     `${context(i)}\n\nList claims that a second source should confirm before publication.`,
+
+  grammar: (i: ArticleContext): string =>
+    `${context(i)}\n\nList grammar, spelling and punctuation issues in the body. For each, quote the exact excerpt and give a fix. Return an empty list when the text is clean.`,
 
   image: (i: ArticleContext): string =>
     `${context(i)}\n\nWrite one image-generation prompt for a featured image.`,

@@ -535,6 +535,73 @@ No local blockers remain.
   `pnpm --filter @kurasikapa/web seed:demo` against a local Mongo
   (defaults to `127.0.0.1:37017`, overridable via `MONGODB_URI`).
 
+## 11. PRD gap close-out on 2026-08-13 (through KUR-65)
+
+A full audit of `docs/02-prd.md` against the code found the gaps below; each
+was then built and verified.
+
+### Built
+- **Studio workflow transition UI** — the six transition Server Actions
+  existed but no component called them. New `transition-controls.tsx`,
+  `schedule-control.tsx` and `workflow-buttons.tsx` render only the actions
+  the domain state machine + the viewer's role allow, wired into the article
+  editor page; `e2e/studio.spec.ts` gained a sign-in → submit → approve →
+  schedule journey.
+- **Schedule publishing UI** — datetime control calling
+  `schedulePublicationAction`, shown only when the domain allows scheduling.
+- **AI assists completed** — rewrite + tone (new `RewritePanel` streaming tab,
+  shared `use-stream-proposal.ts` core), fact-check, image-prompt and
+  category-detect wired into the copilot assist panel (`assists.ts`);
+  `detectCategoryAction` now loads the real sections server-side rather than
+  trusting a browser-supplied list. All remain propose-then-accept (ADR-0005).
+- **AI grammar check** — new `AiPort.grammarCheck` (GrammarIssue list),
+  Anthropic adapter implementation (prompt, zod schema, balanced-model
+  routing), `grammarCheckAction`, and a review-list UI. Never auto-applied.
+- **Reader sign-up** — `/[locale]/sign-up` mirroring sign-in
+  (`sign-up-form.tsx` via `authClient.signUp.email`), reciprocal links
+  between the two pages.
+- **News index** — `/[locale]/news`, the page breaking news lands on:
+  `cachedLatest` listing (same cache tag as the homepage rails), lead story +
+  grid; added to header nav, footer, sitemap, and `messages/{en,fr}.json`.
+- **Social per-platform captions** — `captionForPlatform` in the domain
+  (platform override wins, blank falls back to shared), `QueueSocialPost`
+  fan-out, per-platform textareas in the composer, mongo round-trip test.
+- **Social publish-now + short summary** — "Publish now" queues with
+  `scheduledAt = now` (ClockPort at the boundary); `ProposeSocialSummary`
+  use case + composer button offering the summary as an acceptable proposal.
+- **Lighthouse CI** — new `lighthouse` job in `ci.yml` (mongo:8 service, seed
+  → build → `treosh/lighthouse-ci-action@v12` on `/en` + an article page);
+  assertions in `.github/lighthouse/lighthouserc.json`: accessibility error ≥
+  0.9, performance warn ≥ 0.5 to start.
+- **Axe coverage** — the WCAG sweep in `e2e/reading.spec.ts` now covers every
+  journey path (10 paths).
+- **Opinion/Editorial + missing categories** — `cat_entertainment`,
+  `cat_lifestyle`, `cat_opinion`, `cat_editorial` join the demo seed (3
+  stories each, EN+FR); `OPINION_CATEGORY_IDS` + `OpinionByline` give
+  opinion/editorial articles the PRD's distinct byline treatment
+  (author-forward + standing views-are-the-author's disclaimer).
+- **Revision on every transition** — `RevisionTrigger` on the `Revision`
+  entity (optional for legacy documents, required at mint); all six
+  transition use cases append a snapshot revision via the shared
+  `mintTransitionRevision` helper; approve's pinned-revision mechanism is
+  untouched. Composition wiring updated to pass `revisions` + `ids`.
+- **Demo seed** — now 35 published stories, 11 sections, 3 comments, one of
+  each non-public workflow state; runnable via
+  `pnpm --filter @kurasikapa/web seed:demo`.
+- Dead `queueSocialPostAction` (single-caption) removed from
+  `actions/side-actions.ts`; the composer uses the extended
+  `actions/social.ts`.
+- `packages/adapter-mongo/src/testing/mongo-harness.ts` — `KURA_TEST_MONGO_URI`
+  escape hatch (same pattern as the Go service): the suite can run against an
+  already-running replica set when the Docker host is too loaded to spawn
+  Testcontainers. Unset, behaviour is unchanged; CI takes the container path.
+- Two e2e defects the new journeys exposed, fixed:
+  - Better Auth's credential-path rate limit (three sign-ins a minute, stored
+    in the `rateLimit` collection) refused the fourth signed-in journey;
+    `studio.spec.ts` now resets the allowance before its extra sign-in.
+  - The sign-in/sign-up cross-links were distinguishable by colour alone
+    (`link-in-text-block`, WCAG 2.2 AA); both are underlined.
+
 ### Still open / next (categorized)
 
 **(a) Blocked on client / credentials**

@@ -1,5 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
 import { SignInForm } from '@/components/auth/sign-in-form'
+import { Link } from '@/i18n/navigation'
 import { socialProviders } from '@/composition/auth-providers'
 
 /**
@@ -30,6 +31,16 @@ export default async function SignInPage({
         providers={configured}
         captchaSiteKey={process.env['NEXT_PUBLIC_TURNSTILE_SITE_KEY']}
       />
+
+      <p className="text-on-surface-variant mt-[var(--spacing-md)] text-sm">
+        No account yet?{' '}
+        <Link
+          href="/sign-up"
+          className="text-secondary hover:text-primary underline underline-offset-2 transition-colors"
+        >
+          Create one
+        </Link>
+      </p>
     </section>
   )
 }

@@ -1,17 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { callAction } from '../../actions/call'
-import {
-  suggestHeadlinesAction,
-  suggestSeoAction,
-  suggestTagsAction,
-  summariseAction,
-} from '../../actions/ai'
-import type { ActionResult } from '../../actions/result'
 import { type Suggestion, SuggestionList } from './suggestion-list'
-
-type Assist = 'headlines' | 'seo' | 'tags' | 'summary'
+import { ASSISTS, LABEL, type Assist } from './assists'
 
 export interface AiPanelProps {
   readonly title: string
@@ -133,72 +124,4 @@ function AssistButtons({
       ))}
     </div>
   )
-}
-
-const LABEL: Readonly<Record<Assist, string>> = {
-  headlines: 'Headlines',
-  seo: 'SEO',
-  tags: 'Tags',
-  summary: 'Summary',
-}
-
-interface Ctx {
-  title: string
-  body: string
-  locale: string
-}
-
-const ok = (items: readonly Suggestion[]): ActionResult<readonly Suggestion[]> => ({
-  ok: true,
-  data: items,
-})
-
-/**
- * Each assist maps its own result shape to one list the panel can render.
- * Keeping the mapping here rather than in the panel means adding an assist is
- * one entry, not a new branch in the view.
- */
-const ASSISTS: Readonly<
-  Record<Assist, (ctx: Ctx) => Promise<ActionResult<readonly Suggestion[]>>>
-> = {
-  headlines: async (ctx) => {
-    const result = await callAction(() => suggestHeadlinesAction(ctx))
-    if (!result.ok) return result
-
-    return ok(result.data.map((h) => ({ text: h.text, note: h.rationale, applicable: true })))
-  },
-
-  seo: async (ctx) => {
-    const result = await callAction(() => suggestSeoAction(ctx))
-    if (!result.ok) return result
-
-    return ok([
-      { text: result.data.metaTitle, note: 'Meta title', applicable: false },
-      { text: result.data.metaDescription, note: 'Meta description', applicable: false },
-      { text: result.data.keywords.join(', '), note: 'Keywords', applicable: false },
-    ])
-  },
-
-  tags: async (ctx) => {
-    const result = await callAction(() => suggestTagsAction(ctx))
-    if (!result.ok) return result
-
-    return ok(
-      result.data.map((t) => ({
-        text: t.label,
-        note: `confidence ${t.confidence.toFixed(2)}`,
-        applicable: false,
-      })),
-    )
-  },
-
-  summary: async (ctx) => {
-    const result = await callAction(() => summariseAction(ctx))
-    if (!result.ok) return result
-
-    return ok([
-      { text: result.data.short, note: 'Summary', applicable: false },
-      ...result.data.bullets.map((b) => ({ text: b, note: 'Bullet', applicable: false })),
-    ])
-  },
 }

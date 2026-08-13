@@ -1,4 +1,4 @@
-import type { ArticleStatus } from '@kurasikapa/domain'
+import type { ArticleStatus, RevisionTrigger } from '@kurasikapa/domain'
 
 /**
  * The shape on disk. Deliberately not the domain shape.
@@ -35,6 +35,8 @@ export interface RevisionDocument {
   body: string
   authorId: string
   createdAt: Date
+  /** Why the revision exists. Optional — older documents predate the field. */
+  trigger?: RevisionTrigger
 }
 
 export interface RoleAssignmentDocument {

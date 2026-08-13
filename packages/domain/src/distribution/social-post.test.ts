@@ -9,6 +9,7 @@ import {
   PLATFORMS,
   SchedulePostInPast,
   SocialPost,
+  captionForPlatform,
   socialPostId,
 } from './social-post'
 
@@ -139,6 +140,32 @@ describe('markFailed — the retry budget', () => {
     post.markFailed('network')
 
     expect(post.attempts).toBe(0)
+  })
+})
+
+describe('captionForPlatform', () => {
+  it('gives a platform its own caption when one was written', () => {
+    expect(captionForPlatform('instagram', { instagram: 'Made for IG' }, 'Shared caption')).toBe(
+      'Made for IG',
+    )
+  })
+
+  it('falls back to the shared caption for a platform without one', () => {
+    // The override list answers "what differs", not "what repeats" — Facebook
+    // gets the shared caption itself, not a copy of it.
+    expect(captionForPlatform('facebook', { instagram: 'Made for IG' }, 'Shared caption')).toBe(
+      'Shared caption',
+    )
+  })
+
+  it('treats a blank override as no override', () => {
+    expect(captionForPlatform('facebook', { facebook: '   ' }, 'Shared caption')).toBe(
+      'Shared caption',
+    )
+  })
+
+  it('falls back when there are no overrides at all', () => {
+    expect(captionForPlatform('facebook', undefined, 'Shared caption')).toBe('Shared caption')
   })
 })
 

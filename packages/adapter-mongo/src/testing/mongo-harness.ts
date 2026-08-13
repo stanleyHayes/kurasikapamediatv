@@ -20,8 +20,16 @@ export interface MongoHarness {
  * on publish, which is the worst possible place to discover the difference.
  */
 export async function startMongo(): Promise<MongoHarness> {
-  const container: StartedMongoDBContainer = await new MongoDBContainer('mongo:8').start()
-  const client = new MongoClient(container.getConnectionString(), { directConnection: true })
+  // KURA_TEST_MONGO_URI runs the suite against an already-running MongoDB
+  // instead of spawning a container per file — the escape hatch for a Docker
+  // host too loaded to start containers (it must still be a replica set:
+  // the transaction tests need one). Unset, nothing changes.
+  const external = process.env['KURA_TEST_MONGO_URI']
+  const container: StartedMongoDBContainer | undefined =
+    external === undefined ? await new MongoDBContainer('mongo:8').start() : undefined
+  const uri = external ?? container?.getConnectionString()
+  if (uri === undefined) throw new Error('no MongoDB to connect to')
+  const client = new MongoClient(uri, { directConnection: true })
 
   await client.connect()
   const db = client.db('kurasikapa_test')
@@ -35,7 +43,7 @@ export async function startMongo(): Promise<MongoHarness> {
     },
     async stop(): Promise<void> {
       await client.close()
-      await container.stop()
+      await container?.stop()
     },
   }
 }

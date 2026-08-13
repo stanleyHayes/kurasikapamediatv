@@ -53,7 +53,13 @@ export class UpdateDraft implements UseCase<UpdateDraftInput, UpdateDraftResult>
     const previous = await this.deps.revisions.findLatest(article.id)
     const revision = mintRevision(
       this.deps,
-      { articleId: article.id, title: input.title, body: input.body, authorId: input.actor.id },
+      {
+        articleId: article.id,
+        title: input.title,
+        body: input.body,
+        authorId: input.actor.id,
+        trigger: 'edit',
+      },
       previous,
     )
 

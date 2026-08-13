@@ -105,6 +105,27 @@ describe('structured methods', () => {
     expect(notes[0]?.concern).toBe('No source given')
   })
 
+  it('returns grammar issues with a fix for each', async () => {
+    const adapter = adapterReturning({
+      issues: [
+        { excerpt: 'their was', problem: 'Wrong pronoun form', suggestion: 'there was' },
+      ],
+    })
+
+    const issues = await adapter.grammarCheck(article)
+
+    expect(issues).toEqual([
+      { excerpt: 'their was', problem: 'Wrong pronoun form', suggestion: 'there was' },
+    ])
+  })
+
+  it('returns an empty list when the text is clean', async () => {
+    // A clean draft is a result, not an error — the panel shows "no issues".
+    const adapter = adapterReturning({ issues: [] })
+
+    expect(await adapter.grammarCheck(article)).toEqual([])
+  })
+
   it('returns an image prompt string', async () => {
     const adapter = adapterReturning({ prompt: 'A wide shot of parliament at dusk.' })
     expect(await adapter.imagePrompt(article)).toBe('A wide shot of parliament at dusk.')

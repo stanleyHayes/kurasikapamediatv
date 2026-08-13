@@ -7,6 +7,7 @@ import type {
   CategorySuggestion,
   DraftRequest,
   FactCheckNote,
+  GrammarIssue,
   Headline,
   RewriteRequest,
   SeoSuggestion,
@@ -27,6 +28,7 @@ export interface FakeAiScript {
   readonly summary?: Summary
   readonly translation?: TranslatedArticle
   readonly notes?: readonly FactCheckNote[]
+  readonly grammarIssues?: readonly GrammarIssue[]
   readonly imagePrompt?: string
   readonly socialCaption?: SocialCaption
 }
@@ -40,6 +42,9 @@ const DEFAULTS = {
   summary: { short: 'A summary.', bullets: ['A point'] },
   translation: { locale: 'fr', title: 'Un Titre', body: 'Un corps.' },
   notes: [{ claim: 'A claim', concern: 'Unsourced', suggestedSource: 'Official release' }],
+  grammarIssues: [
+    { excerpt: 'their was', problem: 'Wrong pronoun form', suggestion: 'there was' },
+  ],
   imagePrompt: 'A wide editorial photograph.',
   socialCaption: { caption: 'A proposed caption.', hashtags: ['news'] },
 } as const satisfies Required<FakeAiScript>
@@ -119,6 +124,10 @@ export class FakeAi implements AiPort {
 
   factCheck(input: ArticleContext): Promise<readonly FactCheckNote[]> {
     return Promise.resolve(this.record('factCheck', input, this.script.notes))
+  }
+
+  grammarCheck(input: ArticleContext): Promise<readonly GrammarIssue[]> {
+    return Promise.resolve(this.record('grammarCheck', input, this.script.grammarIssues))
   }
 
   imagePrompt(input: ArticleContext): Promise<string> {

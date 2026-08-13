@@ -2,8 +2,10 @@ import {
   type Actor,
   type ArticleId,
   type Platform,
+  type PlatformCaptions,
   SocialPost,
   type SocialPostId,
+  captionForPlatform,
   requirePermission,
   socialPostId,
 } from '@kurasikapa/domain'
@@ -25,6 +27,8 @@ export interface QueueSocialPostInput {
   readonly articleId: ArticleId
   readonly platforms: readonly Platform[]
   readonly caption: string
+  /** Per-platform overrides; a platform without one gets the shared caption. */
+  readonly captions?: PlatformCaptions | undefined
   readonly scheduledAt: Date
 }
 
@@ -35,9 +39,11 @@ export interface QueueSocialPostResult {
 /**
  * Queues one post per platform for a published article.
  *
- * One caption for all platforms here; per-platform captions are a questionnaire
- * item (§ 10) and become an argument, not a redesign — each platform already
- * gets its own row.
+ * Each platform gets its own row and may carry its own caption; platforms
+ * without an override share `caption` (the domain decides which applies).
+ * A `scheduledAt` of right now is legitimate — "publish now" queues a post
+ * whose moment has already arrived, and the fan-out worker picks it up on
+ * its next pass.
  */
 export class QueueSocialPost implements UseCase<QueueSocialPostInput, QueueSocialPostResult> {
   constructor(private readonly deps: QueueSocialPostDeps) {}
@@ -58,7 +64,7 @@ export class QueueSocialPost implements UseCase<QueueSocialPostInput, QueueSocia
         {
           id: socialPostId(this.deps.ids.next()),
           platform,
-          caption: input.caption,
+          caption: captionForPlatform(platform, input.captions, input.caption),
           scheduledAt: input.scheduledAt,
         },
         article,

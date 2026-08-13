@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { articleId, revisionId, userId } from '../shared/ids'
-import { NonMonotonicSequence, Revision, type RevisionProps } from './revision'
+import { type NewRevision, NonMonotonicSequence, Revision } from './revision'
 
 const ARTICLE = articleId('art_1')
 const AUTHOR = userId('usr_author')
@@ -8,13 +8,14 @@ const EDITOR = userId('usr_editor')
 const NOW = new Date('2026-08-08T10:00:00Z')
 const LATER = new Date('2026-08-08T12:00:00Z')
 
-const base = (id: string, title: string, body: string): Omit<RevisionProps, 'seq'> => ({
+const base = (id: string, title: string, body: string): NewRevision => ({
   id: revisionId(id),
   articleId: ARTICLE,
   title,
   body,
   authorId: AUTHOR,
   createdAt: NOW,
+  trigger: 'edit',
 })
 
 describe('append', () => {
@@ -36,6 +37,12 @@ describe('append', () => {
     expect(rev.body).toBe('body text')
     expect(rev.authorId).toBe(AUTHOR)
     expect(rev.createdAt).toEqual(NOW)
+    expect(rev.trigger).toBe('edit')
+  })
+
+  it('records which transition caused the revision', () => {
+    const rev = Revision.append({ ...base('rev_1', 'A', 'first'), trigger: 'submit' }, null)
+    expect(rev.trigger).toBe('submit')
   })
 })
 
@@ -59,6 +66,13 @@ describe('restoreOnto', () => {
     expect(restored.createdAt).toEqual(LATER)
   })
 
+  it('marks the forwarded revision as a restore', () => {
+    const first = Revision.append(base('rev_1', 'Original', 'body'), null)
+    const restored = first.restoreOnto(revisionId('rev_2'), first, EDITOR, LATER)
+
+    expect(restored.trigger).toBe('restore')
+  })
+
   it('leaves the restored-from revision untouched', () => {
     const first = Revision.append(base('rev_1', 'Original', 'body'), null)
     first.restoreOnto(revisionId('rev_2'), first, EDITOR, LATER)
@@ -80,5 +94,19 @@ describe('reconstitute', () => {
     const rev = Revision.reconstitute({ ...base('rev_9', 'T', 'B'), seq: 9 })
     expect(rev.seq).toBe(9)
     expect(rev.snapshot().seq).toBe(9)
+  })
+
+  it('tolerates a record written before triggers existed', () => {
+    const rev = Revision.reconstitute({
+      id: revisionId('rev_1'),
+      articleId: ARTICLE,
+      seq: 1,
+      title: 'T',
+      body: 'B',
+      authorId: AUTHOR,
+      createdAt: NOW,
+    })
+
+    expect(rev.trigger).toBeUndefined()
   })
 })

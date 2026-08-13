@@ -46,6 +46,28 @@ describe('round trip', () => {
     expect(loaded?.snapshot()).toEqual(original.snapshot())
   })
 
+  it('keeps each platform its own caption', async () => {
+    // Per-platform captions are one row per platform by design; a write path
+    // that collapsed them would hand Instagram the Facebook caption.
+    const facebook = post('sp_fb', LATER)
+    const instagram = SocialPost.reconstitute({
+      ...facebook.snapshot(),
+      id: socialPostId('sp_ig'),
+      platform: 'instagram',
+      caption: 'Budget 2026 in sixty seconds.',
+    })
+    await repo.save(facebook)
+    await repo.save(instagram)
+
+    const page = await repo.listQueue({ limit: 10 })
+    const captions = Object.fromEntries(page.items.map((p) => [p.platform, p.caption]))
+
+    expect(captions).toEqual({
+      facebook: 'Budget 2026 explained.',
+      instagram: 'Budget 2026 in sixty seconds.',
+    })
+  })
+
   it('returns null for an unknown id', async () => {
     expect(await repo.findById(socialPostId('sp_missing'))).toBeNull()
   })

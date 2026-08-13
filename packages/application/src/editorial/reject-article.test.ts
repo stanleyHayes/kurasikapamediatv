@@ -1,7 +1,7 @@
 import { IllegalTransition, NotPermitted, articleId, revisionId } from '@kurasikapa/domain'
 import { anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { aJournalist, anEditor, harness } from '../testing/harness'
+import { aJournalist, aRevision, anEditor, harness } from '../testing/harness'
 import { ArticleNotFound } from './errors'
 import { RejectArticle } from './reject-article'
 
@@ -13,24 +13,33 @@ const inReview = (): ReturnType<typeof anArticle> =>
 
 describe('RejectArticle', () => {
   it('returns the article to draft', async () => {
-    const h = harness({ articles: [inReview()] })
+    const h = harness({ articles: [inReview()], revisions: [aRevision()] })
     const result = await new RejectArticle(h).execute({ actor: anEditor, articleId: target, note })
 
     expect(result.status).toBe('draft')
   })
 
   it('clears any prior approval, so a stale revision cannot publish later', async () => {
-    const h = harness({ articles: [inReview()] })
+    const h = harness({ articles: [inReview()], revisions: [aRevision()] })
     await new RejectArticle(h).execute({ actor: anEditor, articleId: target, note })
 
     expect((await h.articles.findById(target))?.snapshot().approvedRevisionId).toBeNull()
   })
 
   it("carries the editor's note on the event for the author notification", async () => {
-    const h = harness({ articles: [inReview()] })
+    const h = harness({ articles: [inReview()], revisions: [aRevision()] })
     await new RejectArticle(h).execute({ actor: anEditor, articleId: target, note })
 
     expect(h.events.last()).toMatchObject({ name: 'article.rejected', note })
+  })
+
+  it('appends a revision recording the rejection', async () => {
+    const h = harness({ articles: [inReview()], revisions: [aRevision()] })
+    await new RejectArticle(h).execute({ actor: anEditor, articleId: target, note })
+
+    const entry = (await h.revisions.listFor(target)).at(-1)!
+    expect(entry.seq).toBe(2)
+    expect(entry.trigger).toBe('reject')
   })
 
   it('reports an unknown article', async () => {

@@ -14,7 +14,6 @@ import {
   parseInput,
   postCommentSchema,
   proposeSocialCaptionSchema,
-  queueSocialPostSchema,
   restoreRevisionSchema,
 } from './schemas'
 
@@ -55,31 +54,6 @@ export async function toggleSavedAction(
       : await container().saveArticle.execute({ actor, articleId: target })
 
     return { saved: result.saved }
-  })
-}
-
-/**
- * Queues a published article to the social platforms.
- *
- * One post per platform, all validated before any is written — the use case
- * refuses the whole request rather than leaving half a fan-out queued.
- */
-export async function queueSocialPostAction(
-  input: unknown,
-): Promise<ActionResult<{ queued: number }>> {
-  return attempt(async () => {
-    const parsed = parseInput(queueSocialPostSchema, input)
-    const actor = await requireActor()
-
-    const result = await container().queueSocialPost.execute({
-      actor,
-      articleId: parsed.articleId as ArticleId,
-      platforms: parsed.platforms,
-      caption: parsed.caption,
-      scheduledAt: new Date(parsed.scheduledAt),
-    })
-
-    return { queued: result.queued.length }
   })
 }
 

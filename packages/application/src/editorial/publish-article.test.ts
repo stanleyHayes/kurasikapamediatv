@@ -6,7 +6,7 @@ import {
 } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { LATER, NOW, anAuthor, anEditor, harness } from '../testing/harness'
+import { LATER, NOW, aRevision, anAuthor, anEditor, harness } from '../testing/harness'
 import { ArticleNotFound } from './errors'
 import { PublishDueArticles } from './publish-due-articles'
 import { PublishArticle } from './publish-article'
@@ -15,7 +15,7 @@ const target = articleId('art_1')
 
 describe('PublishArticle', () => {
   it('publishes an approved article', async () => {
-    const h = harness({ articles: [anApprovedArticle()] })
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
     const result = await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
 
     expect(result.status).toBe('published')
@@ -23,7 +23,7 @@ describe('PublishArticle', () => {
   })
 
   it('returns the slug and locale the caller needs to invalidate the cache', async () => {
-    const h = harness({ articles: [anApprovedArticle()] })
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
     const result = await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
 
     expect(result.slug).toBe('budget-2026')
@@ -33,7 +33,7 @@ describe('PublishArticle', () => {
   it('carries slug and locale on the event, so no second read is needed', async () => {
     // Breaking news must be live within the publishing request. A subscriber
     // that had to re-fetch the article to know its tag would add a round trip.
-    const h = harness({ articles: [anApprovedArticle()] })
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
     await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
 
     expect(h.events.last()).toMatchObject({
@@ -43,9 +43,19 @@ describe('PublishArticle', () => {
     })
   })
 
+  it('appends a revision recording the publication', async () => {
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
+    await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
+
+    const entry = (await h.revisions.listFor(target)).at(-1)!
+    expect(entry.seq).toBe(2)
+    expect(entry.trigger).toBe('publish')
+  })
+
   it('clears the schedule when publishing something scheduled', async () => {
     const h = harness({
       articles: [anApprovedArticle({ status: 'scheduled', scheduledAt: LATER })],
+      revisions: [aRevision()],
     })
     await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
 
@@ -86,6 +96,24 @@ describe('PublishArticle', () => {
   })
 })
 
+describe('PublishDueArticles', () => {
+  it('records the publication in history just like the editor path', async () => {
+    // Cron and editor share publishAndAnnounce so the two cannot drift — that
+    // includes the revision every transition must write.
+    const h = harness({
+      articles: [anApprovedArticle({ status: 'scheduled', scheduledAt: NOW })],
+      revisions: [aRevision()],
+    })
+
+    const result = await new PublishDueArticles(h).execute({ actor: anEditor })
+
+    expect(result.published).toEqual([target])
+    const entry = (await h.revisions.listFor(target)).at(-1)!
+    expect(entry.seq).toBe(2)
+    expect(entry.trigger).toBe('publish')
+  })
+})
+
 describe('a failing announcement does not fail a completed publish', () => {
   it('still reports success, and the article stays published', async () => {
     // The bug this guards was found by the scheduled-publication cron. The
@@ -93,7 +121,7 @@ describe('a failing announcement does not fail a completed publish', () => {
     // and the cron marked a live article as failed. Next minute it retried,
     // the domain refused published → published, and it failed again — an
     // alert that never clears, about an article that was never broken.
-    const h = harness({ articles: [anApprovedArticle()] })
+    const h = harness({ articles: [anApprovedArticle()], revisions: [aRevision()] })
     h.events.publish = (): Promise<void> => Promise.reject(new Error('cache subscriber exploded'))
 
     const result = await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
@@ -105,7 +133,10 @@ describe('a failing announcement does not fail a completed publish', () => {
   })
 
   it('also holds for the scheduled path, which is where it bites hardest', async () => {
-    const h = harness({ articles: [anApprovedArticle({ status: 'scheduled', scheduledAt: NOW })] })
+    const h = harness({
+      articles: [anApprovedArticle({ status: 'scheduled', scheduledAt: NOW })],
+      revisions: [aRevision()],
+    })
     h.events.publish = (): Promise<void> => Promise.reject(new Error('cache subscriber exploded'))
 
     const result = await new PublishDueArticles(h).execute({ actor: anEditor })

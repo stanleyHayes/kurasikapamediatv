@@ -1,7 +1,7 @@
 import { IllegalTransition, NotPermitted, articleId, revisionId } from '@kurasikapa/domain'
 import { anApprovedArticle, anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
-import { NOW, aJournalist, anEditor, harness } from '../testing/harness'
+import { NOW, aJournalist, aRevision, anEditor, harness } from '../testing/harness'
 import { ArticleNotFound } from './errors'
 import { PublishArticle } from './publish-article'
 import { UnpublishArticle } from './unpublish-article'
@@ -14,7 +14,7 @@ const published = (): ReturnType<typeof anApprovedArticle> =>
 
 describe('UnpublishArticle', () => {
   it('pulls a published article', async () => {
-    const h = harness({ articles: [published()] })
+    const h = harness({ articles: [published()], revisions: [aRevision()] })
     const result = await new UnpublishArticle(h).execute({
       actor: anEditor,
       articleId: target,
@@ -25,14 +25,23 @@ describe('UnpublishArticle', () => {
   })
 
   it('retains the reason on the event for the audit log', async () => {
-    const h = harness({ articles: [published()] })
+    const h = harness({ articles: [published()], revisions: [aRevision()] })
     await new UnpublishArticle(h).execute({ actor: anEditor, articleId: target, reason })
 
     expect(h.events.last()).toMatchObject({ name: 'article.unpublished', reason })
   })
 
+  it('appends a revision recording the withdrawal', async () => {
+    const h = harness({ articles: [published()], revisions: [aRevision()] })
+    await new UnpublishArticle(h).execute({ actor: anEditor, articleId: target, reason })
+
+    const entry = (await h.revisions.listFor(target)).at(-1)!
+    expect(entry.seq).toBe(2)
+    expect(entry.trigger).toBe('unpublish')
+  })
+
   it('keeps the approved revision, so a correction can republish without re-review', async () => {
-    const h = harness({ articles: [published()] })
+    const h = harness({ articles: [published()], revisions: [aRevision()] })
     await new UnpublishArticle(h).execute({ actor: anEditor, articleId: target, reason })
 
     const pulled = await h.articles.findById(target)
@@ -40,11 +49,15 @@ describe('UnpublishArticle', () => {
   })
 
   it('can be republished straight away', async () => {
-    const h = harness({ articles: [published()] })
+    const h = harness({ articles: [published()], revisions: [aRevision()] })
     await new UnpublishArticle(h).execute({ actor: anEditor, articleId: target, reason })
     const result = await new PublishArticle(h).execute({ actor: anEditor, articleId: target })
 
     expect(result.status).toBe('published')
+
+    // Both transitions left their own history entries, in sequence.
+    const triggers = (await h.revisions.listFor(target)).map((r) => r.trigger)
+    expect(triggers).toEqual(['create', 'unpublish', 'publish'])
   })
 
   it('refuses a journalist', async () => {
