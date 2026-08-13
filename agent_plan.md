@@ -484,7 +484,10 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   All respect `minimumReleaseAge`; `pnpm audit` is now fully clean.
 - `.github/workflows/ci.yml` — the Go job gains a mongo:8 service and runs
   `make integration`, so the adapter suite (incl. the EnsureIndexes tests)
-  executes in CI instead of only locally.
+  executes in CI instead of only locally. Also removed the job-level
+  `if: hashFiles(...)`: `hashFiles` is step-level only, so the whole workflow
+  file failed to parse and every CI run since KUR-61 had died with zero jobs.
+  `actionlint` is clean.
 
 ### Green locally
 - `pnpm lint` ✅

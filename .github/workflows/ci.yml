@@ -104,7 +104,6 @@ jobs:
   go:
     name: Go service
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('services/api/go.mod') != '' }}
     services:
       # The adapter suite runs against a real MongoDB (make integration), the
       # same way the TS adapters use Testcontainers. Standalone is enough:
