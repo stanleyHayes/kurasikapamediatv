@@ -528,6 +528,13 @@ warning on `gitleaks/gitleaks-action@v2` — not actionable from this repo.
 
 No local blockers remain.
 
+- `apps/web/e2e/demo-seed.ts` — expanded from 7 stories / 3 sections to a
+  full demo set: 23 published stories across both locales, 7 sections, one
+  article in each non-public workflow state (draft, in review, scheduled),
+  and 3 visible comments on the lead story. Now runnable as
+  `pnpm --filter @kurasikapa/web seed:demo` against a local Mongo
+  (defaults to `127.0.0.1:37017`, overridable via `MONGODB_URI`).
+
 ### Still open / next (categorized)
 
 **(a) Blocked on client / credentials**

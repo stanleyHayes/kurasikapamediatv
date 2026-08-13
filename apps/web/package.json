@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "seed:demo": "node e2e/demo-seed.ts"
   },
   "dependencies": {
     "@kurasikapa/adapter-anthropic": "workspace:*",
