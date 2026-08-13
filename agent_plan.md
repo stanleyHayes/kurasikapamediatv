@@ -513,7 +513,7 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   (130 tests; 100% statements/lines, 89.4% branches) and `@kurasikapa/domain`
   (98.8% statements)
 - `pnpm dup` ✅ (2.54% tokens, floor 3%)
-- `pnpm go:verify` ✅ (domain 97.3%, app 90.2%)
+- `pnpm go:verify` ✅ (domain 97.3%, app 94.2%)
 - `pnpm build` ✅ (ran via the Playwright webServer; the `use-server` re-export
   break is fixed)
 - `pnpm --filter @kurasikapa/web test:e2e` ✅ — 29 journeys incl. the KUR-62
