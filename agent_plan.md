@@ -520,6 +520,12 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   contact form and `/en/contact` WCAG sweep
 - `pnpm verify` ✅
 
+CI is green end-to-end on `main` (run 31701435997): Quality gates (incl.
+Build with the turbo `passThroughEnv` fix, 29 E2E journeys, audit), Secret
+scan, and the Go service job (`make verify` + `make integration` against the
+mongo:8 service). The only annotation left is an upstream Node-20 deprecation
+warning on `gitleaks/gitleaks-action@v2` — not actionable from this repo.
+
 No local blockers remain.
 
 ### Still open / next (categorized)
