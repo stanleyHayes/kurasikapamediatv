@@ -153,3 +153,15 @@ export async function seed(): Promise<void> {
 
   await client.close()
 }
+
+/**
+ * Clears the shared rate-limit counters (`rate_limits`, named locally for the
+ * same reason as the shapes above) so a journey starts with a full allowance
+ * instead of whatever a previous run left inside the window.
+ */
+export async function resetRateLimits(): Promise<void> {
+  const client = new MongoClient(URI)
+  await client.connect()
+  await client.db(DB).collection('rate_limits').deleteMany({})
+  await client.close()
+}

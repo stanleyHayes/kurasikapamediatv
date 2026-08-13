@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { callAction } from '../../actions/call'
-import { queueSocialPostAction } from '../../actions/editorial'
+import { queueSocialPostAction } from '../../actions/side-actions'
 import { CaptionField } from './caption-field'
 
 const PLATFORMS = [

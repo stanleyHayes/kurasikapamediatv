@@ -70,6 +70,21 @@ func run(log *slog.Logger) error {
 		return err
 	}
 
+	if err := articles.EnsureIndexes(ctx); err != nil {
+		// Also fatal. locale_slug_unique and family_locale_unique are
+		// correctness rules the domain cannot enforce — without them a racing
+		// double-save wins twice — and due_for_publication is what keeps the
+		// publish cron a scan of scheduled articles only.
+		return err
+	}
+
+	if err := categories.EnsureIndexes(ctx); err != nil {
+		// slug_en_unique / slug_fr_unique are the same kind of rule: two
+		// sections sharing a slug in a locale must be impossible, not merely
+		// unlikely.
+		return err
+	}
+
 	deps := appeditorial.Deps{
 		Articles:   articles,
 		Revisions:  revisions,

@@ -30,11 +30,12 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
   webServer: {
-    // Builds first, deliberately. `next start` serves whatever is already in
-    // .next, so without this the suite silently tests a stale build — the same
+    // Seeds BEFORE the build (see e2e/prebuild-seed.ts for why), then builds,
+    // deliberately. `next start` serves whatever is already in .next, so
+    // without the build this suite silently tests a stale build — the same
     // failure mode as reusing a foreign server, and harder to notice because
     // the tests still pass, just against the wrong code.
-    command: `pnpm exec next build && pnpm exec next start --port ${String(PORT)}`,
+    command: `node e2e/prebuild-seed.ts && pnpm exec next build && pnpm exec next start --port ${String(PORT)}`,
     url: BASE_URL,
     // Never reuse. A stale or foreign server on this port would be tested
     // instead of the build under test — which is exactly what happened the

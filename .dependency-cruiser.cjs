@@ -83,7 +83,14 @@ module.exports = {
       comment: 'An unreferenced module is either dead code or a missing wire-up.',
       from: {
         orphan: true,
-        pathNot: ['\\.d\\.ts$', '(^|/)\\.[^/]+\\.(js|cjs|mjs|ts)$', '\\.config\\.(js|cjs|mjs|ts)$'],
+        // `public/` assets are served at the web root, never imported — an
+        // orphan warning there (e.g. the service worker) is noise by design.
+        pathNot: [
+          '\\.d\\.ts$',
+          '(^|/)\\.[^/]+\\.(js|cjs|mjs|ts)$',
+          '\\.config\\.(js|cjs|mjs|ts)$',
+          '(^|/)public/',
+        ],
       },
       to: {},
     },

@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { RATE_LIMITS } from './documents'
 import { MongoRateLimiter } from './mongo-rate-limiter'
 import { type MongoHarness, startMongo } from './testing/mongo-harness'
 
@@ -99,5 +100,13 @@ describe('MongoRateLimiter', () => {
 
     const fresh = await limiter.consume('k', RULE)
     expect(fresh.remaining).toBe(RULE.limit - 1)
+  })
+
+  it('the counter collection is bounded by a TTL index', async () => {
+    // Created by ensureIndexes, which the harness runs. A collection of
+    // counters without expiry grows without bound.
+    const names = (await mongo.db.collection(RATE_LIMITS).indexes()).map((i) => i.name)
+
+    expect(names).toContain('rate_limit_ttl')
   })
 })

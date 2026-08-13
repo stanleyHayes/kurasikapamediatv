@@ -155,11 +155,3 @@ export async function unpublishArticleAction(
     )
   })
 }
-
-// Re-export side actions that historically lived here so existing imports keep working.
-export {
-  assignRolesAction,
-  queueSocialPostAction,
-  restoreRevisionAction,
-  toggleSavedAction,
-} from './side-actions'

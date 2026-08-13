@@ -122,7 +122,7 @@ test.describe('sections', () => {
  * Checked on every public page a reader can reach.
  */
 test.describe('accessibility', () => {
-  for (const path of ['/en', `/en/articles/${PUBLISHED.slug}`, '/en/sections/business', '/en/search']) {
+  for (const path of ['/en', `/en/articles/${PUBLISHED.slug}`, '/en/sections/business', '/en/search', '/en/contact']) {
     test(`${path} has no WCAG 2.2 AA violations`, async ({ page }) => {
       await page.goto(path)
 

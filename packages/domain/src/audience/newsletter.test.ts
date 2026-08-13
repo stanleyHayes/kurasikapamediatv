@@ -70,3 +70,13 @@ describe('confirmation', () => {
     ).toThrow(InvalidConfirmation)
   })
 })
+
+describe('preferences', () => {
+  it('keeps the locales a reader asked for', () => {
+    expect(NewsletterSubscription.request(draft).locales).toEqual(['en'])
+  })
+
+  it('keeps the cadence a reader asked for', () => {
+    expect(NewsletterSubscription.request(draft).cadence).toBe('daily')
+  })
+})

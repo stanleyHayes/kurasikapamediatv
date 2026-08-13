@@ -215,7 +215,7 @@ the wiring is missing.
 
 | Item | State |
 |---|---|
-| **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". Hosting for the Go service is now an open question — Render was chosen for a worker, not for the primary API. |
+| **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". `render.yaml` + [docs/operations/deploy-api.md](docs/operations/deploy-api.md) + `scripts/smoke-api.sh` are ready; what remains is the hosting decision itself (credentials + who owns the Render/Vercel accounts). |
 | **The Go backend itself** | Domain → HTTP serving done (KUR-29 … KUR-43). Editorial BFF cutover done (KUR-45) for CMS writes/reads and public-site reads when `API_URL` is set. Remaining: delete TS editorial packages once a deployed API is the only live path. |
 | ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
 | ~~**Rich-text editor**~~ | **DONE.** Textarea + Markdown toolbar (bold/italic/heading/link). `ArticleBody` parses a safe subset into React children — still no HTML, still no sanitiser dependency. |
@@ -225,9 +225,9 @@ the wiring is missing.
 | ~~**CAPTCHA**~~ | **DONE.** Cloudflare Turnstile, env-gated. Unset keys leave sign-in alone (Playwright still works). |
 | ~~**Google Analytics**~~ | **DONE.** gtag loads only after the consent banner; unset `NEXT_PUBLIC_GA_MEASUREMENT_ID` renders nothing. Search Console still needs the client property. |
 | **Scheduling actually firing** | Article cron live (KUR-34). Social cron live and fail-closed until Meta credentials exist. |
-| **Remaining designed screens** | Five built routes still use my layouts rather than the supplied designs — see §3.7. |
+| ~~**Remaining designed screens**~~ | **DONE** for every route that exists — all ten built routes match their supplied designs (§3.7). `/team` stays ◑ until the client supplies names/roles/bios/portraits; the R3–R5 screens have no routes yet. |
 | ~~**Error tracking**~~ | **DONE.** Locale + global error boundaries; failures go to stderr via `reportError`. A Sentry DSN is still a hosting choice — the boundary no longer swallows. Backups remain Atlas/ops, not code. |
-| **RSS out** | **DONE.** `/{locale}/feed.xml` from the published list. RSS ingest is live (KUR-55) as drafts via Next cron — media-svc still does not exist. |
+| **RSS out** | **DONE.** `/{locale}/feed.xml` from the published list. RSS ingest is live (KUR-55) as drafts via Next cron. |
 
 ### 5.2 R2 — Audience & Distribution
 
@@ -397,6 +397,10 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   `make verify` instead of the non-existent `services/media-svc`.
 - `services/api/Dockerfile` — multi-stage distroless build added so the API can
   deploy.
+- `render.yaml` — Render blueprint for the Go API: Docker runtime, `/healthz`
+  health check, `MONGODB_URI` / `CRON_SECRET` left as dashboard secrets.
+- `docs/operations/deploy-api.md` — step-by-step deploy, `API_URL` cut-over,
+  smoke-checks, and the TS editorial deletion checklist.
 - `.env.example` — removed superseded Mux keys; added ADR-0010 placeholders for
   Amazon IVS + Cloudinary; `CONTACT_TO_EMAIL` for the newsroom inbox.
 - `.raven/manifest.json`, `CLAUDE.md`, `docs/03-architecture.md`,
@@ -405,34 +409,119 @@ Turnstile, consent-gated GA, fail-closed social send + cron.
   references to `services/api` + Amazon IVS + Cloudinary.
 - **KUR-62** — public contact form: `SubmitContactMessage` + fail-closed Resend
   path, rate limit, standing page + form on `/contact`.
+- `packages/adapter-mongo/src/indexes.ts` — newsletter token index changed from
+  `sparse: true` to `partialFilterExpression: { token: { $type: 'string' } }`;
+  confirmed/unsubscribed records hold `token: null`, so a sparse unique index
+  still collided on `null`. This unblocks `pnpm test` for `adapter-mongo`.
+- `apps/web/src/composition/` — split `build-container.ts` to remove circular
+  imports and stay under the 250-line limit:
+  - `container-types.ts` holds the `Container` and `Infrastructure` interfaces.
+  - `editorial-queries.ts` and `distribution-commands.ts` import the types from
+    `container-types.ts`, not from `build-container.ts`.
+  - `build-container.ts` keeps the builder and the `editorialCommands` helper.
+- `packages/adapter-mongo` — added real-Mongo tests for
+  `MongoNewsletterDigestRepository`, `MongoRssSourceRepository` and
+  `MongoPushSubscriptionRepository`; adapter coverage is now 95.5%.
+- `apps/web/src/security/rate-limit.test.ts` — hand-written `FakeLimiter`
+  tests for the login rate limiter (5 tests); web coverage is now 93.05%.
+- `scripts/smoke-api.sh` — executable curl checks for the `API_URL` cut-over
+  (healthz, unauthenticated write, cron wrong/right secret); referenced from
+  `docs/operations/deploy-api.md` and `docs/README.md`.
+- `agent_plan.md` §5.1 — fixed three stale cells: deployment now points at
+  `render.yaml` + deploy doc + smoke script; "remaining designed screens"
+  marked done (all ten built routes match §3.7); dropped the obsolete
+  "media-svc does not exist" wording from the RSS row.
+- `apps/web/e2e/contact.spec.ts` — Playwright journey for KUR-62: the form
+  renders, an undeliverable message fails closed honestly (Resend unset in
+  e2e), and the sixth send in a minute is rate-limited. `seed.ts` gained
+  `resetRateLimits()`; `/en/contact` joined the WCAG axe sweep.
+- `.dependency-cruiser.cjs` — `public/` excluded from the orphan rule;
+  `pnpm boundaries` is now fully clean (the `sw.js` warning is gone).
+- `apps/web/src/actions/editorial.ts` — removed the `side-actions` re-export:
+  Turbopack allows only async-function exports from a `"use server"` file, so
+  the re-export broke `next build` (13 errors; `pnpm verify` runs no build
+  step, CI's Build gate does). The four importers now import `side-actions`
+  directly.
+- Coverage weak spots closed:
+  - `packages/domain/src/editorial/category.test.ts` — `id`, `order` and
+    `snapshot()` accessors (file now 100%; domain ring 98.8%).
+  - `packages/domain/src/audience/newsletter.test.ts` — `locales` / `cadence`
+    getters (file now 100%).
+  - `packages/adapter-mongo/src/mongo-revision-repository.test.ts` —
+    `findManyByIds` and `findLatestForArticles` (file was 50% statements, now
+    100%).
+  - `packages/adapter-mongo/src/mongo-article-repository.test.ts` —
+    `findManyByIds` (empty + populated).
+- `packages/adapter-mongo/src/indexes.ts` — the `rate_limit_ttl` TTL index moved
+  here from `MongoRateLimiter.ensureIndexes`, which was dead code (nothing
+  called it, so databases set up via `ensureIndexes` had an unbounded counter
+  collection). The rate-limiter suite now asserts the TTL index exists.
+- `services/api` — the Go API now creates every index its editorial queries
+  rely on at startup, not just the revision one:
+  - `internal/adapter/mongo/article_indexes.go` — `ArticleRepository
+    .EnsureIndexes` with the full nine-index articles set ported from
+    `packages/adapter-mongo/src/indexes.ts` (unique `locale_slug` /
+    `family_locale`, listings, text search, partial `due_for_publication`).
+  - `internal/adapter/mongo/category_repository.go` —
+    `CategoryRepository.EnsureIndexes` (sparse unique slugs + nav order).
+  - `cmd/api/main.go` — both wired fatal-on-error beside the revision call.
+  - `internal/adapter/mongo/indexes_test.go` — integration tests: named
+    indexes exist; duplicate `(slug, locale)` is refused by the database.
+- `apps/web/e2e/prebuild-seed.ts` + `playwright.config.ts` — the recurring
+  homepage flake was not a timeout: `next build` prerenders the `'use cache'`
+  homepage against an EMPTY database (the seed ran only in `beforeAll`), and
+  the direct-to-Mongo reseed never fires the publish-time `updateTag`, so the
+  first `/en` hit served "Nothing published yet" until the cacheLife entry
+  expired. The webServer command now runs the seed before the build, so the
+  prerender sees the fixtures — matching production, where the database is
+  never empty at deploy.
+- `services/api/Makefile` — the integration hint now mentions `rs.initiate()`;
+  `docs/operations/deploy-api.md` notes the API self-provisions its indexes.
 
 ### Green locally
 - `pnpm lint` ✅
-- `pnpm typecheck` ✅ (after the comment-repository fix)
-- `pnpm boundaries` ✅ (1 orphan warning on `apps/web/public/sw.js`)
-- `pnpm dup` ✅ (1.62%, floor 3%)
+- `pnpm typecheck` ✅
+- `pnpm boundaries` ✅ (fully clean — `public/` excluded from the orphan rule)
+- `pnpm test` ✅ for every package, including `@kurasikapa/adapter-mongo`
+  (130 tests; 100% statements/lines, 89.4% branches) and `@kurasikapa/domain`
+  (98.8% statements)
+- `pnpm dup` ✅ (2.54% tokens, floor 3%)
 - `pnpm go:verify` ✅ (domain 97.3%, app 90.2%)
-- `pnpm test` ✅ for every package **except** `@kurasikapa/adapter-mongo` (see
-  blocker below).
+- `pnpm build` ✅ (ran via the Playwright webServer; the `use-server` re-export
+  break is fixed)
+- `pnpm --filter @kurasikapa/web test:e2e` ✅ — 29 journeys incl. the KUR-62
+  contact form and `/en/contact` WCAG sweep
+- `pnpm verify` ✅
 
-### Local blocker
-`@kurasikapa/adapter-mongo` tests require Testcontainers to start a `mongo:8`
-container. On this machine Testcontainers reaches the container start but the
-MongoDB process inside is not accepting connections on the mapped port
-(`ECONNREFUSED`), so every test file is skipped and the `afterAll` hook throws
-because `mongo` is undefined. This is an environment issue, not a code issue —
-the same tests run in CI via GitHub Actions where Docker/Testcontainers is
-available. Once a working Testcontainers environment is present, `pnpm verify`
-should be green.
+No local blockers remain.
 
-### Still open / next
-1. **Deploy the Go API** (`services/api`) to Render or another host and set
-   `API_URL` in Vercel.
-2. **Delete the TypeScript editorial packages** once the Go API is the only live
-   path (currently guarded by `API_URL`).
-3. **Flip the social send path** when Meta app review + page tokens exist.
-4. **R3–R5** remain future releases requiring client decisions on IVS quota,
-   Cloudinary credentials, Stripe/Paystack, etc.
+### Still open / next (categorized)
+
+**(a) Blocked on client / credentials**
+- Flip the social send path (Facebook + Instagram Graph posts). Prerequisite:
+  Meta app review + `META_PAGE_ACCESS_TOKEN` / `META_PAGE_ID`.
+- R3 live TV, VOD, podcasts, media asset library. Prerequisite: AWS IVS quota
+  request, Cloudinary credentials, IVS/Cloudinary sizing answers (§6).
+- R4 revenue (memberships, donations, ads, classifieds). Prerequisite:
+  Stripe + Paystack credentials, revenue model decisions.
+- R5 intelligence + reach (SEO Center, analytics hub, public APIs, AI anchor).
+  Prerequisite: budget and scope sign-off.
+- §6 blockers still apply: domain name, launch date, budget, local languages
+  beyond EN/FR; Stitch API key rotation; Git LFS decision; IVS quota sizing.
+
+**(b) Requires a deployed `API_URL`**
+- Deploy the Go API (`services/api`) to Render or another host and set `API_URL`
+  in Vercel. Owner: ops/client hosting decision.
+- Delete the TypeScript editorial packages once the Go API is the only live
+  path. Prerequisite: deployed `API_URL` and a smoke-test of the cut-over
+  (CMS writes/reads, public reads, cron `publish-due`).
+
+**(c) R3–R5 future work (no code exists)**
+- `media` bounded context (live TV, VOD, podcasts, galleries, TTS, media
+  library).
+- `revenue` bounded context (memberships, paywall, donations, ad management).
+- `insight` bounded context (analytics, SEO Center, public APIs, AI-generated
+  content).
 
 ### Client / external blockers
 Unchanged from §6: domain name, launch date, budget, local languages beyond

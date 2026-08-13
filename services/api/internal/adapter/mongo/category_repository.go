@@ -86,3 +86,34 @@ func (r *CategoryRepository) Save(ctx context.Context, category editorial.Catego
 
 	return nil
 }
+
+// EnsureIndexes creates the category indexes the queries here rely on.
+//
+// One unique index per launch locale rather than a wildcard on slugs.$**: a
+// wildcard would index every future locale silently, and an explicit list
+// makes adding a language a visible decision. Sparse, because a category
+// rolled out in one locale before another has no slug there, and the missing
+// field must not collide with the next category's missing field.
+func (r *CategoryRepository) EnsureIndexes(ctx context.Context) error {
+	models := []mongo.IndexModel{
+		{
+			Keys:    bson.D{{Key: "slugs.en", Value: 1}},
+			Options: options.Index().SetUnique(true).SetSparse(true).SetName("slug_en_unique"),
+		},
+		{
+			Keys:    bson.D{{Key: "slugs.fr", Value: 1}},
+			Options: options.Index().SetUnique(true).SetSparse(true).SetName("slug_fr_unique"),
+		},
+		// The navigation tree is read in editorial order on every page render.
+		{
+			Keys:    bson.D{{Key: "order", Value: 1}},
+			Options: options.Index().SetName("nav_order"),
+		},
+	}
+
+	if _, err := r.categories.Indexes().CreateMany(ctx, models); err != nil {
+		return fmt.Errorf("creating category indexes: %w", err)
+	}
+
+	return nil
+}

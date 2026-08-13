@@ -33,7 +33,7 @@ export class MongoRateLimiter implements RateLimiter {
    * without waiting for a real minute to pass.
    */
   constructor(
-    private readonly db: Db,
+    db: Db,
     private readonly clock: ClockPort,
   ) {
     this.counters = db.collection<RateLimitDocument>(RATE_LIMITS)
@@ -70,19 +70,5 @@ export class MongoRateLimiter implements RateLimiter {
       // immediately, which is the burst the limit just refused.
       retryAfterSeconds: Math.max(1, Math.ceil((expiresAt.getTime() - now) / 1000)),
     }
-  }
-
-  /**
-   * The TTL index that stops this collection growing without bound.
-   *
-   * Mongo's TTL monitor runs about once a minute, so documents outlive their
-   * window slightly. That is harmless: the window id already makes an expired
-   * document unreachable, and the index is housekeeping rather than
-   * correctness.
-   */
-  async ensureIndexes(): Promise<void> {
-    await this.db
-      .collection(RATE_LIMITS)
-      .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, name: 'rate_limit_ttl' })
   }
 }

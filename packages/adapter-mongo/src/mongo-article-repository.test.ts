@@ -76,6 +76,23 @@ describe('findBySlug', () => {
   })
 })
 
+describe('findManyByIds', () => {
+  it('skips the round trip when asked for nothing', async () => {
+    await expect(repo.findManyByIds([])).resolves.toEqual([])
+  })
+
+  it('returns the requested articles and no others', async () => {
+    await repo.save(article({ id: 'art_1', slug: 'a' }))
+    await repo.save(article({ id: 'art_2', slug: 'b' }))
+    await repo.save(article({ id: 'art_3', slug: 'c' }))
+
+    const found = await repo.findManyByIds([articleId('art_1'), articleId('art_3')])
+
+    expect(found.map((a) => a.id)).toEqual(expect.arrayContaining(['art_1', 'art_3']))
+    expect(found).toHaveLength(2)
+  })
+})
+
 describe('uniqueness the domain cannot enforce', () => {
   it('rejects a second article with the same slug in the same locale', async () => {
     await repo.save(article({ id: 'art_1', slug: 'budget-2026', locale: 'en' }))

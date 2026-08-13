@@ -3,7 +3,7 @@
 import type { Role } from '@kurasikapa/domain'
 import { callAction } from '../../actions/call'
 import { useState, useTransition } from 'react'
-import { assignRolesAction } from '../../actions/editorial'
+import { assignRolesAction } from '../../actions/side-actions'
 import { RoleCheckboxes } from './role-checkboxes'
 
 export interface PersonView {

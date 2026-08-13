@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { callAction } from '../actions/call'
-import { toggleSavedAction } from '../actions/editorial'
+import { toggleSavedAction } from '../actions/side-actions'
 
 /**
  * Optimistic in appearance, honest in fact.

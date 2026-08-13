@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { callAction } from '../../actions/call'
-import { restoreRevisionAction } from '../../actions/editorial'
+import { restoreRevisionAction } from '../../actions/side-actions'
 
 export interface RevisionView {
   readonly id: string

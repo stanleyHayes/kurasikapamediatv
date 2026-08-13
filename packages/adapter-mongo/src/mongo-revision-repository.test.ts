@@ -65,6 +65,44 @@ describe('listFor', () => {
   })
 })
 
+describe('findManyByIds', () => {
+  it('skips the round trip when asked for nothing', async () => {
+    await expect(repo.findManyByIds([])).resolves.toEqual([])
+  })
+
+  it('returns the requested revisions and no others', async () => {
+    await repo.append(revision('rev_1', 'art_1', 1))
+    await repo.append(revision('rev_2', 'art_1', 2))
+    await repo.append(revision('rev_x', 'art_other', 1))
+
+    const found = await repo.findManyByIds([revisionId('rev_1'), revisionId('rev_x')])
+
+    expect(found.map((r) => r.snapshot().id)).toEqual(
+      expect.arrayContaining(['rev_1', 'rev_x']),
+    )
+    expect(found).toHaveLength(2)
+  })
+})
+
+describe('findLatestForArticles', () => {
+  it('skips the round trip when asked for nothing', async () => {
+    await expect(repo.findLatestForArticles([])).resolves.toEqual([])
+  })
+
+  it('returns only the latest revision of each article', async () => {
+    await repo.append(revision('rev_1', 'art_1', 1))
+    await repo.append(revision('rev_2', 'art_1', 2))
+    await repo.append(revision('rev_a', 'art_2', 1))
+    await repo.append(revision('rev_b', 'art_2', 3))
+    await repo.append(revision('rev_c', 'art_2', 2))
+
+    const latest = await repo.findLatestForArticles([ARTICLE, articleId('art_2')])
+
+    const seqByArticle = new Map(latest.map((r) => [r.snapshot().articleId, r.seq]))
+    expect(seqByArticle).toEqual(new Map([['art_1', 2], ['art_2', 3]]))
+  })
+})
+
 describe('append-only guarantees', () => {
   it('refuses two revisions with the same sequence for one article', async () => {
     // A concurrent double-append must fail loudly, not silently lose a draft.

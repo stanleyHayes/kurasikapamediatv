@@ -13,6 +13,7 @@ import {
   RSS_SOURCES,
   SOCIAL_POSTS,
   CATEGORIES,
+  RATE_LIMITS,
   REVISIONS,
   type ArticleDocument,
   type BookmarkDocument,
@@ -126,7 +127,7 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   ])
   await db.collection<NewsletterDocument>(NEWSLETTER_SUBSCRIBERS).createIndexes([
     { key: { email: 1 }, unique: true, name: 'subscriber_email_unique' },
-    { key: { token: 1 }, unique: true, sparse: true, name: 'subscriber_token_unique' },
+    { key: { token: 1 }, unique: true, name: 'subscriber_token_unique', partialFilterExpression: { token: { $type: 'string' } } },
     { key: { state: 1, locales: 1 }, name: 'confirmed_by_locale' },
   ])
   await db.collection<BreakingAlertDocument>(BREAKING_ALERTS).createIndexes([
@@ -140,5 +141,12 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   ])
   await db.collection<RssSourceDocument>(RSS_SOURCES).createIndexes([
     { key: { url: 1 }, unique: true, name: 'rss_url_unique' },
+  ])
+  // The TTL index that stops the rate-limit collection growing without bound.
+  // Mongo's TTL monitor runs about once a minute, so documents outlive their
+  // window slightly. That is harmless: the window id already makes an expired
+  // document unreachable, and the index is housekeeping rather than correctness.
+  await db.collection(RATE_LIMITS).createIndexes([
+    { key: { expiresAt: 1 }, name: 'rate_limit_ttl', expireAfterSeconds: 0 },
   ])
 }

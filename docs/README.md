@@ -13,6 +13,12 @@ AI-native publishing platform for a France-registered TV, radio and online media
 | 07 | [Quality Gates](07-quality-gates.md) | Engineering Lead | CI enforced |
 | 08 | [Decision Records](decisions/) | Engineering Lead | — |
 
+## Operations
+
+- [Deploy the Go API](operations/deploy-api.md) — Render blueprint, `API_URL`
+  cut-over, smoke-checks ([scripts/smoke-api.sh](../scripts/smoke-api.sh)),
+  and the TS editorial deletion checklist.
+
 ## Source inputs
 
 These documents are derived from, and must stay consistent with:

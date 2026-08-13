@@ -77,6 +77,7 @@ integration:
 	@if [ -z "$$KURA_TEST_MONGO_URI" ]; then \
 		echo "KURA_TEST_MONGO_URI is not set."; \
 		echo "Start one with: docker run -d -p 37017:27017 mongo:8 --replSet rs0"; \
+		echo "Init the replica set once: docker exec <name> mongosh --quiet --eval 'rs.initiate()'"; \
 		echo "Then: export KURA_TEST_MONGO_URI='mongodb://127.0.0.1:37017/?directConnection=true'"; \
 		exit 1; \
 	fi

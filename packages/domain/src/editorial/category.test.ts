@@ -71,6 +71,26 @@ describe('hierarchy', () => {
   })
 })
 
+describe('accessors', () => {
+  it('exposes its identity and placement', () => {
+    const section = politics()
+
+    expect(section.id).toBe('cat_politics')
+    expect(section.order).toBe(1)
+  })
+
+  it('snapshots the props it was reconstituted from', () => {
+    expect(politics().snapshot()).toEqual({
+      id: 'cat_politics',
+      parentId: null,
+      slugs: { en: 'politics', fr: 'politique' },
+      names: { en: 'Politics', fr: 'Politique' },
+      descriptions: { en: 'Power, policy and the people who wield both.' },
+      order: 1,
+    })
+  })
+})
+
 describe('descriptionIn', () => {
   it('gives the standfirst for a locale that has one', () => {
     expect(politics().descriptionIn('en')).toBe('Power, policy and the people who wield both.')

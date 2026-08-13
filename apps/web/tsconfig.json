@@ -2,6 +2,9 @@
   "extends": "../../packages/config/tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
+    // e2e/prebuild-seed.ts runs directly under Node's type stripping, which
+    // resolves imports ESM-style — extensions included.
+    "allowImportingTsExtensions": true,
     "lib": [
       "ES2023",
       "DOM",
