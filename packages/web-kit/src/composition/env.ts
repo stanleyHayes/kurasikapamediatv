@@ -14,7 +14,24 @@ const schema = z.object({
 
   // Auth. The secret signs session cookies, so a weak one is a full compromise
   // of every account — 32 characters is the floor, not a suggestion.
+  /**
+   * Signs session JWTs and is the root of every session's integrity.
+   *
+   * Still named for the library it outlived: rotating this signs everybody out,
+   * so the rename waits for a deployment window rather than riding along with
+   * KUR-66. `AUTH_SECRET` is accepted as the new name — see `sessionSecret()`.
+   */
   BETTER_AUTH_SECRET: z.string().min(32),
+  AUTH_SECRET: z.string().min(32).optional(),
+
+  /**
+   * Sign in with Apple needs four values, not two, because its client secret
+   * is a JWT we sign rather than a string Apple gives us. All four or none.
+   */
+  APPLE_SERVICES_ID: z.string().min(1).optional(),
+  APPLE_TEAM_ID: z.string().min(1).optional(),
+  APPLE_KEY_ID: z.string().min(1).optional(),
+  APPLE_PRIVATE_KEY: z.string().min(1).optional(),
   APP_URL: z.url().default('http://localhost:3000'),
 
   /**

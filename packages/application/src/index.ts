@@ -307,3 +307,7 @@ export {
   SignInWithProvider,
   type ProviderSignInInput,
 } from './identity/sign-in-with-provider'
+export {
+  CompleteOAuthSignIn,
+  type CompleteOAuthInput,
+} from './identity/complete-oauth-sign-in'

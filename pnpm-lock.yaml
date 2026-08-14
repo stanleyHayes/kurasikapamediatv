@@ -447,6 +447,9 @@ importers:
       '@kurasikapa/adapter-anthropic':
         specifier: workspace:*
         version: link:../adapter-anthropic
+      '@kurasikapa/adapter-auth':
+        specifier: workspace:*
+        version: link:../adapter-auth
       '@kurasikapa/adapter-email':
         specifier: workspace:*
         version: link:../adapter-email

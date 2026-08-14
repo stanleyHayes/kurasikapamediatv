@@ -61,24 +61,40 @@ export class SignInWithProvider implements UseCase<ProviderSignInInput, SessionT
     const known = await this.deps.credentials.findByExternal(external.provider, external.subject)
     if (known !== null) return this.deps.sessions.issue(known.userId)
 
-    const email = this.verifiedEmail(external)
+    const email = this.usableEmail(external)
     const existing = await this.deps.credentials.findByEmail(email)
 
-    const credential =
-      existing === null ? await this.createFrom(external, email) : await this.link(existing, external)
+    if (existing === null) {
+      // Nobody to impersonate. An unverified address is acceptable here — the
+      // account being created IS the provider identity, and the address is
+      // only a way to reach them.
+      const created = await this.createFrom(external, email)
 
-    return this.deps.sessions.issue(credential.userId)
+      return this.deps.sessions.issue(created.userId)
+    }
+
+    // An account already exists on this address, so linking would hand the
+    // provider identity somebody else's roles. ONLY a provider-asserted
+    // verification is enough to believe they are the same person. Facebook
+    // never asserts it, so this is the branch that refuses Facebook sign-in
+    // onto an existing account — deliberately.
+    if (!external.emailVerified) throw new ProviderAccountUnusable(external.provider)
+
+    const linked = await this.link(existing, external)
+
+    return this.deps.sessions.issue(linked.userId)
   }
 
   /**
-   * An unverified address is refused outright rather than used to create a
-   * fresh account, because the account it creates would claim an address its
-   * owner never confirmed — and the real owner could never then register.
+   * An address we can actually use, verified or not.
+   *
+   * A provider that returns no address at all is refused: an account needs a
+   * way to be contacted and a way to recover, and inventing one — the
+   * `{id}@facebook.com` pattern — creates an account keyed to a mailbox nobody
+   * owns and nobody can receive a reset at.
    */
-  private verifiedEmail(external: ExternalUser): EmailAddress {
-    if (external.email === null || !external.emailVerified) {
-      throw new ProviderAccountUnusable(external.provider)
-    }
+  private usableEmail(external: ExternalUser): EmailAddress {
+    if (external.email === null) throw new ProviderAccountUnusable(external.provider)
 
     try {
       return EmailAddress.of(external.email)
