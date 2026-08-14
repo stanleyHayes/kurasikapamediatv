@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { RssSourceForm } from '@/components/rss-source-form'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
+import { StudioEmptyState } from '@/components/empty-state'
 
 export default async function RssPage({
   params,
@@ -32,14 +33,14 @@ export default async function RssPage({
         approves it — the same integrity rule as everything else we print.
       </p>
       <RssSourceForm locale={locale} categories={categories} />
-      <ul className="space-y-2">
+      {sources.length === 0 ? <StudioEmptyState eyebrow="Source intake" icon="◎" title="No feeds are connected." description="Add a trusted RSS source above. New items arrive as drafts and still require editorial review before publication." compact /> : <ul className="space-y-2">
         {sources.map((source) => (
           <li key={source.id} className="text-on-surface text-sm">
             {source.url}
             <span className="text-on-surface-variant ml-2">{source.locale}</span>
           </li>
         ))}
-      </ul>
+      </ul>}
     </div>
   )
 }

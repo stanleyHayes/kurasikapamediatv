@@ -24,7 +24,7 @@ async function Body({ params }: StandingParams): Promise<React.ReactElement> {
   return (
     <div>
       <StandingPageView page={pageFor('contact', locale)} />
-      <section className="mx-auto max-w-[var(--container-page)] px-6 pb-[var(--spacing-xl)]">
+      <section className="mx-auto max-w-[var(--container-page)] px-6 pb-[var(--space-xl)]">
         <h2 className="font-display text-on-surface text-[length:var(--text-headline-sm)] font-semibold">
           Write to the newsroom
         </h2>

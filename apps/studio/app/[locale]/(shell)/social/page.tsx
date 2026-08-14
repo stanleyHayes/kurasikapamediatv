@@ -78,8 +78,8 @@ export default async function SocialPage({
         </section>
 
         <section className="lg:col-span-4">
-          <div className="border-outline-variant/50 bg-surface-container-low sticky top-6 rounded-xl border p-5">
-            <h3 className="font-display text-on-surface mb-4 text-lg font-semibold">Compose</h3>
+          <div className="sticky top-6 border-t-4 border-secondary bg-surface-container-lowest p-6 broadcast-shadow">
+            <p className="broadcast-kicker mb-3 text-primary">Distribution</p><h3 className="font-display text-on-surface mb-5 text-2xl font-semibold">Compose</h3>
             <SocialComposer articles={articles} />
           </div>
         </section>

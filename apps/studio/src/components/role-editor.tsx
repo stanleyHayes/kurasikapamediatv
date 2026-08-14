@@ -78,7 +78,7 @@ export function RoleEditor({
   }
 
   return (
-    <li className="border-outline-variant border-b py-4">
+    <div className="py-1">
       <PersonHeader person={person} pending={pending} state={state} message={message} />
 
       <RoleCheckboxes
@@ -93,6 +93,6 @@ export function RoleEditor({
           You cannot change your own roles — promotion takes a second person.
         </p>
       )}
-    </li>
+    </div>
   )
 }

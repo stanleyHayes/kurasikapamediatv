@@ -30,11 +30,7 @@ export function SocialQueue({
   locale: string
 }): React.ReactElement {
   if (posts.length === 0) {
-    return (
-      <p className="text-on-surface-variant">
-        Nothing queued. Compose a post to schedule one.
-      </p>
-    )
+    return <StudioEmptyState eyebrow="Distribution clear" icon="↗" title="Nothing is scheduled." description="Choose a published article in the composer to prepare its next Facebook or Instagram post. Every caption stays a proposal until you queue it." compact />
   }
 
   return (
@@ -54,12 +50,12 @@ function QueueRow({
   locale: string
 }): React.ReactElement {
   return (
-    <li className="border-outline-variant/50 bg-surface-container-low rounded-lg border p-4">
+    <li className="border-b border-outline-variant bg-surface-container-lowest p-5">
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className="text-label-bold text-on-surface uppercase">{post.platform}</span>
 
         <span
-          className={`text-label-bold rounded-full border px-2 py-0.5 text-[10px] uppercase ${
+          className={`text-label-bold border px-2 py-0.5 text-[10px] uppercase ${
             STATE_STYLES[post.state] ?? STATE_STYLES['queued'] ?? ''
           }`}
         >
@@ -89,3 +85,4 @@ function QueueRow({
     </li>
   )
 }
+import { StudioEmptyState } from './empty-state'

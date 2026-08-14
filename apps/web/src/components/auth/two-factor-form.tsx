@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { authClient } from '../../lib/auth-client'
 
 const FIELD =
-  'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface rounded border px-3 py-2 outline-none transition-colors'
+  'h-14 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 text-center text-xl tracking-[0.35em] outline-none transition-colors'
 
 /**
  * Completes a sign-in that stopped for TOTP.
@@ -40,9 +40,9 @@ export function TwoFactorForm({ destination }: { destination: string }): React.R
   }
 
   return (
-    <form action={submit} className="flex max-w-md flex-col gap-[var(--spacing-sm)]">
+    <form action={submit} className="flex w-full flex-col gap-5">
       <label className="flex flex-col gap-2">
-        <span className="text-label-bold text-on-surface-variant uppercase">Authenticator code</span>
+        <span className="text-sm font-semibold text-on-surface">Authenticator code</span>
         <input
           name="code"
           inputMode="numeric"
@@ -60,7 +60,7 @@ export function TwoFactorForm({ destination }: { destination: string }): React.R
 
       <button
         type="submit"
-        className="bg-primary text-on-primary text-label-bold mt-2 rounded px-4 py-2 uppercase"
+        className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full rounded-xl px-5 text-sm font-bold transition-colors"
       >
         Verify
       </button>

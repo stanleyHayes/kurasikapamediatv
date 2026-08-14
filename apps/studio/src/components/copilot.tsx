@@ -50,7 +50,7 @@ export function Copilot(props: CopilotProps): React.ReactElement {
   const [tab, setTab] = useState<Tab>('assist')
 
   return (
-    <div className="border-outline-variant/50 bg-surface-container-low flex h-full flex-col rounded-xl border">
+    <div className="border-outline-variant bg-surface-container-low flex h-full flex-col border-t-4 border-t-secondary">
       <TabBar
         active={tab}
         onSelect={(next) => {

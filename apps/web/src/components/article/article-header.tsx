@@ -19,14 +19,16 @@ const readingMinutes = (body: string | null): number =>
  */
 export function ArticleHeader({ article }: { article: ReadableArticle }): React.ReactElement {
   return (
-    <header className="mx-auto mb-8 max-w-4xl text-center">
-      <div className="mb-6 flex justify-center gap-2">
-        <span className="bg-surface-container-high text-on-surface text-label-bold rounded px-2 py-1 text-[10px] uppercase">
+    <header className="reveal paper-noise relative mb-14 w-full overflow-hidden border-y-2 border-on-surface bg-surface-container-lowest px-6 py-14 text-left md:px-14 md:py-20">
+      <div aria-hidden className="absolute right-0 top-0 h-full w-3 bg-primary" />
+      <div aria-hidden className="absolute -right-4 bottom-0 hidden text-[10rem] font-black leading-none tracking-[-0.08em] text-primary/5 md:block">REPORT</div>
+      <div className="relative mb-9 flex gap-2 border-b border-on-surface/20 pb-5">
+        <span className="broadcast-kicker text-secondary">
           {section(article.categoryId)}
         </span>
       </div>
 
-      <h1 className="font-display text-on-surface text-[2.5rem] leading-[1.15] font-bold tracking-[-0.02em] md:text-[length:var(--text-display-lg)] md:leading-[1.1]">
+      <h1 className="reveal reveal-delay-1 relative max-w-[18ch] font-display text-[2.75rem] leading-none font-bold tracking-[-0.04em] text-on-surface md:text-[length:var(--text-display-lg)]">
         {article.title}
       </h1>
 
@@ -41,7 +43,7 @@ export function ArticleHeader({ article }: { article: ReadableArticle }): React.
 
 function StandardByline({ article }: { article: ReadableArticle }): React.ReactElement {
   return (
-    <div className="text-on-surface-variant mt-8 flex items-center justify-center gap-6">
+    <div className="reveal reveal-delay-2 relative mt-10 flex flex-wrap items-center gap-5 border-l-2 border-secondary pl-5 text-on-surface-variant">
       <span className="text-label-bold uppercase">
         {article.authorName ?? 'Kurasikapa Newsroom'}
       </span>
@@ -62,17 +64,17 @@ function StandardByline({ article }: { article: ReadableArticle }): React.ReactE
  */
 function OpinionByline({ article }: { article: ReadableArticle }): React.ReactElement {
   return (
-    <div className="mt-8 flex flex-col items-center gap-3">
-      <span className="font-display text-on-surface text-xl font-semibold">
+    <div className="mt-8 flex flex-col items-start gap-3">
+      <span className="font-display text-xl font-semibold text-on-surface">
         {article.authorName ?? 'Kurasikapa Newsroom'}
       </span>
 
-      <div className="text-on-surface-variant flex items-center justify-center gap-6">
+      <div className="flex items-center gap-6 text-on-surface-variant">
         <span className="text-label-bold uppercase">{readingMinutes(article.body)} min read</span>
         <PublishedDate article={article} />
       </div>
 
-      <p className="text-on-surface-variant max-w-md text-sm italic">
+      <p className="max-w-md text-sm italic text-on-surface-variant">
         {opinionDisclaimer(article.locale)}
       </p>
     </div>

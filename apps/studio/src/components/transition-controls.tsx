@@ -101,7 +101,7 @@ export function TransitionControls(props: TransitionControlsProps): React.ReactE
   if (available.length === 0) return null
 
   return (
-    <section className="border-outline-variant/50 bg-surface-container-low mb-[var(--spacing-md)] rounded-xl border p-5">
+    <section className="border-outline-variant bg-surface-container-low mb-[var(--space-md)] border-l-4 border-l-primary p-5">
       <h2 className="font-display text-on-surface mb-3 text-lg font-semibold">Workflow</h2>
 
       <div className="flex flex-wrap items-center gap-3">

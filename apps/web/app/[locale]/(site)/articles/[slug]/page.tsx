@@ -78,7 +78,7 @@ export default function ArticlePage({ params }: Params): React.ReactElement {
 
 function ArticleSkeleton(): React.ReactElement {
   return (
-    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]" aria-hidden>
+    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-lg)]" aria-hidden>
       <div className="bg-surface-container h-3 w-24 rounded-sm" />
       <div className="bg-surface-container mt-6 h-12 w-3/4 rounded-sm" />
     </div>
@@ -103,7 +103,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
   )
 
   return (
-    <article className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
+    <article className="mx-auto max-w-[var(--container-page)] px-4 py-6 md:px-8 md:py-10">
       {/* Structured data for Google News and Discover. Escaped so a headline
           cannot close the script block — see seo/json-ld.ts. */}
       <script
@@ -120,10 +120,10 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
         omitted rather than stubbed. It returns with the media work.
       */}
 
-      <div className="grid grid-cols-1 gap-[var(--spacing-md)] md:grid-cols-12">
+      <div className="grid grid-cols-1 gap-10 border-t border-on-surface/20 pt-10 md:grid-cols-12">
         <ArticleRail articleId={article.id} title={article.title} />
 
-        <div className="md:col-span-7 md:col-start-3">
+        <div className="md:col-span-8 md:col-start-4 lg:col-span-7 lg:col-start-4">
           <StoryColumn article={article} locale={locale} />
         </div>
       </div>
@@ -186,4 +186,3 @@ function StoryColumn({
     </>
   )
 }
-

@@ -14,8 +14,10 @@ export function ErrorPanel({
   onRetry: () => void
 }): React.ReactElement {
   return (
-    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-xl)]">
-      <h1 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
+    <section className="mx-auto max-w-[var(--container-page)] px-4 py-8 md:px-8">
+      <div className="signal-grid bg-error-container border-l-[0.75rem] border-error px-7 py-16 md:px-14 md:py-24">
+      <p className="eyebrow text-error mb-5">Transmission interrupted</p>
+      <h1 className="font-display text-on-error-container text-[length:var(--text-headline-md)] font-semibold">
         Something went wrong
       </h1>
       <p className="text-on-surface-variant mt-4 max-w-prose text-[length:var(--text-body-lg)]">
@@ -28,10 +30,11 @@ export function ErrorPanel({
       <button
         type="button"
         onClick={onRetry}
-        className="bg-primary text-on-primary text-label-bold mt-8 rounded px-4 py-2 uppercase"
+        className="bg-error text-on-error mt-8 rounded-full px-6 py-3 font-bold"
       >
         Try again
       </button>
+      </div>
     </section>
   )
 }

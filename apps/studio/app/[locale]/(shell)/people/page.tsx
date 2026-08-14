@@ -85,8 +85,8 @@ function MembersTable({
   selfId: string
 }): React.ReactElement {
   return (
-    <div className="border-outline-variant/50 bg-surface-container-low overflow-hidden rounded-xl border">
-      <div className="border-outline-variant/50 text-label-bold text-on-surface-variant hidden border-b px-6 py-3 uppercase md:grid md:grid-cols-12 md:gap-4">
+    <div className="overflow-hidden border-y-2 border-on-surface bg-surface-container-lowest">
+      <div className="text-label-bold hidden border-b border-outline-variant bg-inverse-surface px-6 py-3 text-white/65 uppercase md:grid md:grid-cols-12 md:gap-4">
         <span className="md:col-span-4">Member</span>
         <span className="md:col-span-8">Roles</span>
       </div>

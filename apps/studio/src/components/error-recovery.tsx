@@ -20,7 +20,7 @@ export function ErrorRecovery({
   onRetry: () => void
 }): React.ReactElement {
   return (
-    <section className="border-outline-variant bg-surface-container-low mx-auto mt-12 max-w-2xl rounded-xl border p-8">
+    <section className="border-outline-variant bg-surface-container-low mx-auto mt-12 max-w-2xl border-l-[0.75rem] border-l-error p-8">
       <h1 className="font-display text-on-surface text-[length:var(--text-headline-sm)] font-semibold">
         This screen failed to load
       </h1>

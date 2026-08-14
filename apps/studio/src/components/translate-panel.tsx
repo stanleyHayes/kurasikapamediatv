@@ -116,7 +116,7 @@ export function TranslatePanel(props: TranslatePanelProps): React.ReactElement {
   const { proposal, error, createdSlug, pending, propose, accept } = useTranslation(props, target)
 
   return (
-    <section className="border-outline-variant/50 bg-surface-container-low rounded-xl border p-5">
+    <section className="border-outline-variant bg-surface-container-low border-l-4 border-l-primary p-5">
       <h3 className="font-display text-on-surface mb-1 text-lg font-semibold">Translate</h3>
       <p className="text-on-surface-variant mb-4 text-sm">
         Proposes a {LOCALE_NAME[target] ?? target} version. Nothing is saved until you accept it.

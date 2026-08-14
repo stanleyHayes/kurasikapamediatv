@@ -27,13 +27,13 @@ export function CommentForm({ articleId }: { articleId: string }): React.ReactEl
           }}
           maxLength={MAX_COMMENT_BODY}
           rows={4}
-          className="border-outline-variant bg-surface mt-2 w-full rounded border px-3 py-2"
+          className="border-outline-variant bg-surface mt-2 w-full rounded-xl border px-4 py-3"
         />
       </label>
       <button
         type="submit"
         disabled={composer.pending || composer.body.trim() === ''}
-        className="border-outline-variant text-label-bold hover:border-secondary rounded border px-3 py-1 uppercase disabled:opacity-60"
+        className="bg-primary text-on-primary hover:bg-on-primary-container rounded-full px-5 py-2.5 text-sm font-bold transition-colors disabled:opacity-60"
       >
         {composer.pending ? 'Sending…' : 'Comment'}
       </button>

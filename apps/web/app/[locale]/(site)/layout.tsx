@@ -26,10 +26,9 @@ export default async function SiteLayout({
 
   return (
     <>
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <SiteHeader liveLabel={t('live')} />
-
-      {/* pt for the fixed header, per the design's `pt-20` on <main>. */}
-      <main className="pt-20">{children}</main>
+      <main id="main-content" className="min-h-[65dvh] pt-20">{children}</main>
 
       <SiteFooter />
       <ServiceWorkerRegister />

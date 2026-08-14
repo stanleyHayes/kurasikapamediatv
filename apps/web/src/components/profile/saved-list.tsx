@@ -30,7 +30,7 @@ export function SavedList({
   now: string
 }): React.ReactElement {
   return (
-    <section className="border-outline-variant bg-surface-container-lowest flex h-[400px] flex-col rounded-xl border p-6">
+    <section className="border-outline-variant bg-surface-container-lowest flex min-h-[400px] flex-col border-t-4 border-t-primary p-6">
       <div className="mb-4 flex items-baseline justify-between">
         <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
           Saved Articles

@@ -77,10 +77,8 @@ function TrendingWidget({
  */
 function SubscribePanel(): React.ReactElement {
   return (
-    <div className="border-secondary/20 relative mt-4 overflow-hidden rounded-xl border p-8">
-      <div className="from-surface-container to-surface-container-high absolute inset-0 z-0 bg-gradient-to-br opacity-90" />
-
-      <div className="relative z-10 flex flex-col items-center gap-4 text-center">
+    <div className="border-secondary bg-surface-container relative mt-4 overflow-hidden border-l-4 p-8">
+      <div className="relative z-10 flex flex-col items-start gap-4 text-left">
         <span aria-hidden className="text-secondary text-4xl">
           ✦
         </span>

@@ -51,21 +51,25 @@ async function NewsBody({ params }: Params): Promise<React.ReactElement> {
   const [lead, ...rest] = items
 
   return (
-    <main className="mx-auto w-full max-w-[var(--container-page)] px-6 py-8 md:py-16">
-      <header className="border-outline-variant mb-12 border-b pb-8">
-        <h1 className="font-display text-on-surface text-[2.5rem] leading-[1.1] font-bold tracking-[-0.02em] md:text-[length:var(--text-display-lg)]">
+    <main className="mx-auto w-full max-w-[var(--container-page)] px-4 py-6 md:px-8 md:py-10">
+      <header className="reveal signal-grid bg-surface-container-lowest relative mb-12 overflow-hidden border-y-4 border-on-surface px-7 py-14 text-on-surface md:mb-16 md:px-14 md:py-20">
+        <div aria-hidden className="absolute bottom-0 right-0 h-4 w-2/3 bg-secondary" />
+        <div aria-hidden className="absolute right-8 top-1/2 hidden -translate-y-1/2 text-[11rem] font-black leading-none text-primary/10 md:block">NEWS</div>
+        <p className="eyebrow text-primary mb-5">Latest / Ghana / World</p>
+        <h1 className="relative max-w-[10ch] font-display text-[3.5rem] leading-[0.9] font-bold tracking-[-0.05em] md:text-[length:var(--text-display-lg)]">
           {t('news')}
         </h1>
+        <p className="relative mt-6 max-w-xl border-l-4 border-secondary pl-5 text-lg text-on-surface-variant">The latest reporting, analysis and voices from Ghana and the wider world.</p>
       </header>
 
       {lead === undefined ? (
         <p className="text-on-surface-variant">Nothing published yet.</p>
       ) : (
-        <div className="flex flex-col gap-[var(--spacing-lg)]">
+        <div className="flex flex-col gap-[var(--space-lg)]">
           <NewsLead article={lead} />
 
           {rest.length > 0 && (
-            <div className="grid grid-cols-1 gap-x-[var(--spacing-lg)] md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-[var(--space-lg)] md:grid-cols-2">
               {rest.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
@@ -85,25 +89,16 @@ async function NewsBody({ params }: Params): Promise<React.ReactElement> {
  */
 function NewsLead({ article }: { article: ArticleView }): React.ReactElement {
   return (
-    <article className="group max-w-3xl">
+    <article className="editorial-card group max-w-6xl overflow-hidden border-b-[0.75rem] border-secondary bg-inverse-surface text-white">
       <Link href={`/articles/${article.slug}`} className="block">
-        <div className="border-outline-variant/40 bg-surface-container-low mb-6 rounded-lg border p-1">
-          <div className="bg-surface-container aspect-video w-full rounded" />
+        <div className="signal-grid bg-primary-container relative aspect-[16/7] w-full overflow-hidden">
+          <div className="bg-primary absolute bottom-0 right-[8%] h-full w-1/3 -skew-x-12" />
         </div>
-
-        <div className="text-label-bold text-secondary mb-2 uppercase" style={{ letterSpacing: '0.1em' }}>
-          {article.categoryId.replace(/^cat_/u, '')}
+        <div className="p-7 md:p-10">
+          <div className="eyebrow text-secondary mb-3">{article.categoryId.replace(/^cat_/u, '')}</div>
+          <h2 className="font-display text-3xl font-semibold text-white transition-colors group-hover:text-secondary md:text-[length:var(--text-headline-md)]">{article.title}</h2>
+          {article.publishedAt !== null && <time dateTime={article.publishedAt} className="mt-4 block text-sm text-white/55">{formatDate(article.publishedAt, article.locale)}</time>}
         </div>
-
-        <h2 className="font-display text-on-surface group-hover:text-primary text-[length:var(--text-headline-md)] font-semibold transition-colors">
-          {article.title}
-        </h2>
-
-        {article.publishedAt !== null && (
-          <time dateTime={article.publishedAt} className="text-on-surface-variant mt-3 block text-sm">
-            {formatDate(article.publishedAt, article.locale)}
-          </time>
-        )}
       </Link>
     </article>
   )

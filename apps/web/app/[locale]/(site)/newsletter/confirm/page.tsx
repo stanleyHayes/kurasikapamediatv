@@ -30,7 +30,7 @@ async function Body({
   const { token } = await searchParams
 
   return (
-    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-lg)]">
       <ConfirmResult token={token ?? ''} />
       <p className="mt-8">
         <Link href="/newsletter" className="text-secondary underline">

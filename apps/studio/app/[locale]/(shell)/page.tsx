@@ -2,6 +2,8 @@ import { setRequestLocale } from 'next-intl/server'
 import { type Metric, MetricCards } from '@/components/metric-cards'
 import { PipelineItem } from '@/components/pipeline-item'
 import { AiRail } from '@/components/ai-rail'
+import { DashboardActions } from '@/components/dashboard-actions'
+import { StudioEmptyState } from '@/components/empty-state'
 import { loadAuthoredPipeline } from '@kurasikapa/web-kit/bff/load-studio'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
@@ -50,6 +52,8 @@ export default async function StudioPage({
     <div className="space-y-8 pb-20">
       <MetricCards metrics={metricsFor(drafts)} />
 
+      <DashboardActions />
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         <section className="space-y-6 lg:col-span-8">
           <div className="flex items-center justify-between">
@@ -57,9 +61,7 @@ export default async function StudioPage({
           </div>
 
           {drafts.length === 0 ? (
-            <p className="text-on-surface-variant">
-              Nothing here yet. Your drafts and submissions will appear in this list.
-            </p>
+            <StudioEmptyState eyebrow="Pipeline clear" icon="✎" title="No stories on your desk." description="Your drafts, submissions and scheduled reports will appear here as a live production ledger. While the desk is clear, check the review queue or monitor incoming sources." action={{ href: '/review', label: 'Open review desk' }} secondaryAction={{ href: '/rss', label: 'Check sources' }} />
           ) : (
             <ul className="space-y-3">
               {drafts.map((draft) => (

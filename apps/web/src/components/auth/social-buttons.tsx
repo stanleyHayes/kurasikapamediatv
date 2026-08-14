@@ -24,13 +24,13 @@ export function SocialButtons({
   if (providers.length === 0) return null
 
   return (
-    <div className="border-outline-variant flex flex-col gap-2 border-t pt-[var(--spacing-sm)]">
+    <div className="border-outline-variant flex flex-col gap-3 border-t pt-6">
       {providers.map((provider) => (
         <button
           key={provider}
           type="button"
           onClick={() => void signIn.social({ provider, callbackURL })}
-          className="border-outline-variant text-label-bold rounded border px-4 py-2 uppercase"
+          className="border-outline-variant hover:border-primary hover:text-primary h-12 w-full rounded-xl border px-4 text-sm font-semibold transition-colors"
         >
           Continue with {LABEL[provider]}
         </button>

@@ -20,14 +20,16 @@ export default async function SearchPage(props: Props): Promise<React.ReactEleme
   setRequestLocale(locale)
 
   return (
-    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
-      <form action={`/${locale}/search`} role="search" className="mb-[var(--spacing-lg)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-4 py-[var(--space-xl)] md:px-8">
+      <header className="mb-10 max-w-3xl"><p className="eyebrow text-primary mb-4">Search the newsroom</p><h1 className="text-[length:var(--text-headline-md)]">Find the reporting you need.</h1></header>
+      <form action={`/${locale}/search`} role="search" className="bg-inverse-surface mb-[var(--space-lg)] border-l-[0.75rem] border-secondary p-6 md:p-10">
         <label className="flex flex-col gap-2">
-          <span className="text-label-bold text-on-surface-variant uppercase">Search</span>
+          <span className="eyebrow text-secondary">Keywords</span>
           <input
             name="q"
             type="search"
-            className="border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface max-w-xl rounded border px-3 py-2 outline-none transition-colors"
+            placeholder="Politics, business, a reporter…"
+            className="bg-surface-container-lowest text-on-surface mt-2 w-full max-w-3xl rounded-2xl px-5 py-4 text-lg"
           />
         </label>
       </form>

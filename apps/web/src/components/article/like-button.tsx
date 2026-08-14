@@ -22,7 +22,7 @@ export function LikeButton({
         onClick={like.toggle}
         disabled={like.pending}
         aria-pressed={like.liked}
-        className="border-outline-variant text-label-bold hover:border-secondary rounded border px-3 py-1 uppercase transition-colors disabled:opacity-60"
+        className="border-outline-variant bg-white hover:border-primary hover:text-primary min-w-24 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-60"
       >
         {like.liked ? 'Liked' : 'Like'} · {String(like.count)}
       </button>

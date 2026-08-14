@@ -21,11 +21,11 @@ const ASSISTS = [
 
 export function AiRail(): React.ReactElement {
   return (
-    <div className="border-outline-variant/50 bg-surface-container-low sticky top-24 flex flex-col rounded-xl border p-5">
+    <div className="border-outline-variant bg-surface-container-low sticky top-24 flex flex-col border-t-4 border-t-secondary p-5">
       <div className="border-outline-variant/30 mb-6 flex items-center gap-3 border-b pb-4">
         <span
           aria-hidden
-          className="from-tertiary to-secondary text-background flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br text-[18px]"
+          className="bg-secondary text-on-secondary flex h-8 w-8 items-center justify-center text-[18px]"
         >
           ✦
         </span>
@@ -48,7 +48,7 @@ export function AiRail(): React.ReactElement {
         {ASSISTS.map((assist) => (
           <div
             key={assist.label}
-            className="border-outline-variant bg-surface-container-lowest text-on-surface-variant flex flex-col items-center justify-center gap-2 rounded-lg border p-3 opacity-60"
+            className="border-outline-variant bg-surface-container-lowest text-on-surface-variant flex flex-col items-start justify-center gap-2 border-l-2 border-l-primary p-3 opacity-70"
           >
             <span aria-hidden>{assist.icon}</span>
             <span className="text-label-bold text-[10px]">{assist.label}</span>

@@ -32,7 +32,8 @@ export default async function StudioLayout({
   setRequestLocale(locale)
 
   return (
-    <div className="bg-background flex h-screen overflow-hidden">
+    <div className="bg-surface flex min-h-screen flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
+      <a href="#studio-content" className="skip-link">Skip to workspace</a>
       <Suspense fallback={<RailSkeleton />}>
         <Guarded locale={locale}>{children}</Guarded>
       </Suspense>
@@ -70,11 +71,11 @@ async function Guarded({
           who sees a prerendered page. */}
       <StudioSideNav />
 
-      <main className="relative flex h-full flex-1 flex-col overflow-hidden">
+      <main id="studio-content" className="relative flex min-h-0 flex-1 flex-col lg:h-full lg:overflow-hidden">
         <StudioTopBar />
 
-        <div className="relative flex-1 overflow-y-auto p-6">
-          <div className="mx-auto max-w-[var(--container-page)]">{children}</div>
+        <div className="paper-noise signal-grid relative flex-1 overflow-y-auto p-4 md:p-8 lg:p-10">
+          <div className="reveal mx-auto max-w-[82rem]">{children}</div>
         </div>
       </main>
     </>

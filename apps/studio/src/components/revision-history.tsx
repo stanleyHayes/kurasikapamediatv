@@ -63,7 +63,7 @@ export function RevisionHistory({
   const { error, restoring, pending, restore } = useRestore(articleId)
 
   return (
-    <section className="border-outline-variant/50 bg-surface-container-low mt-6 rounded-xl border p-5">
+    <section className="border-outline-variant bg-surface-container-low mt-6 border-t-4 border-t-secondary p-5">
       <HistoryHeading count={revisions.length} />
 
       <ol className="flex flex-col gap-3">

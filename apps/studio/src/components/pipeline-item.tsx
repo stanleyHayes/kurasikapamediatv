@@ -25,14 +25,14 @@ export function PipelineItem({
 
   return (
     <li
-      className={`border-outline-variant/50 bg-surface-container-low hover:border-outline-variant relative flex items-center gap-4 rounded-lg border p-4 transition-colors ${
+      className={`editorial-card relative grid items-center gap-4 border-b border-outline-variant bg-surface-container-lowest p-4 transition-colors sm:grid-cols-[3.5rem_1fr_auto] ${
         live ? 'border-secondary/20' : ''
       }`}
     >
       {live && <span aria-hidden className="bg-secondary/50 absolute top-0 bottom-0 left-0 w-1" />}
 
       {/* Thumbnail slot — tonal until the R3 media library gives articles an image. */}
-      <span aria-hidden className="bg-surface-container h-16 w-16 shrink-0 rounded" />
+      <span aria-hidden className="signal-grid hidden h-14 w-14 shrink-0 border border-outline-variant bg-primary-container sm:block" />
 
       <Link href={`/articles/${draft.id}`} className="min-w-0 flex-1">
         <span className="mb-1 flex items-center gap-2">
@@ -62,8 +62,8 @@ export function PipelineItem({
         )}
       </Link>
 
-      <span className="text-label-bold text-on-surface-variant shrink-0 uppercase">
-        {draft.status === 'published' ? 'Live' : 'Open'}
+      <span className="text-label-bold shrink-0 border border-outline-variant px-3 py-2 text-on-surface-variant uppercase">
+        {draft.status === 'published' ? 'View ↗' : 'Open ↗'}
       </span>
     </li>
   )

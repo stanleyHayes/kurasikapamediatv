@@ -10,24 +10,23 @@ const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
  * Border-heavy rather than shadow-heavy, which is the design system's stated
  * elevation rule.
  */
-export function BriefingCard({ article }: { article: ArticleView }): React.ReactElement {
+export function BriefingCard({ article, index = 0 }: { article: ArticleView; index?: number }): React.ReactElement {
   return (
-    <article className="border-outline-variant hover:border-secondary group flex h-full flex-col overflow-hidden rounded-lg border transition-colors">
+    <article className={`editorial-card reveal group flex h-full flex-col border-t-2 border-on-surface bg-surface-container-lowest ${index % 2 === 1 ? 'md:translate-y-10' : ''}`}>
       <Link href={`/articles/${article.slug}`} className="flex h-full flex-col">
-        <div className="relative h-56 overflow-hidden">
-          {/* Stand-in for the card image until the R3 media library lands. */}
-          <div className="from-primary/90 to-surface-container-highest absolute inset-0 bg-gradient-to-br" />
-          <span className="bg-surface/80 text-on-surface text-label-bold absolute top-4 left-4 rounded px-2 py-1 text-[10px] uppercase backdrop-blur">
+        <div className="image-band signal-grid relative h-32 overflow-hidden border-b border-outline-variant bg-primary-container">
+          <div className="absolute bottom-0 right-0 h-3 w-2/3 bg-primary" />
+          <span className="eyebrow absolute left-4 top-4 border border-on-surface bg-surface-container-lowest px-3 py-2 text-[10px] text-on-surface">
             {section(article.categoryId)}
           </span>
         </div>
 
-        <div className="flex flex-grow flex-col p-6">
-          <h3 className="font-display text-on-surface group-hover:text-secondary mb-3 text-[length:var(--text-headline-sm)] leading-tight transition-colors">
+        <div className="flex flex-grow flex-col p-6 md:p-7">
+          <h3 className="font-display text-on-surface group-hover:text-primary mb-5 text-[length:var(--text-headline-sm)] leading-tight transition-colors">
             {article.title}
           </h3>
 
-          <div className="text-on-surface-variant mt-auto text-[10px] tracking-wider uppercase">
+          <div className="mt-auto flex items-center justify-between border-t border-outline-variant pt-4 text-[10px] tracking-wider text-on-surface-variant uppercase">
             {article.publishedAt !== null && (
               <time dateTime={article.publishedAt}>
                 {new Intl.DateTimeFormat(article.locale, {
@@ -36,7 +35,7 @@ export function BriefingCard({ article }: { article: ArticleView }): React.React
                   timeZone: 'UTC',
                 }).format(new Date(article.publishedAt))}
               </time>
-            )}
+            )}<span aria-hidden>Read ↗</span>
           </div>
         </div>
       </Link>

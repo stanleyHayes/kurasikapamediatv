@@ -9,12 +9,12 @@ import { TwoFactorSettings } from '../auth/two-factor-settings'
  */
 export function AccountCards(): React.ReactElement {
   return (
-    <section className="mt-[var(--spacing-lg)]">
+    <section className="mt-[var(--space-lg)]">
       <h2 className="font-display text-on-surface border-outline-variant border-b pb-4 text-[length:var(--text-headline-md)] font-semibold">
         Account &amp; preferences
       </h2>
 
-      <div className="mt-[var(--spacing-md)] grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="mt-[var(--space-md)] grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card title="Profile details" body="Your name and email, as they appear on anything you post." icon="◍">
           <Link
             href="/contact"
@@ -52,7 +52,7 @@ function Card({
   children: React.ReactNode
 }): React.ReactElement {
   return (
-    <div className="border-outline-variant bg-surface-container-lowest flex flex-col gap-6 rounded-xl border p-6">
+    <div className="editorial-card border-outline-variant bg-surface-container-lowest flex flex-col gap-6 border-t-4 border-t-primary p-6">
       <span
         aria-hidden
         className="bg-surface-container text-on-surface-variant flex h-12 w-12 items-center justify-center rounded-full text-xl"

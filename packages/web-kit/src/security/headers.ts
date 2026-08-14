@@ -117,6 +117,16 @@ export function securityHeaders(isDev: boolean): Readonly<Record<string, string>
     // Redundant with frame-ancestors for modern browsers, kept for old ones.
     'X-Frame-Options': 'DENY',
 
+    // Keep each browsing context and response in our origin's security
+    // boundary. This limits cross-window data access and stops another origin
+    // treating our HTML or JSON as a loadable resource.
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Resource-Policy': 'same-origin',
+    'Origin-Agent-Cluster': '?1',
+
+    // DNS prefetch can disclose navigation intent before consent or a click.
+    'X-DNS-Prefetch-Control': 'off',
+
     // Nothing here needs a camera, a microphone or a location.
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   }

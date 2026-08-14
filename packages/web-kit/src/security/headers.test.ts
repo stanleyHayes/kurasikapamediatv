@@ -73,6 +73,10 @@ describe('securityHeaders', () => {
         'Referrer-Policy',
         'X-Frame-Options',
         'Permissions-Policy',
+        'Cross-Origin-Opener-Policy',
+        'Cross-Origin-Resource-Policy',
+        'Origin-Agent-Cluster',
+        'X-DNS-Prefetch-Control',
       ]),
     )
   })
@@ -93,6 +97,14 @@ describe('securityHeaders', () => {
     expect(policy).toContain('camera=()')
     expect(policy).toContain('microphone=()')
     expect(policy).toContain('geolocation=()')
+  })
+
+  it('isolates windows and resources to the site origin', () => {
+    const headers = securityHeaders(false)
+
+    expect(headers['Cross-Origin-Opener-Policy']).toBe('same-origin')
+    expect(headers['Cross-Origin-Resource-Policy']).toBe('same-origin')
+    expect(headers['Origin-Agent-Cluster']).toBe('?1')
   })
 
   it('keeps HSTS in development too, so the header cannot be forgotten', () => {

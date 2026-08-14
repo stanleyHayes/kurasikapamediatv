@@ -1,36 +1,41 @@
 'use client'
 
 import { SignOutButton } from './sign-out-button'
+import Image from 'next/image'
 import { Link, usePathname } from '@kurasikapa/web-kit/i18n/navigation'
 
 /**
  * The docked studio navigation, per the Stitch editorial CMS: a 256px rail
  * carrying the admin identity, the section links, and the primary action.
  *
- * Only the destinations that exist are rendered as links. The design also
- * draws Analytics (R5), Media (R3) and Settings — showing them as dead items
- * would teach an editor that the newsroom's own tools are broken, so they are
- * listed as forthcoming instead, which is true and keeps the rail's shape.
+ * Only destinations backed by a real route and workflow are rendered. Roadmap
+ * labels do not belong in live navigation: a disabled item looks broken and a
+ * fake link teaches editors not to trust the shell.
  *
  * The hrefs are prefix-free because `/studio` is a basePath now — Next
  * prepends it at render time, so writing it here would produce
  * `/studio/studio/review`. See ADR-0011.
  */
-const LIVE = [
-  { href: '/', label: 'Editorial', icon: '✎' },
-  { href: '/review', label: 'Review', icon: '☑' },
-  { href: '/social', label: 'Social', icon: '◈' },
-  { href: '/rss', label: 'RSS', icon: '◎' },
-  { href: '/comments', label: 'Comments', icon: '¶' },
-  { href: '/people', label: 'Users', icon: '☰' },
-  { href: '/audit', label: 'Audit', icon: '◫' },
+interface StudioNavItem { readonly href: string; readonly label: string; readonly icon: string }
+interface StudioNavGroup { readonly heading: string; readonly items: readonly StudioNavItem[] }
+
+const GROUPS: readonly StudioNavGroup[] = [
+  { heading: 'Editorial', items: [
+    { href: '/', label: 'Desk', icon: '✎' },
+    { href: '/review', label: 'Review', icon: '☑' },
+  ] },
+  { heading: 'Distribution', items: [
+    { href: '/social', label: 'Social', icon: '◈' },
+    { href: '/rss', label: 'Sources', icon: '◎' },
+    { href: '/comments', label: 'Comments', icon: '¶' },
+  ] },
+  { heading: 'Governance', items: [
+    { href: '/people', label: 'People', icon: '☰' },
+    { href: '/audit', label: 'Audit', icon: '◫' },
+  ] },
 ] as const
 
-const FORTHCOMING = [
-  { label: 'Analytics', icon: '◔', release: 'R5' },
-  { label: 'Media', icon: '▣', release: 'R3' },
-  { label: 'Settings', icon: '⚙', release: 'R5' },
-] as const
+const LIVE = GROUPS.flatMap((group) => group.items)
 
 /**
  * A client component solely so it can read the pathname.
@@ -53,42 +58,38 @@ export function StudioSideNav(): React.ReactElement {
   return (
     <nav
       aria-label="Studio"
-      className="border-outline-variant bg-surface-container-low hidden h-full w-64 shrink-0 flex-col border-r p-4 md:flex"
+      className="bg-inverse-surface text-inverse-on-surface flex w-full shrink-0 flex-col border-b-4 border-secondary px-4 py-3 lg:w-64 lg:border-b-0 lg:border-r-4 lg:px-5 lg:py-6"
     >
       <Identity />
 
-      <ul className="flex flex-grow flex-col gap-2">
-        {LIVE.map((item) => (
-          <NavLink key={item.href} item={item} active={active === item.href} />
-        ))}
-        {FORTHCOMING.map((item) => (
-          <Forthcoming key={item.label} item={item} />
-        ))}
-      </ul>
+      <div className="flex flex-grow gap-2 overflow-x-auto lg:flex-col lg:gap-3">
+        {GROUPS.map((group) => <NavGroup key={group.heading} group={group} active={active} />)}
+      </div>
 
-      <div className="border-outline-variant mt-auto border-t pt-6">
+      <div className="border-outline-variant ml-auto border-l pl-3 lg:ml-0 lg:mt-auto lg:border-l-0 lg:border-t lg:pl-0 lg:pt-6">
         <SignOutButton />
       </div>
     </nav>
   )
 }
 
+function NavGroup({ group, active }: { group: StudioNavGroup; active: string }): React.ReactElement {
+  return (
+    <section className="shrink-0 lg:block">
+      <p className="mb-1 hidden px-3 text-[9px] font-bold tracking-[.18em] text-white/35 uppercase lg:block">{group.heading}</p>
+      <ul className="flex gap-1 lg:flex-col">
+        {group.items.map((item) => <NavLink key={item.href} item={item} active={active === item.href} />)}
+      </ul>
+    </section>
+  )
+}
+
 function Identity(): React.ReactElement {
   return (
-    <div className="mt-4 mb-8 flex items-center gap-4 px-2">
-      <span
-        aria-hidden
-        className="border-outline-variant bg-surface-container-high flex h-10 w-10 items-center justify-center rounded-full border"
-      >
-        K
-      </span>
-      <div>
-        <p className="font-display text-primary text-[20px] leading-tight font-semibold">
-          Kurasikapa Admin
-        </p>
-        <p className="text-label-bold text-on-surface-variant mt-1 text-[10px] uppercase">
-          Editorial Control
-        </p>
+    <div className="mr-4 flex shrink-0 items-center px-1 lg:mb-9 lg:mr-0 lg:mt-2 lg:block">
+      <Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media" width={1536} height={1024} priority className="h-12 w-20 object-contain object-left lg:h-24 lg:w-full" />
+      <div className="mt-3 hidden lg:block">
+        <p className="eyebrow text-secondary">Newsroom studio</p>
       </div>
     </div>
   )
@@ -98,7 +99,7 @@ function NavLink({
   item,
   active,
 }: {
-  item: (typeof LIVE)[number]
+  item: StudioNavItem
   active: boolean
 }): React.ReactElement {
   return (
@@ -108,38 +109,15 @@ function NavLink({
         aria-current={active ? 'page' : undefined}
         className={
           active
-            ? 'bg-secondary-container text-on-secondary-container flex items-center gap-3 rounded-lg px-3 py-2 font-bold'
-            : 'text-on-surface-variant hover:bg-surface-container-high flex items-center gap-3 rounded-lg px-3 py-2 transition-colors'
+            ? 'bg-primary text-on-primary flex shrink-0 items-center gap-3 px-3 py-3 font-bold'
+            : 'text-white/65 hover:bg-white/10 hover:text-white flex shrink-0 items-center gap-3 px-3 py-3 transition-colors'
         }
       >
         <span aria-hidden className="text-[20px] leading-none">
           {item.icon}
         </span>
-        <span>{item.label}</span>
+        <span className="hidden sm:inline">{item.label}</span>
       </Link>
-    </li>
-  )
-}
-
-/**
- * A destination that does not exist yet, shown rather than hidden.
- *
- * The design draws six sections. Rendering the three unbuilt ones as dead
- * links would teach an editor the newsroom's own tools are broken; omitting
- * them hides the roadmap. Naming the release is true and keeps the rail's shape.
- */
-function Forthcoming({ item }: { item: (typeof FORTHCOMING)[number] }): React.ReactElement {
-  return (
-    <li>
-      <span className="text-on-surface-variant/40 flex items-center gap-3 rounded-lg px-3 py-2">
-        <span aria-hidden className="text-[20px] leading-none">
-          {item.icon}
-        </span>
-        <span>{item.label}</span>
-        <span className="text-label-bold border-outline-variant ml-auto rounded-full border px-1.5 text-[9px]">
-          {item.release}
-        </span>
-      </span>
     </li>
   )
 }

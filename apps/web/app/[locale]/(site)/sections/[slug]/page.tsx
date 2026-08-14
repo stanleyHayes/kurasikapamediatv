@@ -48,14 +48,16 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
   const trending = rest.slice(4, 7)
 
   return (
-    <main className="mx-auto w-full max-w-[var(--container-page)] px-6 py-8 md:py-16">
-      <header className="border-outline-variant mb-12 border-b pb-8 md:mb-16">
-        <h1 className="font-display text-on-surface mb-4 text-[2.5rem] leading-[1.1] font-bold tracking-[-0.02em] md:text-[length:var(--text-display-lg)]">
+    <main className="mx-auto w-full max-w-[var(--container-page)] px-4 py-6 md:px-8 md:py-10">
+      <header className="reveal signal-grid bg-primary relative mb-12 overflow-hidden border-r-[0.75rem] border-secondary px-7 py-16 text-white md:mb-16 md:px-14 md:py-24">
+        <div aria-hidden className="absolute -bottom-16 right-4 text-[22rem] font-black leading-none text-white/10">{section.name.slice(0, 1)}</div>
+        <p className="eyebrow text-secondary-container mb-5">Section desk / Kurasikapa</p>
+        <h1 className="relative font-display mb-4 text-[3.5rem] leading-[0.9] font-bold tracking-[-0.05em] md:text-[length:var(--text-display-lg)]">
           {section.name}
         </h1>
 
         {section.description !== null && (
-          <p className="text-on-surface-variant max-w-3xl text-[length:var(--text-body-lg)]">
+          <p className="relative max-w-3xl text-[length:var(--text-body-lg)] text-white/68">
             {section.description}
           </p>
         )}
@@ -64,12 +66,12 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
       {lead === undefined ? (
         <p className="text-on-surface-variant">Nothing published in this section yet.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-[var(--spacing-lg)] lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-[var(--space-lg)] lg:grid-cols-12">
           <div className="flex flex-col gap-12 md:gap-16 lg:col-span-8">
             <LeadStory article={lead} now={section.now} />
 
             {secondary.length > 0 && (
-              <div className="grid grid-cols-1 gap-[var(--spacing-md)] md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-[var(--space-md)] md:grid-cols-2">
                 {secondary.map((article) => (
                   <SectionCard key={article.id} article={article} />
                 ))}

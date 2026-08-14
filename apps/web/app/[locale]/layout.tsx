@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Outfit, Playfair_Display } from 'next/font/google'
+import { Outfit } from 'next/font/google'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -15,22 +15,15 @@ import '../globals.css'
  * `display: swap` shows the fallback immediately rather than holding text
  * invisible while a font downloads. On a news site, words first.
  */
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  display: 'swap',
-  variable: '--font-playfair',
-})
-
 const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-outfit',
 })
 
 export const viewport: Viewport = {
-  themeColor: '#131b2e',
+  themeColor: '#087f23',
 }
 
 export function generateStaticParams(): { locale: string }[] {
@@ -73,8 +66,8 @@ export default async function LocaleLayout({
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} className={`${playfair.variable} ${outfit.variable}`}>
-      <body className="bg-surface text-on-surface min-h-screen">
+    <html lang={locale} className={outfit.variable}>
+      <body className="bg-surface text-on-surface min-h-screen font-sans">
         {/* Chrome lives in the (site) group, not here — the studio is a
             full-screen admin shell and must not inherit the masthead. */}
         <NextIntlClientProvider>

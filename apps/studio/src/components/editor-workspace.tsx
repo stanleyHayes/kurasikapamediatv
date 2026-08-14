@@ -66,7 +66,7 @@ export function EditorWorkspace(props: EditorWorkspaceProps): React.ReactElement
 
   return (
     <div className="grid min-h-[70vh] grid-cols-1 gap-6 lg:grid-cols-12">
-      <div className="flex flex-col gap-[var(--spacing-md)] lg:col-span-8">
+      <div className="flex flex-col gap-[var(--space-md)] lg:col-span-8">
         <EditorFields
           title={title}
           body={body}

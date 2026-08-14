@@ -50,7 +50,7 @@ export function AiPanel(props: AiPanelProps): React.ReactElement {
   }
 
   return (
-    <aside className="border-outline-variant rounded-lg border p-[var(--spacing-sm)]">
+    <aside className="border-outline-variant rounded-lg border p-[var(--space-sm)]">
       <h2 className="text-label-bold text-secondary uppercase">AI assist</h2>
       <p className="text-on-surface-variant mt-1 text-sm">
         Suggestions only. Nothing is applied until you apply it.
@@ -94,7 +94,7 @@ function AssistResults(props: {
   }
 
   return (
-    <div aria-live="polite" className="mt-[var(--spacing-sm)]">
+    <div aria-live="polite" className="mt-[var(--space-sm)]">
       {body()}
     </div>
   )
@@ -108,7 +108,7 @@ function AssistButtons({
   onRun: (assist: Assist) => void
 }): React.ReactElement {
   return (
-    <div className="mt-[var(--spacing-sm)] flex flex-wrap gap-2">
+    <div className="mt-[var(--space-sm)] flex flex-wrap gap-2">
       {(Object.keys(ASSISTS) as Assist[]).map((assist) => (
         <button
           key={assist}

@@ -36,7 +36,7 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
 
   return (
     <>
-      <div className="mb-[var(--spacing-md)] flex items-center gap-3">
+      <div className="mb-[var(--space-md)] flex items-center gap-3">
         <StatusBadge status={draft.status} />
         <span className="text-on-surface-variant text-label-bold uppercase">{draft.locale}</span>
       </div>
@@ -74,7 +74,7 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
 
 function EditorSkeleton(): React.ReactElement {
   return (
-    <div className="flex flex-col gap-[var(--spacing-md)]" aria-hidden>
+    <div className="flex flex-col gap-[var(--space-md)]" aria-hidden>
       <div className="bg-surface-container h-10 rounded" />
       <div className="bg-surface-container h-96 rounded" />
     </div>

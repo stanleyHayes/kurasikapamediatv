@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Outfit, Playfair_Display } from 'next/font/google'
+import { Outfit } from 'next/font/google'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -17,22 +17,15 @@ import '../globals.css'
  * - A manifest, robots or a sitemap. The studio is `noindex` and installable
  *   by nobody.
  */
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  display: 'swap',
-  variable: '--font-playfair',
-})
-
 const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-outfit',
 })
 
 export const viewport: Viewport = {
-  themeColor: '#131b2e',
+  themeColor: '#064e19',
 }
 
 export const metadata: Metadata = {
@@ -61,8 +54,8 @@ export default async function StudioRootLayout({
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} className={`${playfair.variable} ${outfit.variable}`}>
-      <body className="bg-surface text-on-surface min-h-screen">
+    <html lang={locale} className={outfit.variable}>
+      <body className="bg-surface text-on-surface min-h-screen font-sans">
         {/* The studio carries no translated copy yet — see src/i18n/request.ts.
             The provider is still here so a component may format a date or a
             number in the editor's locale without extra wiring. */}

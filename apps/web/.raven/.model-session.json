@@ -1,29 +1,34 @@
 {
   "session_started_at": "2026-08-08T18:06:10.324016Z",
   "raven_overhead": {
-    "tokens": 168,
-    "cost_usd": 4.2e-05,
-    "calls": 3,
+    "tokens": 248,
+    "cost_usd": 6.2e-05,
+    "calls": 4,
     "by_source": {
       "triage-router": {
         "tokens": 168,
         "calls": 3,
         "cost_usd": 4.2e-05
+      },
+      "architect-router": {
+        "tokens": 80,
+        "calls": 1,
+        "cost_usd": 2e-05
       }
     }
   },
   "user_work": {
     "tokens": 0,
     "cost_usd": 0.0,
-    "calls": 3,
+    "calls": 4,
     "tier_counts": {
-      "SIMPLE": 3,
+      "SIMPLE": 4,
       "MEDIUM": 0,
       "COMPLEX": 0,
       "LOCAL_ONLY": 0
     },
     "last_classification": {
-      "timestamp": "2026-08-08T19:07:59.021239Z",
+      "timestamp": "2026-08-14T09:16:51.149938Z",
       "user_query_hash": "e3b0c44298fc1c14",
       "tier": "SIMPLE",
       "score": 0,

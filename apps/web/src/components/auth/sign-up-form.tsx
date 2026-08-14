@@ -23,7 +23,7 @@ export interface SignUpFormProps {
 const FAILED = 'We could not create that account. The email may already be registered.'
 
 const FIELD =
-  'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface rounded border px-3 py-2 outline-none transition-colors'
+  'h-13 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 outline-none transition-colors'
 
 /**
  * Reader self-registration. Mirrors the sign-in form: React 19 form action,
@@ -54,8 +54,8 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
   }
 
   return (
-    <div className="flex max-w-md flex-col gap-[var(--spacing-md)]">
-      <form action={submit} className="flex flex-col gap-[var(--spacing-sm)]">
+    <div className="flex w-full flex-col gap-6">
+      <form action={submit} className="flex w-full flex-col gap-5">
         <Field label="Name" name="name" type="text" autoComplete="name" />
         <Field label="Email" name="email" type="email" autoComplete="email" />
         <Field
@@ -75,7 +75,7 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
         )}
         <button
           type="submit"
-          className="bg-primary text-on-primary text-label-bold mt-2 rounded px-4 py-2 uppercase"
+          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full rounded-xl px-5 text-sm font-bold transition-colors"
         >
           Create account
         </button>
@@ -117,8 +117,8 @@ function Field(props: {
   minLength?: number | undefined
 }): React.ReactElement {
   return (
-    <label className="flex flex-col gap-2">
-      <span className="text-label-bold text-on-surface-variant uppercase">{props.label}</span>
+    <label className="flex w-full flex-col gap-2">
+      <span className="text-sm font-semibold text-on-surface">{props.label}</span>
       <input
         type={props.type}
         name={props.name}

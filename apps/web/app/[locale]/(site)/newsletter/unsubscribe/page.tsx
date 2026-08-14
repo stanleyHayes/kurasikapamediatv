@@ -19,7 +19,7 @@ async function Body({ params }: Params): Promise<React.ReactElement> {
   setRequestLocale(locale)
 
   return (
-    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-lg)]">
       <h1 className="font-display text-on-surface text-[length:var(--text-headline-lg)] font-semibold">
         Leave the briefing
       </h1>

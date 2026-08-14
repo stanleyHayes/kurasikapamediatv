@@ -4,14 +4,15 @@ import { useState, useTransition } from 'react'
 import { callAction } from '@kurasikapa/web-kit/actions/call'
 import { moderateCommentAction } from '../actions/studio-actions'
 import type { CommentView } from '@kurasikapa/web-kit/read-model/comment-view'
+import { StudioEmptyState } from './empty-state'
 
 export function CommentQueue({ items }: { items: readonly CommentView[] }): React.ReactElement {
   if (items.length === 0) {
-    return <p className="text-on-surface-variant">Nothing is waiting for moderation.</p>
+    return <StudioEmptyState eyebrow="All caught up" icon="¶" title="No comments need a decision." description="Reader submissions will collect here before publication. The empty queue means every current conversation has been reviewed." action={{ href: '/', label: 'Back to editorial' }} compact />
   }
 
   return (
-    <ul className="border-outline-variant/50 bg-surface-container-low divide-outline-variant/40 divide-y overflow-hidden rounded-xl border">
+    <ul className="border-outline-variant bg-surface-container-low divide-outline-variant/40 divide-y overflow-hidden border-t-4 border-t-primary">
       {items.map((item) => (
         <QueueRow key={item.id} item={item} />
       ))}

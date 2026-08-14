@@ -28,7 +28,7 @@ const LABEL: Readonly<Record<ArticleStatus, string>> = {
 export function StatusBadge({ status }: { status: ArticleStatus }): React.ReactElement {
   return (
     <span
-      className={`text-label-bold inline-block rounded-lg px-2 py-1 text-xs uppercase ${TONE[status]}`}
+      className={`text-label-bold inline-block border-l-2 border-current px-2 py-1 text-[10px] uppercase ${TONE[status]}`}
     >
       {LABEL[status]}
     </span>

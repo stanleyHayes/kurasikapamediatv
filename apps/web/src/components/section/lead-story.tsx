@@ -21,15 +21,14 @@ export function LeadStory({
   now: string
 }): React.ReactElement {
   return (
-    <article className="group">
+    <article className="editorial-card group overflow-hidden border-b-4 border-primary bg-surface-container-lowest">
       <Link href={`/articles/${article.slug}`} className="block">
-        <div className="border-outline-variant/40 bg-surface-container-low mb-6 rounded-lg border p-1">
-          <div className="bg-surface-container aspect-video w-full rounded" />
+        <div className="signal-grid bg-primary-container relative aspect-[16/8] w-full overflow-hidden">
+          <div className="bg-primary absolute bottom-0 right-[12%] h-full w-1/3 -skew-x-12" />
         </div>
-
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-5 p-7 md:grid-cols-[9rem_1fr] md:p-10">
           <div className="flex items-center gap-3">
-            <span className="text-label-bold text-secondary uppercase" style={{ letterSpacing: '0.1em' }}>
+            <span className="eyebrow text-secondary">
               {section(article.categoryId)}
             </span>
             <span className="text-on-surface-variant text-label-bold">
@@ -37,17 +36,17 @@ export function LeadStory({
             </span>
           </div>
 
-          <h2 className="font-display text-on-surface group-hover:text-primary text-[length:var(--text-headline-md)] font-semibold transition-colors">
+          <h2 className="font-display text-on-surface group-hover:text-primary text-[length:var(--text-headline-md)] font-semibold transition-colors md:col-start-2">
             {article.title}
           </h2>
 
           {article.excerpt !== null && (
-            <p className="text-on-surface-variant line-clamp-3 text-[length:var(--text-body-lg)]">
+            <p className="text-on-surface-variant line-clamp-3 text-[length:var(--text-body-lg)] md:col-start-2">
               {article.excerpt}
             </p>
           )}
 
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex items-center gap-2 md:col-start-2">
             <span className="text-label-bold text-on-surface uppercase">
               By Kurasikapa Newsroom
             </span>

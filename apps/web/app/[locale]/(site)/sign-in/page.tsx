@@ -1,5 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
 import { SignInForm } from '@/components/auth/sign-in-form'
+import { AuthShell } from '@/components/auth/auth-shell'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { socialProviders } from '@kurasikapa/web-kit/composition/auth-providers'
 import { env } from '@kurasikapa/web-kit/composition/env'
@@ -20,11 +21,7 @@ export default async function SignInPage({
   const configured = Object.keys(socialProviders(process.env)) as ('google' | 'facebook' | 'apple')[]
 
   return (
-    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-xl)]">
-      <h1 className="font-display text-primary mb-[var(--spacing-md)] text-[length:var(--text-headline-md)] font-semibold">
-        Sign in
-      </h1>
-
+    <AuthShell eyebrow="Welcome back" title="Sign in" intro="Continue reading, saving and managing your Kurasikapa account." footnote={<>No account yet? <Link href="/sign-up" className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary">Create one</Link></>}>
       {/* Server-supplied destination. Taking it from a query string would turn
           this into an open redirect.
 
@@ -37,15 +34,6 @@ export default async function SignInPage({
         captchaSiteKey={process.env['NEXT_PUBLIC_TURNSTILE_SITE_KEY']}
       />
 
-      <p className="text-on-surface-variant mt-[var(--spacing-md)] text-sm">
-        No account yet?{' '}
-        <Link
-          href="/sign-up"
-          className="text-secondary hover:text-primary underline underline-offset-2 transition-colors"
-        >
-          Create one
-        </Link>
-      </p>
-    </section>
+    </AuthShell>
   )
 }

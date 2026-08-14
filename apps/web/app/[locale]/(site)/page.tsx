@@ -32,7 +32,7 @@ async function Front({ locale }: { locale: string }): Promise<React.ReactElement
   ])
   if (items.length === 0) {
     return (
-      <p className="text-on-surface-variant py-[var(--spacing-xl)]">
+      <p className="text-on-surface-variant py-[var(--space-xl)]">
         Nothing published yet.
       </p>
     )
@@ -46,24 +46,24 @@ function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement
     <>
       {lead !== undefined && <Hero article={lead} />}
 
-      <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
-        <div className="grid grid-cols-1 gap-[var(--spacing-lg)] lg:grid-cols-12">
+      <section className="mx-auto max-w-[var(--container-page)] px-4 py-[var(--space-xl)] md:px-8">
+        <div className="grid grid-cols-1 gap-[var(--space-lg)] lg:grid-cols-12">
           <div className="flex flex-col gap-8 lg:col-span-8">
-            <div className="border-outline-variant flex items-end justify-between border-b pb-4">
+            <div className="reveal flex items-end justify-between gap-4 border-b-4 border-on-surface pb-5">
               <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
-                Editor&rsquo;s Briefing
+                The briefing
               </h2>
               <Link
                 href="/search"
-                className="text-label-bold text-on-surface-variant hover:text-secondary uppercase transition-colors"
+                className="editorial-link eyebrow text-primary hover:text-secondary transition-colors"
               >
                 View all
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-[var(--spacing-md)] md:grid-cols-2">
-              {briefing.map((article) => (
-                <BriefingCard key={article.id} article={article} />
+            <div className="grid grid-cols-1 gap-x-[var(--space-md)] gap-y-10 md:grid-cols-2">
+              {briefing.map((article, index) => (
+                <BriefingCard key={article.id} article={article} index={index} />
               ))}
             </div>
           </div>
@@ -76,9 +76,8 @@ function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement
         </div>
       </section>
 
-      {/* The design's gradient hairline between regions. */}
       <div className="mx-auto max-w-[var(--container-page)] px-6 py-8">
-        <div className="via-outline-variant h-px w-full bg-gradient-to-r from-transparent to-transparent" />
+        <div className="bg-outline-variant h-px w-full" />
       </div>
     </>
   )
@@ -86,7 +85,7 @@ function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement
 
 function HomeSkeleton(): React.ReactElement {
   return (
-    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-md)]" aria-hidden>
+    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-md)]" aria-hidden>
       <div className="bg-surface-container h-[480px] rounded-xl md:h-[640px]" />
     </div>
   )

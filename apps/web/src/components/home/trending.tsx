@@ -13,9 +13,9 @@ const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
  */
 export function Trending({ articles }: { articles: readonly ArticleView[] }): React.ReactElement {
   return (
-    <aside className="flex flex-col gap-8">
-      <div className="border-outline-variant border-b pb-4">
-        <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
+    <aside className="reveal reveal-delay-2 bg-inverse-surface text-inverse-on-surface flex flex-col gap-8 border-t-[0.75rem] border-secondary p-6 md:p-8">
+      <div className="border-white/20 border-b pb-4">
+        <h2 className="font-display text-white text-[length:var(--text-headline-md)] font-semibold">
           Trending Now
         </h2>
       </div>
@@ -26,7 +26,7 @@ export function Trending({ articles }: { articles: readonly ArticleView[] }): Re
             <Link href={`/articles/${article.slug}`} className="group flex gap-4">
               <span
                 aria-hidden
-                className="font-display text-outline-variant group-hover:text-secondary text-[length:var(--text-display-lg)] leading-none transition-colors"
+                className="font-display text-white/20 group-hover:text-secondary text-6xl leading-none transition-colors"
               >
                 {i + 1}
               </span>
@@ -35,7 +35,7 @@ export function Trending({ articles }: { articles: readonly ArticleView[] }): Re
                 <span className="text-label-bold text-secondary mb-2 block text-[10px] uppercase">
                   {section(article.categoryId)}
                 </span>
-                <span className="text-on-surface group-hover:text-primary block text-[length:var(--text-body-lg)] font-medium transition-colors">
+                <span className="text-white group-hover:text-secondary block text-[length:var(--text-body-lg)] font-medium transition-colors">
                   {article.title}
                 </span>
               </span>
@@ -57,9 +57,9 @@ export function Trending({ articles }: { articles: readonly ArticleView[] }): Re
  */
 function NewsletterPanel(): React.ReactElement {
   return (
-    <div className="border-outline-variant bg-surface-container-low mt-auto rounded-lg border p-6">
-      <h3 className="font-display text-on-surface mb-2 text-xl">The Daily Briefing</h3>
-      <p className="text-on-surface-variant mb-4 text-sm">
+    <div className="bg-primary mt-auto border-l-4 border-secondary p-6">
+      <h3 className="font-display mb-2 text-xl text-white">The Daily Briefing</h3>
+      <p className="mb-4 text-sm text-white/75">
         Curated journalism delivered to your inbox.
       </p>
       <Link

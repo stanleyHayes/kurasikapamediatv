@@ -22,14 +22,19 @@ async function Body({ params }: Params): Promise<React.ReactElement> {
   setRequestLocale(locale)
 
   return (
-    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--spacing-lg)]">
-      <h1 className="font-display text-on-surface text-[length:var(--text-headline-lg)] font-semibold">
+    <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-lg)]">
+      <header className="signal-grid relative overflow-hidden border-y-4 border-on-surface bg-secondary-container px-7 py-14 md:px-14 md:py-20">
+      <p className="eyebrow text-primary mb-5">Inbox edition / Daily</p>
+      <h1 className="relative max-w-[12ch] font-display text-on-surface text-[length:var(--text-display-lg)] font-semibold">
         The Daily Briefing
       </h1>
-      <p className="text-on-surface-variant mt-4 max-w-xl text-[length:var(--text-body-lg)]">
+      <p className="text-on-surface-variant relative mt-6 max-w-xl border-l-4 border-primary pl-5 text-[length:var(--text-body-lg)]">
         Curated journalism, in the language you read. We mail nothing until you
         confirm the address — the same integrity rule as everything else we publish.
       </p>
+      <div aria-hidden className="absolute bottom-0 right-6 text-[12rem] font-black leading-none text-primary/10">@</div>
+      </header>
+      <div className="mx-auto max-w-2xl">
       <NewsletterForm locale={locale} />
       <PushOptIn locale={locale} vapidPublicKey={vapidPublicKey()} />
       <p className="text-on-surface-variant mt-8 text-sm">
@@ -38,6 +43,7 @@ async function Body({ params }: Params): Promise<React.ReactElement> {
           Unsubscribe
         </Link>
       </p>
+      </div>
     </section>
   )
 }

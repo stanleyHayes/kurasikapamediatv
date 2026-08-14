@@ -14,8 +14,9 @@ export async function CommentThread({
   const comments = page.items.map(toCommentView)
 
   return (
-    <section className="border-outline-variant mt-12 border-t pt-8" aria-labelledby="comments-heading">
-      <h2 id="comments-heading" className="font-display text-on-surface text-xl font-semibold">
+    <section className="mt-14 border-t-4 border-primary bg-surface-container-lowest p-6 md:p-8" aria-labelledby="comments-heading">
+      <p className="eyebrow text-primary mb-3">Community</p>
+      <h2 id="comments-heading" className="font-display text-on-surface text-3xl font-semibold tracking-[-0.03em]">
         Comments
       </h2>
       {comments.length === 0 ? (

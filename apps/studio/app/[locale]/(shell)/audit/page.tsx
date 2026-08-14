@@ -3,6 +3,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
+import { StudioEmptyState } from '@/components/empty-state'
 
 /**
  * The record of what the newsroom did.
@@ -38,9 +39,9 @@ export default async function AuditPage({
       </p>
 
       {page.items.length === 0 ? (
-        <p className="text-on-surface-variant">Nothing recorded yet.</p>
+        <StudioEmptyState eyebrow="Clean record" icon="◫" title="No audit events yet." description="Editorial actions, role changes and scheduled publications will appear here as an immutable record once newsroom activity begins." action={{ href: '/', label: 'Return to editorial' }} compact />
       ) : (
-        <ul className="border-outline-variant/50 bg-surface-container-low divide-outline-variant/40 divide-y overflow-hidden rounded-xl border">
+        <ul className="divide-outline-variant/40 overflow-hidden border-y-2 border-on-surface bg-surface-container-lowest divide-y">
           {page.items.map((entry) => (
             <AuditRow key={entry.id} entry={entry} locale={locale} />
           ))}

@@ -24,7 +24,7 @@ export interface SignInFormProps {
 const FAILED = 'Those details did not match an account.'
 
 const FIELD =
-  'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface rounded border px-3 py-2 outline-none transition-colors'
+  'h-13 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 outline-none transition-colors placeholder:text-on-surface-variant/50'
 
 /**
  * Uses React 19's form action rather than an onSubmit handler: no controlled
@@ -47,8 +47,8 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
   }
 
   return (
-    <div className="flex max-w-md flex-col gap-[var(--spacing-md)]">
-      <form action={submit} className="flex flex-col gap-[var(--spacing-sm)]">
+    <div className="flex w-full flex-col gap-6">
+      <form action={submit} className="flex w-full flex-col gap-5">
         <Field label="Email" name="email" type="email" autoComplete="email" />
         <Field label="Password" name="password" type="password" autoComplete="current-password" />
         {props.captchaSiteKey !== undefined && (
@@ -61,7 +61,7 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
         )}
         <button
           type="submit"
-          className="bg-primary text-on-primary text-label-bold mt-2 rounded px-4 py-2 uppercase"
+          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full rounded-xl px-5 text-sm font-bold transition-colors"
         >
           Sign in
         </button>
@@ -100,8 +100,8 @@ function Field(props: {
   autoComplete: string
 }): React.ReactElement {
   return (
-    <label className="flex flex-col gap-2">
-      <span className="text-label-bold text-on-surface-variant uppercase">{props.label}</span>
+    <label className="flex w-full flex-col gap-2">
+      <span className="text-sm font-semibold text-on-surface">{props.label}</span>
       <input
         type={props.type}
         name={props.name}

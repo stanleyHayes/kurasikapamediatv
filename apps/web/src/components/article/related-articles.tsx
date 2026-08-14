@@ -20,8 +20,8 @@ export async function RelatedArticles({
   if (related.length === 0) return null
 
   return (
-    <aside className="border-outline-variant mt-[var(--spacing-lg)] border-t pt-[var(--spacing-md)]">
-      <h2 className="font-display text-on-surface text-2xl font-semibold">More in this section</h2>
+    <aside className="border-on-surface mt-[var(--space-xl)] border-t-4 pt-[var(--space-md)]">
+      <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-on-surface text-3xl font-semibold">Keep reading</h2><span className="eyebrow text-secondary">Same desk</span></div>
       <ul className="mt-4">
         {related.map((article) => (
           <li key={article.id}>

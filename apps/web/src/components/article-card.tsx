@@ -7,27 +7,12 @@ import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
  */
 export function ArticleCard({ article }: { article: ArticleView }): React.ReactElement {
   return (
-    <article className="group border-outline-variant hover:bg-surface-container-low border-b transition-colors duration-200">
+    <article className="group editorial-card border-on-surface/25 hover:border-primary hover:bg-surface-container-lowest border-b">
       {/* next-intl's Link adds the locale prefix; the path stays locale-free here. */}
-      <Link href={`/articles/${article.slug}`} className="block py-6">
-        <div className="text-label-bold text-secondary mb-2 uppercase">
-          {article.categoryId.replace(/^cat_/u, '')}
-        </div>
-
-        <h3 className="text-headline-sm text-on-surface font-display group-hover:text-primary transition-colors">
-          {article.title}
-        </h3>
-
-        {article.publishedAt !== null && (
-          <time
-            dateTime={article.publishedAt}
-            className="text-on-surface-variant mt-2 block text-sm"
-          >
-            {formatDate(article.publishedAt, article.locale)}
-          </time>
-        )}
-
-        <span className="bg-secondary mt-4 block h-0.5 w-0 transition-[width] duration-300 ease-[var(--ease-entrance)] group-hover:w-12" />
+      <Link href={`/articles/${article.slug}`} className="grid gap-5 py-8 sm:grid-cols-[7rem_1fr_1.5rem] sm:items-start">
+        <div className="broadcast-kicker pt-1 text-secondary">{article.categoryId.replace(/^cat_/u, '')}</div>
+        <div><h3 className="max-w-[30ch] font-display text-[1.45rem] leading-[1.08] text-on-surface transition-colors group-hover:text-primary">{article.title}</h3>{article.publishedAt !== null && <time dateTime={article.publishedAt} className="mt-4 block text-xs tabular-nums text-on-surface-variant">{formatDate(article.publishedAt, article.locale)}</time>}</div>
+        <span aria-hidden className="text-xl transition-transform group-hover:-translate-y-1 group-hover:translate-x-1">↗</span>
       </Link>
     </article>
   )
