@@ -1,39 +1,35 @@
 import { base64url, createRemoteJWKSet, jwtVerify, type RemoteJWKSet } from 'jose'
-import {
-  OAuthExchangeFailed,
-  type AuthorizationRequest,
-  type ExternalUser,
-  type OAuthProvider,
-  type SecretGenerator,
+import type {
+  AuthorizationRequest,
+  ExternalUser,
+  OAuthProvider,
+  SecretGenerator,
 } from '@kurasikapa/application'
+import { assertedTrue, failOAuth, joseErrorCode, nonEmptyString } from './claims'
+import { requestWithTimeout, timeoutFrom, type FetchLike } from './http'
 
 /**
  * Google sign-in over OpenID Connect.
  *
- * The endpoints below are transcribed from Google's discovery document
- * (`https://accounts.google.com/.well-known/openid-configuration`) rather than
- * fetched at runtime. Discovery would put a second network round trip on the
- * critical path of every sign-in and a second thing that can be down; these
- * URLs have not moved in a decade, and if they do, this file is the one place
- * that changes.
+ * The endpoints are transcribed from Google's discovery document rather than
+ * fetched at runtime. Discovery would put a second round trip on the critical
+ * path of every sign-in and a second thing that can be down; these URLs have
+ * not moved in a decade, and if they do, this file is the one place to change.
  */
 const AUTHORIZATION_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth'
 const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token'
 const JWKS_URI = 'https://www.googleapis.com/oauth2/v3/certs'
 
 /**
- * Google's documentation accepts BOTH spellings of its own issuer, and tokens
- * carrying either are in circulation. Rejecting the bare form would reject
- * valid tokens; leaving `issuer` unset would accept a well-formed token minted
- * by anybody whose keys we happened to trust. The list is exactly these two.
+ * Google accepts BOTH spellings of its own issuer and tokens carrying either
+ * are in circulation. Rejecting the bare form rejects valid tokens; leaving
+ * `issuer` unset accepts a well-formed token minted by anybody whose keys we
+ * happened to trust. Exactly these two.
  */
 const ISSUERS = ['https://accounts.google.com', 'accounts.google.com']
 
-/**
- * The only signing algorithm the discovery document advertises, pinned here so
- * a token cannot nominate its own — the classic JWT forgery, `alg: none`
- * included.
- */
+/** The only algorithm discovery advertises, pinned so a token cannot nominate
+ * its own — the classic JWT forgery, `alg: none` included. */
 const ALGORITHM = 'RS256'
 
 /** `openid` yields the id_token, `email` the claim we match accounts on, `profile` the display name. */
@@ -46,13 +42,13 @@ export interface GoogleOAuthConfig {
   readonly clientId: string
   /** Never appears in a URL or a log line; it is only ever a form field on the token POST. */
   readonly clientSecret: string
+  /** Milliseconds before a stalled token endpoint is abandoned. See http.ts. */
+  readonly timeoutMs?: number
 }
 
-/**
- * The id_token claims we read. Every field is `unknown` on purpose: these
- * arrive as parsed JSON from outside the system, and typing them as `string`
- * would be an assertion we have not yet earned.
- */
+/** The id_token claims we read. Every field is `unknown` on purpose: these
+ * arrive as parsed JSON from outside the system, and typing one as `string`
+ * would be an assertion we have not yet earned. */
 interface GoogleIdTokenClaims {
   readonly sub?: unknown
   readonly nonce?: unknown
@@ -65,22 +61,25 @@ export class GoogleOAuthProvider implements OAuthProvider {
   readonly provider = 'google' as const
 
   private readonly jwks: RemoteJWKSet
+  private readonly timeoutMs: number
 
   constructor(
     private readonly config: GoogleOAuthConfig,
     private readonly secrets: SecretGenerator,
+    // Optional and last, so no call site changes. Injectable because `vi.mock`
+    // is banned: a fake here is the only way to test the exchange offline.
+    private readonly http: FetchLike = fetch,
   ) {
     // Built once per instance, not per call. jose caches the key set and holds
     // a cooldown between fetches, so a flood of tokens carrying an unknown
     // `kid` cannot turn our sign-in route into a load generator against Google.
     this.jwks = createRemoteJWKSet(new URL(JWKS_URI))
+    this.timeoutMs = timeoutFrom(config.timeoutMs)
   }
 
-  /**
-   * Not `async`, because nothing here awaits: the authorization URL is built
-   * from local entropy alone. The port is asynchronous for the providers that
-   * do need I/O here, and returning a resolved promise costs nothing.
-   */
+  /** Not `async`: the URL is built from local entropy alone. The port is
+   * asynchronous for providers that do need I/O here, and a resolved promise
+   * costs nothing. */
   authorization(input: { readonly redirectUri: string }): Promise<AuthorizationRequest> {
     const state = this.secrets.token(ENTROPY_BYTES)
     const nonce = this.secrets.token(ENTROPY_BYTES)
@@ -116,9 +115,9 @@ export class GoogleOAuthProvider implements OAuthProvider {
   }): Promise<ExternalUser> {
     // The port allows both to be null because Facebook has no nonce and Apple
     // no PKCE; Google has both, so a callback missing either means the stored
-    // request was lost or forged. Treating that as merely optional would
-    // downgrade this sign-in to one with no replay and no code-interception
-    // defence — and it would still succeed, which is the dangerous part.
+    // request was lost or forged. Treating it as optional downgrades this
+    // sign-in to one with no replay and no code-interception defence — and it
+    // still succeeds, which is the dangerous part.
     if (input.nonce === null || input.codeVerifier === null) {
       fail('this sign-in was started without a nonce and PKCE verifier')
     }
@@ -136,9 +135,8 @@ export class GoogleOAuthProvider implements OAuthProvider {
    * BASE64URL(SHA-256(verifier)), per RFC 7636 § 4.2.
    *
    * The digest comes from the injected `SecretGenerator` — hex encoded, hence
-   * the re-encoding — rather than from `node:crypto`, so this adapter stays
-   * testable and keeps the repository's ban on ambient crypto below the
-   * composition root intact.
+   * the re-encoding — rather than from `node:crypto`, keeping the repository's
+   * ban on ambient crypto below the composition root intact.
    */
   private codeChallenge(verifier: string): string {
     const hex = this.secrets.sha256(verifier)
@@ -158,11 +156,15 @@ export class GoogleOAuthProvider implements OAuthProvider {
     readonly codeVerifier: string
   }): Promise<string> {
     // Narrow try: it wraps ONLY the network call, so a bug in our own parsing
-    // below cannot be mistaken for Google being unreachable.
+    // below cannot be mistaken for Google being unreachable. It also catches
+    // the deadline — an aborted fetch rejects, and unwrapped that reaches the
+    // route as a 500 rather than as a failed sign-in.
     let response: Response
     try {
-      response = await fetch(TOKEN_ENDPOINT, {
+      response = await requestWithTimeout(this.http, {
+        url: TOKEN_ENDPOINT,
         method: 'POST',
+        timeoutMs: this.timeoutMs,
         headers: {
           'content-type': 'application/x-www-form-urlencoded',
           accept: 'application/json',
@@ -201,9 +203,9 @@ export class GoogleOAuthProvider implements OAuthProvider {
    * Verifies the id_token and reduces it to the identity the domain wants.
    *
    * Signature, issuer and audience are jose's; the nonce is ours, because no
-   * JWT library checks it — it is an OIDC claim, not a JWT one, and an id_token
-   * that verifies perfectly while carrying somebody else's nonce is exactly the
-   * replay this whole flow exists to stop.
+   * JWT library checks it — it is an OIDC claim, not a JWT one. A token that
+   * verifies perfectly while carrying somebody else's nonce is exactly the
+   * replay this flow exists to stop.
    */
   private async identityFrom(idToken: string, nonce: string): Promise<ExternalUser> {
     let claims: GoogleIdTokenClaims
@@ -218,7 +220,7 @@ export class GoogleOAuthProvider implements OAuthProvider {
       })
       claims = payload
     } catch (error) {
-      fail(`the id_token did not verify (${joseCode(error)})`)
+      fail(`the id_token did not verify (${joseErrorCode(error)})`)
     }
 
     const subject = nonEmptyString(claims.sub)
@@ -241,39 +243,7 @@ export class GoogleOAuthProvider implements OAuthProvider {
   }
 }
 
-/** An absent, empty or non-string claim is no claim at all, and says so in the type. */
-const nonEmptyString = (value: unknown): string | null =>
-  typeof value === 'string' && value !== '' ? value : null
-
-/**
- * Google has shipped `email_verified` as both a JSON boolean and the string
- * "true". Everything else — absent, `false`, `"1"`, `null` — is NOT an
- * assertion and must read as false: an unverified address arriving at the
- * domain as verified is account takeover in one step, because the use case
- * links a provider identity onto an existing account by matching email.
- */
-const assertedTrue = (value: unknown): boolean => value === true || value === 'true'
-
-/**
- * Returns `never` so TypeScript narrows at every call site, which is what lets
- * the checks above read as guards rather than as if/else pyramids.
- *
- * Reasons describe what failed, never what was sent: no code, no verifier, no
- * token, no secret ever reaches this string. `OAuthExchangeFailed.message` is
- * logged and may be surfaced to the person signing in.
- */
+/** This provider's name, bound once. See `failOAuth` for what may go in a reason. */
 function fail(reason: string): never {
-  throw new OAuthExchangeFailed('google', reason)
-}
-
-/**
- * jose's failure codes are a fixed enum, so they are safe to put in a message
- * and are the difference between "our clock is wrong" and "someone is forging
- * tokens". Key and encoding problems arrive as a bare `TypeError` with no code
- * at all, which is why the fallback is load-bearing rather than defensive.
- */
-function joseCode(error: unknown): string {
-  const code = (error as { code?: unknown }).code
-
-  return typeof code === 'string' ? code : 'unknown'
+  failOAuth('google', reason)
 }

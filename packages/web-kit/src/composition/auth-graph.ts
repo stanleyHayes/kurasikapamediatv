@@ -149,7 +149,7 @@ function configuredProviders(
   for (const provider of [
     googleProvider(secrets),
     facebookProvider(secrets),
-    appleProvider(secrets),
+    appleProvider(secrets, systemClock),
   ]) {
     if (provider !== null) providers.set(provider.provider, provider)
   }

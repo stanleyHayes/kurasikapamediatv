@@ -1,4 +1,4 @@
-import type { OAuthProvider, SecretGenerator } from '@kurasikapa/application'
+import type { ClockPort, OAuthProvider, SecretGenerator } from '@kurasikapa/application'
 import {
   AppleOAuthProvider,
   FacebookOAuthProvider,
@@ -46,8 +46,13 @@ export function facebookProvider(secrets: SecretGenerator): OAuthProvider | null
  * about four environment variables, and checking only for a CLIENT_SECRET
  * (as a two-value provider would) would report it configured when it cannot
  * possibly work.
+ *
+ * It is also the only provider needing a clock: that JWT is cached until
+ * shortly before its own `exp`, and the adapter takes the clock as a port so
+ * the cache boundary is testable. The wall clock is read here, where it is
+ * allowed, and nowhere below.
  */
-export function appleProvider(secrets: SecretGenerator): OAuthProvider | null {
+export function appleProvider(secrets: SecretGenerator, clock: ClockPort): OAuthProvider | null {
   const { APPLE_SERVICES_ID, APPLE_TEAM_ID, APPLE_KEY_ID, APPLE_PRIVATE_KEY } = env()
 
   if (
@@ -70,5 +75,6 @@ export function appleProvider(secrets: SecretGenerator): OAuthProvider | null {
       privateKeyPkcs8: APPLE_PRIVATE_KEY.replace(/\\n/gu, '\n'),
     },
     secrets,
+    clock,
   )
 }
