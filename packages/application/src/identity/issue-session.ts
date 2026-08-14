@@ -1,6 +1,6 @@
-import { claimsFor, ttlFor, type UserId } from '@kurasikapa/domain'
+import { claimsFor, ttlFor, type RefreshTokenRecord, type UserId } from '@kurasikapa/domain'
 import type { ClockPort, IdPort } from '../ports/ambient'
-import type { RefreshTokenRepository } from '../ports/refresh-token-repository'
+import type { NewRefreshToken, RefreshTokenRepository } from '../ports/refresh-token-repository'
 import type { SecretGenerator } from '../ports/totp'
 import type { TokenSigner } from '../ports/token-signer'
 
@@ -53,15 +53,33 @@ export class SessionIssuer {
 
   /** Starts a brand new session family. */
   async issue(userId: UserId): Promise<SessionTokens> {
-    return this.mint(userId, this.deps.ids.next())
+    const { tokens, record } = await this.build(userId, this.deps.ids.next())
+    await this.deps.refreshTokens.create(record)
+
+    return tokens
   }
 
-  /** Continues an existing family, for refresh — same `sid`, new tokens. */
-  async reissue(userId: UserId, sessionId: string): Promise<SessionTokens> {
-    return this.mint(userId, sessionId)
+  /**
+   * Continues an existing family — same `sid`, new tokens, old one spent.
+   *
+   * Goes through `rotate` rather than `create` because marking the presented
+   * token spent IS the rotation. Issuing a replacement without spending the
+   * original leaves it `active` forever: it can be refreshed again and again,
+   * reuse detection never fires, and a stolen refresh token is good for its
+   * full thirty days. That is the whole security property of this design, and
+   * it is one forgotten call away from being absent.
+   */
+  async rotate(spent: RefreshTokenRecord): Promise<SessionTokens> {
+    const { tokens, record } = await this.build(spent.userId, spent.sessionId)
+    await this.deps.refreshTokens.rotate(spent.id, record)
+
+    return tokens
   }
 
-  private async mint(userId: UserId, sessionId: string): Promise<SessionTokens> {
+  private async build(
+    userId: UserId,
+    sessionId: string,
+  ): Promise<{ tokens: SessionTokens; record: NewRefreshToken }> {
     const now = this.deps.clock.now()
 
     const accessToken = await this.deps.tokens.sign(
@@ -70,21 +88,22 @@ export class SessionIssuer {
 
     const refreshToken = this.deps.secrets.token(SessionIssuer.REFRESH_TOKEN_BYTES)
 
-    await this.deps.refreshTokens.create({
-      id: this.deps.ids.next(),
-      sessionId,
-      userId,
-      tokenHash: this.deps.secrets.sha256(refreshToken),
-      expiresAt: new Date(now.getTime() + ttlFor('refresh') * 1000),
-      createdAt: now,
-    })
-
     return {
-      accessToken,
-      refreshToken,
-      sessionId,
-      accessExpiresInSeconds: ttlFor('access'),
-      refreshExpiresInSeconds: ttlFor('refresh'),
+      record: {
+        id: this.deps.ids.next(),
+        sessionId,
+        userId,
+        tokenHash: this.deps.secrets.sha256(refreshToken),
+        expiresAt: new Date(now.getTime() + ttlFor('refresh') * 1000),
+        createdAt: now,
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
+        sessionId,
+        accessExpiresInSeconds: ttlFor('access'),
+        refreshExpiresInSeconds: ttlFor('refresh'),
+      },
     }
   }
 }

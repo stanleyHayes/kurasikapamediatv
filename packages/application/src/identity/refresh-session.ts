@@ -60,6 +60,6 @@ export class RefreshSession implements UseCase<RefreshInput, SessionTokens> {
       throw new SessionNotRefreshable()
     }
 
-    return this.deps.sessions.reissue(record.userId, record.sessionId)
+    return this.deps.sessions.rotate(record)
   }
 }

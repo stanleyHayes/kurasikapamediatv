@@ -14,6 +14,8 @@ import {
   SOCIAL_POSTS,
   CATEGORIES,
   RATE_LIMITS,
+  CREDENTIALS,
+  REFRESH_TOKENS,
   REVISIONS,
   type ArticleDocument,
   type BookmarkDocument,
@@ -28,6 +30,8 @@ import {
   type SocialPostDocument,
   type CategoryDocument,
   type RevisionDocument,
+  type CredentialDocument,
+  type RefreshTokenDocument,
 } from './documents'
 
 /**
@@ -149,4 +153,50 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   await db.collection(RATE_LIMITS).createIndexes([
     { key: { expiresAt: 1 }, name: 'rate_limit_ttl', expireAfterSeconds: 0 },
   ])
+
+  /*
+   * Authentication (KUR-66).
+   *
+   * The unique index on `email` is not an optimisation — it is the ONLY thing
+   * that stops two concurrent sign-ups from both creating an account for the
+   * same address. MongoCredentialRepository relies on it throwing.
+   */
+  await db
+    .collection<CredentialDocument>(CREDENTIALS)
+    .createIndex({ email: 1 }, { unique: true, name: 'credentials_email_unique' })
+
+  // Provider lookups go through the immutable subject, never the email.
+  await db
+    .collection<CredentialDocument>(CREDENTIALS)
+    .createIndex(
+      { 'externals.provider': 1, 'externals.subject': 1 },
+      { name: 'credentials_external_identity' },
+    )
+
+  // Every refresh redeems by hash, so this one is on the hot path.
+  await db
+    .collection<RefreshTokenDocument>(REFRESH_TOKENS)
+    .createIndex({ tokenHash: 1 }, { unique: true, name: 'refresh_token_hash_unique' })
+
+  // Revoking a family, and revoking every session a user has.
+  await db
+    .collection<RefreshTokenDocument>(REFRESH_TOKENS)
+    .createIndex({ sessionId: 1 }, { name: 'refresh_token_session' })
+  await db
+    .collection<RefreshTokenDocument>(REFRESH_TOKENS)
+    .createIndex({ userId: 1 }, { name: 'refresh_token_user' })
+
+  /*
+   * Expired tokens delete themselves 30 days after they lapse.
+   *
+   * The delay is deliberate: a spent token must outlive its own expiry for
+   * reuse detection to still recognise a replay rather than shrugging at an
+   * unknown hash.
+   */
+  await db
+    .collection<RefreshTokenDocument>(REFRESH_TOKENS)
+    .createIndex(
+      { expiresAt: 1 },
+      { expireAfterSeconds: 30 * 24 * 60 * 60, name: 'refresh_token_ttl' },
+    )
 }

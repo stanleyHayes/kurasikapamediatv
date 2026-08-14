@@ -28,3 +28,12 @@ export {
   InMemorySocialPostRepository,
   RecordingSocial,
 } from './social-fakes'
+export {
+  AllowingRateLimiter,
+  FakePasswordHasher,
+  FakeSecretGenerator,
+  FakeTokenSigner,
+  FakeTotp,
+  InMemoryCredentialRepository,
+  InMemoryRefreshTokenRepository,
+} from './auth-fakes'
