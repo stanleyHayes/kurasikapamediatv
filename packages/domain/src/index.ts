@@ -27,6 +27,61 @@ export {
 
 export { Actor, NotPermitted, requirePermission } from './identity/actor'
 export { PERMISSIONS, ROLES, type Permission, type Role, permissionsOf } from './identity/role'
+export { EmailAddress, InvalidEmailAddress } from './identity/email-address'
+export {
+  PASSWORD_RULES,
+  PasswordContainsIdentity,
+  PasswordTooLong,
+  PasswordTooShort,
+  assertAcceptablePassword,
+} from './identity/password-policy'
+export {
+  ACCESS_TOKEN_TTL_SECONDS,
+  CHALLENGE_TOKEN_TTL_SECONDS,
+  CLOCK_SKEW_TOLERANCE_SECONDS,
+  REFRESH_TOKEN_TTL_SECONDS,
+  TokenExpired,
+  WrongTokenKind,
+  type SessionClaims,
+  type TokenKind,
+  assertUsable,
+  claimsFor,
+  ttlFor,
+} from './identity/session-policy'
+export {
+  RefreshTokenExpired,
+  RefreshTokenReused,
+  RefreshTokenRevoked,
+  type RefreshTokenRecord,
+  type RefreshTokenState,
+  assertRedeemable,
+  isReuse,
+} from './identity/refresh-token'
+export {
+  CODE_DIGITS,
+  DRIFT_STEPS,
+  RECOVERY_CODE_COUNT,
+  TIME_STEP_SECONDS,
+  InvalidTotpCode,
+  TotpCodeAlreadyUsed,
+  acceptableCounters,
+  assertNotReplayed,
+  counterAt,
+  isWellFormedCode,
+  normaliseCode,
+} from './identity/totp-policy'
+export {
+  EXTERNAL_PROVIDERS,
+  Credential,
+  NoWayToSignIn,
+  ProviderAlreadyLinked,
+  TotpAlreadyEnrolled,
+  TotpNotEnrolled,
+  type CredentialProps,
+  type ExternalIdentity,
+  type ExternalProvider,
+  type TotpEnrolment,
+} from './identity/credential'
 export {
   CannotAssignOwnRoles,
   UnknownRole,
