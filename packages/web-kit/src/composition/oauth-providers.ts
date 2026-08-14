@@ -39,6 +39,21 @@ export function facebookProvider(secrets: SecretGenerator): OAuthProvider | null
 }
 
 /**
+ * Restores the real newlines in a PKCS#8 PEM.
+ *
+ * Vercel's dashboard cannot hold a literal newline, so the .p8 key is stored
+ * with `\n` escaped. A PEM without real newlines fails to import with an error
+ * that says nothing about why, and it fails at the first sign-in rather than
+ * at boot.
+ *
+ * Exported for its own test: the restored key is held privately by the
+ * adapter, so this is the only place its shape can be asserted.
+ */
+export function pkcs8FromEnv(stored: string): string {
+  return stored.replace(/\\n/gu, '\n')
+}
+
+/**
  * Apple needs four values, not two.
  *
  * Its client secret is not a string Apple hands over — it is an ES256 JWT we
@@ -69,10 +84,7 @@ export function appleProvider(secrets: SecretGenerator, clock: ClockPort): OAuth
       servicesId: APPLE_SERVICES_ID,
       teamId: APPLE_TEAM_ID,
       keyId: APPLE_KEY_ID,
-      // Vercel's dashboard cannot hold a literal newline, so the key is stored
-      // with \n escaped and restored here. A PKCS#8 PEM without real newlines
-      // fails to import with an error that says nothing about why.
-      privateKeyPkcs8: APPLE_PRIVATE_KEY.replace(/\\n/gu, '\n'),
+      privateKeyPkcs8: pkcs8FromEnv(APPLE_PRIVATE_KEY),
     },
     secrets,
     clock,

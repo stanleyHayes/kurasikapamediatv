@@ -4,7 +4,24 @@ import { ScryptPasswordHasher } from './scrypt-password-hasher'
 const hasher = new ScryptPasswordHasher()
 const PASSWORD = 'correct horse battery staple'
 
-describe('hash', () => {
+/**
+ * Every test below that hashes needs longer than Vitest's 5s default.
+ *
+ * ~220ms per call on an idle machine is the parameters working as intended —
+ * scrypt is memory-hard on purpose. But `pnpm verify` runs every package's
+ * suite at once through turbo, each with its own worker pool, and a KDF that
+ * is deliberately CPU- and memory-bound stretches by an order of magnitude on
+ * a saturated box. A single hash-and-verify then runs past 5s and the suite
+ * goes red on a machine that is merely busy — which is exactly what CI is.
+ *
+ * Raised on these suites rather than in vitest.config.ts, so the rest of the
+ * package keeps the default where a slow test really does mean a hang. The
+ * alternative fix — lowering N, r or p until the default fits — would trade a
+ * security property for a green run, and the parameters are load-bearing.
+ */
+const KDF_TIMEOUT_MS = 60_000
+
+describe('hash', { timeout: KDF_TIMEOUT_MS }, () => {
   it('round trips', async () => {
     expect(await hasher.verify(PASSWORD, await hasher.hash(PASSWORD))).toBe(true)
   })
@@ -55,7 +72,7 @@ describe('verify, against hostile input', () => {
   })
 })
 
-describe('needsRehash', () => {
+describe('needsRehash', { timeout: KDF_TIMEOUT_MS }, () => {
   it('is false for a hash made with current parameters', async () => {
     expect(hasher.needsRehash(await hasher.hash(PASSWORD))).toBe(false)
   })

@@ -3,6 +3,7 @@ import type {
   ProvisionChannelInput,
   ProvisionedChannel,
 } from '../ports/live-video'
+import { LiveVideoUnavailable } from '../media/errors'
 
 /**
  * A provider that hands back predictable channels and remembers every teardown.
@@ -60,7 +61,17 @@ export class FailClosedLiveVideo implements LiveVideoPort {
     return Promise.reject(this.unconfigured())
   }
 
-  private unconfigured(): Error {
-    return new Error('Live video is not configured: AWS_ACCESS_KEY_ID is unset')
+  /**
+   * `LiveVideoUnavailable`, exactly as the IVS adapter's `unconfigured()`
+   * raises it — not a bare `Error`.
+   *
+   * A fake that throws a weaker type than production is a fake that agrees with
+   * a bug: the studio's error plumbing maps this class to a named message and
+   * rethrows everything else as a 500, so a suite built on a bare `Error` would
+   * stay green while an operator on a fresh checkout read "Something went
+   * wrong" instead of the variable to set.
+   */
+  private unconfigured(): LiveVideoUnavailable {
+    return new LiveVideoUnavailable('Live video is not configured: AWS_ACCESS_KEY_ID is unset')
   }
 }

@@ -59,6 +59,24 @@ export class InMemoryCredentialRepository implements CredentialRepository {
   }
 }
 
+/** Exported so an assertion matches the real string rather than a copy of it. */
+export const CREDENTIAL_STORE_UNAVAILABLE = 'credential store unavailable'
+
+/**
+ * Inserts fail with something that is NOT `EmailAlreadyRegistered`.
+ *
+ * RegisterUser swallows the duplicate-email error to keep its answer neutral,
+ * and the swallow is written as "not a duplicate, rethrow". Widen it by one
+ * character and a store that is down starts reporting registrations as
+ * accepted — the reader waits for a confirmation email that was never queued
+ * against a row that was never written.
+ */
+export class ExplodingCredentialRepository extends InMemoryCredentialRepository {
+  override create(): Promise<void> {
+    return Promise.reject(new Error(CREDENTIAL_STORE_UNAVAILABLE))
+  }
+}
+
 export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
   private readonly rows = new Map<string, RefreshTokenRecord>()
 

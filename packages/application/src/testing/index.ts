@@ -37,6 +37,8 @@ export {
 } from './social-fakes'
 export {
   AllowingRateLimiter,
+  CREDENTIAL_STORE_UNAVAILABLE,
+  ExplodingCredentialRepository,
   FakePasswordHasher,
   FakeSecretGenerator,
   FakeTokenSigner,
@@ -44,3 +46,8 @@ export {
   InMemoryCredentialRepository,
   InMemoryRefreshTokenRepository,
 } from './auth-fakes'
+export {
+  FakeOAuthProvider,
+  RefusingOAuthProvider,
+  type ExchangeCall,
+} from './oauth-fakes'

@@ -2,7 +2,6 @@
   "extends": "./packages/config/tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
       "@kurasikapa/domain": ["./packages/domain/src/index.ts"],
       "@kurasikapa/domain/testing": ["./packages/domain/src/testing/builders.ts"],

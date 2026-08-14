@@ -8,7 +8,7 @@ import {
   InMemoryBroadcastRepository,
   STORE_UNAVAILABLE,
 } from '../testing/in-memory-broadcast-repository'
-import { AlreadyBroadcasting } from './errors'
+import { AlreadyBroadcasting, LiveVideoUnavailable } from './errors'
 import { StartBroadcast } from './start-broadcast'
 
 const NOW = new Date('2026-08-14T19:02:00Z')
@@ -130,8 +130,12 @@ describe('StartBroadcast', () => {
   it('fails closed, and records nothing, when the provider is unconfigured', async () => {
     const broadcasts = new InMemoryBroadcastRepository()
 
+    // The TYPE is the assertion, not just the message. ADR-0012 makes an
+    // unconfigured provider the normal state of a fresh checkout and CI, and
+    // the studio only turns it into a sentence naming the missing variable
+    // because it recognises this class; anything else becomes a bare 500.
     await expect(startWith(broadcasts, new FailClosedLiveVideo()).execute(goLive)).rejects.toThrow(
-      'AWS_ACCESS_KEY_ID is unset',
+      LiveVideoUnavailable,
     )
     expect(broadcasts.count()).toBe(0)
   })
