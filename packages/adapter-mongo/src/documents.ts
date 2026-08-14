@@ -1,4 +1,4 @@
-import type { ArticleStatus, RevisionTrigger } from '@kurasikapa/domain'
+import type { ArticleStatus, BroadcastState, RevisionTrigger } from '@kurasikapa/domain'
 
 /**
  * The shape on disk. Deliberately not the domain shape.
@@ -149,6 +149,37 @@ export interface SocialPostDocument {
   createdBy: string
 }
 
+/**
+ * One live transmission on disk. Mirrors `BroadcastProps` field for field.
+ *
+ * **There is no `streamKey`, and adding one is not a refactor.** The key is the
+ * credential that lets its holder broadcast as the station; the aggregate never
+ * holds it and `LiveVideoPort` hands it back exactly once, at provision time.
+ * Absent beats hashed here — a hash is only useful to verify a key someone
+ * presents, and nothing in this system ever does that, so the field would be a
+ * permanent copy of a secret in every nightly backup earning nothing. If a
+ * future feature needs to re-show it, that is the provider's rotate call, not a
+ * column.
+ *
+ * `channelArn` is not a secret but is not a reader's business either: it is the
+ * handle an attacker enumerates the station's AWS estate with. It lives here
+ * because EndBroadcast needs it to tear the channel down — a channel with no row
+ * pointing at it bills forever — and `GetCurrentBroadcast` projects it away.
+ */
+export interface BroadcastDocument {
+  _id: string
+  title: string
+  /** Its own locale, like an article's. Product rule 3: locale is data. */
+  locale: string
+  channelArn: string
+  playbackUrl: string
+  state: BroadcastState
+  scheduledFor: Date
+  startedAt: Date | null
+  endedAt: Date | null
+  createdBy: string
+}
+
 export const ARTICLES = 'articles'
 export const REVISIONS = 'article_revisions'
 export const ROLE_ASSIGNMENTS = 'role_assignments'
@@ -163,6 +194,7 @@ export const NEWSLETTER_DIGESTS = 'newsletter_digests'
 export const PUSH_SUBSCRIPTIONS = 'push_subscriptions'
 export const RSS_SOURCES = 'rss_sources'
 export const SOCIAL_POSTS = 'social_posts'
+export const BROADCASTS = 'broadcasts'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'
 /** Ephemeral counters, reaped by a TTL index. */

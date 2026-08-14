@@ -2,7 +2,6 @@ import {
   EmailAddress,
   claimsFor,
   type Credential,
-  type UserId,
 } from '@kurasikapa/domain'
 import type { ClockPort } from '../ports/ambient'
 import type { CredentialRepository } from '../ports/credential-repository'
@@ -10,7 +9,7 @@ import type { PasswordHasher } from '../ports/password-hasher'
 import type { RateLimitRule, RateLimiter } from '../ports/rate-limit'
 import type { TokenSigner } from '../ports/token-signer'
 import type { UseCase } from '../ports/use-case'
-import { SessionIssuer, type SessionTokens } from './issue-session'
+import type { SessionIssuer, SessionTokens } from './issue-session'
 
 export interface SignInInput {
   readonly email: string
@@ -144,7 +143,7 @@ export class SignInWithPassword implements UseCase<SignInInput, SignInOutcome> {
   private async challenge(credential: Credential): Promise<string> {
     return this.deps.tokens.sign(
       claimsFor({
-        userId: credential.userId as UserId,
+        userId: credential.userId,
         sessionId: `pending:${credential.userId}`,
         kind: 'challenge',
         now: this.deps.clock.now(),

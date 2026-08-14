@@ -92,6 +92,7 @@ export {
   EmptyIdentifier,
   type ArticleId,
   type AssetId,
+  type BroadcastId,
   type CommentId,
   type Branded,
   type CategoryId,
@@ -101,6 +102,7 @@ export {
   type UserId,
   articleId,
   assetId,
+  broadcastId,
   commentId,
   categoryId,
   familyId,
@@ -178,5 +180,13 @@ export {
   type SocialPostId,
   type SocialPostProps,
 } from './distribution/social-post'
+
+export {
+  Broadcast,
+  type BroadcastProps,
+  type NewBroadcast,
+} from './media/broadcast'
+export { BROADCAST_STATES, type BroadcastState } from './media/broadcast-state'
+export { AlreadyLive, BroadcastHasEnded, NotLive } from './media/errors'
 
 export { AuditEntry, type AuditEntryProps } from './insight/audit-entry'

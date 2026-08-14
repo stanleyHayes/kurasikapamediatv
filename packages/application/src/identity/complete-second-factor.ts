@@ -83,7 +83,7 @@ export class CompleteSecondFactor implements UseCase<SecondFactorInput, SessionT
     assertUsable(claims, 'challenge', this.deps.clock.now())
 
     const credential = await this.deps.credentials.findByUserId(claims.sub)
-    if (credential === null || !credential.requiresSecondFactor) throw new InvalidTotpCode()
+    if (!credential?.requiresSecondFactor) throw new InvalidTotpCode()
 
     return credential
   }

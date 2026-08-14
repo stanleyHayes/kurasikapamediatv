@@ -1,4 +1,4 @@
-import { SignJWT, errors, jwtVerify } from 'jose'
+import { SignJWT, jwtVerify, type errors } from 'jose'
 import type { SessionClaims, TokenKind } from '@kurasikapa/domain'
 import { InvalidToken, type TokenSigner } from '@kurasikapa/application'
 
@@ -115,16 +115,13 @@ const isTokenKind = (value: unknown): value is TokenKind =>
 function describe(error: unknown): string {
   const code = (error as errors.JOSEError | undefined)?.code
 
-  switch (code) {
-    case 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED':
-      return 'signature did not verify'
-    case 'ERR_JWT_EXPIRED':
-      return 'expired'
-    case 'ERR_JOSE_ALG_NOT_ALLOWED':
-      return 'unexpected algorithm'
-    case 'ERR_JWT_CLAIM_VALIDATION_FAILED':
-      return 'claim validation failed'
-    default:
-      return 'malformed'
-  }
+  // A chain, not a switch: jose publishes a dozen codes and only these four
+  // mean something distinct to a caller. Enumerating the rest to satisfy an
+  // exhaustiveness check would leak library internals into an auth error.
+  if (code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') return 'signature did not verify'
+  if (code === 'ERR_JWT_EXPIRED') return 'expired'
+  if (code === 'ERR_JOSE_ALG_NOT_ALLOWED') return 'unexpected algorithm'
+  if (code === 'ERR_JWT_CLAIM_VALIDATION_FAILED') return 'claim validation failed'
+
+  return 'malformed'
 }

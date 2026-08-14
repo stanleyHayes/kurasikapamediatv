@@ -94,6 +94,11 @@ export class SessionIssuer {
         sessionId,
         userId,
         tokenHash: this.deps.secrets.sha256(refreshToken),
+        // Derived from the INJECTED instant, not read from the clock — the
+        // value is fully determined by `now`. The rule bans naming Date at
+        // all, so the exemption is made visible here rather than evaded by
+        // writing the same read a different way.
+        // eslint-disable-next-line no-restricted-globals
         expiresAt: new Date(now.getTime() + ttlFor('refresh') * 1000),
         createdAt: now,
       },

@@ -23,40 +23,7 @@ export type {
 } from './ports/social'
 export type { CommentRepository } from './ports/comment-repository'
 export type { LikeRepository } from './ports/like-repository'
-export {
-  LikeArticle,
-  type LikeArticleDeps,
-  type LikeArticleInput,
-} from './audience/like-article'
-export { UnlikeArticle, type UnlikeArticleInput } from './audience/unlike-article'
-export {
-  CountLikes,
-  type CountLikesInput,
-  type CountLikesResult,
-} from './audience/count-likes'
 export type { ArticleReadRank, ReadingRepository } from './ports/reading-repository'
-export { ListMostRead, type ListMostReadInput } from './audience/list-most-read'
-export { ListRelatedArticles, type ListRelatedArticlesInput } from './audience/list-related-articles'
-export { RecordReading, type RecordReadingDeps, type RecordReadingInput } from './audience/record-reading'
-export { ListReadingHistory, type ListReadingHistoryInput, type ReadArticle } from './audience/list-reading-history'
-export { CountReadings } from './audience/count-readings'
-export {
-  PostComment,
-  type PostCommentDeps,
-  type PostCommentInput,
-} from './audience/post-comment'
-export {
-  CommentNotFound,
-  ModerateComment,
-  type ModerateCommentDeps,
-  type ModerateCommentInput,
-} from './audience/moderate-comment'
-export {
-  ListPendingComments,
-  ListVisibleComments,
-  type ListPendingCommentsInput,
-  type ListVisibleCommentsInput,
-} from './audience/list-comments'
 export {
   QueueSocialPost,
   type QueueSocialPostDeps,
@@ -67,19 +34,6 @@ export { CaptionNeedsBody, ProposeSocialCaption, type ProposeSocialCaptionDeps, 
 export { ProposeSocialSummary, type ProposeSocialSummaryDeps, type ProposeSocialSummaryInput } from './distribution/propose-social-summary'
 export { PublishDuePosts, type PublishDuePostsDeps, type PublishDuePostsResult } from './distribution/publish-due-posts'
 export type { RoleRepository } from './ports/role-repository'
-export {
-  SaveArticle,
-  type SaveArticleDeps,
-  type SaveArticleInput,
-} from './audience/save-article'
-export {
-  ListSavedArticles,
-  type SavedArticle,
-  RemoveSavedArticle,
-  type ListSavedArticlesInput,
-  type RemoveSavedArticleInput,
-  type SavedArticlesDeps,
-} from './audience/manage-saved-articles'
 export type { DirectoryUser, UserDirectory } from './ports/user-directory'
 export {
   ListUsers,
@@ -100,11 +54,6 @@ export {
   type ListedArticle,
 } from './editorial/browse-category'
 export type { SearchHit, SearchPort, SearchQuery } from './ports/search'
-export {
-  SearchArticles,
-  type SearchArticlesDeps,
-  type SearchArticlesInput,
-} from './audience/search-articles'
 export {
   AssignRoles,
   type AssignRolesDeps,
@@ -231,22 +180,10 @@ export { ReadAuditLog, type ReadAuditLogInput, type ReadAuditLogDeps } from './i
 export type { RateLimiter, RateLimitRule, RateLimitVerdict } from './ports/rate-limit'
 export type { EmailMessage, EmailPort } from './ports/email'
 export type { NewsletterRepository } from './ports/newsletter-repository'
-export { EmailDeliveryFailed, SubscribeNewsletter, type SubscribeNewsletterDeps, type SubscribeNewsletterInput } from './audience/subscribe-newsletter'
-export {
-  ContactMessageTooLong,
-  EmptyContactMessage,
-  SubmitContactMessage,
-  type SubmitContactMessageDeps,
-  type SubmitContactMessageInput,
-} from './audience/submit-contact-message'
-export { ConfirmNewsletter } from './audience/confirm-newsletter'
-export { UnsubscribeNewsletter } from './audience/unsubscribe-newsletter'
 export type { BreakingAlertRepository } from './ports/breaking-alert-repository'
 export { BreakingAlertAlreadySent, SendBreakingAlert, type SendBreakingAlertDeps, type SendBreakingAlertInput } from './distribution/send-breaking-alert'
 export type { PushMessage, PushPort } from './ports/push'
 export type { PushSubscriptionRepository } from './ports/push-subscription-repository'
-export { SubscribePush, type SubscribePushInput } from './audience/subscribe-push'
-export { UnsubscribePush } from './audience/unsubscribe-push'
 export type { RssEntry, RssFeedPort, RssPullResult } from './ports/rss-feed'
 export type { RssSourceRepository } from './ports/rss-source-repository'
 export { RegisterRssSource, type RegisterRssSourceInput } from './distribution/register-rss-source'
@@ -254,60 +191,6 @@ export { IngestRssFeeds, type IngestRssFeedsDeps } from './distribution/ingest-r
 export type { NewsletterDigestRepository } from './ports/newsletter-digest-repository'
 export { DigestAlreadySent, SendNewsletterDigest, type SendNewsletterDigestDeps, type SendNewsletterDigestInput } from './distribution/send-newsletter-digest'
 
-// --- identity: authentication (KUR-66, replaces Better Auth) ---
-export type { PasswordHasher } from './ports/password-hasher'
-export { InvalidToken, type TokenSigner } from './ports/token-signer'
-export {
-  EmailAlreadyRegistered,
-  type CredentialRepository,
-} from './ports/credential-repository'
-export type {
-  NewRefreshToken,
-  RefreshTokenRepository,
-} from './ports/refresh-token-repository'
-export {
-  OAuthExchangeFailed,
-  OAuthStateMismatch,
-  type AuthorizationRequest,
-  type ExternalUser,
-  type OAuthProvider,
-} from './ports/oauth-provider'
-export type { SecretGenerator, TotpPort } from './ports/totp'
-export {
-  SessionIssuer,
-  type SessionIssuerDeps,
-  type SessionTokens,
-} from './identity/issue-session'
-export {
-  RegisterUser,
-  RegistrationThrottled,
-  type RegisterInput,
-  type RegisterResult,
-} from './identity/register-user'
-export {
-  SignInFailed,
-  SignInWithPassword,
-  TooManyAttempts,
-  type SignInInput,
-  type SignInOutcome,
-} from './identity/sign-in-with-password'
-export {
-  CompleteSecondFactor,
-  SecondFactorThrottled,
-  type SecondFactorInput,
-} from './identity/complete-second-factor'
-export {
-  RefreshSession,
-  SessionNotRefreshable,
-  type RefreshInput,
-} from './identity/refresh-session'
-export { SignOut, type SignOutInput } from './identity/sign-out'
-export {
-  ProviderAccountUnusable,
-  SignInWithProvider,
-  type ProviderSignInInput,
-} from './identity/sign-in-with-provider'
-export {
-  CompleteOAuthSignIn,
-  type CompleteOAuthInput,
-} from './identity/complete-oauth-sign-in'
+export * from './identity'
+export * from './media'
+export * from './audience'

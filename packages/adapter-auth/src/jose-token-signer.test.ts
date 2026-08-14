@@ -53,7 +53,7 @@ describe('refusing tokens', () => {
       'utf8',
     ).toString('base64url')
 
-    await expect(signer.verify(`${header}.${forged}.${signature}`)).rejects.toBeInstanceOf(
+    await expect(signer.verify(`${String(header)}.${forged}.${String(signature)}`)).rejects.toBeInstanceOf(
       InvalidToken,
     )
   })

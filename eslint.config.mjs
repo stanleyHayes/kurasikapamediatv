@@ -125,6 +125,12 @@ export default tseslint.config(
       '@typescript-eslint/no-non-null-assertion': 'off',
       'no-restricted-globals': 'off',
       'no-restricted-properties': 'off',
+      // `expect(() => f()).toThrow()` is the idiom this rule forbids, and
+      // describe > describe > it.each is four callbacks by construction. Both
+      // fight the shape of a test rather than its quality; neither is relaxed
+      // for source.
+      '@typescript-eslint/no-confusing-void-expression': 'off',
+      'max-nested-callbacks': 'off',
     },
   },
 

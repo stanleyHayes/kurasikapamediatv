@@ -39,12 +39,12 @@ export class Rfc6238Totp implements TotpPort {
     // Dynamic truncation, RFC 4226 §5.3: the low nibble of the last byte picks
     // the offset, and the high bit is masked off so the result is positive on
     // platforms that read it as signed.
-    const offset = (digest[digest.length - 1] as number) & 0x0f
+    const offset = (digest[digest.length - 1] ?? 0) & 0x0f
     const binary =
-      (((digest[offset] as number) & 0x7f) << 24) |
-      (((digest[offset + 1] as number) & 0xff) << 16) |
-      (((digest[offset + 2] as number) & 0xff) << 8) |
-      ((digest[offset + 3] as number) & 0xff)
+      (((digest[offset] ?? 0) & 0x7f) << 24) |
+      (((digest[offset + 1] ?? 0) & 0xff) << 16) |
+      (((digest[offset + 2] ?? 0) & 0xff) << 8) |
+      ((digest[offset + 3] ?? 0) & 0xff)
 
     return (binary % 10 ** CODE_DIGITS).toString().padStart(CODE_DIGITS, '0')
   }
@@ -84,12 +84,12 @@ export function base32Encode(buffer: Buffer): string {
     bits += 8
 
     while (bits >= 5) {
-      output += BASE32_ALPHABET[(value >>> (bits - 5)) & 31]
+      output += BASE32_ALPHABET[(value >>> (bits - 5)) & 31] ?? ''
       bits -= 5
     }
   }
 
-  if (bits > 0) output += BASE32_ALPHABET[(value << (5 - bits)) & 31]
+  if (bits > 0) output += BASE32_ALPHABET[(value << (5 - bits)) & 31] ?? ''
 
   return output
 }

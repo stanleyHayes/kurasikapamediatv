@@ -1,5 +1,7 @@
 import {
   AlreadyDecided,
+  AlreadyLive,
+  BroadcastHasEnded,
   CannotAssignOwnRoles,
   CannotCommentUnpublished,
   CannotAlertUnpublished,
@@ -15,6 +17,7 @@ import {
   InvalidEmail,
   InvalidSlug,
   MissingApprovedRevision,
+  NotLive,
   NotOwnArticle,
   NotPermitted,
   ScheduleInPast,
@@ -22,13 +25,16 @@ import {
 } from '@kurasikapa/domain'
 import { RateLimited } from '../security/rate-limit'
 import {
+  AlreadyBroadcasting,
   ArticleNotFound,
   BreakingAlertAlreadySent,
+  BroadcastNotFound,
   CaptionNeedsBody,
   CommentNotFound,
   ContactMessageTooLong,
   EmailDeliveryFailed,
   EmptyContactMessage,
+  LiveVideoUnavailable,
   RevisionNotFound,
   RevisionNotOfArticle,
   SlugTaken,
@@ -87,6 +93,16 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [InvalidPushEndpoint, 'invalid_push_endpoint'],
   [InvalidPushKey, 'invalid_push_key'],
   [InvalidRssUrl, 'invalid_rss_url'],
+  // Live. Every one of these is a sentence the studio prints next to the
+  // Go-live button, so each must reach the operator intact rather than as a
+  // 500 — `LiveVideoUnavailable` above all, because ADR-0012 makes "no
+  // provider configured" the default state of a fresh deployment.
+  [LiveVideoUnavailable, 'live_video_unavailable'],
+  [AlreadyBroadcasting, 'already_broadcasting'],
+  [BroadcastNotFound, 'broadcast_not_found'],
+  [AlreadyLive, 'already_live'],
+  [NotLive, 'not_live'],
+  [BroadcastHasEnded, 'broadcast_has_ended'],
 ]
 
 export function toActionError(error: unknown): ActionError {

@@ -100,6 +100,15 @@ function build(): AuthGraph {
     totp,
     secrets,
     providers: configuredProviders(secrets),
+    ...useCases({ credentials, refreshTokens, limiter, secrets, passwords, totp, tokens, sessions }),
+  }
+}
+
+/** Split out purely to keep `build` under the 50-line function cap. */
+function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets' | 'providers'> {
+  const { credentials, refreshTokens, limiter, passwords, totp, tokens, sessions, secrets } = d
+
+  return {
     register: new RegisterUser({
       credentials,
       passwords,
@@ -133,6 +142,17 @@ function build(): AuthGraph {
       ids: cryptoIds,
     }),
   }
+}
+
+interface UseCaseDeps {
+  readonly credentials: MongoCredentialRepository
+  readonly refreshTokens: MongoRefreshTokenRepository
+  readonly limiter: MongoRateLimiter
+  readonly passwords: ScryptPasswordHasher
+  readonly totp: Rfc6238Totp
+  readonly tokens: JoseTokenSigner
+  readonly sessions: SessionIssuer
+  readonly secrets: NodeSecretGenerator
 }
 
 /**

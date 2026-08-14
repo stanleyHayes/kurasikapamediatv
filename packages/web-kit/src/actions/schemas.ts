@@ -36,6 +36,30 @@ export const registerRssSourceSchema = z.object({
   categoryId: id,
 })
 
+/**
+ * Going live.
+ *
+ * `locale` is a literal union rather than the free string used above, for the
+ * reason `translateSchema.targetLocale` is: a broadcast in a locale the router
+ * does not serve has no page to play on. The difference here is what a mistake
+ * costs — this request provisions a channel that bills by the hour before
+ * anybody notices the URL 404s.
+ *
+ * The title is short on purpose: it becomes the channel's label in the AWS
+ * console, where an operator scans it under time pressure to find the
+ * transmission they need to kill.
+ */
+export const startBroadcastSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  locale: z.enum(['en', 'fr']),
+})
+
+/**
+ * Ending one. The id is all the browser sends — who may end it, and whether it
+ * is in a state that can end, are the domain's questions, not this schema's.
+ */
+export const endBroadcastSchema = z.object({ broadcastId: id })
+
 export const updateDraftSchema = z.object({
   articleId: id,
   title: z.string().trim().min(1).max(300),

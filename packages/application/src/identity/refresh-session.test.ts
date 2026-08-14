@@ -110,10 +110,10 @@ describe('reuse is treated as theft', () => {
 
     const reused = await refresh
       .execute({ refreshToken: first.refreshToken })
-      .catch((e: Error) => e.message)
+      .catch((e: unknown) => (e as Error).message)
     const unknown = await refresh
       .execute({ refreshToken: 'invented' })
-      .catch((e: Error) => e.message)
+      .catch((e: unknown) => (e as Error).message)
 
     expect(reused).toBe(unknown)
   })

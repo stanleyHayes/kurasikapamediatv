@@ -19,25 +19,25 @@ import type { RateLimitRule, RateLimitVerdict, RateLimiter } from '../ports/rate
 export class InMemoryCredentialRepository implements CredentialRepository {
   private readonly byUser = new Map<string, Credential>()
 
-  async findByEmail(email: EmailAddress): Promise<Credential | null> {
+  findByEmail(email: EmailAddress): Promise<Credential | null> {
     for (const credential of this.byUser.values()) {
-      if (credential.email.equals(email)) return credential
+      if (credential.email.equals(email)) return Promise.resolve(credential)
     }
 
-    return null
+    return Promise.resolve(null)
   }
 
-  async findByUserId(userId: UserId): Promise<Credential | null> {
-    return this.byUser.get(userId) ?? null
+  findByUserId(userId: UserId): Promise<Credential | null> {
+    return Promise.resolve(this.byUser.get(userId) ?? null)
   }
 
-  async findByExternal(provider: ExternalProvider, subject: string): Promise<Credential | null> {
+  findByExternal(provider: ExternalProvider, subject: string): Promise<Credential | null> {
     for (const credential of this.byUser.values()) {
       const external = credential.externalFor(provider)
-      if (external !== null && external.subject === subject) return credential
+      if (external?.subject === subject) return Promise.resolve(credential)
     }
 
-    return null
+    return Promise.resolve(null)
   }
 
   async create(credential: Credential): Promise<void> {
@@ -48,8 +48,10 @@ export class InMemoryCredentialRepository implements CredentialRepository {
     this.byUser.set(credential.userId, credential)
   }
 
-  async update(credential: Credential): Promise<void> {
+  update(credential: Credential): Promise<void> {
     this.byUser.set(credential.userId, credential)
+
+    return Promise.resolve()
   }
 
   get size(): number {
@@ -60,38 +62,46 @@ export class InMemoryCredentialRepository implements CredentialRepository {
 export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
   private readonly rows = new Map<string, RefreshTokenRecord>()
 
-  async findByHash(tokenHash: string): Promise<RefreshTokenRecord | null> {
+  findByHash(tokenHash: string): Promise<RefreshTokenRecord | null> {
     for (const row of this.rows.values()) {
-      if (row.tokenHash === tokenHash) return row
+      if (row.tokenHash === tokenHash) return Promise.resolve(row)
     }
 
-    return null
+    return Promise.resolve(null)
   }
 
-  async create(token: NewRefreshToken): Promise<void> {
+  create(token: NewRefreshToken): Promise<void> {
     this.rows.set(token.id, { ...token, state: 'active' })
+
+    return Promise.resolve()
   }
 
-  async rotate(spentId: string, replacement: NewRefreshToken): Promise<void> {
+  rotate(spentId: string, replacement: NewRefreshToken): Promise<void> {
     const spent = this.rows.get(spentId)
-    if (spent === undefined || spent.state !== 'active') {
+    if (spent?.state !== 'active') {
       throw new Error(`Refresh token ${spentId} was not active`)
     }
 
     this.rows.set(spentId, { ...spent, state: 'rotated' })
     this.rows.set(replacement.id, { ...replacement, state: 'active' })
+
+    return Promise.resolve()
   }
 
-  async revokeFamily(sessionId: string): Promise<void> {
+  revokeFamily(sessionId: string): Promise<void> {
     for (const [id, row] of this.rows) {
       if (row.sessionId === sessionId) this.rows.set(id, { ...row, state: 'revoked' })
     }
+
+    return Promise.resolve()
   }
 
-  async revokeAllForUser(userId: UserId): Promise<void> {
+  revokeAllForUser(userId: UserId): Promise<void> {
     for (const [id, row] of this.rows) {
       if (row.userId === userId) this.rows.set(id, { ...row, state: 'revoked' })
     }
+
+    return Promise.resolve()
   }
 
   /** Test seam: forces the state a scenario needs without a second use case. */
@@ -114,12 +124,12 @@ export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
 export class FakePasswordHasher implements PasswordHasher {
   constructor(private readonly weakPrefix = 'weak:') {}
 
-  async hash(plain: string): Promise<string> {
-    return `hashed:${plain}`
+  hash(plain: string): Promise<string> {
+    return Promise.resolve(`hashed:${plain}`)
   }
 
-  async verify(plain: string, encoded: string): Promise<boolean> {
-    return encoded === `hashed:${plain}` || encoded === `${this.weakPrefix}${plain}`
+  verify(plain: string, encoded: string): Promise<boolean> {
+    return Promise.resolve(encoded === `hashed:${plain}` || encoded === `${this.weakPrefix}${plain}`)
   }
 
   needsRehash(encoded: string): boolean {
@@ -131,17 +141,17 @@ export class FakePasswordHasher implements PasswordHasher {
 export class FakeTokenSigner implements TokenSigner {
   readonly signed: SessionClaims[] = []
 
-  async sign(claims: SessionClaims): Promise<string> {
+  sign(claims: SessionClaims): Promise<string> {
     this.signed.push(claims)
 
-    return `signed.${JSON.stringify(claims)}`
+    return Promise.resolve(`signed.${JSON.stringify(claims)}`)
   }
 
-  async verify(token: string): Promise<SessionClaims> {
+  verify(token: string): Promise<SessionClaims> {
     if (!token.startsWith('signed.')) throw new InvalidToken('not signed by us')
 
     try {
-      return JSON.parse(token.slice('signed.'.length)) as SessionClaims
+      return Promise.resolve(JSON.parse(token.slice('signed.'.length)) as SessionClaims)
     } catch {
       throw new InvalidToken('malformed')
     }
@@ -191,11 +201,11 @@ export class AllowingRateLimiter implements RateLimiter {
     this.denied = true
   }
 
-  async consume(key: string, _rule: RateLimitRule): Promise<RateLimitVerdict> {
+  consume(key: string, _rule: RateLimitRule): Promise<RateLimitVerdict> {
     this.consumed.push(key)
 
-    return this.denied
+    return Promise.resolve(this.denied
       ? { allowed: false, remaining: 0, retryAfterSeconds: 42 }
-      : { allowed: true, remaining: 1, retryAfterSeconds: 0 }
+      : { allowed: true, remaining: 1, retryAfterSeconds: 0 })
   }
 }

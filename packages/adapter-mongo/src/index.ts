@@ -11,6 +11,7 @@ export {
   PUSH_SUBSCRIPTIONS,
   RSS_SOURCES,
   SOCIAL_POSTS,
+  BROADCASTS,
   CATEGORIES,
   ROLE_ASSIGNMENTS,
   type ArticleDocument,
@@ -25,6 +26,7 @@ export {
   type PushSubscriptionDocument,
   type RssSourceDocument,
   type SocialPostDocument,
+  type BroadcastDocument,
   type CategoryDocument,
   type RoleAssignmentDocument,
 } from './documents'
@@ -54,6 +56,7 @@ export { MongoNewsletterDigestRepository } from './mongo-newsletter-digest-repos
 export { MongoPushSubscriptionRepository } from './mongo-push-subscription-repository'
 export { MongoRssSourceRepository } from './mongo-rss-source-repository'
 export { MongoSocialPostRepository } from './mongo-social-post-repository'
+export { MongoBroadcastRepository } from './mongo-broadcast-repository'
 export { MongoAuditLog } from './mongo-audit-log'
 export { MongoRateLimiter } from './mongo-rate-limiter'
 export { MongoCredentialRepository } from './mongo-credential-repository'

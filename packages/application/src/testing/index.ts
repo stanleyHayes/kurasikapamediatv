@@ -22,6 +22,13 @@ export { FailClosedRssFeed, RecordingRssFeed } from './fake-rss'
 export { InMemoryRssSourceRepository } from './in-memory-rss-source-repository'
 export { InMemoryNewsletterDigestRepository } from './in-memory-newsletter-digest-repository'
 export { FakeSearch } from './fake-search'
+export { FailClosedLiveVideo, FakeLiveVideo } from './fake-live-video'
+export {
+  ExplodingBroadcastRepository,
+  InMemoryBroadcastRepository,
+  STORE_UNAVAILABLE,
+  UnfilteredBroadcastRepository,
+} from './in-memory-broadcast-repository'
 export { InMemoryCategoryRepository } from './in-memory-category-repository'
 export {
   FlakySocial,

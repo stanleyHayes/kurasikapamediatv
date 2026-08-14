@@ -61,7 +61,7 @@ export function assertAcceptablePassword(password: string, emailLocalPart?: stri
   // Length in code points, not UTF-16 units: a passphrase of emoji or CJK
   // characters is not one third as strong as it looks, and `.length` would say
   // it was longer than it is.
-  const length = [...password].length
+  const length = Array.from(password).length
 
   if (length < MIN_LENGTH) throw new PasswordTooShort()
   if (length > MAX_LENGTH) throw new PasswordTooLong()
