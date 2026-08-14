@@ -3,6 +3,7 @@ import {
   EmptyIdentifier,
   articleId,
   assetId,
+  broadcastId,
   categoryId,
   commentId,
   familyId,
@@ -20,6 +21,7 @@ const CONSTRUCTORS = [
   ['userId', userId],
   ['assetId', assetId],
   ['commentId', commentId],
+  ['broadcastId', broadcastId],
 ] as const
 
 describe.each(CONSTRUCTORS)('%s', (_name, make) => {

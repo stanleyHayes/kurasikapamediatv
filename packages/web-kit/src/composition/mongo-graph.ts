@@ -2,6 +2,7 @@ import {
   MongoArticleRepository,
   MongoAuditLog,
   MongoBookmarkRepository,
+  MongoBroadcastRepository,
   MongoCategoryRepository,
   MongoCommentRepository,
   MongoLikeRepository,

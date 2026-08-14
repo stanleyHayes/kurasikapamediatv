@@ -56,6 +56,22 @@ export const RULES = {
 
   /** RSS source registration. Fail-closed so a form cannot flood fetches. */
   rss: { limit: 8, windowSeconds: 60 },
+
+  /**
+   * Going live. Fail-closed and tight, and the only rule here protecting an
+   * invoice rather than a server: every start provisions a channel that bills
+   * by the hour whether or not anyone is watching it.
+   *
+   * The domain already caps concurrency at one live broadcast per locale, so
+   * this is not about volume — it is about a start/end loop, or a retry storm
+   * behind a flaky response, leaving a trail of channels nobody has a record
+   * of. Six a minute is far more than a newsroom needs and far less than a
+   * loop can spend.
+   *
+   * Ending is deliberately NOT limited. A limiter that can refuse "end
+   * broadcast" is a limiter that can hold the station on air.
+   */
+  live: { limit: 6, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>
 
 /**

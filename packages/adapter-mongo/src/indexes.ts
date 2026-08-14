@@ -3,6 +3,7 @@ import {
   ARTICLES,
   AUDIT_ENTRIES,
   BOOKMARKS,
+  BROADCASTS,
   LIKES,
   READINGS,
   COMMENTS,
@@ -17,6 +18,7 @@ import {
   REVISIONS,
   type ArticleDocument,
   type BookmarkDocument,
+  type BroadcastDocument,
   type LikeDocument,
   type ReadingDocument,
   type CommentDocument,
@@ -95,6 +97,7 @@ export async function ensureIndexes(db: Db): Promise<void> {
   ])
 
   await ensureAudienceIndexes(db)
+  await ensureMediaIndexes(db)
 
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.
@@ -148,5 +151,44 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   // document unreachable, and the index is housekeeping rather than correctness.
   await db.collection(RATE_LIMITS).createIndexes([
     { key: { expiresAt: 1 }, name: 'rate_limit_ttl', expireAfterSeconds: 0 },
+  ])
+}
+
+async function ensureMediaIndexes(db: Db): Promise<void> {
+  await db.collection<BroadcastDocument>(BROADCASTS).createIndexes([
+    // "Is this locale on air?" — the homepage asks it on every request, for
+    // everyone, so it is the one broadcast query a reader can trigger and the
+    // one that must not read the archive to answer.
+    //
+    // Partial on `state`, keyed on `locale` alone. The filter is what keeps it
+    // correct *and* fast as the collection ages: the index holds only the rows
+    // that are live — never more than one per locale — so it is the same size
+    // in year three as on day one, while a plain `{ locale, state }` compound
+    // would carry an entry for every broadcast the station ever ran. Mongo can
+    // use it because `currentLive` queries `state: 'live'` literally; a query
+    // that widened that predicate would silently fall back to a scan.
+    //
+    // `unique` is the point of the index, not a bonus. StartBroadcast reads
+    // `currentLive`, sees null, provisions a channel and then writes — and two
+    // operators pressing "go live" in the same second both read null. Without
+    // this, both rows say `live`, two channels bill by the hour and the front
+    // page plays whichever the sort happens to reach. Here the second write
+    // fails with a duplicate key, and StartBroadcast's teardown removes the
+    // channel it had already provisioned. The rule belongs to the domain; this
+    // is the only place it can be held across two concurrent requests.
+    //
+    // Ended and scheduled rows sit outside the filter, so a locale keeps as
+    // much history as it likes and may line up tomorrow's bulletin while
+    // tonight's is still on air.
+    {
+      key: { locale: 1 },
+      unique: true,
+      name: 'broadcast_live_per_locale_unique',
+      partialFilterExpression: { state: 'live' },
+    },
+    // The studio list: one locale, newest scheduled first. `_id` breaks the tie
+    // so two broadcasts scheduled for the same minute keep a stable order
+    // instead of swapping places between two loads of the same screen.
+    { key: { locale: 1, scheduledFor: -1, _id: -1 }, name: 'broadcast_by_locale_recent' },
   ])
 }

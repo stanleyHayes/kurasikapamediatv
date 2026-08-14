@@ -253,3 +253,11 @@ export { RegisterRssSource, type RegisterRssSourceInput } from './distribution/r
 export { IngestRssFeeds, type IngestRssFeedsDeps } from './distribution/ingest-rss-feeds'
 export type { NewsletterDigestRepository } from './ports/newsletter-digest-repository'
 export { DigestAlreadySent, SendNewsletterDigest, type SendNewsletterDigestDeps, type SendNewsletterDigestInput } from './distribution/send-newsletter-digest'
+
+// Media (R3 — live broadcasting) exports through its own barrel, not name by
+// name here. This file was one line under the 250-line ceiling; listing a whole
+// context's ports, use cases and errors would have failed the build on an
+// export list rather than on anything real. `src/media/index.ts` carries them,
+// and stays the place new media names are added — the line below never grows.
+// Any context added after this one should follow the same shape.
+export * from './media'
