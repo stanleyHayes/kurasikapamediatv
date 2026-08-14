@@ -253,3 +253,61 @@ export { RegisterRssSource, type RegisterRssSourceInput } from './distribution/r
 export { IngestRssFeeds, type IngestRssFeedsDeps } from './distribution/ingest-rss-feeds'
 export type { NewsletterDigestRepository } from './ports/newsletter-digest-repository'
 export { DigestAlreadySent, SendNewsletterDigest, type SendNewsletterDigestDeps, type SendNewsletterDigestInput } from './distribution/send-newsletter-digest'
+
+// --- identity: authentication (KUR-66, replaces Better Auth) ---
+export type { PasswordHasher } from './ports/password-hasher'
+export { InvalidToken, type TokenSigner } from './ports/token-signer'
+export {
+  EmailAlreadyRegistered,
+  type CredentialRepository,
+} from './ports/credential-repository'
+export type {
+  NewRefreshToken,
+  RefreshTokenRepository,
+} from './ports/refresh-token-repository'
+export {
+  OAuthExchangeFailed,
+  OAuthStateMismatch,
+  type AuthorizationRequest,
+  type ExternalUser,
+  type OAuthProvider,
+} from './ports/oauth-provider'
+export type { SecretGenerator, TotpPort } from './ports/totp'
+export {
+  SessionIssuer,
+  type SessionIssuerDeps,
+  type SessionTokens,
+} from './identity/issue-session'
+export {
+  RegisterUser,
+  RegistrationThrottled,
+  type RegisterInput,
+  type RegisterResult,
+} from './identity/register-user'
+export {
+  SignInFailed,
+  SignInWithPassword,
+  TooManyAttempts,
+  type SignInInput,
+  type SignInOutcome,
+} from './identity/sign-in-with-password'
+export {
+  CompleteSecondFactor,
+  SecondFactorThrottled,
+  type SecondFactorInput,
+} from './identity/complete-second-factor'
+export {
+  RefreshSession,
+  SessionNotRefreshable,
+  type RefreshInput,
+} from './identity/refresh-session'
+export { SignOut, type SignOutInput } from './identity/sign-out'
+export {
+  ProviderAccountUnusable,
+  SignInWithProvider,
+  type ProviderSignInInput,
+} from './identity/sign-in-with-provider'
+export {
+  CompleteOAuthSignIn,
+  type CompleteOAuthInput,
+} from './identity/complete-oauth-sign-in'

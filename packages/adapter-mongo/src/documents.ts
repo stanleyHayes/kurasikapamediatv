@@ -184,3 +184,50 @@ export interface RateLimitDocument {
   /** TTL anchor. Mongo reaps the document some time after this. */
   expiresAt: Date
 }
+
+// --- identity: authentication (KUR-66) ---
+
+export const CREDENTIALS = 'credentials'
+export const REFRESH_TOKENS = 'refresh_tokens'
+
+/**
+ * Authentication material, kept apart from the `user` collection the roles
+ * screen reads. Nothing that renders a screen should be able to reach a
+ * password hash, and two collections is what makes that a type error rather
+ * than a code-review note.
+ */
+export interface ExternalIdentityDocument {
+  readonly provider: 'google' | 'facebook' | 'apple'
+  readonly subject: string
+  readonly linkedAt: Date
+}
+
+export interface TotpDocument {
+  readonly secret: string
+  readonly lastUsedCounter: number | null
+  readonly recoveryCodeHashes: readonly string[]
+  readonly enrolledAt: Date
+}
+
+export interface CredentialDocument {
+  /** The user id. One credential per user, so the id IS the key. */
+  readonly _id: string
+  /** Normalised (trimmed, lowercased) by the domain before it reaches here. */
+  readonly email: string
+  readonly passwordHash: string | null
+  readonly externals: readonly ExternalIdentityDocument[]
+  readonly totp: TotpDocument | null
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
+export interface RefreshTokenDocument {
+  readonly _id: string
+  readonly sessionId: string
+  readonly userId: string
+  /** SHA-256 of the token. The token itself is never stored. */
+  readonly tokenHash: string
+  readonly state: 'active' | 'rotated' | 'revoked'
+  readonly expiresAt: Date
+  readonly createdAt: Date
+}
