@@ -23,7 +23,7 @@ export function ArticleHeader({ article }: { article: ReadableArticle }): React.
       <div aria-hidden className="absolute right-0 top-0 h-full w-3 bg-primary" />
       <div aria-hidden className="absolute -right-4 bottom-0 hidden text-[10rem] font-black leading-none tracking-[-0.08em] text-primary/5 md:block">REPORT</div>
       <div className="relative mb-9 flex gap-2 border-b border-on-surface/20 pb-5">
-        <span className="broadcast-kicker text-secondary">
+        <span className="broadcast-kicker text-secondary-ink">
           {section(article.categoryId)}
         </span>
       </div>

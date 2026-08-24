@@ -8,7 +8,7 @@ export function Hero({ article }: { article: ArticleView }): React.ReactElement 
         <div className="grid min-h-[39rem] lg:grid-cols-[minmax(0,1.6fr)_minmax(18rem,.55fr)]">
           <div className="relative flex flex-col justify-between p-7 md:p-12 lg:p-16">
             <div className="reveal flex items-center justify-between border-b border-on-surface/20 pb-5">
-              <span className="broadcast-kicker text-primary">Lead report</span>
+              <span className="broadcast-kicker text-primary-ink">Lead report</span>
               <span className="eyebrow text-on-surface-variant">Friday edition · Accra</span>
             </div>
             <div className="py-16 md:py-24">

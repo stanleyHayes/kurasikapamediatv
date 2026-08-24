@@ -39,7 +39,7 @@ async function Body({ params }: Params): Promise<React.ReactElement> {
       <PushOptIn locale={locale} vapidPublicKey={vapidPublicKey()} />
       <p className="text-on-surface-variant mt-8 text-sm">
         Already subscribed?{' '}
-        <Link href="/newsletter/unsubscribe" className="text-secondary underline">
+        <Link href="/newsletter/unsubscribe" className="text-secondary-ink underline">
           Unsubscribe
         </Link>
       </p>

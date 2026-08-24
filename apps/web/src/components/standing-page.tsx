@@ -17,7 +17,7 @@ function PageHero({ page }: { page: StandingPage }): React.ReactElement {
         className="bg-secondary absolute bottom-0 left-0 h-4 w-2/3"
       />
       <div className="relative flex flex-col justify-end px-7 py-12 md:px-14 md:py-16">
-        <p className="broadcast-kicker mb-5 text-primary">Kurasikapa Media TV</p>
+        <p className="broadcast-kicker mb-5 text-primary-ink">Kurasikapa Media TV</p>
         <h1 className="font-display max-w-4xl text-[2.75rem] leading-none font-bold tracking-[-0.04em] text-on-surface md:text-[length:var(--text-display-lg)]">
           {page.title}
         </h1>
@@ -86,7 +86,7 @@ export function StandingPageView({ page }: { page: StandingPage }): React.ReactE
               <dl className="mt-[var(--space-sm)] flex flex-col gap-3">
                 {section.bullets.map((bullet) => (
                   <div key={bullet.term} className="border-outline-variant border-l-2 pl-4">
-                    <dt className="text-label-bold text-secondary uppercase">{bullet.term}</dt>
+                    <dt className="text-label-bold text-secondary-ink uppercase">{bullet.term}</dt>
                     <dd className="text-on-surface mt-1">{bullet.detail}</dd>
                   </div>
                 ))}

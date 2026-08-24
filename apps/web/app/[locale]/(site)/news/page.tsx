@@ -95,7 +95,7 @@ function NewsLead({ article }: { article: ArticleView }): React.ReactElement {
           <div className="bg-primary absolute bottom-0 right-[8%] h-full w-1/3 -skew-x-12" />
         </div>
         <div className="p-7 md:p-10">
-          <div className="eyebrow text-secondary-ink mb-3">{article.categoryId.replace(/^cat_/u, '')}</div>
+          <div className="eyebrow text-secondary mb-3">{article.categoryId.replace(/^cat_/u, '')}</div>
           <h2 className="font-display text-3xl font-semibold text-white transition-colors group-hover:text-secondary md:text-[length:var(--text-headline-md)]">{article.title}</h2>
           {article.publishedAt !== null && <time dateTime={article.publishedAt} className="mt-4 block text-sm text-white/55">{formatDate(article.publishedAt, article.locale)}</time>}
         </div>

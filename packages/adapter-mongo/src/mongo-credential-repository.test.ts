@@ -37,21 +37,32 @@ const native = (email = EMAIL): Credential =>
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
   })
 
-/** Seeds the two rows Better Auth writes for a password account. */
-async function seedLegacy(options: { email?: string; twoFactor?: boolean } = {}): Promise<string> {
+/**
+ * Seeds the two rows Better Auth writes for a password account.
+ *
+ * `link` chooses how the foreign keys point at the user. Both forms occur —
+ * which adapter version wrote the row decides — and a database can hold both.
+ * The first version of this file only ever seeded 'hex', so the query that
+ * matched only hex passed here and failed against a real Better Auth sign-up.
+ */
+async function seedLegacy(
+  options: { email?: string; twoFactor?: boolean; link?: 'hex' | 'objectId' } = {},
+): Promise<string> {
   const id = new ObjectId()
+  const owner = options.link === 'objectId' ? id : id.toHexString()
+
   await mongo.db.collection(LEGACY_USERS).insertOne({
     _id: id,
     email: options.email ?? EMAIL,
     createdAt: new Date('2025-06-01T00:00:00.000Z'),
   })
   await mongo.db.collection(LEGACY_ACCOUNTS).insertOne({
-    userId: id.toHexString(),
+    userId: owner,
     providerId: 'credential',
     password: LEGACY_HASH,
   })
   if (options.twoFactor === true) {
-    await mongo.db.collection(LEGACY_TWO_FACTOR).insertOne({ userId: id.toHexString() })
+    await mongo.db.collection(LEGACY_TWO_FACTOR).insertOne({ userId: owner })
   }
 
   return id.toHexString()
@@ -91,6 +102,27 @@ describe('findByEmail', () => {
     const found = await repo.findByEmail(EmailAddress.of(EMAIL))
     expect(found?.passwordHash).toBe(NATIVE_HASH)
   })
+
+  it.each(['hex', 'objectId'] as const)(
+    'finds the account whether the account row links by %s',
+    async (link) => {
+      await seedLegacy({ link })
+
+      expect((await repo.findByEmail(EmailAddress.of(EMAIL)))?.passwordHash).toBe(LEGACY_HASH)
+    },
+  )
+
+  it.each(['hex', 'objectId'] as const)(
+    'REFUSES a two-factor account linked by %s',
+    async (link) => {
+      // The refusal must not depend on the id form either — matching one form
+      // would miss the twoFactor row and migrate the account without its
+      // second factor, which is the outcome this check exists to prevent.
+      await seedLegacy({ link, twoFactor: true })
+
+      expect(await repo.findByEmail(EmailAddress.of(EMAIL))).toBeNull()
+    },
+  )
 
   it('REFUSES an account with Better Auth two-factor enrolled', async () => {
     // Its secret lives in a schema this stack does not read, so migrating the

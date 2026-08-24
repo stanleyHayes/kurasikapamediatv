@@ -24,7 +24,7 @@ export default async function SearchPage(props: Props): Promise<React.ReactEleme
       <header className="mb-10 max-w-3xl"><p className="eyebrow text-primary-ink mb-4">Search the newsroom</p><h1 className="text-[length:var(--text-headline-md)]">Find the reporting you need.</h1></header>
       <form action={`/${locale}/search`} role="search" className="bg-inverse-surface mb-[var(--space-lg)] border-l-[0.75rem] border-secondary p-6 md:p-10">
         <label className="flex flex-col gap-2">
-          <span className="eyebrow text-secondary-ink">Keywords</span>
+          <span className="eyebrow text-secondary">Keywords</span>
           <input
             name="q"
             type="search"

@@ -6,7 +6,7 @@ import {
   type ExternalProvider,
   type UserId,
 } from '@kurasikapa/domain'
-import { MongoServerError, type Collection, type Db } from 'mongodb'
+import { MongoServerError, ObjectId, type Collection, type Db } from 'mongodb'
 import {
   CREDENTIALS,
   LEGACY_ACCOUNTS,
@@ -137,13 +137,15 @@ export class MongoCredentialRepository implements CredentialRepository {
     const email = user['email']
     if (typeof email !== 'string' || email === '') return null
 
+    const owner = eitherIdForm(id)
+
     const enrolled = await this.db
       .collection(LEGACY_TWO_FACTOR)
-      .countDocuments({ userId: id }, { limit: 1 })
+      .countDocuments({ userId: owner }, { limit: 1 })
     if (enrolled > 0) return null
 
     const account = await this.db.collection(LEGACY_ACCOUNTS).findOne({
-      userId: id,
+      userId: owner,
       providerId: 'credential',
     })
 
@@ -169,6 +171,23 @@ export class MongoCredentialRepository implements CredentialRepository {
 
 /** Only ever used for a legacy row with no timestamp; never written back. */
 const EPOCH = new Date(0)
+
+/**
+ * Matches a Better Auth `userId` however it was stored.
+ *
+ * Its Mongo adapter writes `user._id` as an ObjectId, and whether the foreign
+ * keys that point at it are ObjectIds or hex strings is a detail of the adapter
+ * version that wrote them — a database can hold both, from different releases.
+ * Matching one form finds nothing for the other, and "nothing" here reads as
+ * "those details did not match an account" to someone whose password is right.
+ */
+function eitherIdForm(id: string): { $in: (string | ObjectId)[] } {
+  const forms: (string | ObjectId)[] = [id]
+
+  if (ObjectId.isValid(id)) forms.push(new ObjectId(id))
+
+  return { $in: forms }
+}
 
 function toDocument(credential: Credential): CredentialDocument {
   const props = credential.snapshot()
