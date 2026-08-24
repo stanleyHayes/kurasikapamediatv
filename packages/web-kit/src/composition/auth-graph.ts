@@ -1,4 +1,5 @@
 import {
+  CompleteOAuthSignIn,
   CompleteSecondFactor,
   RefreshSession,
   RegisterUser,
@@ -45,6 +46,15 @@ export interface AuthGraph {
   readonly refresh: RefreshSession
   readonly signOut: SignOut
   readonly signInWithProvider: SignInWithProvider
+  /**
+   * The OAuth callback, start to finish — the ONLY door.
+   *
+   * Exposed rather than left to route code assembling `signInWithProvider`
+   * itself, because this use case is where the `state` comparison lives. A
+   * callback that reaches the token exchange without it is login CSRF, and the
+   * whole point of the use case is that skipping the check is not expressible.
+   */
+  readonly completeOAuthSignIn: CompleteOAuthSignIn
   /** Only the providers whose credentials are configured. */
   readonly providers: ReadonlyMap<ExternalProvider, OAuthProvider>
 }
@@ -108,6 +118,15 @@ function build(): AuthGraph {
 function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets' | 'providers'> {
   const { credentials, refreshTokens, limiter, passwords, totp, tokens, sessions, secrets } = d
 
+  // Built first: `completeOAuthSignIn` wraps it, and the wrapper is the only
+  // way a route is meant to reach it.
+  const signInWithProvider = new SignInWithProvider({
+    credentials,
+    sessions,
+    clock: systemClock,
+    ids: cryptoIds,
+  })
+
   return {
     register: new RegisterUser({
       credentials,
@@ -135,12 +154,8 @@ function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets'
     }),
     refresh: new RefreshSession({ refreshTokens, secrets, sessions, clock: systemClock }),
     signOut: new SignOut({ refreshTokens, secrets }),
-    signInWithProvider: new SignInWithProvider({
-      credentials,
-      sessions,
-      clock: systemClock,
-      ids: cryptoIds,
-    }),
+    signInWithProvider,
+    completeOAuthSignIn: new CompleteOAuthSignIn({ signInWithProvider, secrets }),
   }
 }
 
