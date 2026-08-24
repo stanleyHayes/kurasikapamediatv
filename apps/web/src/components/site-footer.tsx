@@ -58,7 +58,7 @@ export function SiteFooter(): React.ReactElement {
               <div key={group.title}>
                 <p className="mb-5 flex items-center gap-2 border-b border-white/20 pb-3 text-sm font-semibold text-secondary"><FooterIcon name={group.icon} className="h-5 w-5" />{group.title}</p>
                 <ul className="space-y-3 text-sm text-white/68">
-                  {group.links.map((link) => <li key={link.href}><Link href={link.href} className="group/link flex items-center gap-2.5 transition-colors hover:text-white"><FooterIcon name={link.icon as FooterIconName} className="h-4 w-4 shrink-0 text-white/35 transition-colors group-hover/link:text-secondary" /><span className="editorial-link">{link.label}</span></Link></li>)}
+                  {group.links.map((link) => <li key={link.href}><Link href={link.href} className="group/link flex items-center gap-2.5 transition-colors hover:text-white"><FooterIcon name={link.icon as FooterIconName} className="h-4 w-4 shrink-0 text-white/48 transition-colors group-hover/link:text-secondary" /><span className="editorial-link">{link.label}</span></Link></li>)}
                 </ul>
               </div>
             ))}
@@ -67,7 +67,7 @@ export function SiteFooter(): React.ReactElement {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-[var(--container-page)] flex-col gap-2 px-5 py-5 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <div className="mx-auto flex max-w-[var(--container-page)] flex-col gap-2 px-5 py-5 text-xs text-white/52 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <p>© <CopyrightYear /> Kurasikapa Media TV</p>
           <p>Accra, Ghana · Reporting without borders</p>
         </div>
