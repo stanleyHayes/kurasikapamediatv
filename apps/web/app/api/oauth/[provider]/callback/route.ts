@@ -95,7 +95,7 @@ async function complete(
       codeVerifier: emptyToNull(jar.get(VERIFIER_COOKIE)),
     })
 
-    return landing(`${studioUrl(env())}`, issuedCookies(tokens))
+    return landing(studioUrl(env()), issuedCookies(tokens))
   } catch (error) {
     if (error instanceof OAuthStateMismatch || error instanceof OAuthExchangeFailed) {
       return failed(name)
