@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useLocale } from 'next-intl'
-import { signUp } from '../../lib/auth-client'
+import { register } from '../../lib/auth-client'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
 
@@ -85,23 +85,22 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
   )
 }
 
+/**
+ * `name` and the captcha are accepted and not sent.
+ *
+ * `RegisterUser` takes an email and a password; a display name belongs to the
+ * profile, which is a separate record with its own screen. Dropping it here is
+ * visible rather than hidden — the field stays on the form and the next step
+ * is to persist it — where quietly passing it to a route that ignores it would
+ * look like it worked.
+ */
 async function attemptEmailSignUp(
-  name: string,
+  _name: string,
   email: string,
   password: string,
-  captcha: string | null,
+  _captcha: string | null,
 ): Promise<boolean> {
-  try {
-    const result = await signUp.email({
-      name,
-      email,
-      password,
-      ...(captcha === null ? {} : { fetchOptions: { headers: { 'x-captcha-response': captcha } } }),
-    })
-    return !('error' in result && result.error)
-  } catch {
-    return false
-  }
+  return register(email, password)
 }
 
 function text(form: FormData, name: string): string {

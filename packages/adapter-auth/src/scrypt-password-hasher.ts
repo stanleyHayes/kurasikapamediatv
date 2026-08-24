@@ -66,7 +66,13 @@ export class ScryptPasswordHasher implements PasswordHasher {
    */
   async verify(plain: string, encoded: string): Promise<boolean> {
     const parsed = parse(encoded)
-    if (parsed === null) return false
+
+    // Not our format. Before giving up, try the one format we inherited —
+    // every account that predates KUR-66 has a Better Auth hash, and refusing
+    // it here would lock out every existing reader and editor on the day the
+    // custom stack takes over sign-in. `needsRehash` returns true for it, so
+    // the row is upgraded during this same sign-in.
+    if (parsed === null) return verifyLegacy(plain, encoded)
 
     try {
       const derived = await this.derive(plain, parsed.salt, parsed.params)
@@ -131,5 +137,52 @@ function parse(encoded: string): Parsed | null {
     params: { N, r, p },
     salt: Buffer.from(salt, 'base64url'),
     hash: Buffer.from(hash, 'base64url'),
+  }
+}
+
+/**
+ * Better Auth's scrypt, reproduced exactly enough to check a stored hash.
+ *
+ * `salt:key`, both hex, from scrypt N=16384 r=16 p=1 dkLen=64 over an
+ * NFKC-normalised password — and the salt is fed to scrypt as the hex STRING,
+ * not as the 16 bytes it encodes. Getting any one of those wrong verifies
+ * nothing and reads as "wrong password" to someone whose password is right.
+ *
+ * Read from `@better-auth/utils/password` at 0.4.3 rather than remembered.
+ * There is no `hashLegacy`: nothing should ever WRITE this format again.
+ */
+const LEGACY_PARAMS = { N: 16_384, r: 16, p: 1 } as const
+const LEGACY_KEY_LENGTH = 64
+const LEGACY_MAX_MEMORY = 128 * LEGACY_PARAMS.N * LEGACY_PARAMS.r * 2
+const HEX = /^[0-9a-f]+$/u
+
+async function verifyLegacy(plain: string, encoded: string): Promise<boolean> {
+  const parts = encoded.split(':')
+  if (parts.length !== 2) return false
+
+  const [salt, key] = parts
+  if (salt === undefined || key === undefined) return false
+  if (!HEX.test(salt) || !HEX.test(key)) return false
+
+  // Length checked before deriving: a 64-byte key is 128 hex characters, and
+  // anything else is a different format that merely contains a colon. Skipping
+  // this spends ~200ms of scrypt on every malformed row.
+  if (key.length !== LEGACY_KEY_LENGTH * 2) return false
+
+  try {
+    const derived = await scryptAsync(
+      plain.normalize('NFKC'),
+      // The hex string itself, as UTF-8 — this is what Better Auth passed.
+      Buffer.from(salt, 'utf8'),
+      LEGACY_KEY_LENGTH,
+      { ...LEGACY_PARAMS, maxmem: LEGACY_MAX_MEMORY },
+    )
+    const stored = Buffer.from(key, 'hex')
+
+    if (derived.length !== stored.length) return false
+
+    return timingSafeEqual(derived, stored)
+  } catch {
+    return false
   }
 }

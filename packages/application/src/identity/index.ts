@@ -55,3 +55,9 @@ export {
   CompleteOAuthSignIn,
   type CompleteOAuthInput,
 } from './complete-oauth-sign-in'
+export {
+  EnrolSecondFactor,
+  EnrolmentRefused,
+  type EnrolSecondFactorInput,
+  type EnrolSecondFactorResult,
+} from './enrol-second-factor'

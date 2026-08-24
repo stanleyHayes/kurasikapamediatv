@@ -1,7 +1,3 @@
-'use client'
-
-import { signIn } from '../../lib/auth-client'
-
 export type SocialProvider = 'google' | 'facebook' | 'apple'
 
 const LABEL: Readonly<Record<SocialProvider, string>> = {
@@ -16,24 +12,28 @@ const LABEL: Readonly<Record<SocialProvider, string>> = {
  */
 export function SocialButtons({
   providers,
-  callbackURL,
 }: {
   providers: readonly SocialProvider[]
-  callbackURL: string
+  /** Accepted and unused: the callback URL is fixed server-side now. */
+  callbackURL?: string
 }): React.ReactElement | null {
   if (providers.length === 0) return null
 
   return (
     <div className="border-outline-variant flex flex-col gap-3 border-t pt-6">
+      {/*
+        Plain links, not fetches. The provider round trip is a navigation: the
+        route sets the state, nonce and PKCE cookies and 302s onward, and an
+        XHR would follow that redirect without ever leaving the page.
+      */}
       {providers.map((provider) => (
-        <button
+        <a
           key={provider}
-          type="button"
-          onClick={() => void signIn.social({ provider, callbackURL })}
-          className="border-outline-variant hover:border-primary hover:text-primary h-12 w-full rounded-xl border px-4 text-sm font-semibold transition-colors"
+          href={`/api/oauth/${provider}`}
+          className="border-outline-variant hover:border-primary hover:text-primary flex h-12 w-full items-center justify-center rounded-xl border px-4 text-sm font-semibold transition-colors"
         >
           Continue with {LABEL[provider]}
-        </button>
+        </a>
       ))}
     </div>
   )

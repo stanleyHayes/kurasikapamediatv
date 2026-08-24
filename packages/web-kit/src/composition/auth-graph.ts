@@ -1,6 +1,7 @@
 import {
   CompleteOAuthSignIn,
   CompleteSecondFactor,
+  EnrolSecondFactor,
   RefreshSession,
   RegisterUser,
   SessionIssuer,
@@ -55,6 +56,17 @@ export interface AuthGraph {
    * whole point of the use case is that skipping the check is not expressible.
    */
   readonly completeOAuthSignIn: CompleteOAuthSignIn
+  /**
+   * Turning a second factor ON. Kept beside the one that CHECKS it, because
+   * the two must agree about where the secret lives — an enrolment written to
+   * a store the verifier does not read is a factor nobody is ever asked for.
+   */
+  readonly enrolSecondFactor: EnrolSecondFactor
+  /**
+   * Exposed for the enrolment-confirmation route, which reads the enrolled
+   * secret to check one code without issuing a session or consuming a counter.
+   */
+  readonly credentials: MongoCredentialRepository
   /** Only the providers whose credentials are configured. */
   readonly providers: ReadonlyMap<ExternalProvider, OAuthProvider>
 }
@@ -128,6 +140,7 @@ function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets'
   })
 
   return {
+    credentials,
     register: new RegisterUser({
       credentials,
       passwords,
@@ -156,6 +169,14 @@ function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets'
     signOut: new SignOut({ refreshTokens, secrets }),
     signInWithProvider,
     completeOAuthSignIn: new CompleteOAuthSignIn({ signInWithProvider, secrets }),
+    enrolSecondFactor: new EnrolSecondFactor({
+      credentials,
+      passwords,
+      totp,
+      secrets,
+      clock: systemClock,
+      issuer: 'Kurasikapa Media',
+    }),
   }
 }
 

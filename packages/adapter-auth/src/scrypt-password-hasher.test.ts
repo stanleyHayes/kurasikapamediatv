@@ -91,3 +91,61 @@ describe('needsRehash', { timeout: KDF_TIMEOUT_MS }, () => {
     expect(hasher.needsRehash('')).toBe(true)
   })
 })
+
+/**
+ * The one foreign format this hasher must READ.
+ *
+ * Better Auth owned sign-in before KUR-66 and stored `salt:key` hex from
+ * scrypt N=16384 r=16 p=1 dkLen=64, over an NFKC-normalised password. Every
+ * account that exists today has one of these. Without this the cutover locks
+ * out every user, because `findByEmail` returns a credential whose hash this
+ * hasher cannot check — and `needsRehash` above only upgrades a password it
+ * has first VERIFIED.
+ */
+describe('verify, against a Better Auth hash', { timeout: KDF_TIMEOUT_MS }, () => {
+  const legacy = async (password: string): Promise<string> => {
+    const { randomBytes, scrypt } = await import('node:crypto')
+    const salt = randomBytes(16).toString('hex')
+    const key = await new Promise<Buffer>((resolve, reject) => {
+      scrypt(
+        password.normalize('NFKC'),
+        salt,
+        64,
+        { N: 16_384, r: 16, p: 1, maxmem: 128 * 16_384 * 16 * 2 },
+        (error, derived) => {
+          if (error) reject(error)
+          else resolve(derived)
+        },
+      )
+    })
+
+    return `${salt}:${key.toString('hex')}`
+  }
+
+  it('accepts the right password', async () => {
+    expect(await hasher.verify(PASSWORD, await legacy(PASSWORD))).toBe(true)
+  })
+
+  it('refuses the wrong one', async () => {
+    expect(await hasher.verify('not it', await legacy(PASSWORD))).toBe(false)
+  })
+
+  it('normalises the same way, so a passphrase survives the migration', async () => {
+    // Better Auth normalised NFKC before hashing. Verifying without it would
+    // reject a correct password composed differently by another keyboard —
+    // the user would be told their password is wrong and it would never work.
+    const composed = 'café passphrase'.normalize('NFC')
+    const decomposed = 'café passphrase'.normalize('NFD')
+    expect(await hasher.verify(decomposed, await legacy(composed))).toBe(true)
+  })
+
+  it('marks it for rehash, so the row is upgraded on that sign-in', async () => {
+    expect(hasher.needsRehash(await legacy(PASSWORD))).toBe(true)
+  })
+
+  it('is not fooled by a colon in something that is not a legacy hash', async () => {
+    expect(await hasher.verify(PASSWORD, 'nonsense:alsononsense')).toBe(false)
+    expect(await hasher.verify(PASSWORD, ':')).toBe(false)
+    expect(await hasher.verify(PASSWORD, 'zz:zz')).toBe(false)
+  })
+})

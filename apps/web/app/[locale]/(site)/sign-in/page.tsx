@@ -4,7 +4,7 @@ import { AuthShell } from '@/components/auth/auth-shell'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { socialProviders } from '@kurasikapa/web-kit/composition/auth-providers'
 import { env } from '@kurasikapa/web-kit/composition/env'
-import { studioUrl } from '@kurasikapa/web-kit/composition/origins'
+import { siteUrl, studioUrl } from '@kurasikapa/web-kit/composition/origins'
 
 /**
  * The provider list is computed on the server from configured credentials, so
@@ -29,6 +29,7 @@ export default async function SignInPage({
           answer on another origin — see ADR-0011. */}
       <SignInForm
         destination={`${studioUrl(env())}/${locale}`}
+        twoFactorUrl={`${siteUrl(env())}/${locale}/two-factor`}
         callbackURL={`${studioUrl(env())}/${locale}`}
         providers={configured}
         captchaSiteKey={process.env['NEXT_PUBLIC_TURNSTILE_SITE_KEY']}

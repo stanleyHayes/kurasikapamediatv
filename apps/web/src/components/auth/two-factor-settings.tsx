@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { authClient } from '../../lib/auth-client'
+import { completeSecondFactor, enrolSecondFactor } from '../../lib/auth-client'
 
 const FIELD =
   'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface rounded border px-3 py-2 outline-none transition-colors'
@@ -63,27 +63,33 @@ async function enableTwoFactor(
   setMessage: (message: string | null) => void,
 ): Promise<void> {
   setMessage(null)
-  try {
-    const result = await authClient.twoFactor.enable({ password })
-    if (result.error) {
-      setMessage(FAILED_ENABLE)
-      return
-    }
-    setTotpURI(result.data.totpURI)
-    setBackup(result.data.backupCodes)
-  } catch {
+
+  const enrolled = await enrolSecondFactor(password)
+  if (enrolled === null) {
     setMessage(FAILED_ENABLE)
+
+    return
   }
+
+  // The factor is live from here. The recovery codes are returned once and
+  // never again — only their hashes are stored — so showing them IS the
+  // safety net for someone who closes the page before scanning the QR.
+  setTotpURI(enrolled.provisioningUri)
+  setBackup(enrolled.recoveryCodes)
 }
 
+/**
+ * Confirms the authenticator was set up correctly. NOT a gate — enrolment
+ * already happened — so a wrong code here costs nothing but a retry, and the
+ * recovery codes above remain the way back in either way.
+ */
 async function confirmTotp(code: string, setMessage: (message: string | null) => void): Promise<void> {
   setMessage(null)
-  try {
-    const result = await authClient.twoFactor.verifyTotp({ code })
-    setMessage(result.error ? FAILED_CODE : 'Two-factor authentication is on.')
-  } catch {
-    setMessage(FAILED_CODE)
-  }
+  setMessage(
+    (await completeSecondFactor('', code))
+      ? 'Two-factor authentication is on.'
+      : FAILED_CODE,
+  )
 }
 
 function Setup({

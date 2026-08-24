@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { authClient } from '../../lib/auth-client'
+import { completeSecondFactor, takeChallenge } from '../../lib/auth-client'
 
 const FIELD =
   'h-14 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 text-center text-xl tracking-[0.35em] outline-none transition-colors'
@@ -25,14 +25,18 @@ export function TwoFactorForm({ destination }: { destination: string }): React.R
       return
     }
 
-    try {
-      const result = await authClient.twoFactor.verifyTotp({ code })
-      if (result.error) {
-        setError('That code was not accepted.')
-        return
-      }
-    } catch {
+    // Consumed, not read: a challenge is single use, and leaving it in
+    // storage after a failed attempt invites replaying it in another tab.
+    const challenge = takeChallenge()
+    if (challenge === null) {
       setError('That code was not accepted.')
+
+      return
+    }
+
+    if (!(await completeSecondFactor(challenge, code))) {
+      setError('That code was not accepted.')
+
       return
     }
 

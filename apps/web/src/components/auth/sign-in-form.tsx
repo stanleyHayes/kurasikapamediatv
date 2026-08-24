@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from '../../lib/auth-client'
+import { rememberChallenge, signInWithPassword } from '../../lib/auth-client'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
 
@@ -15,6 +15,8 @@ export interface SignInFormProps {
    * literal union when the destination stopped being a path this app owns.
    */
   readonly destination: string
+  /** Where a second factor is collected. Absolute, for the same reason. */
+  readonly twoFactorUrl: string
   /** Absolute URL for the OAuth round trip, which leaves the app. */
   readonly callbackURL: string
   readonly providers: readonly ('google' | 'facebook' | 'apple')[]
@@ -38,11 +40,23 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
 
   const submit = async (form: FormData): Promise<void> => {
     setError(null)
-    const ok = await attemptEmailSignIn(text(form, 'email'), text(form, 'password'), captcha)
-    if (!ok) {
-      setError(FAILED)
+    const result = await signInWithPassword(text(form, 'email'), text(form, 'password'), captcha)
+
+    // Right password, second factor owed. The challenge is not a session — it
+    // goes to the code page, which trades it for one.
+    if (result.challengeToken !== undefined) {
+      rememberChallenge(result.challengeToken)
+      window.location.assign(props.twoFactorUrl)
+
       return
     }
+
+    if (!result.ok) {
+      setError(FAILED)
+
+      return
+    }
+
     window.location.assign(props.destination)
   }
 
@@ -69,23 +83,6 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
       <SocialButtons providers={props.providers} callbackURL={props.callbackURL} />
     </div>
   )
-}
-
-async function attemptEmailSignIn(
-  email: string,
-  password: string,
-  captcha: string | null,
-): Promise<boolean> {
-  try {
-    const result = await signIn.email({
-      email,
-      password,
-      ...(captcha === null ? {} : { fetchOptions: { headers: { 'x-captcha-response': captcha } } }),
-    })
-    return !('error' in result && result.error)
-  } catch {
-    return false
-  }
 }
 
 function text(form: FormData, name: string): string {

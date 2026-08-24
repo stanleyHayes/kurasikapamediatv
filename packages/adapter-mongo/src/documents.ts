@@ -220,6 +220,18 @@ export interface RateLimitDocument {
 // --- identity: authentication (KUR-66) ---
 
 export const CREDENTIALS = 'credentials'
+
+/**
+ * Better Auth's own collections, read ONLY to migrate off them.
+ *
+ * It owned sign-in before KUR-66 and every account that exists today lives
+ * here, not in `credentials`. Nothing writes to these — the fallback in
+ * MongoCredentialRepository reads a row once, and the first successful sign-in
+ * writes the native row that supersedes it.
+ */
+export const LEGACY_USERS = 'user'
+export const LEGACY_ACCOUNTS = 'account'
+export const LEGACY_TWO_FACTOR = 'twoFactor'
 export const REFRESH_TOKENS = 'refresh_tokens'
 
 /**
