@@ -746,3 +746,79 @@ editorial packages (needs a deployed `API_URL`), the social send path (Meta app
 review), `/team` content and the legal pages' real wording (client). The legal
 pages carry a visible provisional notice on purpose — inventing the text would
 be worse than admitting it is missing.
+
+---
+
+## 13. Green main on 2026-08-24 (KUR-68, KUR-69)
+
+CI passes end to end for the first time since 2026-08-14 — every job, every
+step, including the E2E journeys and the axe sweep, which had not executed at
+all in that window because Lint was the first gate and it died first.
+
+### KUR-68 — the session cutover, finished
+
+`currentActor()` had been returning null for everyone. KUR-66 replaced the
+session READ with its own JWT cookie and never landed the write, so the studio
+was unreachable and every mutating Server Action saw an anonymous visitor while
+sign-in appeared to succeed. E2E caught it the day it merged; nobody saw the
+report.
+
+Built: the five `/api/session` routes, `/api/oauth/[provider]` and its callback
+through `completeOAuthSignIn` (which was written, tested and unreachable), the
+`/api/account/two-factor` enrolment pair, and `EnrolSecondFactor`, which KUR-66
+never wrote.
+
+The part that made it safe is the lazy credential migration. The two stacks use
+different stores AND different hashes — Better Auth `user`/`account`, scrypt
+N=16384 r=16 p=1, `salt:key` hex; this stack `credentials`, scrypt N=65536 r=8
+p=2, `scrypt$…` base64url — so a straight cutover locks out every account that
+exists. `ScryptPasswordHasher.verify` now reads the legacy format,
+`MongoCredentialRepository` falls back to the legacy collections, and `update`
+upserts, so the rehash `SignInWithPassword` already performed becomes the
+migration. It is one-way and needs no downtime.
+
+Two traps worth remembering:
+
+- `@better-auth/mongo-adapter` coerces every field referencing `user.id` to an
+  ObjectId, so `account.userId` is NOT a hex string. The first version matched
+  hex only, found the user and then no account, and returned "those details did
+  not match an account" for a correct password. The tests seeded hex only and
+  passed. They are parameterised over both forms now.
+- An account with Better Auth two-factor enrolled is refused, not migrated. Its
+  secret lives in a schema this stack does not read, so migrating would return
+  `totp: null` and sign the user in on a password alone.
+
+`/api/auth/[...all]` stays mounted: it is now only a legacy account-creation
+path whose rows migrate on first sign-in, and the E2E seed still uses it, which
+means the studio journeys exercise the migration exactly as a deployment will.
+Retiring it is the last step — nothing else calls it.
+
+### KUR-69 — contrast
+
+73 axe violations, all `color-contrast`, all from the redesign in f4bf93a. Now
+zero. Two layers of fix:
+
+- The footer's muted white-on-#08150d was below 4.5:1 and appears on every
+  page: opacity only, /35 → /48 and /40 → /52.
+- `--color-primary` and `--color-secondary` fail as text on light surfaces and
+  cannot simply be darkened, because both are also text on the near-black
+  header and footer where a darker value fails the other way. New
+  `--color-primary-ink` and `--color-secondary-ink` carry the same hues at
+  4.92 and 4.94; the fills keep the logo's green and amber. The rule is the
+  SURFACE, not the class — two eyebrows inside `bg-inverse-surface` containers
+  had to be reverted after being converted.
+
+The sweep now runs with `reducedMotion: 'reduce'`. `.reveal` fades over 760ms
+and axe was sampling mid-animation, reporting whatever opacity it caught.
+
+### Still open
+
+Unchanged: deployment to Vercel + Render, the social send path, `/team` content
+and the legal pages' wording, and everything in R2–R5. Two new items:
+
+- Retire Better Auth once nothing creates accounts through `/api/auth`, and
+  drop `better-auth` from `packages/web-kit`.
+- The studio refreshes by calling the site's `/api/session/refresh`
+  cross-origin. That works in both deployment shapes but is only exercised
+  same-origin by the suite; the split-origin path needs a real deployment to
+  prove.
