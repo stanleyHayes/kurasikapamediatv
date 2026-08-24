@@ -1,5 +1,9 @@
 # Build stage
-FROM golang:1.26-alpine AS builder
+# Pinned, not floating. `1.26-alpine` would have kept building on go1.26.5
+# well after the stdlib advisories in go.mod's toolchain note were published.
+# The `toolchain` directive there is the real floor; this keeps the image
+# reproducible so a rebuild of an old commit is the binary that commit shipped.
+FROM golang:1.26.7-alpine AS builder
 
 WORKDIR /app
 

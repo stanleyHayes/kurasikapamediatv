@@ -23,6 +23,16 @@
         "REVALIDATE_SECRET"
       ]
     },
+    // `Route` (typedRoutes) is a narrowed union only once Next has written
+    // .next/types/routes.d.ts. Without it the type widens to `string`, and
+    // type-aware lint rules read a necessary cast as a redundant one — which
+    // is exactly how `pnpm lint` came to pass locally, off a stale build, and
+    // fail on CI's clean checkout. typegen is the cheap half of `next build`:
+    // no bundling, no database, no env. `lint` runs it first so the gate
+    // answers the same question everywhere.
+    "typegen": {
+      "outputs": [".next/types/**"]
+    },
     "typecheck": {
       "dependsOn": ["^build"]
     },

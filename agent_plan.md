@@ -650,3 +650,99 @@ was then built and verified.
 Unchanged from §6: domain name, launch date, budget, local languages beyond
 EN/FR; Stitch API key rotation; Git LFS decision; IVS quota sizing; AWS,
 Cloudinary, Resend, Stripe/Paystack and Meta credentials.
+
+---
+
+## 12. Production-readiness sweep on 2026-08-24 (green main again)
+
+`main` had been red since 2026-08-14 (`3acf783`). Two jobs failed, and because
+Lint is the first gate in the quality job, **typecheck, boundaries, tests,
+build, E2E, duplication and audit had not run on that commit at all**.
+
+### Fixed
+
+- **Lint was environment-dependent, and the local pass was the wrong answer.**
+  `apps/studio/src/external-route.ts:18` tripped
+  `@typescript-eslint/no-unnecessary-type-assertion` on CI and passed locally.
+  `Route` is a narrowed union only once Next has written
+  `.next/types/routes.d.ts`; on a clean checkout it widens to `string`, which
+  makes a necessary cast read as a redundant one. Local runs passed off a
+  stale `.next` from an earlier build.
+
+  This mattered more than the error: `pnpm verify` — the documented gate —
+  returned green locally for a commit CI rejected. New `typegen` turbo task
+  (`next typegen`, which is the cheap half of a build: no bundling, no
+  database, no env) and `lint` now runs it first, so the gate asks the same
+  question everywhere. Verified by deleting both `.next` directories and
+  running `pnpm lint` from cold.
+
+- **govulncheck: five reachable Go stdlib advisories.** GO-2026-6089 and
+  GO-2026-5026 (`net/http`, via `ListenAndServe`), GO-2026-6090
+  (`crypto/tls`), GO-2026-6218 (`net/url`) and GO-2026-5972 (`encoding/asn1`,
+  via `ApplyURI`) — all fixed in go1.26.6. `go.mod` said `go 1.26`, which sets
+  the language version and no floor, and the Dockerfile floated on
+  `golang:1.26-alpine`. Added `toolchain go1.26.7` and pinned the builder
+  image. `govulncheck ./...` now reports 0 affecting vulnerabilities and
+  `make verify` stays green (domain 97.3%, app 94.2%).
+
+### Built
+
+- **`composition/production-readiness.ts`** — the gap between "the process
+  starts" and "the platform works". `env.ts` validates what is needed to BOOT;
+  these are the keys whose absence the code handles correctly and *silently*.
+  `CRON_SECRET` unset means the cron routes 404 by design, so scheduled
+  publication, RSS ingest and both digests do nothing on a site that looks
+  healthy. Checked once at server start from each app's new
+  `instrumentation.ts`, which refuses to come up and names every gap with what
+  it costs.
+
+  Keyed on the RAW `APP_URL` rather than `NODE_ENV` alone. Unset means nobody
+  configured the deployment; explicitly loopback means a server under test —
+  which is how the Playwright suite serves production builds of both apps, and
+  running E2E is what caught it: the first version turned the whole gate red.
+  A second defect came from the live boot — comparing `host` instead of
+  `hostname` demanded `COOKIE_DOMAIN` for every local run, because cookies
+  ignore the port. Both are now regression tests.
+
+- **`observability/request-error.ts`** — `onRequestError` in both apps funnels
+  every server-side render, route-handler and Server Action failure into one
+  structured line with the route attached. Deliberately not a provider SDK:
+  choosing one is an operations decision, and this already works with any log
+  drain. It must never carry `headers` — they hold the session cookie and the
+  `Authorization` header, and log retention outlives the session. Tested.
+
+### Audit findings — NOT acted on, deliberately
+
+Both are the two most recent merges, and both landed the lower layers without
+the top one. Neither is an R1 gap; neither should be finished without a
+decision.
+
+- **KUR-66 custom JWT auth is a half-landed migration.** The stack is built and
+  tested — `RegisterUser`, `SignInWithPassword`, `CompleteSecondFactor`,
+  `RefreshSession`, `SignOut`, `SignInWithProvider`, `CompleteOAuthSignIn`, the
+  jose/scrypt/TOTP adapters, the Mongo credential and refresh-token repos, and
+  `auth-graph.ts`. **No route handler uses any of it**; `actor.ts` consumes
+  only `tokens.verify`. Live auth is still Better Auth via
+  `/api/auth/[...all]`, which does its own OAuth state check — so nothing is
+  currently vulnerable, and `CompleteOAuthSignIn` is unreachable rather than
+  bypassed. Finishing it is an auth cutover: routes, a session-migration
+  window, and the `BETTER_AUTH_SECRET` → `AUTH_SECRET` rename that `env.ts`
+  says "waits for a deployment window rather than riding along with KUR-66".
+  Note `auth-graph.ts` does not yet expose `completeOAuthSignIn` — wire that
+  when the callback route is written, so the CSRF check stays impossible to
+  skip.
+
+- **KUR-67 live broadcast has no surface.** `domain/media`, `application/media`
+  (`StartBroadcast`, `EndBroadcast`, `GetCurrentBroadcast`, `ListBroadcasts`),
+  the fail-closed IVS adapter and `media-graph.ts` are all built and tested.
+  Nothing in `apps/` references any of it — `media-graph.ts` is the only
+  consumer. This is R3 scope and blocked on the AWS IVS quota request and
+  sizing answers in §6.
+
+### Still blocked, unchanged
+
+Deployment to Vercel + Render (hosting credentials), deleting the TypeScript
+editorial packages (needs a deployed `API_URL`), the social send path (Meta app
+review), `/team` content and the legal pages' real wording (client). The legal
+pages carry a visible provisional notice on purpose — inventing the text would
+be worse than admitting it is missing.

@@ -13,7 +13,7 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "test:e2e": "turbo run test:e2e",
-    "lint": "eslint .",
+    "lint": "turbo run typegen && eslint .",
     "typecheck": "turbo run typecheck",
     "boundaries": "depcruise packages apps --config .dependency-cruiser.cjs",
     "dup": "jscpd",

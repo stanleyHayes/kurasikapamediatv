@@ -2,6 +2,15 @@ module github.com/kurasikapa/api
 
 go 1.26
 
+// Floor, not a preference. go1.26.5 and earlier carry five reachable
+// stdlib advisories this service trips on its own hot paths — GO-2026-6089
+// and GO-2026-5026 (net/http, via ListenAndServe), GO-2026-6090 (crypto/tls),
+// GO-2026-6218 (net/url) and GO-2026-5972 (encoding/asn1, via ApplyURI).
+// The `go` directive above only sets the language version; without this line
+// a build on an older toolchain is silently vulnerable and govulncheck in CI
+// is the only thing that notices.
+toolchain go1.26.7
+
 require golang.org/x/text v0.40.0
 
 require (
