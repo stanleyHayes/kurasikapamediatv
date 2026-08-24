@@ -15,7 +15,7 @@ export async function CommentThread({
 
   return (
     <section className="mt-14 border-t-4 border-primary bg-surface-container-lowest p-6 md:p-8" aria-labelledby="comments-heading">
-      <p className="eyebrow text-primary mb-3">Community</p>
+      <p className="eyebrow text-primary-ink mb-3">Community</p>
       <h2 id="comments-heading" className="font-display text-on-surface text-3xl font-semibold tracking-[-0.03em]">
         Comments
       </h2>

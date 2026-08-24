@@ -15,7 +15,7 @@ export function AuthShell(props: AuthShellProps): React.ReactElement {
         <AuthStory />
         <div className="flex items-center px-6 py-14 sm:px-12 lg:px-20">
           <div className="w-full max-w-lg">
-            <p className="eyebrow text-primary mb-5">{props.eyebrow}</p>
+            <p className="eyebrow text-primary-ink mb-5">{props.eyebrow}</p>
             <h1 className="font-display text-on-surface text-5xl leading-[0.98] tracking-[-0.04em] sm:text-6xl">
               {props.title}
             </h1>

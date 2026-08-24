@@ -55,7 +55,7 @@ function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement
               </h2>
               <Link
                 href="/search"
-                className="editorial-link eyebrow text-primary hover:text-secondary transition-colors"
+                className="editorial-link eyebrow text-primary-ink hover:text-secondary-ink transition-colors"
               >
                 View all
               </Link>

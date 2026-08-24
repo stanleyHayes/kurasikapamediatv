@@ -28,7 +28,7 @@ export function LeadStory({
         </div>
         <div className="grid gap-5 p-7 md:grid-cols-[9rem_1fr] md:p-10">
           <div className="flex items-center gap-3">
-            <span className="eyebrow text-secondary">
+            <span className="eyebrow text-secondary-ink">
               {section(article.categoryId)}
             </span>
             <span className="text-on-surface-variant text-label-bold">

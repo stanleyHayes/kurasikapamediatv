@@ -9,6 +9,23 @@
   --color-primary-container: #dff3df;
   --color-on-primary-container: #063d18;
   --color-secondary: #e39a0a;
+
+  /*
+   * Text-safe siblings of the two brand colours, for LIGHT surfaces only.
+   *
+   * `.eyebrow` is 12px bold — normal text by WCAG, so 4.5:1 applies, and both
+   * brand colours miss it badly on a light background: primary #07852a is
+   * 4.26, secondary #e39a0a is 2.34. Darkening the tokens themselves is not
+   * available, because the same two are text on the near-black header and
+   * footer, where a darker value fails the other way — #077927 drops to 3.36
+   * on #08150d. One token cannot serve both surfaces.
+   *
+   * So the fills keep the logo's green and amber, and these carry the same
+   * hues down to where small text is legible. Worst case across every light
+   * surface in the palette: 4.92 and 4.94.
+   */
+  --color-primary-ink: #077927;
+  --color-secondary-ink: #8c5f0a;
   --color-on-secondary: #211400;
   --color-secondary-container: #ffdf9f;
   --color-on-secondary-container: #5e3900;

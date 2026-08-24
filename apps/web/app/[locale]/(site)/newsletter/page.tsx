@@ -24,7 +24,7 @@ async function Body({ params }: Params): Promise<React.ReactElement> {
   return (
     <section className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-lg)]">
       <header className="signal-grid relative overflow-hidden border-y-4 border-on-surface bg-secondary-container px-7 py-14 md:px-14 md:py-20">
-      <p className="eyebrow text-primary mb-5">Inbox edition / Daily</p>
+      <p className="eyebrow text-primary-ink mb-5">Inbox edition / Daily</p>
       <h1 className="relative max-w-[12ch] font-display text-on-surface text-[length:var(--text-display-lg)] font-semibold">
         The Daily Briefing
       </h1>

@@ -12,7 +12,7 @@ export function Hero({ article }: { article: ArticleView }): React.ReactElement 
               <span className="eyebrow text-on-surface-variant">Friday edition · Accra</span>
             </div>
             <div className="py-16 md:py-24">
-              <p className="reveal reveal-delay-1 eyebrow mb-6 text-secondary">{article.categoryId.replace(/^cat_/u, '')}</p>
+              <p className="reveal reveal-delay-1 eyebrow mb-6 text-secondary-ink">{article.categoryId.replace(/^cat_/u, '')}</p>
               <h1 className="reveal reveal-delay-2 max-w-[14ch] text-[length:var(--text-display-lg)] text-on-surface">
                 <Link href={`/articles/${article.slug}`} className="transition-colors hover:text-primary">{article.title}</Link>
               </h1>

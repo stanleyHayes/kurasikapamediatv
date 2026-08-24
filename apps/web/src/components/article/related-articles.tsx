@@ -21,7 +21,7 @@ export async function RelatedArticles({
 
   return (
     <aside className="border-on-surface mt-[var(--space-xl)] border-t-4 pt-[var(--space-md)]">
-      <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-on-surface text-3xl font-semibold">Keep reading</h2><span className="eyebrow text-secondary">Same desk</span></div>
+      <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-on-surface text-3xl font-semibold">Keep reading</h2><span className="eyebrow text-secondary-ink">Same desk</span></div>
       <ul className="mt-4">
         {related.map((article) => (
           <li key={article.id}>

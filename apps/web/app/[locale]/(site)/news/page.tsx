@@ -55,7 +55,7 @@ async function NewsBody({ params }: Params): Promise<React.ReactElement> {
       <header className="reveal signal-grid bg-surface-container-lowest relative mb-12 overflow-hidden border-y-4 border-on-surface px-7 py-14 text-on-surface md:mb-16 md:px-14 md:py-20">
         <div aria-hidden className="absolute bottom-0 right-0 h-4 w-2/3 bg-secondary" />
         <div aria-hidden className="absolute right-8 top-1/2 hidden -translate-y-1/2 text-[11rem] font-black leading-none text-primary/10 md:block">NEWS</div>
-        <p className="eyebrow text-primary mb-5">Latest / Ghana / World</p>
+        <p className="eyebrow text-primary-ink mb-5">Latest / Ghana / World</p>
         <h1 className="relative max-w-[10ch] font-display text-[3.5rem] leading-[0.9] font-bold tracking-[-0.05em] md:text-[length:var(--text-display-lg)]">
           {t('news')}
         </h1>
@@ -95,7 +95,7 @@ function NewsLead({ article }: { article: ArticleView }): React.ReactElement {
           <div className="bg-primary absolute bottom-0 right-[8%] h-full w-1/3 -skew-x-12" />
         </div>
         <div className="p-7 md:p-10">
-          <div className="eyebrow text-secondary mb-3">{article.categoryId.replace(/^cat_/u, '')}</div>
+          <div className="eyebrow text-secondary-ink mb-3">{article.categoryId.replace(/^cat_/u, '')}</div>
           <h2 className="font-display text-3xl font-semibold text-white transition-colors group-hover:text-secondary md:text-[length:var(--text-headline-md)]">{article.title}</h2>
           {article.publishedAt !== null && <time dateTime={article.publishedAt} className="mt-4 block text-sm text-white/55">{formatDate(article.publishedAt, article.locale)}</time>}
         </div>
