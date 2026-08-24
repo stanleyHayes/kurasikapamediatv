@@ -58,6 +58,20 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    /*
+     * The axe sweep must measure colours, not animation frames.
+     *
+     * `.reveal` fades content in over 760ms. axe samples whenever the page
+     * happens to be ready, so a heading caught mid-fade is reported as a
+     * contrast failure at whatever opacity it had reached — a real-looking
+     * violation that appears and disappears with machine load, and names a
+     * colour that exists for less than a second.
+     *
+     * Reduced motion is a setting the theme already honours by dropping the
+     * spatial movement and the fades, so this audits a state real users get,
+     * and every measurement is of the final colour.
+     */
+    contextOptions: { reducedMotion: 'reduce' },
   },
 
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

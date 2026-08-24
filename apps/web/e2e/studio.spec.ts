@@ -88,7 +88,12 @@ test.describe('signed in', () => {
   test('signing out ends the session, not just the page', async ({ page }) => {
     await signIn(page)
     await page.getByRole('button', { name: 'Sign out' }).click()
-    await page.waitForURL(/\/en$/u)
+
+    // "Left the studio", not `/\/en$/`. That pattern also matches the studio's
+    // OWN /studio/en, so it was already satisfied the moment it was evaluated:
+    // the wait returned immediately, the next goto raced the in-flight action,
+    // and the sign-out was reported as broken when it had simply not finished.
+    await page.waitForURL((url) => !url.pathname.startsWith('/studio'))
 
     // Returning to the studio must require signing in again. A sign-out that
     // only navigates away leaves the session alive — and now that sign-out is

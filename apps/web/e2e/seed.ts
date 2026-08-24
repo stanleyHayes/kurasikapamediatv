@@ -102,6 +102,15 @@ export async function seedEditor(baseUrl: string): Promise<void> {
   await db.collection('session').deleteMany({})
   await db.collection('role_assignments').deleteMany({})
 
+  // The native stores too, or the run inherits the PREVIOUS run's migration.
+  // A `credentials` row survives with the same email and a working password
+  // hash but the old user's id, so sign-in succeeds against a user whose role
+  // assignments were just deleted — and the studio bounces an editor it should
+  // have admitted, for a reason nothing on screen explains.
+  await db.collection('credentials').deleteMany({})
+  await db.collection('refresh_tokens').deleteMany({})
+  await db.collection('twoFactor').deleteMany({})
+
   const response = await fetch(`${baseUrl}/api/auth/sign-up/email`, {
     method: 'POST',
     // Origin is required: Better Auth rejects originless requests with

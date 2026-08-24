@@ -28,7 +28,7 @@ export function PushOptIn({
             setNote(await enablePush(locale, vapidPublicKey))
           })
         }}
-        className="text-label-bold text-secondary uppercase underline disabled:opacity-50"
+        className="text-label-bold text-secondary-ink uppercase underline disabled:opacity-50"
       >
         {pending ? 'Enabling…' : 'Enable breaking-news alerts'}
       </button>
