@@ -822,3 +822,34 @@ and the legal pages' wording, and everything in R2–R5. Two new items:
   cross-origin. That works in both deployment shapes but is only exercised
   same-origin by the suite; the split-origin path needs a real deployment to
   prove.
+
+---
+
+## 14. KUR-70 — first production deployment (2026-08-30)
+
+**Status: IN PROGRESS — Render and public web are live; studio and custom DNS
+have external account-level blockers.**
+
+- Render `kurasikapa-media-api` is live on the Starter plan in Frankfurt at
+  `https://kurasikapa-media-api.onrender.com`. The deployed commit is
+  `a2ce022`; `GET /healthz`, the unauthorised write guard, hidden cron guard,
+  and authorised publish-due cron all pass `scripts/smoke-api.sh`.
+- `kurasikapa-web` and `kurasikapa-studio` exist as separate Vercel projects,
+  linked to this GitHub monorepo with roots `apps/web` and `apps/studio`. Their
+  production environment contracts share the same auth, cache-revalidation,
+  cron, database and API values. Deployment protection is disabled for these
+  public production projects.
+- Public web is deployed from `feature/KUR-70-production-deployment` and serves
+  HTTP 200 at `https://kurasikapa-web-hayfordstanleys-projects.vercel.app/en`.
+- Studio deployment is blocked by the Vercel Hobby cron limit: its required
+  every-minute schedules are rejected because Hobby permits daily crons only.
+  Decision required: upgrade the Vercel workspace to Pro, or explicitly accept
+  a reduced/external scheduling design.
+- `kurasikapa.tv` and `studio.kurasikapa.tv` are attached to their projects,
+  but DNS is not configured. Required external DNS records are apex A records
+  `216.198.79.1` and `64.29.17.1`, plus `studio` CNAME
+  `20885681fed6c319.vercel-dns-017.com`.
+- Deployment fixes landed in this branch: Render no longer overrides its
+  managed `PORT`; the API service name has a collision-free hostname; the
+  smoke script matches the real Go routes and fail-closed status codes; and
+  Studio's `vercel.json` no longer uses an unsupported pseudo-comment key.
