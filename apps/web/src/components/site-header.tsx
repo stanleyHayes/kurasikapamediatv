@@ -2,10 +2,12 @@
 
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
+import { useEffect, useRef } from 'react'
 import { Link, usePathname } from '@kurasikapa/web-kit/i18n/navigation'
 import { isNavItemActive, localizedHref } from './site-header-state'
 
 const PRIMARY = [
+  { paths: { en: '/live', fr: '/live' }, key: 'live' },
   { paths: { en: '/news', fr: '/news' }, key: 'latest' },
   { paths: { en: '/sections/ghana', fr: '/sections/ghana' }, key: 'ghana' },
   { paths: { en: '/sections/africa', fr: '/sections/afrique' }, key: 'africa' },
@@ -42,20 +44,45 @@ function NavLink({ item, pathname, mobile = false }: { item: NavItem; pathname: 
   const locale = useLocale()
   const href = localizedHref(item.paths, locale)
   const current = isNavItemActive(pathname, href)
+  const live = item.key === 'live'
   const classes = mobile
     ? current ? 'block border-l-4 border-secondary bg-primary px-4 py-3 font-bold text-white' : 'hover:bg-primary-container block border-l-4 border-transparent px-4 py-3 font-semibold'
-    : current ? 'bg-secondary px-3 py-2 text-[13px] font-bold text-on-secondary' : 'editorial-link px-3 py-2 text-[13px] font-semibold text-white/72 transition-colors hover:text-white'
+    : current ? 'bg-secondary px-3 py-2 text-[13px] font-bold text-on-secondary' : `${live ? 'text-secondary' : 'text-white/72'} editorial-link px-3 py-2 text-[13px] font-semibold transition-colors hover:text-white`
 
-  return <Link href={href} aria-current={current ? 'page' : undefined} className={classes}>{t(item.key)}</Link>
+  return <Link href={href} aria-current={current ? 'page' : undefined} className={classes}>{live && <span aria-hidden className="mr-1.5 inline-block h-2 w-2 bg-secondary" />}{t(item.key)}</Link>
+}
+
+function useDismissableDetails(): React.RefObject<HTMLDetailsElement | null> {
+  const detailsRef = useRef<HTMLDetailsElement>(null)
+
+  useEffect(() => {
+    function dismiss(event: PointerEvent | KeyboardEvent): void {
+      const details = detailsRef.current
+      if (!details?.open) return
+      if (event instanceof KeyboardEvent && event.key !== 'Escape') return
+      if (event instanceof PointerEvent && details.contains(event.target as Node)) return
+      details.removeAttribute('open')
+    }
+
+    document.addEventListener('pointerdown', dismiss)
+    document.addEventListener('keydown', dismiss)
+    return () => {
+      document.removeEventListener('pointerdown', dismiss)
+      document.removeEventListener('keydown', dismiss)
+    }
+  }, [])
+
+  return detailsRef
 }
 
 function MoreMenu({ pathname }: { pathname: string }): React.ReactElement {
   const t = useTranslations('nav')
   const locale = useLocale()
+  const detailsRef = useDismissableDetails()
   const current = MORE.some((item) => isNavItemActive(pathname, localizedHref(item.paths, locale)))
 
   return (
-    <details className="group relative">
+    <details ref={detailsRef} className="group relative">
       <summary aria-current={current ? 'page' : undefined} className={`${current ? 'bg-secondary font-bold text-on-secondary' : 'font-semibold text-white/72 hover:text-white'} inline-flex cursor-pointer list-none items-center gap-1.5 px-3 py-2 text-[13px] transition-colors [&::-webkit-details-marker]:hidden`}>
         {t('more')}
         <svg aria-hidden viewBox="0 0 20 20" fill="none" className="h-4 w-4 transition-transform duration-200 group-open:rotate-180">
@@ -63,25 +90,28 @@ function MoreMenu({ pathname }: { pathname: string }): React.ReactElement {
         </svg>
       </summary>
       <ul className="broadcast-shadow border-outline-variant bg-surface-container-lowest absolute right-0 top-12 z-20 grid w-[38rem] max-w-[calc(100vw-2rem)] grid-cols-2 border p-3 text-on-surface">
-        {MORE.map((item) => {
-          const href = localizedHref(item.paths, locale)
-          const active = isNavItemActive(pathname, href)
-          return (
-            <li key={item.paths.en}>
-              <Link href={href} aria-current={active ? 'page' : undefined} className={`${active ? 'border-secondary bg-primary-container' : 'border-transparent hover:border-outline-variant hover:bg-surface-container-low'} group/item grid min-h-24 grid-cols-[2.75rem_1fr] gap-3 border-l-4 p-4 transition-colors`}>
-                <span className={`${active ? 'bg-secondary text-on-secondary' : 'border-outline-variant text-primary border'} grid h-11 w-11 place-items-center`}>
-                  <DeskIcon name={item.icon} />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-base font-bold leading-tight">{t(item.key)}</span>
-                  <span className="mt-1.5 block text-xs leading-relaxed text-on-surface-variant">{t(`${item.key}Description`)}</span>
-                </span>
-              </Link>
-            </li>
-          )
-        })}
+        {MORE.map((item) => <MoreMenuItem key={item.paths.en} item={item} pathname={pathname} onSelect={() => detailsRef.current?.removeAttribute('open')} />)}
       </ul>
     </details>
+  )
+}
+
+function MoreMenuItem({ item, pathname, onSelect }: { item: (typeof MORE)[number]; pathname: string; onSelect: () => void }): React.ReactElement {
+  const t = useTranslations('nav')
+  const locale = useLocale()
+  const href = localizedHref(item.paths, locale)
+  const active = isNavItemActive(pathname, href)
+
+  return (
+    <li>
+      <Link href={href} onClick={onSelect} aria-current={active ? 'page' : undefined} className={`${active ? 'border-secondary bg-primary-container' : 'border-transparent hover:border-outline-variant hover:bg-surface-container-low'} grid min-h-24 grid-cols-[2.75rem_1fr] gap-3 border-l-4 p-4 transition-colors`}>
+        <span className={`${active ? 'bg-secondary text-on-secondary' : 'border-outline-variant text-primary border'} grid h-11 w-11 place-items-center`}><DeskIcon name={item.icon} /></span>
+        <span className="min-w-0">
+          <span className="block text-base font-bold leading-tight">{t(item.key)}</span>
+          <span className="mt-1.5 block text-xs leading-relaxed text-on-surface-variant">{t(`${item.key}Description`)}</span>
+        </span>
+      </Link>
+    </li>
   )
 }
 

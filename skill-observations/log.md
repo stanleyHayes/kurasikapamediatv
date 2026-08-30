@@ -108,3 +108,17 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Require rendered open-state inspection at target widths, use the longest localized label during review, define a safe minimum item width, and verify icon, title, and description hierarchy when a menu acts as a directory.
 
 **Principle:** A dropdown is a layout state of its own and must be verified while open with its longest real content.
+
+### Observation 7: Navigation refactors need a before-and-after destination inventory
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Skill:** frontend-design
+**Type:** open-source
+**Phase/Area:** Information architecture verification
+
+**Issue:** A navigation redesign improved grouping and presentation but silently omitted a prominent product destination that already existed in the interface vocabulary.
+
+**Suggested improvement:** Before changing navigation arrays, inventory every existing destination and classify each as retained, relocated, intentionally removed, or not yet backed by a route; compare that inventory against the rendered desktop and mobile navigation after implementation.
+
+**Principle:** Better navigation hierarchy must not erase product capabilities by accident.

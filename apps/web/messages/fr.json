@@ -39,6 +39,13 @@
     "latest": "À la une",
     "readMore": "Lire la suite"
   },
+  "livePage": {
+    "title": "TV en direct",
+    "description": "Regardez Kurasikapa Media TV en direct d’Accra pour les dernières nouvelles, les interviews et les émissions.",
+    "status": "Hors antenne",
+    "emptyTitle": "La prochaine diffusion est en préparation",
+    "emptyDescription": "Lorsque la rédaction passera en direct, le flux démarrera automatiquement ici."
+  },
   "article": {
     "by": "Par"
   },

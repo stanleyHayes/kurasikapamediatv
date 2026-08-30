@@ -39,6 +39,13 @@
     "latest": "Latest",
     "readMore": "Read more"
   },
+  "livePage": {
+    "title": "Live TV",
+    "description": "Watch Kurasikapa Media TV live from Accra for breaking coverage, interviews and programmes.",
+    "status": "Off air",
+    "emptyTitle": "The next broadcast is being prepared",
+    "emptyDescription": "When the newsroom goes live, the stream will begin here automatically."
+  },
   "article": {
     "by": "By"
   },
