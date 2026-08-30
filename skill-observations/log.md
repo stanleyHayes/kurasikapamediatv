@@ -94,3 +94,17 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** For every navigation link, verify the final URL, expected landmark or heading, active-state semantics and localized slug in each supported locale; treat soft-404 content as a broken destination even when transport status is 200.
 
 **Principle:** A navigation endpoint is valid only when it renders the intended destination in every supported locale.
+
+### Observation 6: Dropdowns need open-state content-fit verification
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Skill:** frontend-design
+**Type:** open-source
+**Phase/Area:** Component verification
+
+**Issue:** A compact multi-column dropdown passed structural checks while its longest labels collided; its text-glyph caret and label-only items also lacked a useful information hierarchy.
+
+**Suggested improvement:** Require rendered open-state inspection at target widths, use the longest localized label during review, define a safe minimum item width, and verify icon, title, and description hierarchy when a menu acts as a directory.
+
+**Principle:** A dropdown is a layout state of its own and must be verified while open with its longest real content.
