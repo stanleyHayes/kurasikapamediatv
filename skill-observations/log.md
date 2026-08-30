@@ -45,3 +45,20 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** When a user names reference products, inspect their actual shared primitives and shells, extract reusable interaction patterns, and translate those patterns into the target brand instead of copying surface styling.
 
 **Principle:** Learn structure from references, preserve identity in the implementation.
+
+## 2026-08-30
+
+### Observation 3: Validate provider plan limits before provisioning scheduled workloads
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A multi-service production deployment reached provider validation before discovering that the active hosting plan rejected sub-daily cron schedules.
+**Skill:** New skill candidate: production deployment readiness
+**Type:** open-source
+**Phase/Area:** Preflight and provider capability validation
+
+**Issue:** Repository configuration and local builds can be valid while the selected hosting account rejects a required runtime capability, leaving infrastructure partially provisioned and forcing a late cost-versus-degradation decision.
+
+**Suggested improvement:** Add a preflight that inventories scheduled jobs, required frequencies, runtime versions, monorepo roots, custom domains, and current account plans, then checks each requirement against live provider limits before creating resources.
+
+**Principle:** Deployment readiness includes the capabilities of the active provider plan, not only valid application configuration.
