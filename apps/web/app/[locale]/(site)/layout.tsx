@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { ServiceWorkerRegister } from '@/pwa/service-worker-register'
@@ -22,12 +22,10 @@ export default async function SiteLayout({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const t = await getTranslations('nav')
-
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to content</a>
-      <SiteHeader liveLabel={t('live')} />
+      <SiteHeader />
       <main id="main-content" className="min-h-[65dvh] pt-20">{children}</main>
 
       <SiteFooter />
