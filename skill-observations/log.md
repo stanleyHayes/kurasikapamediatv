@@ -77,3 +77,5 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** For every base-path deployment, test the bare project host, the base path without a locale, and the canonical localized route; require intentional redirects for the first two.
 
 **Principle:** A deployment is reachable only when its natural entrypoints lead users to the working application.
+
+2026-08-30 completion checkpoint: no new reusable skill observation; the auth-field request was a bounded application of existing accessible form guidance.

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { rememberChallenge, signInWithPassword } from '../../lib/auth-client'
+import { AuthField } from './auth-field'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
 
@@ -24,9 +25,6 @@ export interface SignInFormProps {
 }
 
 const FAILED = 'Those details did not match an account.'
-
-const FIELD =
-  'h-13 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 outline-none transition-colors placeholder:text-on-surface-variant/50'
 
 /**
  * Uses React 19's form action rather than an onSubmit handler: no controlled
@@ -63,8 +61,8 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
   return (
     <div className="flex w-full flex-col gap-6">
       <form action={submit} className="flex w-full flex-col gap-5">
-        <Field label="Email" name="email" type="email" autoComplete="email" />
-        <Field label="Password" name="password" type="password" autoComplete="current-password" />
+        <AuthField label="Email" name="email" type="email" autoComplete="email" placeholder="you@example.com" icon="email" />
+        <AuthField label="Password" name="password" type="password" autoComplete="current-password" placeholder="Enter your password" icon="lock" />
         {props.captchaSiteKey !== undefined && (
           <TurnstileField siteKey={props.captchaSiteKey} onToken={setCaptcha} />
         )}
@@ -88,24 +86,4 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
 function text(form: FormData, name: string): string {
   const value = form.get(name)
   return typeof value === 'string' ? value : ''
-}
-
-function Field(props: {
-  label: string
-  name: string
-  type: string
-  autoComplete: string
-}): React.ReactElement {
-  return (
-    <label className="flex w-full flex-col gap-2">
-      <span className="text-sm font-semibold text-on-surface">{props.label}</span>
-      <input
-        type={props.type}
-        name={props.name}
-        autoComplete={props.autoComplete}
-        required
-        className={FIELD}
-      />
-    </label>
-  )
 }

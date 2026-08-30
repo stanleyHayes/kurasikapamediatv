@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useLocale } from 'next-intl'
 import { register } from '../../lib/auth-client'
+import { AuthField } from './auth-field'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
 
@@ -22,9 +23,6 @@ export interface SignUpFormProps {
 
 const FAILED = 'We could not create that account. The email may already be registered.'
 
-const FIELD =
-  'h-13 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 outline-none transition-colors'
-
 /**
  * Reader self-registration. Mirrors the sign-in form: React 19 form action,
  * no controlled field state, and the same post-success destination — a fresh
@@ -37,15 +35,9 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
   const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
   const [captcha, setCaptcha] = useState<string | null>(null)
-
   const submit = async (form: FormData): Promise<void> => {
     setError(null)
-    const ok = await attemptEmailSignUp(
-      text(form, 'name'),
-      text(form, 'email'),
-      text(form, 'password'),
-      captcha,
-    )
+    const ok = await attemptEmailSignUp(text(form, 'name'), text(form, 'email'), text(form, 'password'), captcha)
     if (!ok) {
       setError(FAILED)
       return
@@ -56,13 +48,15 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
   return (
     <div className="flex w-full flex-col gap-6">
       <form action={submit} className="flex w-full flex-col gap-5">
-        <Field label="Name" name="name" type="text" autoComplete="name" />
-        <Field label="Email" name="email" type="email" autoComplete="email" />
-        <Field
+        <AuthField label="Name" name="name" type="text" autoComplete="name" placeholder="Your full name" icon="user" />
+        <AuthField label="Email" name="email" type="email" autoComplete="email" placeholder="you@example.com" icon="email" />
+        <AuthField
           label="Password"
           name="password"
           type="password"
           autoComplete="new-password"
+          placeholder="Create at least 8 characters"
+          icon="lock"
           minLength={8}
         />
         {props.captchaSiteKey !== undefined && (
@@ -106,26 +100,4 @@ async function attemptEmailSignUp(
 function text(form: FormData, name: string): string {
   const value = form.get(name)
   return typeof value === 'string' ? value : ''
-}
-
-function Field(props: {
-  label: string
-  name: string
-  type: string
-  autoComplete: string
-  minLength?: number | undefined
-}): React.ReactElement {
-  return (
-    <label className="flex w-full flex-col gap-2">
-      <span className="text-sm font-semibold text-on-surface">{props.label}</span>
-      <input
-        type={props.type}
-        name={props.name}
-        autoComplete={props.autoComplete}
-        required
-        {...(props.minLength === undefined ? {} : { minLength: props.minLength })}
-        className={FIELD}
-      />
-    </label>
-  )
 }

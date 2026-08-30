@@ -866,3 +866,6 @@ are live. Custom-domain DNS remains an external registrar action.**
   instead of the bare “Nothing published yet” line: newsroom status, launch
   context, reader actions, and a concise statement of what the first edition
   will deliver.
+- Public sign-in and registration fields now share one accessible input
+  treatment with leading semantic icons, task-specific placeholders, visible
+  focus treatment, and a trailing show/hide control on password fields.
