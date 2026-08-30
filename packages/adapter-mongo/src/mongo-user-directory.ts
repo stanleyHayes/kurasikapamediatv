@@ -91,6 +91,12 @@ export class MongoUserDirectory implements UserDirectory {
     }
   }
 
+  async updateName(id: UserId, name: string): Promise<void> {
+    const oid = objectIdOf(id)
+    if (oid === null) return
+    await this.users.updateOne({ _id: oid }, { $set: { name } })
+  }
+
   private async rolesFor(ids: readonly string[]): Promise<Map<string, Role[]>> {
     if (ids.length === 0) return new Map()
 

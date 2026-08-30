@@ -1,4 +1,4 @@
-export const SITE_PAGE_KEYS = ['about', 'team', 'contact', 'careers', 'faq', 'advertise', 'privacy', 'terms', 'cookies'] as const
+export const SITE_PAGE_KEYS = ['careers', 'help', 'faq'] as const
 export type SitePageKey = (typeof SITE_PAGE_KEYS)[number]
 
 export interface SitePageProps { readonly id: string; readonly key: SitePageKey; readonly locale: string; readonly title: string; readonly lead: string; readonly body: string; readonly updatedAt: Date }

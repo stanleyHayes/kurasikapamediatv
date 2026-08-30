@@ -61,3 +61,5 @@ export {
   type EnrolSecondFactorInput,
   type EnrolSecondFactorResult,
 } from './enrol-second-factor'
+export { ChangePassword, PasswordChangeRejected, type ChangePasswordInput } from './change-password'
+export { UpdateOwnProfile, type UpdateOwnProfileInput } from './update-own-profile'

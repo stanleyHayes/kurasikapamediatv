@@ -24,4 +24,5 @@ export interface UserDirectory {
    * are not found — never a driver error on the public article path.
    */
   findById(id: UserId): Promise<DirectoryUser | null>
+  updateName(id: UserId, name: string): Promise<void>
 }

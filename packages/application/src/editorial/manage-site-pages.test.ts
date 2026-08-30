@@ -15,13 +15,13 @@ describe('ManageSitePages', () => {
   it('lets a publisher save localized standing-page content', async () => {
     const pages = new MemoryPages()
     const actor = new Actor(userId('usr_editor'), ['editor'])
-    await new ManageSitePages({ pages, clock: { now: () => new Date('2026-08-30T20:00:00Z') } }).execute({ actor, key: 'about', locale: 'en', title: 'About', lead: 'Our work', body: 'Independent reporting.' })
-    expect((await pages.find('about', 'en'))?.snapshot().title).toBe('About')
+    await new ManageSitePages({ pages, clock: { now: () => new Date('2026-08-30T20:00:00Z') } }).execute({ actor, key: 'careers', locale: 'en', title: 'Careers', lead: 'Join us', body: 'Independent reporting.' })
+    expect((await pages.find('careers', 'en'))?.snapshot().title).toBe('Careers')
   })
 
   it('refuses a reader', async () => {
     const actor = new Actor(userId('usr_reader'), ['guest'])
-    await expect(new ManageSitePages({ pages: new MemoryPages(), clock: { now: () => new Date() } }).execute({ actor, key: 'about', locale: 'en', title: 'About', lead: '', body: 'Copy' })).rejects.toThrow('article:publish')
+    await expect(new ManageSitePages({ pages: new MemoryPages(), clock: { now: () => new Date() } }).execute({ actor, key: 'careers', locale: 'en', title: 'Careers', lead: '', body: 'Copy' })).rejects.toThrow('article:publish')
   })
 
   it('reads through the repository', async () => {

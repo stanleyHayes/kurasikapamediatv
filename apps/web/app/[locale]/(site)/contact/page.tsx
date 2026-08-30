@@ -2,10 +2,10 @@ import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { ContactForm } from '@/components/contact/contact-form'
 import { StandingPageView } from '@/components/standing-page'
-import { type StandingParams, standingRoute } from '@/content/standing-route'
-import { cmsPageFor } from '@/content/cms-page'
+import { pageFor } from '@/content/pages'
+import { type StandingParams, staticStandingRoute } from '@/content/standing-route'
 
-const route = standingRoute('contact', 'contact')
+const route = staticStandingRoute('contact', 'contact')
 
 export const generateMetadata = route.generateMetadata
 
@@ -23,7 +23,7 @@ async function Body({ params }: StandingParams): Promise<React.ReactElement> {
 
   return (
     <div>
-      <StandingPageView page={await cmsPageFor('contact', locale)} pageKey="contact" />
+      <StandingPageView page={pageFor('contact', locale)} />
       <section className="mx-auto max-w-[var(--container-page)] px-6 pb-[var(--space-xl)]">
         <h2 className="font-display text-on-surface text-[length:var(--text-headline-sm)] font-semibold">
           Write to the newsroom

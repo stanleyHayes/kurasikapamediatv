@@ -3,8 +3,8 @@ import { EmptyPageContent, SitePage } from './site-page'
 
 describe('SitePage', () => {
   it('normalises editable content and records publication time', () => {
-    const page = SitePage.create({ key: 'about', locale: 'en', title: ' About us ', lead: ' Our purpose ', body: '## Mission\n\nTell the truth.', updatedAt: new Date('2026-08-30T20:00:00Z') })
-    expect(page.snapshot()).toMatchObject({ id: 'about:en', title: 'About us', lead: 'Our purpose' })
+    const page = SitePage.create({ key: 'careers', locale: 'en', title: ' Careers ', lead: ' Join us ', body: '## Open roles\n\nTell the truth.', updatedAt: new Date('2026-08-30T20:00:00Z') })
+    expect(page.snapshot()).toMatchObject({ id: 'careers:en', title: 'Careers', lead: 'Join us' })
   })
 
   it('refuses empty title or body', () => {

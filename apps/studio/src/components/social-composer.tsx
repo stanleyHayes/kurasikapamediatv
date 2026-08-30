@@ -126,15 +126,16 @@ function PublishNowField({
   onChange: (checked: boolean) => void
 }): React.ReactElement {
   return (
-    <label className="flex items-center gap-2">
+    <label className="flex cursor-pointer items-center gap-3 border border-outline-variant bg-surface-container-lowest px-4 py-3 has-[:checked]:border-secondary has-[:checked]:bg-secondary-container">
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => {
           onChange(event.target.checked)
         }}
-        className="accent-secondary h-4 w-4"
+        className="peer sr-only"
       />
+      <span aria-hidden className="grid size-5 place-items-center border-2 border-outline text-transparent peer-checked:border-secondary peer-checked:bg-secondary peer-checked:text-on-secondary">✓</span>
       <span className="text-label-bold text-on-surface-variant uppercase">Publish now</span>
     </label>
   )

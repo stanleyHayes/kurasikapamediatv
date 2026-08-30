@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useEffect, useRef } from 'react'
 import { Link, usePathname } from '@kurasikapa/web-kit/i18n/navigation'
 import { SignOutButton } from './sign-out-button'
 import { StudioIcon, type StudioIconName } from './studio-icon'
@@ -26,16 +27,20 @@ const ITEMS = GROUPS.flatMap((group) => group.items)
 
 export function StudioSideNav({ collapsed, mobileOpen, onClose }: { collapsed: boolean; mobileOpen: boolean; onClose: () => void }): React.ReactElement {
   const pathname = usePathname()
+  const navigation = useRef<HTMLElement>(null)
   const active = [...ITEMS].sort((a, b) => b.href.length - a.href.length).find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))?.href ?? '/'
   const compact = collapsed && !mobileOpen
+  useEffect(() => {
+    const saved = window.sessionStorage.getItem('studio-navigation-scroll')
+    if (navigation.current !== null && saved !== null) navigation.current.scrollTop = Number(saved)
+  }, [pathname])
+  const close = (): void => {
+    if (navigation.current !== null) window.sessionStorage.setItem('studio-navigation-scroll', String(navigation.current.scrollTop))
+    onClose()
+  }
   return <aside aria-label="Studio navigation" className={`fixed inset-y-0 left-0 z-50 flex h-dvh flex-col overflow-hidden border-r-4 border-secondary bg-inverse-surface text-white transition-[width,transform] lg:relative lg:translate-x-0 ${compact ? 'lg:w-[76px]' : 'lg:w-[280px]'} ${mobileOpen ? 'w-[280px] translate-x-0' : 'w-[280px] -translate-x-full'}`}>
-    <div className="flex h-20 shrink-0 items-center justify-between border-b border-white/15 px-4">
-      <Link href="/" onClick={onClose} className="flex min-w-0 items-center gap-3"><Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media" width={100} height={64} className="h-12 w-12 object-contain" />{!compact && <span><strong className="block font-display text-lg">Kurasikapa</strong><small className="block text-[9px] font-bold tracking-[.16em] text-secondary uppercase">Newsroom studio</small></span>}</Link>
-      {mobileOpen && <button type="button" onClick={onClose} aria-label="Close navigation" className="p-2 text-white/70 lg:hidden"><StudioIcon name="close" /></button>}
-    </div>
-    <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">
-      {GROUPS.map((group) => <section key={group.heading} className="mb-5">{!compact && <p className="mb-2 px-3 text-[9px] font-bold tracking-[.18em] text-white/35 uppercase">{group.heading}</p>}<ul className="space-y-1">{group.items.map((item) => <NavLink key={item.href} item={item} active={active === item.href} compact={compact} onClose={onClose} />)}</ul></section>)}
-    </nav>
+    <div className="flex h-20 shrink-0 items-center justify-between border-b border-white/15 px-4"><Link href="/" onClick={close} className="flex min-w-0 items-center gap-3"><Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media" width={100} height={64} className="h-12 w-12 object-contain" />{!compact && <span><strong className="block font-display text-lg">Kurasikapa</strong><small className="block text-[9px] font-bold tracking-[.16em] text-secondary uppercase">Newsroom studio</small></span>}</Link>{mobileOpen && <button type="button" onClick={onClose} aria-label="Close navigation" className="p-2 text-white/70 lg:hidden"><StudioIcon name="close" /></button>}</div>
+    <nav ref={navigation} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">{GROUPS.map((group) => <section key={group.heading} className="mb-5">{!compact && <p className="mb-2 px-3 text-[9px] font-bold tracking-[.18em] text-white/35 uppercase">{group.heading}</p>}<ul className="space-y-1">{group.items.map((item) => <NavLink key={item.href} item={item} active={active === item.href} compact={compact} onClose={close} />)}</ul></section>)}</nav>
     <div className="shrink-0 border-t border-white/15 p-3">{!compact && <p className="mb-3 px-3 text-[10px] leading-4 text-white/45">Production workspace<br/><span className="text-secondary">Systems operational</span></p>}<SignOutButton /></div>
   </aside>
 }

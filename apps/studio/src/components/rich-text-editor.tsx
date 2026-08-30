@@ -27,10 +27,12 @@ export function RichTextEditor({
   body,
   editable,
   onBody,
+  showToolbar = true,
 }: {
   body: string
   editable: boolean
   onBody: (value: string) => void
+  showToolbar?: boolean
 }): React.ReactElement {
   const surface = useRef<HTMLDivElement>(null)
   const emitted = useRef<string | null>(null)
@@ -54,7 +56,7 @@ export function RichTextEditor({
 
   return (
     <>
-      <RichTextToolbar editable={editable} surface={surface} onApplied={emit} />
+      {showToolbar && <RichTextToolbar editable={editable} surface={surface} onApplied={emit} />}
       <div
         ref={surface}
         contentEditable={editable}

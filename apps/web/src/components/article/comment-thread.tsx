@@ -14,26 +14,26 @@ export async function CommentThread({
   const comments = page.items.map(toCommentView)
 
   return (
-    <section className="mt-14 border-t-4 border-primary bg-surface-container-lowest p-6 md:p-8" aria-labelledby="comments-heading">
-      <p className="eyebrow text-primary-ink mb-3">Community</p>
-      <h2 id="comments-heading" className="font-display text-on-surface text-3xl font-semibold tracking-[-0.03em]">
-        Comments
-      </h2>
+    <section className="mt-16 overflow-hidden border border-outline-variant bg-surface-container-lowest" aria-labelledby="comments-heading">
+      <header className="grid gap-5 border-b border-outline-variant bg-inverse-surface p-6 text-white md:grid-cols-[1fr_auto] md:items-end md:p-9">
+        <div><p className="eyebrow mb-3 text-secondary">Reader conversation</p><h2 id="comments-heading" className="font-display text-4xl font-semibold tracking-[-0.04em]">Join the discussion</h2><p className="mt-3 max-w-xl text-sm leading-relaxed text-white/60">Add context, ask a useful question, or share what this story means where you are.</p></div>
+        <p className="border-l-4 border-secondary pl-4 text-sm font-semibold">{comments.length} {comments.length === 1 ? 'contribution' : 'contributions'}</p>
+      </header>
+      <div className="p-6 md:p-9">
       {comments.length === 0 ? (
-        <p className="text-on-surface-variant mt-4 text-sm">No comments yet.</p>
+        <div className="my-6 border border-dashed border-outline-variant bg-surface-container-low p-6"><p className="font-display text-xl font-semibold text-on-surface">Start a thoughtful conversation.</p><p className="mt-2 text-sm text-on-surface-variant">There are no published responses yet. Your perspective can open the discussion.</p></div>
       ) : (
-        <ul className="mt-6 space-y-6">
-          {comments.map((comment) => (
-            <li key={comment.id}>
-              <time dateTime={comment.createdAt} className="text-on-surface-variant text-xs">
-                {comment.createdAt.slice(0, 10)}
-              </time>
-              <p className="text-on-surface mt-1 whitespace-pre-wrap">{comment.body}</p>
+        <ul className="my-7 divide-y divide-outline-variant border-y border-outline-variant">
+          {comments.map((comment, index) => (
+            <li key={comment.id} className="grid gap-4 py-6 sm:grid-cols-[3rem_1fr]">
+              <span aria-hidden className="grid size-12 place-items-center bg-primary font-display text-lg font-bold text-on-primary">{String(index + 1).padStart(2, '0')}</span>
+              <div><div className="flex flex-wrap items-center justify-between gap-2"><strong className="text-sm text-on-surface">Kurasikapa reader</strong><time dateTime={comment.createdAt} className="text-xs text-on-surface-variant">{comment.createdAt.slice(0, 10)}</time></div><p className="mt-3 whitespace-pre-wrap text-[1.05rem] leading-relaxed text-on-surface">{comment.body}</p></div>
             </li>
           ))}
         </ul>
       )}
       <CommentForm articleId={articleId} />
+      </div>
     </section>
   )
 }

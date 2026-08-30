@@ -66,7 +66,7 @@ function CadenceField({
         Cadence
       </legend>
       {(['daily', 'weekly'] as const).map((cadence) => (
-        <label key={cadence} className="text-on-surface mr-4 text-sm">
+        <label key={cadence} className="text-on-surface mr-2 inline-flex cursor-pointer items-center gap-3 border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm font-semibold has-[:checked]:border-primary has-[:checked]:bg-primary-container">
           <input
             type="radio"
             name="cadence"
@@ -74,8 +74,9 @@ function CadenceField({
             onChange={() => {
               onChange(cadence)
             }}
-            className="mr-2"
+            className="peer sr-only"
           />
+          <span aria-hidden className="grid size-5 place-items-center rounded-full border-2 border-outline text-[10px] text-transparent peer-checked:border-primary peer-checked:text-primary">●</span>
           {cadence === 'daily' ? 'Daily' : 'Weekly'}
         </label>
       ))}

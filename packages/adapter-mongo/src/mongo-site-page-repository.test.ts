@@ -12,16 +12,16 @@ afterAll(async () => { await mongo.stop() })
 
 describe('MongoSitePageRepository', () => {
   it('upserts and returns localized content', async () => {
-    const page = SitePage.create({ key: 'about', locale: 'en', title: 'About', lead: 'Our purpose', body: 'Independent reporting.', updatedAt: new Date('2026-08-30T20:00:00Z') })
+    const page = SitePage.create({ key: 'careers', locale: 'en', title: 'Careers', lead: 'Join us', body: 'Independent reporting.', updatedAt: new Date('2026-08-30T20:00:00Z') })
     await repo.save(page)
-    expect((await repo.find('about', 'en'))?.snapshot()).toEqual(page.snapshot())
-    expect(await repo.find('about', 'fr')).toBeNull()
+    expect((await repo.find('careers', 'en'))?.snapshot()).toEqual(page.snapshot())
+    expect(await repo.find('careers', 'fr')).toBeNull()
   })
 
   it('lists one locale in key order', async () => {
-    await repo.save(SitePage.create({ key: 'team', locale: 'en', title: 'Team', lead: '', body: 'People', updatedAt: new Date() }))
-    await repo.save(SitePage.create({ key: 'about', locale: 'en', title: 'About', lead: '', body: 'Purpose', updatedAt: new Date() }))
-    await repo.save(SitePage.create({ key: 'about', locale: 'fr', title: 'A propos', lead: '', body: 'Mission', updatedAt: new Date() }))
-    expect((await repo.list('en')).map((page) => page.snapshot().key)).toEqual(['about', 'team'])
+    await repo.save(SitePage.create({ key: 'faq', locale: 'en', title: 'FAQ', lead: '', body: 'Answers', updatedAt: new Date() }))
+    await repo.save(SitePage.create({ key: 'careers', locale: 'en', title: 'Careers', lead: '', body: 'Purpose', updatedAt: new Date() }))
+    await repo.save(SitePage.create({ key: 'careers', locale: 'fr', title: 'Carrières', lead: '', body: 'Mission', updatedAt: new Date() }))
+    expect((await repo.list('en')).map((page) => page.snapshot().key)).toEqual(['careers', 'faq'])
   })
 })

@@ -10,16 +10,15 @@ export function CommentForm({ articleId }: { articleId: string }): React.ReactEl
 
   return (
     <form
-      className="mt-6 space-y-3"
+      className="mt-7 border-t-4 border-secondary bg-surface-container-low p-5 md:p-7"
       onSubmit={(event) => {
         event.preventDefault()
         composer.submit()
       }}
     >
       <label className="block">
-        <span className="text-label-bold text-on-surface-variant text-[10px] uppercase">
-          Your comment
-        </span>
+        <span className="font-display text-xl font-semibold text-on-surface">Add your perspective</span>
+        <span className="mt-1 block text-sm text-on-surface-variant">Be specific, respectful and relevant to the reporting.</span>
         <textarea
           value={composer.body}
           onChange={(event) => {
@@ -27,15 +26,16 @@ export function CommentForm({ articleId }: { articleId: string }): React.ReactEl
           }}
           maxLength={MAX_COMMENT_BODY}
           rows={4}
-          className="border-outline-variant bg-surface mt-2 w-full rounded-xl border px-4 py-3"
+          placeholder="What would you add to this story?"
+          className="border-outline-variant bg-surface mt-4 w-full border px-4 py-4 leading-relaxed outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
         />
       </label>
       <button
         type="submit"
         disabled={composer.pending || composer.body.trim() === ''}
-        className="bg-primary text-on-primary hover:bg-on-primary-container rounded-full px-5 py-2.5 text-sm font-bold transition-colors disabled:opacity-60"
+        className="bg-primary text-on-primary hover:bg-on-primary-container mt-4 px-6 py-3 text-sm font-bold transition-colors disabled:opacity-60"
       >
-        {composer.pending ? 'Sending…' : 'Comment'}
+        {composer.pending ? 'Sending…' : 'Submit for review'}
       </button>
       {composer.error !== null && (
         <p role="status" className="text-error text-sm">

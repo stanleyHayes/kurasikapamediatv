@@ -29,7 +29,7 @@ function isOfflineReadable(pathname, search) {
   if (params.has('_rsc')) return false
   if (pathname.startsWith('/api/')) return false
   if (pathname.includes('/studio')) return false
-  if (pathname.includes('/sign-in') || pathname.includes('/two-factor')) return false
+  if (pathname.includes('/sign-in') || pathname.includes('/forgot-password') || pathname.includes('/two-factor')) return false
   if (pathname.includes('/profile') || pathname.includes('/newsletter')) return false
   if (pathname.startsWith('/_next/') && !pathname.startsWith('/_next/static/')) return false
   if (/^\/[a-z]{2}\/?$/u.test(pathname)) return true

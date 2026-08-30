@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { callAction } from '@kurasikapa/web-kit/actions/call'
 import { schedulePublicationAction } from '../actions/editorial'
 import { useRouter } from '@kurasikapa/web-kit/i18n/navigation'
+import { BrandedDateTime } from './branded-date-time'
 
 /**
  * The only date picker in the studio, for the one transition that needs a
@@ -44,15 +45,11 @@ export function ScheduleControl({ articleId }: { articleId: string }): React.Rea
 
   return (
     <span className="flex flex-wrap items-center gap-2">
-      <input
-        type="datetime-local"
-        aria-label="Publication date and time"
+      <BrandedDateTime
+        label="Publication date and time"
         value={at}
         disabled={pending}
-        onChange={(event) => {
-          setAt(event.target.value)
-        }}
-        className="border-outline-variant bg-surface-container-low rounded border px-3 py-2 text-sm"
+        onChange={setAt}
       />
 
       <button

@@ -1,6 +1,7 @@
 import {
   CompleteOAuthSignIn,
   CompleteSecondFactor,
+  ChangePassword,
   EnrolSecondFactor,
   RefreshSession,
   RegisterUser,
@@ -8,6 +9,7 @@ import {
   SignInWithPassword,
   SignInWithProvider,
   SignOut,
+  UpdateOwnProfile,
   type OAuthProvider,
 } from '@kurasikapa/application'
 import {
@@ -20,6 +22,7 @@ import {
   MongoCredentialRepository,
   MongoRateLimiter,
   MongoRefreshTokenRepository,
+  MongoUserDirectory,
 } from '@kurasikapa/adapter-mongo'
 import type { ExternalProvider } from '@kurasikapa/domain'
 import { cryptoIds, systemClock } from './ambient'
@@ -62,6 +65,9 @@ export interface AuthGraph {
    * a store the verifier does not read is a factor nobody is ever asked for.
    */
   readonly enrolSecondFactor: EnrolSecondFactor
+  readonly changePassword: ChangePassword
+  readonly updateOwnProfile: UpdateOwnProfile
+  readonly users: MongoUserDirectory
   /**
    * Exposed for the enrolment-confirmation route, which reads the enrolled
    * secret to check one code without issuing a session or consuming a counter.
@@ -95,6 +101,7 @@ function build(): AuthGraph {
   const db = mongoDb()
   const credentials = new MongoCredentialRepository(db)
   const refreshTokens = new MongoRefreshTokenRepository(db)
+  const users = new MongoUserDirectory(db)
   const limiter = new MongoRateLimiter(db, systemClock)
   const secrets = new NodeSecretGenerator()
   const passwords = new ScryptPasswordHasher()
@@ -108,7 +115,6 @@ function build(): AuthGraph {
     issuer: siteUrl(env()),
     audience: 'urn:kurasikapa:session',
   })
-
   const sessions = new SessionIssuer({
     tokens,
     refreshTokens,
@@ -116,28 +122,19 @@ function build(): AuthGraph {
     clock: systemClock,
     ids: cryptoIds,
   })
-
   return {
     tokens,
     totp,
     secrets,
     providers: configuredProviders(secrets),
-    ...useCases({ credentials, refreshTokens, limiter, secrets, passwords, totp, tokens, sessions }),
+    ...useCases({ credentials, refreshTokens, users, limiter, secrets, passwords, totp, tokens, sessions }),
   }
 }
 
 /** Split out purely to keep `build` under the 50-line function cap. */
 function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets' | 'providers'> {
-  const { credentials, refreshTokens, limiter, passwords, totp, tokens, sessions, secrets } = d
-
-  // Built first: `completeOAuthSignIn` wraps it, and the wrapper is the only
-  // way a route is meant to reach it.
-  const signInWithProvider = new SignInWithProvider({
-    credentials,
-    sessions,
-    clock: systemClock,
-    ids: cryptoIds,
-  })
+  const { credentials, refreshTokens, users, limiter, passwords, totp, tokens, sessions, secrets } = d
+  const signInWithProvider = new SignInWithProvider({ credentials, sessions, clock: systemClock, ids: cryptoIds })
 
   return {
     credentials,
@@ -177,12 +174,16 @@ function useCases(d: UseCaseDeps): Omit<AuthGraph, 'tokens' | 'totp' | 'secrets'
       clock: systemClock,
       issuer: 'Kurasikapa Media',
     }),
+    changePassword: new ChangePassword({ credentials, passwords, refreshTokens, clock: systemClock }),
+    updateOwnProfile: new UpdateOwnProfile(users),
+    users,
   }
 }
 
 interface UseCaseDeps {
   readonly credentials: MongoCredentialRepository
   readonly refreshTokens: MongoRefreshTokenRepository
+  readonly users: MongoUserDirectory
   readonly limiter: MongoRateLimiter
   readonly passwords: ScryptPasswordHasher
   readonly totp: Rfc6238Totp

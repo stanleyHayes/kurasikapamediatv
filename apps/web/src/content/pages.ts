@@ -36,6 +36,7 @@ export type PageKey =
   | 'about'
   | 'team'
   | 'contact'
+  | 'help'
   | 'faq'
   | 'advertise'
   | 'careers'
@@ -111,6 +112,18 @@ const EN: Readonly<Record<PageKey, StandingPage>> = {
         heading: 'Corrections',
         paragraphs: [
           'If you believe we have published something inaccurate, write to the newsroom address above. We correct the record openly — every article carries its revision history internally, and corrections are noted on the page.',
+        ],
+      },
+    ],
+  },
+
+  help: {
+    title: 'Help centre',
+    lead: 'Practical guidance for reading, accounts, newsletters and contacting the newsroom.',
+    sections: [
+      {
+        paragraphs: [
+          'Find answers about using Kurasikapa Media TV, managing your account and getting support from our team.',
         ],
       },
     ],

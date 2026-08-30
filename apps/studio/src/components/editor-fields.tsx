@@ -9,7 +9,7 @@ const FIELD =
 
 const TOGGLE = 'rounded border px-2 py-1 text-xs uppercase'
 
-type BodyMode = 'rich' | 'source'
+type BodyMode = 'rich' | 'source' | 'preview'
 
 export function EditorFields({
   title,
@@ -38,7 +38,7 @@ export function EditorFields({
         />
       </label>
 
-      <BodyField body={body} editable={editable} onBody={onBody} />
+      <MarkdownBodyField body={body} editable={editable} onBody={onBody} />
     </>
   )
 }
@@ -53,18 +53,13 @@ export function EditorFields({
  * stays one click away because markdown is the storage format and some
  * bodies will always need it.
  */
-function BodyField({
-  body,
-  editable,
-  onBody,
-}: {
+export function MarkdownBodyField({ body, editable, onBody }: {
   body: string
   editable: boolean
   onBody: (value: string) => void
 }): React.ReactElement {
   const textarea = useRef<HTMLTextAreaElement>(null)
   const [mode, setMode] = useState<BodyMode>('rich')
-
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -78,6 +73,13 @@ function BodyField({
             }}
           />
           <ModeButton
+            label="Preview"
+            active={mode === 'preview'}
+            onClick={() => {
+              setMode('preview')
+            }}
+          />
+          <ModeButton
             label="Markdown source"
             active={mode === 'source'}
             onClick={() => {
@@ -86,11 +88,14 @@ function BodyField({
           />
         </div>
       </div>
-
       {mode === 'rich' ? (
         <RichTextEditor body={body} editable={editable} onBody={onBody} />
-      ) : (
+      ) : mode === 'source' ? (
         <SourceEditor body={body} editable={editable} textarea={textarea} onBody={onBody} />
+      ) : (
+        <div className="border-outline-variant bg-surface min-h-[32rem] border p-6" aria-label="Article preview">
+          <RichTextEditor body={body} editable={false} showToolbar={false} onBody={onBody} />
+        </div>
       )}
     </div>
   )

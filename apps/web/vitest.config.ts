@@ -18,6 +18,7 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   'src/actions/reader-actions.ts',
   'src/actions/newsletter-actions.ts',
   'src/actions/contact-actions.ts',
+  'src/actions/account-actions.ts',
   'src/actions/push.ts',
   // Vendor client construction, browser-only — the same category as web-kit's
   // composition/auth.ts. Exercised by the auth E2E journey.

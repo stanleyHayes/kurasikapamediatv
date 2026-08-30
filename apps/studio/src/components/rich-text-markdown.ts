@@ -104,6 +104,8 @@ function topLevelToMarkdown(node: Node): string {
       return listToMarkdown(node, '-')
     case 'OL':
       return listToMarkdown(node, '1.')
+    case 'CODE':
+      return `\`${cleanText(node.textContent)}\``
     default:
       // P, DIV (Enter in a contenteditable), BLOCKQUOTE, and anything a
       // paste smuggled in: the public renderer shows their text, so the text

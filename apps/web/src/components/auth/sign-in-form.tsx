@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { rememberChallenge, signInWithPassword } from '../../lib/auth-client'
 import { AuthField } from './auth-field'
 import { SocialButtons } from './social-buttons'
@@ -63,6 +64,12 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
       <form action={submit} className="flex w-full flex-col gap-5">
         <AuthField label="Email" name="email" type="email" autoComplete="email" placeholder="you@example.com" icon="email" />
         <AuthField label="Password" name="password" type="password" autoComplete="current-password" placeholder="Enter your password" icon="lock" />
+        <Link
+          href="/forgot-password"
+          className="text-primary-ink -mt-2 self-end text-sm font-semibold underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary"
+        >
+          Forgot password?
+        </Link>
         {props.captchaSiteKey !== undefined && (
           <TurnstileField siteKey={props.captchaSiteKey} onToken={setCaptcha} />
         )}

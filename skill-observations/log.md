@@ -182,3 +182,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Keep approved repository copy as a temporary read fallback, seed it into the CMS collection, then browser-test the complete editor save to public-page render loop before removing the fallback in a later content migration.
 
 **Principle:** A CMS migration is complete only when approved content survives the cutover and an editor-authored change reaches the public route.
+
+### Observation 12: Brand systems must own compound form controls
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A polished newsroom interface still exposed operating-system dropdown and date-picker surfaces when controls opened.
+**Skill:** frontend-design
+**Type:** open-source
+**Phase/Area:** Form-control design systems
+
+**Issue:** Styling the closed native select did not style its open menu, and native date-time controls introduced a second visual language at the exact moment an editor made a consequential choice.
+
+**Suggested improvement:** Inventory select, radio, checkbox, date and time controls as a dedicated design-system pass; use accessible hidden form semantics behind branded visible controls and verify both closed and open states in the browser.
+
+**Principle:** A branded form control is not complete until its interaction state belongs to the same visual system as its resting state.

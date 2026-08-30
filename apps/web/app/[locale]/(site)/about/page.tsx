@@ -1,6 +1,6 @@
-import { standingRoute } from '@/content/standing-route'
+import { staticStandingRoute } from '@/content/standing-route'
 
-const route = standingRoute('about', 'about')
+const route = staticStandingRoute('about', 'about')
 
 export const generateMetadata = route.generateMetadata
 export default route.Page

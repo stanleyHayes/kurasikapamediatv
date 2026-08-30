@@ -5,7 +5,7 @@ import type { DirectoryUser, UserDirectory } from '../ports/user-directory'
 export class InMemoryUserDirectory implements UserDirectory {
   readonly calls: Cursor[] = []
 
-  constructor(private readonly users: readonly DirectoryUser[] = []) {}
+  constructor(private readonly users: DirectoryUser[] = []) {}
 
   list(cursor: Cursor): Promise<Page<DirectoryUser>> {
     this.calls.push(cursor)
@@ -14,5 +14,12 @@ export class InMemoryUserDirectory implements UserDirectory {
 
   findById(id: UserId): Promise<DirectoryUser | null> {
     return Promise.resolve(this.users.find((row) => row.id === id) ?? null)
+  }
+
+  updateName(id: UserId, name: string): Promise<void> {
+    const index = this.users.findIndex((row) => row.id === id)
+    const current = this.users[index]
+    if (current !== undefined) this.users[index] = { ...current, name }
+    return Promise.resolve()
   }
 }

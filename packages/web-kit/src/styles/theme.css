@@ -86,6 +86,38 @@
 
 @layer base {
   :root { color-scheme: light; }
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --color-surface: #07110a;
+    --color-surface-dim: #050d07;
+    --color-surface-container-lowest: #101d13;
+    --color-surface-container-low: #142318;
+    --color-surface-container: #1a2a1e;
+    --color-surface-container-high: #233427;
+    --color-surface-container-highest: #304235;
+    --color-on-surface: #f4f2e9;
+    --color-on-surface-variant: #b9c6bb;
+    --color-outline: #7f9182;
+    --color-outline-variant: #34483a;
+    --color-primary-ink: #7bdb90;
+    --color-secondary-ink: #ffc85b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme='system'] {
+      color-scheme: dark;
+      --color-surface: #07110a;
+      --color-surface-container-lowest: #101d13;
+      --color-surface-container-low: #142318;
+      --color-surface-container: #1a2a1e;
+      --color-surface-container-high: #233427;
+      --color-on-surface: #f4f2e9;
+      --color-on-surface-variant: #b9c6bb;
+      --color-outline: #7f9182;
+      --color-outline-variant: #34483a;
+      --color-primary-ink: #7bdb90;
+      --color-secondary-ink: #ffc85b;
+    }
+  }
   * { border-color: var(--color-outline-variant); }
   html { scroll-behavior: smooth; background: var(--color-surface); }
   body {

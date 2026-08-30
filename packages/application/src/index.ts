@@ -42,6 +42,8 @@ export {
   type ListUsersInput,
 } from './identity/list-users'
 export { ResolvePublicByline, publicBylineName, type ResolvePublicBylineInput } from './identity/resolve-public-byline'
+export { UpdateOwnProfile, type UpdateOwnProfileInput } from './identity/update-own-profile'
+export { ChangePassword, PasswordChangeRejected, type ChangePasswordInput } from './identity/change-password'
 export {
   ListSections,
   type ListSectionsDeps,

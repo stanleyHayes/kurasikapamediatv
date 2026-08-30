@@ -2,7 +2,7 @@ import type { Actor } from '@kurasikapa/domain'
 import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import { AccountCards } from '@/components/profile/account-cards'
+import { AccountSettings } from '@/components/profile/account-settings'
 import {
   ReadingHistory,
   type ReadArticleView,
@@ -10,6 +10,7 @@ import {
 import { SavedList, type SavedArticleView } from '@/components/profile/saved-list'
 import { currentActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
+import { authGraph } from '@kurasikapa/web-kit/composition/auth-graph'
 
 interface Params {
   params: Promise<{ locale: string }>
@@ -40,6 +41,10 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
   if (actor === null) redirect(`/${locale}/sign-in`)
 
   const library = await loadLibrary(actor)
+  const [user, credential] = await Promise.all([
+    authGraph().users.findById(actor.id),
+    authGraph().credentials.findByUserId(actor.id),
+  ])
   const now = new Date().toISOString()
 
   return (
@@ -67,7 +72,7 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
 
       <ReadingHistory articles={library.history} now={now} />
 
-      <AccountCards />
+      <AccountSettings name={user?.name ?? 'Kurasikapa reader'} email={user?.email ?? credential?.email.value ?? ''} locale={locale} />
     </>
   )
 }

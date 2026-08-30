@@ -27,6 +27,7 @@ export function shouldRegisterServiceWorker(nodeEnv: string): boolean {
 function isPrivateReaderPath(pathname: string): boolean {
   return (
     pathname.includes('/sign-in') ||
+    pathname.includes('/forgot-password') ||
     pathname.includes('/two-factor') ||
     pathname.includes('/profile') ||
     pathname.includes('/newsletter')

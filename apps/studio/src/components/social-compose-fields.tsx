@@ -1,5 +1,8 @@
 'use client'
 
+import { BrandedDateTime } from './branded-date-time'
+import { BrandedSelect } from './branded-select'
+
 export const PLATFORMS = [
   { id: 'facebook', label: 'Facebook' },
   { id: 'instagram', label: 'Instagram' },
@@ -20,21 +23,13 @@ export function ArticlePicker({
   return (
     <label className="flex flex-col gap-1">
       <span className="text-label-bold text-on-surface-variant uppercase">Article</span>
-      <select
+      <BrandedSelect
         name="articleId"
-        required
         value={value}
-        onChange={(event) => {
-          onChange(event.target.value)
-        }}
-        className={FIELD}
-      >
-        {articles.map((article) => (
-          <option key={article.id} value={article.id}>
-            {article.title}
-          </option>
-        ))}
-      </select>
+        label="Article"
+        onChange={onChange}
+        options={articles.map((article) => ({ value: article.id, label: article.title }))}
+      />
     </label>
   )
 }
@@ -79,7 +74,7 @@ export function ScheduleField(): React.ReactElement {
   return (
     <label className="flex flex-col gap-1">
       <span className="text-label-bold text-on-surface-variant uppercase">Publish at</span>
-      <input type="datetime-local" name="scheduledAt" required className={FIELD} />
+      <BrandedDateTime name="scheduledAt" label="Publish date and time" />
     </label>
   )
 }

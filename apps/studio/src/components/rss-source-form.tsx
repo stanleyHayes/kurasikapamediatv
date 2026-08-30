@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { registerRssSourceAction } from '../actions/rss'
 import { callAction } from '@kurasikapa/web-kit/actions/call'
+import { BrandedSelect } from './branded-select'
 
 export function RssSourceForm({
   locale,
@@ -38,6 +39,7 @@ function RssFields({
   categories: readonly { id: string; name: string }[]
   pending: boolean
 }): React.ReactElement {
+  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '')
   return (
     <>
       <label className="block">
@@ -50,20 +52,16 @@ function RssFields({
           className="border-outline-variant mt-1 w-full border bg-transparent px-3 py-2"
         />
       </label>
-      <label className="block">
+      <div className="block">
         <span className="text-label-bold text-on-surface-variant text-xs uppercase">Section</span>
-        <select
+        <div className="mt-1"><BrandedSelect
           name="categoryId"
-          required
-          className="border-outline-variant mt-1 w-full border bg-transparent px-3 py-2"
-        >
-          {categories.map((row) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          value={categoryId}
+          onChange={setCategoryId}
+          label="Section"
+          options={categories.map((row) => ({ value: row.id, label: row.name }))}
+        /></div>
+      </div>
       <button
         type="submit"
         disabled={pending || categories.length === 0}
