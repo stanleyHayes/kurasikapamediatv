@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "//": "Paths carry the /studio basePath: Next serves API routes under it too, so a bare /api/cron/... would 404 and the schedule would silently never publish anything.",
   "crons": [
     {
       "path": "/studio/api/cron/publish-due",

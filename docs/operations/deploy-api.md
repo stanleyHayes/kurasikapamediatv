@@ -8,14 +8,15 @@ unset `API_URL` keeps the TypeScript path.
 
 1. In Render, choose **New → Blueprint** and point it at this repo. It will
    read [`render.yaml`](../../render.yaml).
-2. The blueprint creates one Docker web service (`kurasikapa-api`) from
+2. The blueprint creates one Docker web service (`kurasikapa-media-api`) from
    `services/api/Dockerfile`. Health check: `GET /healthz`.
 3. In the service's **Environment** tab, set:
    - `MONGODB_URI` — Atlas connection string (replica set).
    - `MONGODB_DB` — `kurasikapa` (default; only override for a different DB).
    - `CRON_SECRET` — a random bearer token for the cron guard. Leave unset to
      refuse every scheduled request.
-   - `PORT` — Render sets this; the blueprint pins `8080`.
+   - `PORT` — do not set this manually. Render injects the port that its edge
+     proxy routes to, and the API reads it at startup.
 4. Deploy. Wait for the health check to pass. At startup the API creates the
    Mongo indexes it depends on (`articles`, `categories`, `article_revisions`)
    and refuses to serve if the unique ones cannot be built — a first deploy
@@ -24,20 +25,21 @@ unset `API_URL` keeps the TypeScript path.
 ## 2. Point the web app at it
 
 In Vercel, set `API_URL` to the Render service URL (e.g.
-`https://kurasikapa-api.onrender.com`) and redeploy. No code change is needed.
+`https://kurasikapa-media-api.onrender.com`) and redeploy. No code change is needed.
 
 ## 3. Smoke-check the cut-over
 
 Run [`scripts/smoke-api.sh`](../../scripts/smoke-api.sh), which checks:
 
 - `GET $API_URL/healthz` → `200`
-- `POST $API_URL/api/articles` without a session → `403`
-- `POST $API_URL/api/cron/publish-due` with the wrong secret → `401`/`403`.
-- `POST $API_URL/api/cron/publish-due` with the right secret → `200` (skipped
+- `POST $API_URL/articles` without a session → `403`
+- `POST $API_URL/internal/publish-due` with the wrong secret → `404` (the
+  protected route is deliberately hidden).
+- `POST $API_URL/internal/publish-due` with the right secret → `200` (skipped
   unless `CRON_SECRET` is set).
 
 ```sh
-API_URL=https://kurasikapa-api.onrender.com CRON_SECRET=... scripts/smoke-api.sh
+API_URL=https://kurasikapa-media-api.onrender.com CRON_SECRET=... scripts/smoke-api.sh
 ```
 
 Then, in the studio, create a draft, submit it, approve it, publish it, and

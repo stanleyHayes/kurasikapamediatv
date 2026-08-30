@@ -24,6 +24,7 @@ test-results/
 # secrets — never commit any of these
 .env
 .env.*
+.vercel/
 !.env.example
 *.pem
 *.key

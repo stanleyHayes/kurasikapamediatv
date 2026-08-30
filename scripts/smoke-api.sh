@@ -3,11 +3,11 @@
 # Mirrors docs/operations/deploy-api.md §3.
 #
 # Usage:
-#   API_URL=https://kurasikapa-api.onrender.com scripts/smoke-api.sh
+#   API_URL=https://kurasikapa-media-api.onrender.com scripts/smoke-api.sh
 #   CRON_SECRET=... API_URL=... scripts/smoke-api.sh   # also tests the cron happy path
 set -euo pipefail
 
-: "${API_URL:?set API_URL to the deployed service, e.g. https://kurasikapa-api.onrender.com}"
+: "${API_URL:?set API_URL to the deployed service, e.g. https://kurasikapa-media-api.onrender.com}"
 
 fail=0
 
@@ -32,15 +32,15 @@ else
   fail=1
 fi
 
-check "POST /api/articles without a session" "403" \
-  "$API_URL/api/articles" -H 'Content-Type: application/json' -d '{}'
+check "POST /articles without a session" "403" \
+  "$API_URL/articles" -H 'Content-Type: application/json' -d '{}'
 
-check "POST /api/cron/publish-due with wrong secret" "401 403" \
-  "$API_URL/api/cron/publish-due" -H 'Authorization: Bearer wrong-secret'
+check "POST /internal/publish-due with wrong secret" "404" \
+  "$API_URL/internal/publish-due" -H 'Authorization: Bearer wrong-secret'
 
 if [[ -n "${CRON_SECRET:-}" ]]; then
-  check "POST /api/cron/publish-due with right secret" "200" \
-    "$API_URL/api/cron/publish-due" -H "Authorization: Bearer $CRON_SECRET"
+  check "POST /internal/publish-due with right secret" "200" \
+    "$API_URL/internal/publish-due" -H "Authorization: Bearer $CRON_SECRET"
 else
   echo "SKIP  cron happy path (CRON_SECRET unset)"
 fi
