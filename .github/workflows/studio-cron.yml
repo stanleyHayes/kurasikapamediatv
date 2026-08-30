@@ -1,0 +1,47 @@
+name: Studio schedules
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-schedules-${{ github.event.schedule || 'manual' }}
+  cancel-in-progress: false
+
+env:
+  STUDIO_ORIGIN: https://kurasikapa-studio-hayfordstanleys-projects.vercel.app
+
+jobs:
+  publishing:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/5 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish due articles
+        run: >-
+          curl --fail-with-body --silent --show-error --retry 3
+          --request POST
+          --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          "$STUDIO_ORIGIN/studio/api/cron/publish-due"
+
+      - name: Publish due social posts
+        run: >-
+          curl --fail-with-body --silent --show-error --retry 3
+          --request POST
+          --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          "$STUDIO_ORIGIN/studio/api/cron/publish-due-posts"
+
+  rss-ingest:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '7 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ingest RSS sources
+        run: >-
+          curl --fail-with-body --silent --show-error --retry 3
+          --request POST
+          --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          "$STUDIO_ORIGIN/studio/api/cron/ingest-rss"

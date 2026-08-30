@@ -48,7 +48,16 @@ load the public article page. All should come from the Go service.
 If any step fails, unset `API_URL` to fall back to the TypeScript path, fix,
 and try again.
 
-## 4. Delete the TypeScript editorial packages
+## 4. Scheduled Studio work
+
+The Vercel Hobby plan only permits daily cron jobs, which is too slow for
+scheduled news publication. [studio-cron.yml](../../.github/workflows/studio-cron.yml)
+runs the protected Studio endpoints instead: publication and social delivery
+every five minutes, and RSS ingestion hourly. Add `CRON_SECRET` as a GitHub
+Actions repository secret with the same value configured in Studio and Render.
+The workflow also supports a manual run for deployment verification.
+
+## 5. Delete the TypeScript editorial packages
 
 Only after the smoke-check above is green and the Go API is the only live
 path, remove:

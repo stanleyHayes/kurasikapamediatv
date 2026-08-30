@@ -827,8 +827,9 @@ and the legal pages' wording, and everything in R2–R5. Two new items:
 
 ## 14. KUR-70 — first production deployment (2026-08-30)
 
-**Status: IN PROGRESS — Render and public web are live; studio and custom DNS
-have external account-level blockers.**
+**Status: IN PROGRESS — Render and public web are live; Studio scheduling has
+a Hobby-compatible implementation; Studio deployment and custom DNS remain to
+be verified.**
 
 - Render `kurasikapa-media-api` is live on the Starter plan in Frankfurt at
   `https://kurasikapa-media-api.onrender.com`. The deployed commit is
@@ -841,10 +842,10 @@ have external account-level blockers.**
   public production projects.
 - Public web is deployed from `feature/KUR-70-production-deployment` and serves
   HTTP 200 at `https://kurasikapa-web-hayfordstanleys-projects.vercel.app/en`.
-- Studio deployment is blocked by the Vercel Hobby cron limit: its required
-  every-minute schedules are rejected because Hobby permits daily crons only.
-  Decision required: upgrade the Vercel workspace to Pro, or explicitly accept
-  a reduced/external scheduling design.
+- Vercel Hobby rejects sub-daily cron definitions. KUR-70 therefore moves the
+  protected Studio schedules to `.github/workflows/studio-cron.yml`: publishing
+  and social delivery every five minutes, RSS ingestion hourly, plus manual
+  dispatch. The GitHub `CRON_SECRET` must match Studio and Render.
 - `kurasikapa.tv` and `studio.kurasikapa.tv` are attached to their projects,
   but DNS is not configured. Required external DNS records are apex A records
   `216.198.79.1` and `64.29.17.1`, plus `studio` CNAME
