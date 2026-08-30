@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
+import { EditorialEmptyState } from '@/components/editorial-empty-state'
 import { LeadStory } from '@/components/section/lead-story'
 import { SectionCard } from '@/components/section/section-card'
 import { SectionSidebar } from '@/components/section/section-sidebar'
@@ -64,7 +65,7 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
       </header>
 
       {lead === undefined ? (
-        <p className="text-on-surface-variant">Nothing published in this section yet.</p>
+        <EditorialEmptyState surface="section" sectionName={section.name} />
       ) : (
         <div className="grid grid-cols-1 gap-[var(--space-lg)] lg:grid-cols-12">
           <div className="flex flex-col gap-12 md:gap-16 lg:col-span-8">

@@ -1,7 +1,8 @@
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 interface EditorialEmptyStateProps {
-  readonly surface: 'home' | 'news'
+  readonly surface: 'home' | 'news' | 'section'
+  readonly sectionName?: string | undefined
 }
 
 const expectations = [
@@ -12,8 +13,12 @@ const expectations = [
 
 export function EditorialEmptyState({
   surface,
+  sectionName,
 }: EditorialEmptyStateProps): React.ReactElement {
   const isHome = surface === 'home'
+  const headline = surface === 'section' && sectionName !== undefined
+    ? `${sectionName} reporting is underway.`
+    : isHome ? 'The first edition is taking shape.' : 'Reporting is underway.'
 
   return (
     <section className="signal-grid relative isolate overflow-hidden border-y-4 border-on-surface bg-surface-container-lowest text-on-surface">
@@ -30,7 +35,7 @@ export function EditorialEmptyState({
           </div>
 
           <h1 className="max-w-[11ch] font-display text-5xl font-semibold leading-[0.92] tracking-[-0.05em] md:text-[length:var(--text-display-lg)]">
-            {isHome ? 'The first edition is taking shape.' : 'Reporting is underway.'}
+            {headline}
           </h1>
           <p className="mt-7 max-w-2xl border-l-4 border-secondary pl-5 text-[length:var(--text-body-lg)] leading-relaxed text-on-surface-variant">
             Our editors are preparing Kurasikapa&apos;s opening stories. This page will update the
