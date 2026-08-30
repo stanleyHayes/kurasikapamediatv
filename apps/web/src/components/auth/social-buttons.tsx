@@ -30,7 +30,7 @@ export function SocialButtons({
         <a
           key={provider}
           href={`/api/oauth/${provider}`}
-          className="border-outline-variant hover:border-primary hover:text-primary flex h-12 w-full items-center justify-center rounded-xl border px-4 text-sm font-semibold transition-colors"
+          className="border-outline-variant hover:border-primary hover:text-primary flex h-12 w-full items-center justify-center border px-4 text-sm font-semibold transition-colors"
         >
           Continue with {LABEL[provider]}
         </a>

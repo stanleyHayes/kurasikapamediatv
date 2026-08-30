@@ -80,6 +80,8 @@ const schema = z.object({
    * is not a reason to make it so.
    */
   CRON_SECRET: z.string().min(32).optional(),
+  /** One-use production bootstrap guard. Never retained after bootstrap. */
+  BOOTSTRAP_SECRET: z.string().min(32).optional(),
 
   /**
    * Base URL for the Go API (ADR-0009 BFF seam).

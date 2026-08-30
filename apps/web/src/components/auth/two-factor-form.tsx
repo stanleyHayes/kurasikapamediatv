@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { completeSecondFactor, takeChallenge } from '../../lib/auth-client'
 
 const FIELD =
-  'h-14 w-full border-outline-variant bg-surface-container-lowest text-on-surface rounded-xl border px-4 text-center text-xl tracking-[0.35em] outline-none transition-colors'
+  'h-14 w-full border-outline-variant bg-surface-container-lowest text-on-surface border px-4 text-center text-xl tracking-[0.35em] outline-none transition-colors'
 
 /**
  * Completes a sign-in that stopped for TOTP.
@@ -64,7 +64,7 @@ export function TwoFactorForm({ destination }: { destination: string }): React.R
 
       <button
         type="submit"
-        className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full rounded-xl px-5 text-sm font-bold transition-colors"
+        className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-colors"
       >
         Verify
       </button>

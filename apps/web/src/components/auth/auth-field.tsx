@@ -23,7 +23,7 @@ export function AuthField(props: AuthFieldProps): React.ReactElement {
   return (
     <label htmlFor={id} className="flex w-full flex-col gap-2">
       <span className="text-sm font-semibold text-on-surface">{props.label}</span>
-      <span className="border-outline-variant bg-surface-container-lowest focus-within:border-primary focus-within:ring-primary/15 flex h-13 items-center rounded-xl border transition-[border-color,box-shadow] focus-within:ring-4">
+      <span className="border-outline-variant bg-surface-container-lowest focus-within:border-primary focus-within:ring-primary/15 flex h-13 items-center border transition-[border-color,box-shadow] focus-within:ring-4">
         <FieldIcon name={props.icon} />
         <input
           id={id}
@@ -33,7 +33,7 @@ export function AuthField(props: AuthFieldProps): React.ReactElement {
           placeholder={props.placeholder}
           required
           {...(props.minLength === undefined ? {} : { minLength: props.minLength })}
-          className="h-full min-w-0 flex-1 bg-transparent px-1 text-on-surface outline-none placeholder:text-on-surface-variant/55"
+          className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent px-1 text-on-surface outline-none placeholder:text-on-surface-variant/55 focus:ring-0"
         />
         {isPassword && (
           <button
@@ -43,7 +43,7 @@ export function AuthField(props: AuthFieldProps): React.ReactElement {
             onClick={() => {
               setRevealed((visible) => !visible)
             }}
-            className="text-on-surface-variant hover:text-primary focus-visible:ring-primary mr-2 grid size-10 place-items-center rounded-lg outline-none transition-colors focus-visible:ring-2"
+            className="text-on-surface-variant hover:text-primary focus-visible:ring-primary mr-2 grid size-10 place-items-center outline-none transition-colors focus-visible:ring-2"
           >
             <EyeIcon crossed={revealed} />
           </button>

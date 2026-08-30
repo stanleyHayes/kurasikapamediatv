@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { completeSecondFactor, enrolSecondFactor } from '../../lib/auth-client'
 
 const FIELD =
-  'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface rounded border px-3 py-2 outline-none transition-colors'
+  'border-outline-variant focus:border-secondary bg-surface-container-lowest text-on-surface border px-3 py-2 outline-none transition-colors'
 
 const FAILED_ENABLE = 'Could not start two-factor. Check your password.'
 const FAILED_CODE = 'That code was not accepted.'
@@ -40,7 +40,7 @@ export function TwoFactorSettings(): React.ReactElement {
         onClick={() => {
           void enableTwoFactor(password, setTotpURI, setBackup, setMessage)
         }}
-        className="bg-primary text-on-primary text-label-bold rounded px-3 py-2 uppercase"
+        className="bg-primary text-on-primary text-label-bold px-3 py-2 uppercase"
       >
         Enable two-factor
       </button>
@@ -130,7 +130,7 @@ function Setup({
         onClick={() => {
           void onVerify()
         }}
-        className="border-outline-variant text-label-bold rounded border px-3 py-2 uppercase"
+        className="border-outline-variant text-label-bold border px-3 py-2 uppercase"
       >
         Confirm code
       </button>

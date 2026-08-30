@@ -73,7 +73,7 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
         )}
         <button
           type="submit"
-          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full rounded-xl px-5 text-sm font-bold transition-colors"
+          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-colors"
         >
           Sign in
         </button>

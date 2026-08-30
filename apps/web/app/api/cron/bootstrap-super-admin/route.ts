@@ -18,7 +18,7 @@ interface Body {
  * normalisation and duplicate handling remain exactly the production rules.
  */
 export async function POST(request: Request): Promise<Response> {
-  if (!isAuthorisedCron(request, env().CRON_SECRET)) {
+  if (!isAuthorisedCron(request, env().BOOTSTRAP_SECRET)) {
     return new Response(null, { status: 404 })
   }
 
