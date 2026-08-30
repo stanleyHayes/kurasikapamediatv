@@ -9,5 +9,11 @@
       "path": "/api/cron/send-digest/weekly",
       "schedule": "0 8 * * 1"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/studio/:path*",
+      "destination": "https://kurasikapa-studio-hayfordstanleys-projects.vercel.app/studio/:path*"
+    }
   ]
 }

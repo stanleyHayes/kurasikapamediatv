@@ -3,12 +3,12 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/studio/en",
+      "destination": "https://kurasikapa-web-hayfordstanleys-projects.vercel.app/studio/en",
       "permanent": false
     },
     {
       "source": "/studio",
-      "destination": "/studio/en",
+      "destination": "https://kurasikapa-web-hayfordstanleys-projects.vercel.app/studio/en",
       "permanent": false
     }
   ]
