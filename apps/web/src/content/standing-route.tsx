@@ -42,7 +42,7 @@ export function standingRoute(
       const { locale } = await params
       setRequestLocale(locale)
 
-      return <StandingPageView page={await cmsPageFor(key, locale)} pageKey={key} />
+      return <StandingPageView page={await cmsPageFor(key, locale)} pageKey={key} locale={locale} />
     },
   }
 }
@@ -65,7 +65,7 @@ export function staticStandingRoute(
     Page: async ({ params }: StandingParams): Promise<React.ReactElement> => {
       const { locale } = await params
       setRequestLocale(locale)
-      return <StandingPageView page={pageFor(key, locale)} />
+      return <StandingPageView page={pageFor(key, locale)} pageKey={key} locale={locale} />
     },
   }
 }

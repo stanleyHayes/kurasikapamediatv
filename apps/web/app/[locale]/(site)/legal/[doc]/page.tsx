@@ -34,5 +34,5 @@ export default async function LegalPage({ params }: Params): Promise<React.React
 
   if (!isLegal(doc)) notFound()
 
-  return <StandingPageView page={pageFor(doc, locale)} />
+  return <StandingPageView page={pageFor(doc, locale)} pageKey={doc} locale={locale} />
 }

@@ -5,6 +5,7 @@ const KEYS: PageKey[] = [
   'about',
   'team',
   'contact',
+  'help',
   'faq',
   'advertise',
   'careers',
@@ -79,7 +80,7 @@ describe('provisional copy is declared, not hidden', () => {
     },
   )
 
-  it.each<PageKey>(['about', 'contact', 'faq'])('%s is not flagged', (key) => {
+  it.each<PageKey>(['about', 'contact', 'help', 'faq'])('%s is not flagged', (key) => {
     expect(pageFor(key, 'en').needsClientCopy).toBeUndefined()
   })
 })

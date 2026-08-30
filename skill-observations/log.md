@@ -197,3 +197,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Inventory select, radio, checkbox, date and time controls as a dedicated design-system pass; use accessible hidden form semantics behind branded visible controls and verify both closed and open states in the browser.
 
 **Principle:** A branded form control is not complete until its interaction state belongs to the same visual system as its resting state.
+
+### Observation 13: Related information pages still need distinct jobs
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A suite of public information pages was visually polished through one shared renderer, but user review still found the whole suite unsatisfying.
+**Skill:** redesign-existing-projects
+**Type:** open-source
+**Phase/Area:** Multi-page redesign systems
+
+**Issue:** Improving a shared template propagated better styling but also propagated the same hierarchy, density and storytelling pattern to every page, making functionally different destinations feel interchangeable.
+
+**Suggested improvement:** During the design audit, assign each related route a specific reader job and a route-specific content module before building shared visual primitives; verify at least one company, support and policy page in rendered form.
+
+**Principle:** A coherent page family should share visual grammar, not an identical content composition.

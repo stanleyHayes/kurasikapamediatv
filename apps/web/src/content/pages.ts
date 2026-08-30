@@ -91,7 +91,7 @@ const EN: Readonly<Record<PageKey, StandingPage>> = {
     sections: [
       {
         paragraphs: [
-          'Profiles for our editorial board and journalists are being prepared. Bylines on every article already link to their author.',
+          'Our newsroom brings together editors, reporters, producers and audience specialists around one standard: make every story useful, fair and accountable. Individual bylines connect each published article to the journalist responsible for it.',
         ],
       },
     ],
