@@ -80,8 +80,6 @@ const schema = z.object({
    * is not a reason to make it so.
    */
   CRON_SECRET: z.string().min(32).optional(),
-  /** One-use navigation taxonomy seed guard. Removed after production seeding. */
-  TAXONOMY_SEED_SECRET: z.string().min(32).optional(),
 
   /**
    * Base URL for the Go API (ADR-0009 BFF seam).

@@ -869,3 +869,22 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Public sign-in and registration fields now share one accessible input
   treatment with leading semantic icons, task-specific placeholders, visible
   focus treatment, and a trailing show/hide control on password fields.
+
+## 15. KUR-71 — production news navigation (2026-08-30)
+
+**Status: DEPLOYED — bilingual local-to-global navigation is live.**
+
+- Replaced the four-link hard-coded menu with a newsroom hierarchy: Latest,
+  Ghana, Africa, World, Politics, Business and Sports, with Education, Health,
+  Technology, Culture, Entertainment, Lifestyle, Opinion and Editorial under
+  More. This follows the locality-to-world and core-desk pattern used by
+  established Ghanaian and international newsrooms without copying their UI.
+- Every label and section slug is locale-aware. French links use `politique`,
+  `economie`, `afrique`, `monde`, `sante`, `technologie`, `divertissement` and
+  `art-de-vivre` rather than sending French readers to English soft-404s.
+- Desktop, utility and mobile navigation now use route-derived active states,
+  visible high-contrast treatments and `aria-current="page"`. The misleading
+  nonfunctional Live item was removed until a real live destination exists.
+- Production now has the 14 root-level bilingual section records. They were
+  written through an idempotent, one-use secret-protected seed and the route
+  and secret were removed immediately afterward.

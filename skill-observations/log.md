@@ -79,3 +79,18 @@ resolved statuses always carry their resolution date
 **Principle:** A deployment is reachable only when its natural entrypoints lead users to the working application.
 
 2026-08-30 completion checkpoint: no new reusable skill observation; the auth-field request was a bounded application of existing accessible form guidance.
+
+### Observation 5: Navigation audits must validate destination content, not status alone
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A production news navbar returned HTTP 200 for hard-coded section links while rendering the application's soft-404 page because the production taxonomy was empty.
+**Skill:** New skill candidate: production navigation audit
+**Type:** open-source
+**Phase/Area:** Route verification
+
+**Issue:** Status-only link checks classified soft 404s as healthy and missed locale-specific slugs that resolved in one language but not another.
+
+**Suggested improvement:** For every navigation link, verify the final URL, expected landmark or heading, active-state semantics and localized slug in each supported locale; treat soft-404 content as a broken destination even when transport status is 200.
+
+**Principle:** A navigation endpoint is valid only when it renders the intended destination in every supported locale.
