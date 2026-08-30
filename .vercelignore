@@ -1,0 +1,16 @@
+.git
+.vercel
+**/.next
+**/node_modules
+**/coverage
+**/.turbo
+**/playwright-report
+**/test-results
+**/.jscpd
+**/*.tsbuildinfo
+services/api/coverage*.out
+stitch_kurasikapa_ai_media_platform
+stitch_kurasikapa_ai_media_platform.zip
+.env
+.env.*
+!.env.example
