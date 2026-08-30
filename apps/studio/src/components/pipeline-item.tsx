@@ -24,7 +24,7 @@ export function PipelineItem({
   const live = draft.status === 'published'
 
   return (
-    <li
+    <div
       className={`editorial-card relative grid items-center gap-4 border-b border-outline-variant bg-surface-container-lowest p-4 transition-colors sm:grid-cols-[3.5rem_1fr_auto] ${
         live ? 'border-secondary/20' : ''
       }`}
@@ -65,6 +65,6 @@ export function PipelineItem({
       <span className="text-label-bold shrink-0 border border-outline-variant px-3 py-2 text-on-surface-variant uppercase">
         {draft.status === 'published' ? 'View ↗' : 'Open ↗'}
       </span>
-    </li>
+    </div>
   )
 }

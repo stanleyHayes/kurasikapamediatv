@@ -5,6 +5,7 @@ import { type Metric, MetricCards } from '@/components/metric-cards'
 import { MemberRow } from '@/components/member-row'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
+import { CollectionView } from '@/components/collection-view'
 
 interface Person {
   readonly id: string
@@ -94,11 +95,7 @@ function MembersTable({
       {people.length === 0 ? (
         <p className="text-on-surface-variant p-6">Nobody has signed up yet.</p>
       ) : (
-        <ul>
-          {people.map((person) => (
-            <MemberRow key={person.id} person={person} isSelf={person.id === selfId} />
-          ))}
-        </ul>
+        <CollectionView noun="people" filters={['super_admin', 'editor', 'journalist', 'unassigned']} entries={people.map((person) => ({ id: person.id, search: `${person.name} ${person.email} ${person.roles.join(' ')}`, filter: person.roles[0] ?? 'unassigned', content: <MemberRow person={person} isSelf={person.id === selfId} /> }))} />
       )}
     </div>
   )

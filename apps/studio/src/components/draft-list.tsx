@@ -1,6 +1,7 @@
 import type { DraftView } from '@kurasikapa/web-kit/read-model/studio-view'
 import { DraftRow } from './draft-row'
 import { StudioEmptyState } from './empty-state'
+import { CollectionView } from './collection-view'
 
 /**
  * Shared by the drafts view and the review queue. The two differ in what they
@@ -24,11 +25,7 @@ export function DraftList({
       {caption !== undefined && (
         <p className="text-on-surface-variant mb-[var(--space-sm)] text-sm">{caption}</p>
       )}
-      <ul>
-        {drafts.map((draft) => (
-          <DraftRow key={draft.id} draft={draft} />
-        ))}
-      </ul>
+      <CollectionView noun="stories" filters={[...new Set(drafts.map((draft) => draft.status))]} entries={drafts.map((draft) => ({ id: draft.id, search: `${draft.title} ${draft.locale} ${draft.status}`, filter: draft.status, content: <DraftRow draft={draft} /> }))} />
     </>
   )
 }

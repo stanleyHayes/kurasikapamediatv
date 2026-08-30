@@ -11,6 +11,7 @@ import { ShareButton } from '@/components/article/share-button'
 import { LikeControl } from '@/components/article/like-control'
 import { ReadingBeacon } from '@/components/article/reading-beacon'
 import { SaveControl } from '@/components/article/save-control'
+import { StoryBanner } from '@/components/story/story-banner'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
@@ -103,7 +104,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
   )
 
   return (
-    <article className="mx-auto max-w-[var(--container-page)] px-4 py-6 md:px-8 md:py-10">
+    <article className="pb-16">
       {/* Structured data for Google News and Discover. Escaped so a headline
           cannot close the script block — see seo/json-ld.ts. */}
       <script
@@ -111,20 +112,16 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
         dangerouslySetInnerHTML={{ __html: asScriptContent(jsonLd) }}
       />
 
-      <ArticleHeader article={article} />
-
-      {/*
-        The design puts a full-bleed hero image here. Articles carry no image
-        reference until the media library lands in R3, and an empty 440px
-        panel reads as a broken image rather than as a slot — so the block is
-        omitted rather than stubbed. It returns with the media work.
-      */}
-
-      <div className="grid grid-cols-1 gap-10 border-t border-on-surface/20 pt-10 md:grid-cols-12">
-        <ArticleRail articleId={article.id} title={article.title} />
-
-        <div className="md:col-span-8 md:col-start-4 lg:col-span-7 lg:col-start-4">
-          <StoryColumn article={article} locale={locale} />
+      <div className="border-b-2 border-on-surface bg-surface-container-lowest">
+        <div className="mx-auto grid max-w-[var(--container-page)] lg:grid-cols-[1.2fr_.8fr]">
+          <ArticleHeader article={article} />
+          <StoryBanner categoryId={article.categoryId} large />
+        </div>
+      </div>
+      <div className="mx-auto max-w-[var(--container-page)] px-4 md:px-8">
+        <div className="grid grid-cols-1 gap-10 py-10 md:grid-cols-12 md:py-14">
+          <ArticleRail articleId={article.id} title={article.title} />
+          <div className="md:col-span-9 lg:col-span-7"><StoryColumn article={article} locale={locale} /></div>
         </div>
       </div>
     </article>

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { StudioEmptyState } from '@/components/empty-state'
+import { CollectionView } from '@/components/collection-view'
 
 /**
  * The record of what the newsroom did.
@@ -41,11 +42,7 @@ export default async function AuditPage({
       {page.items.length === 0 ? (
         <StudioEmptyState eyebrow="Clean record" icon="◫" title="No audit events yet." description="Editorial actions, role changes and scheduled publications will appear here as an immutable record once newsroom activity begins." action={{ href: '/', label: 'Return to editorial' }} compact />
       ) : (
-        <ul className="divide-outline-variant/40 overflow-hidden border-y-2 border-on-surface bg-surface-container-lowest divide-y">
-          {page.items.map((entry) => (
-            <AuditRow key={entry.id} entry={entry} locale={locale} />
-          ))}
-        </ul>
+        <CollectionView noun="events" filters={[...new Set(page.items.map((entry) => entry.action))]} entries={page.items.map((entry) => ({ id: entry.id, search: `${entry.action} ${entry.actorId} ${entry.subjectId} ${Object.values(entry.detail).join(' ')}`, filter: entry.action, content: <AuditRow entry={entry} locale={locale} /> }))} />
       )}
     </div>
   )
@@ -55,7 +52,7 @@ function AuditRow({ entry, locale }: { entry: AuditEntry; locale: string }): Rea
   const detail = Object.entries(entry.detail)
 
   return (
-    <li className="px-6 py-4">
+    <div className="border-b border-outline-variant/40 px-6 py-4">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="text-label-bold text-on-surface uppercase">{entry.action}</span>
         <time dateTime={entry.occurredAt.toISOString()} className="text-on-surface-variant text-sm">
@@ -82,6 +79,6 @@ function AuditRow({ entry, locale }: { entry: AuditEntry; locale: string }): Rea
           ))}
         </dl>
       )}
-    </li>
+    </div>
   )
 }

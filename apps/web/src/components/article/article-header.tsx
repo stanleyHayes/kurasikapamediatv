@@ -19,16 +19,16 @@ const readingMinutes = (body: string | null): number =>
  */
 export function ArticleHeader({ article }: { article: ReadableArticle }): React.ReactElement {
   return (
-    <header className="reveal paper-noise relative mb-14 w-full overflow-hidden border-y-2 border-on-surface bg-surface-container-lowest px-6 py-14 text-left md:px-14 md:py-20">
-      <div aria-hidden className="absolute right-0 top-0 h-full w-3 bg-primary" />
-      <div aria-hidden className="absolute -right-4 bottom-0 hidden text-[10rem] font-black leading-none tracking-[-0.08em] text-primary/5 md:block">REPORT</div>
+    <header className="reveal paper-noise relative flex min-h-[25rem] w-full flex-col justify-center overflow-hidden px-6 py-14 text-left md:px-14 md:py-20 lg:border-r-2 lg:border-on-surface">
+      <div aria-hidden className="absolute left-0 top-0 h-2 w-32 bg-secondary" />
+      <div aria-hidden className="absolute -right-4 bottom-0 hidden text-[9rem] font-black leading-none tracking-[-0.08em] text-primary/5 md:block">REPORT</div>
       <div className="relative mb-9 flex gap-2 border-b border-on-surface/20 pb-5">
         <span className="broadcast-kicker text-secondary-ink">
           {section(article.categoryId)}
         </span>
       </div>
 
-      <h1 className="reveal reveal-delay-1 relative max-w-[18ch] font-display text-[2.75rem] leading-none font-bold tracking-[-0.04em] text-on-surface md:text-[length:var(--text-display-lg)]">
+      <h1 className="reveal reveal-delay-1 relative max-w-[16ch] font-display text-[2.5rem] leading-[1.02] font-bold tracking-[-0.04em] text-on-surface md:text-6xl">
         {article.title}
       </h1>
 

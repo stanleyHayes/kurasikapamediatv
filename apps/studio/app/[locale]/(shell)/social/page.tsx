@@ -51,7 +51,7 @@ export default async function SocialPage({
     container().socialPosts.listQueue({ limit: 50 }),
     loadPublishedList({ locale, limit: 50 }, env().API_URL, async () => {
       const page = await container().listPublishedArticles.execute({ locale, limit: 50 })
-      return { items: page.items.map(toArticleView), nextCursor: page.nextCursor }
+      return { items: page.items.map(({ article, excerpt, readingMinutes }) => ({ ...toArticleView(article), excerpt, readingMinutes })), nextCursor: page.nextCursor }
     }),
   ])
 

@@ -86,7 +86,7 @@ export async function proposeSocialSummaryAction(
       locale: parsed.locale,
       limit: 50,
     })
-    const mine = page.items.find((article) => article.id === parsed.articleId)
+    const mine = page.items.find(({ article }) => article.id === parsed.articleId)?.article
     if (mine === undefined) throw new ArticleNotFound(parsed.articleId as ArticleId)
 
     return new ProposeSocialSummary({

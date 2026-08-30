@@ -152,3 +152,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Treat excerpts and reading time as listing-use-case output, batch-load only approved revisions behind the revision port, and pass serialisable metadata through the read model to every card variant.
 
 **Principle:** Reader-facing metadata is editorial content and must follow the same approval boundary as the article body.
+
+### Observation 10: Admin list controls should wrap real workflow rows
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** Multiple server-rendered Studio queues needed consistent search, filtering and pagination without moving use cases or mutations into a generic client table.
+**Skill:** frontend-design
+**Type:** open-source
+**Phase/Area:** Admin collection architecture
+
+**Issue:** Rebuilding each queue as a client-owned data table would duplicate controls and weaken server-component boundaries, while a purely visual toolbar would not operate on the real rows.
+
+**Suggested improvement:** Use a serialisable collection entry contract carrying search/filter metadata and the existing rendered row as content, so one client control surface can paginate heterogeneous server-backed workflows without owning their business actions.
+
+**Principle:** Shared admin controls should coordinate workflow views, not absorb the workflows themselves.

@@ -1,8 +1,7 @@
 import { setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import { StudioSideNav } from '@/components/side-nav'
-import { StudioTopBar } from '@/components/top-bar'
+import { StudioShell } from '@/components/studio-shell'
 import { currentActor } from '@kurasikapa/web-kit/composition/actor'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { signInUrl, siteUrl } from '@kurasikapa/web-kit/composition/origins'
@@ -69,15 +68,7 @@ async function Guarded({
       {/* Rendered inside the boundary, not in the prerendered shell: it holds
           the sign-out control, and "sign out" has no meaning for the visitor
           who sees a prerendered page. */}
-      <StudioSideNav />
-
-      <main id="studio-content" className="relative flex min-h-0 flex-1 flex-col lg:h-full lg:overflow-hidden">
-        <StudioTopBar />
-
-        <div className="paper-noise signal-grid relative flex-1 overflow-y-auto p-4 md:p-8 lg:p-10">
-          <div className="reveal mx-auto max-w-[82rem]">{children}</div>
-        </div>
-      </main>
+      <StudioShell locale={locale}>{children}</StudioShell>
     </>
   )
 }

@@ -4,7 +4,7 @@ import { StatusBadge } from './status-badge'
 
 export function DraftRow({ draft }: { draft: DraftView }): React.ReactElement {
   return (
-    <li className="border-outline-variant hover:bg-surface-container-low border-b transition-colors">
+    <div className="border-outline-variant hover:bg-surface-container-low border-b transition-colors">
       <Link href={`/articles/${draft.id}`} className="flex items-baseline gap-4 px-2 py-4">
         <StatusBadge status={draft.status} />
 
@@ -20,7 +20,7 @@ export function DraftRow({ draft }: { draft: DraftView }): React.ReactElement {
           </time>
         )}
       </Link>
-    </li>
+    </div>
   )
 }
 

@@ -32,7 +32,7 @@ export async function ReadingPanel({
   const other = locale === 'fr' ? 'en' : 'fr'
 
   return (
-    <aside className="border-outline-variant bg-surface-container-low mb-12 rounded-lg border p-6">
+    <aside className="border-outline-variant bg-surface-container-low mb-12 border-l-4 border-l-secondary p-6">
       <div className="border-outline-variant/60 mb-5 flex items-center justify-between border-b pb-4">
         <h2 className="text-label-bold text-secondary flex items-center gap-2 uppercase">
           <span aria-hidden>✦</span> AI Enhanced Reading

@@ -1,3 +1,5 @@
+import { CollectionView } from './collection-view'
+
 export interface QueuedPostView {
   readonly id: string
   readonly platform: string
@@ -33,13 +35,7 @@ export function SocialQueue({
     return <StudioEmptyState eyebrow="Distribution clear" icon="↗" title="Nothing is scheduled." description="Choose a published article in the composer to prepare its next Facebook or Instagram post. Every caption stays a proposal until you queue it." compact />
   }
 
-  return (
-    <ul className="space-y-3">
-      {posts.map((post) => (
-        <QueueRow key={post.id} post={post} locale={locale} />
-      ))}
-    </ul>
-  )
+  return <CollectionView noun="posts" filters={[...new Set(posts.map((post) => post.state))]} entries={posts.map((post) => ({ id: post.id, search: `${post.caption} ${post.platform} ${post.state}`, filter: post.state, content: <QueueRow post={post} locale={locale} /> }))} />
 }
 
 function QueueRow({
@@ -50,7 +46,7 @@ function QueueRow({
   locale: string
 }): React.ReactElement {
   return (
-    <li className="border-b border-outline-variant bg-surface-container-lowest p-5">
+    <div className="border-b border-outline-variant bg-surface-container-lowest p-5">
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className="text-label-bold text-on-surface uppercase">{post.platform}</span>
 
@@ -82,7 +78,7 @@ function QueueRow({
       <p className="text-on-surface line-clamp-2 text-sm">{post.caption}</p>
 
       {post.lastError !== null && <p className="text-error mt-2 text-sm">{post.lastError}</p>}
-    </li>
+    </div>
   )
 }
 import { StudioEmptyState } from './empty-state'

@@ -5,19 +5,14 @@ import { callAction } from '@kurasikapa/web-kit/actions/call'
 import { moderateCommentAction } from '../actions/studio-actions'
 import type { CommentView } from '@kurasikapa/web-kit/read-model/comment-view'
 import { StudioEmptyState } from './empty-state'
+import { CollectionView } from './collection-view'
 
 export function CommentQueue({ items }: { items: readonly CommentView[] }): React.ReactElement {
   if (items.length === 0) {
     return <StudioEmptyState eyebrow="All caught up" icon="¶" title="No comments need a decision." description="Reader submissions will collect here before publication. The empty queue means every current conversation has been reviewed." action={{ href: '/', label: 'Back to editorial' }} compact />
   }
 
-  return (
-    <ul className="border-outline-variant bg-surface-container-low divide-outline-variant/40 divide-y overflow-hidden border-t-4 border-t-primary">
-      {items.map((item) => (
-        <QueueRow key={item.id} item={item} />
-      ))}
-    </ul>
-  )
+  return <CollectionView noun="comments" entries={items.map((item) => ({ id: item.id, search: `${item.body} ${item.articleId}`, filter: 'pending', content: <QueueRow item={item} /> }))} />
 }
 
 function QueueRow({ item }: { item: CommentView }): React.ReactElement | null {
@@ -25,7 +20,7 @@ function QueueRow({ item }: { item: CommentView }): React.ReactElement | null {
   if (row.gone) return null
 
   return (
-    <li className="px-6 py-4">
+    <div className="border-b border-outline-variant/40 px-6 py-4">
       <p className="text-on-surface-variant text-xs">
         On {item.articleId} · {item.createdAt.slice(0, 16).replace('T', ' ')}
       </p>
@@ -51,7 +46,7 @@ function QueueRow({ item }: { item: CommentView }): React.ReactElement | null {
           {row.error}
         </p>
       )}
-    </li>
+    </div>
   )
 }
 

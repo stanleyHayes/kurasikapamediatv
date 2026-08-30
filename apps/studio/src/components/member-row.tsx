@@ -41,7 +41,7 @@ export function MemberRow({
   isSelf: boolean
 }): React.ReactElement {
   return (
-    <li className="border-outline-variant/60 grid grid-cols-1 items-start gap-4 border-b px-6 py-4 last:border-0 md:grid-cols-12">
+    <div className="border-outline-variant/60 grid grid-cols-1 items-start gap-4 border-b px-6 py-4 last:border-0 md:grid-cols-12">
       <div className="flex items-center gap-3 md:col-span-4">
         <span
           aria-hidden
@@ -61,6 +61,6 @@ export function MemberRow({
       <div className="md:col-span-8">
         <RoleEditor isSelf={isSelf} person={{ ...person, roles: [...person.roles] }} />
       </div>
-    </li>
+    </div>
   )
 }

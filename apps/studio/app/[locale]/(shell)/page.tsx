@@ -8,6 +8,7 @@ import { loadAuthoredPipeline } from '@kurasikapa/web-kit/bff/load-studio'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { type DraftView, byWorkflowPriority, toDraftView } from '@kurasikapa/web-kit/read-model/studio-view'
+import { CollectionView } from '@/components/collection-view'
 
 /**
  * The design's figures are Total Articles, AI Tokens Used and Alerts. Only the
@@ -63,11 +64,7 @@ export default async function StudioPage({
           {drafts.length === 0 ? (
             <StudioEmptyState eyebrow="Pipeline clear" icon="✎" title="No stories on your desk." description="Your drafts, submissions and scheduled reports will appear here as a live production ledger. While the desk is clear, check the review queue or monitor incoming sources." action={{ href: '/review', label: 'Open review desk' }} secondaryAction={{ href: '/rss', label: 'Check sources' }} />
           ) : (
-            <ul className="space-y-3">
-              {drafts.map((draft) => (
-                <PipelineItem key={draft.id} draft={draft} now={now} />
-              ))}
-            </ul>
+            <CollectionView noun="stories" filters={[...new Set(drafts.map((draft) => draft.status))]} entries={drafts.map((draft) => ({ id: draft.id, search: `${draft.title} ${draft.excerpt ?? ''} ${draft.locale} ${draft.status}`, filter: draft.status, content: <PipelineItem draft={draft} now={now} /> }))} />
           )}
         </section>
 
