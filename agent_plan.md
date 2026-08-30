@@ -827,9 +827,8 @@ and the legal pages' wording, and everything in R2–R5. Two new items:
 
 ## 14. KUR-70 — first production deployment (2026-08-30)
 
-**Status: IN PROGRESS — Render and public web are live; Studio scheduling has
-a Hobby-compatible implementation; Studio deployment and custom DNS remain to
-be verified.**
+**Status: DEPLOYED — Render API, public web, Studio, and protected schedules
+are live. Custom-domain DNS remains an external registrar action.**
 
 - Render `kurasikapa-media-api` is live on the Starter plan in Frankfurt at
   `https://kurasikapa-media-api.onrender.com`. The deployed commit is
@@ -840,12 +839,15 @@ be verified.**
   production environment contracts share the same auth, cache-revalidation,
   cron, database and API values. Deployment protection is disabled for these
   public production projects.
-- Public web is deployed from `feature/KUR-70-production-deployment` and serves
-  HTTP 200 at `https://kurasikapa-web-hayfordstanleys-projects.vercel.app/en`.
+- Public web deploy `dpl_HX5h9ZHNMRwr4DrWpwEG5TaHWSkG` and Studio deploy
+  `dpl_5AcWRKfpJGr8iHmVtzLESbUJpsMk` are READY from `main`; both stable Vercel
+  aliases return HTTP 200. The protected publish-due and RSS endpoints return
+  200 with the shared secret, while a wrong secret returns 404.
 - Vercel Hobby rejects sub-daily cron definitions. KUR-70 therefore moves the
   protected Studio schedules to `.github/workflows/studio-cron.yml`: publishing
   and social delivery every five minutes, RSS ingestion hourly, plus manual
-  dispatch. The GitHub `CRON_SECRET` must match Studio and Render.
+  dispatch. GitHub `CRON_SECRET` matches Studio and Render. Social delivery is
+  gated by `ENABLE_SOCIAL_CRON=true` until Meta credentials are approved.
 - `kurasikapa.tv` and `studio.kurasikapa.tv` are attached to their projects,
   but DNS is not configured. Required external DNS records are apex A records
   `216.198.79.1` and `64.29.17.1`, plus `studio` CNAME

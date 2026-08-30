@@ -55,7 +55,9 @@ scheduled news publication. [studio-cron.yml](../../.github/workflows/studio-cro
 runs the protected Studio endpoints instead: publication and social delivery
 every five minutes, and RSS ingestion hourly. Add `CRON_SECRET` as a GitHub
 Actions repository secret with the same value configured in Studio and Render.
-The workflow also supports a manual run for deployment verification.
+The workflow also supports a manual run for deployment verification. Social
+delivery remains skipped until Meta credentials are approved and the GitHub
+repository variable `ENABLE_SOCIAL_CRON` is set to `true`.
 
 ## 5. Delete the TypeScript editorial packages
 

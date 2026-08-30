@@ -29,6 +29,7 @@ jobs:
           "$STUDIO_ORIGIN/studio/api/cron/publish-due"
 
       - name: Publish due social posts
+        if: vars.ENABLE_SOCIAL_CRON == 'true'
         run: >-
           curl --fail-with-body --silent --show-error --retry 3
           --request POST
