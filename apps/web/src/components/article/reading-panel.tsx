@@ -32,28 +32,29 @@ export async function ReadingPanel({
   const other = locale === 'fr' ? 'en' : 'fr'
 
   return (
-    <aside className="border-outline-variant bg-surface-container-low mb-12 border-l-4 border-l-secondary p-6">
-      <div className="border-outline-variant/60 mb-5 flex items-center justify-between border-b pb-4">
-        <h2 className="text-label-bold text-secondary flex items-center gap-2 uppercase">
-          <span aria-hidden>✦</span> AI Enhanced Reading
+    <aside className="signal-grid relative mb-14 overflow-hidden border-y-2 border-on-surface bg-inverse-surface p-6 text-white md:p-8">
+      <span aria-hidden className="absolute -right-3 -top-10 font-display text-[10rem] font-black leading-none text-white/[.04]">03</span>
+      <div className="relative mb-6 flex items-center justify-between border-b border-white/20 pb-5">
+        <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-secondary">
+          <span aria-hidden>✦</span> The story in brief
         </h2>
 
         <Link
           href={`/articles/${slug}`}
           locale={other}
-          className="text-label-bold text-on-surface-variant hover:text-secondary uppercase transition-colors"
+          className="text-xs font-bold uppercase tracking-[.12em] text-white/60 transition-colors hover:text-secondary"
         >
           Translate
         </Link>
       </div>
 
-      <h3 className="font-display text-on-surface mb-3 text-xl">Key Takeaways</h3>
+      <h3 className="relative mb-4 font-display text-3xl font-semibold">What to know</h3>
 
-      <ul className="text-on-surface-variant list-disc space-y-2 pl-5">
-        {takeaways.map((point) => (
-          <li key={point}>{point}</li>
+      <ol className="relative divide-y divide-white/15 border-y border-white/15">
+        {takeaways.map((point, index) => (
+          <li key={point} className="grid grid-cols-[2rem_1fr] gap-3 py-4 text-sm leading-relaxed text-white/75"><span className="font-mono text-secondary">{String(index + 1).padStart(2, '0')}</span>{point}</li>
         ))}
-      </ul>
+      </ol>
     </aside>
   )
 }

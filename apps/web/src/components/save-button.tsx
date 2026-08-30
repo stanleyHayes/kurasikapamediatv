@@ -49,9 +49,9 @@ export function SaveButton({
         onClick={toggle}
         disabled={pending}
         aria-pressed={saved}
-        className="border-outline-variant bg-white hover:border-primary hover:text-primary min-w-24 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-60"
+        className="min-w-32 border border-outline-variant border-l-4 border-l-primary bg-surface-container-lowest px-4 py-3 text-left text-sm font-bold text-on-surface transition-colors hover:bg-primary hover:text-on-primary disabled:opacity-60"
       >
-        {saved ? 'Saved' : 'Save'}
+        <span aria-hidden className="mr-2">{saved ? '✓' : '+'}</span>{saved ? 'Saved' : 'Save story'}
       </button>
 
       {error !== null && (

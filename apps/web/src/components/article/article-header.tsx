@@ -2,103 +2,37 @@ import type { ReadableArticle } from '@kurasikapa/web-kit/read-model/article-vie
 import { isOpinionArticle, opinionDisclaimer } from './opinion-byline'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
+const readingMinutes = (body: string | null): number => body === null ? 1 : Math.max(1, Math.round(body.split(/\s+/u).length / 200))
 
-/** Roughly 200 words a minute — the figure most newsrooms use. */
-const readingMinutes = (body: string | null): number =>
-  body === null ? 1 : Math.max(1, Math.round(body.split(/\s+/u).length / 200))
-
-/**
- * The centred article header from the Stitch design: chip row, display-lg
- * headline, then a byline. Opinion and Editorial get the "distinct byline
- * treatment" the PRD promises their pages — author-forward, with the standing
- * disclaimer that the views are the author's (see opinion-byline.ts).
- *
- * The byline is the directory display name when we have one. Missing names
- * keep the house line rather than inventing a journalist — doubly important
- * on opinion, where the whole point is that a named person owns the view.
- */
+/** A front-page masthead for one story, with the reporting metadata on the record. */
 export function ArticleHeader({ article }: { article: ReadableArticle }): React.ReactElement {
-  return (
-    <header className="reveal paper-noise relative flex min-h-[25rem] w-full flex-col justify-center overflow-hidden px-6 py-14 text-left md:px-14 md:py-20 lg:border-r-2 lg:border-on-surface">
-      <div aria-hidden className="absolute left-0 top-0 h-2 w-32 bg-secondary" />
-      <div aria-hidden className="absolute -right-4 bottom-0 hidden text-[9rem] font-black leading-none tracking-[-0.08em] text-primary/5 md:block">REPORT</div>
-      <div className="relative mb-9 flex gap-2 border-b border-on-surface/20 pb-5">
-        <span className="broadcast-kicker text-secondary-ink">
-          {section(article.categoryId)}
-        </span>
+  const opinion = isOpinionArticle(article.categoryId)
+  return <header className="paper-noise relative overflow-hidden border-b-2 border-on-surface bg-surface-container-lowest">
+    <div className="mx-auto max-w-[var(--container-page)] px-4 pt-8 md:px-8 md:pt-12">
+      <div className="flex items-center justify-between border-y border-on-surface py-3 text-[.68rem] font-bold uppercase tracking-[.2em]">
+        <span className="flex items-center gap-3 text-primary"><span className="h-2 w-2 bg-secondary" />{section(article.categoryId)} desk</span>
+        <span className="font-mono text-on-surface-variant">KM / {article.locale.toUpperCase()} / {opinion ? 'Viewpoint' : 'Report'}</span>
       </div>
-
-      <h1 className="reveal reveal-delay-1 relative max-w-[16ch] font-display text-[2.5rem] leading-[1.02] font-bold tracking-[-0.04em] text-on-surface md:text-6xl">
-        {article.title}
-      </h1>
-
-      {isOpinionArticle(article.categoryId) ? (
-        <OpinionByline article={article} />
-      ) : (
-        <StandardByline article={article} />
-      )}
-    </header>
-  )
-}
-
-function StandardByline({ article }: { article: ReadableArticle }): React.ReactElement {
-  return (
-    <div className="reveal reveal-delay-2 relative mt-10 flex flex-wrap items-center gap-5 border-l-2 border-secondary pl-5 text-on-surface-variant">
-      <span className="text-label-bold uppercase">
-        {article.authorName ?? 'Kurasikapa Newsroom'}
-      </span>
-
-      <span aria-hidden className="bg-outline-variant h-8 w-px" />
-
-      <span className="text-label-bold uppercase">{readingMinutes(article.body)} min read</span>
-
-      <PublishedDate article={article} />
-    </div>
-  )
-}
-
-/**
- * Author-forward: the name leads at display size rather than sharing a row
- * with the metadata, and the disclaimer sits under it as a standing part of
- * the byline — not a footnote a reader has to hunt for.
- */
-function OpinionByline({ article }: { article: ReadableArticle }): React.ReactElement {
-  return (
-    <div className="mt-8 flex flex-col items-start gap-3">
-      <span className="font-display text-xl font-semibold text-on-surface">
-        {article.authorName ?? 'Kurasikapa Newsroom'}
-      </span>
-
-      <div className="flex items-center gap-6 text-on-surface-variant">
-        <span className="text-label-bold uppercase">{readingMinutes(article.body)} min read</span>
-        <PublishedDate article={article} />
+      <div className="relative py-12 md:py-20">
+        <span aria-hidden className="absolute -right-[.04em] -top-[.2em] font-display text-[clamp(10rem,24vw,25rem)] font-black leading-none tracking-[-.09em] text-primary/[.045]">K</span>
+        <p className="relative mb-8 max-w-xl text-sm font-medium text-on-surface-variant">Independent reporting from Kurasikapa Media TV</p>
+        <h1 className="relative max-w-[14ch] font-display text-[clamp(3.3rem,7.4vw,7.6rem)] font-semibold leading-[.86] tracking-[-.07em] text-on-surface">{article.title}</h1>
       </div>
-
-      <p className="max-w-md text-sm italic text-on-surface-variant">
-        {opinionDisclaimer(article.locale)}
-      </p>
+      <Byline article={article} opinion={opinion} />
     </div>
-  )
+  </header>
 }
 
-function PublishedDate({
-  article,
-}: {
-  article: ReadableArticle
-}): React.ReactElement | null {
-  if (article.publishedAt === null) return null
+function Byline({ article, opinion }: { article: ReadableArticle; opinion: boolean }): React.ReactElement {
+  return <div className="grid border-t-2 border-on-surface md:grid-cols-[1.2fr_.6fr_.8fr]">
+    <div className="py-6 md:border-r md:border-on-surface md:pr-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Reported by</p><p className="mt-2 font-display text-2xl font-semibold">{article.authorName ?? 'Kurasikapa Newsroom'}</p></div>
+    <div className="border-t border-on-surface py-6 md:border-r md:border-t-0 md:px-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Reading time</p><p className="mt-2 font-mono text-lg font-semibold">{readingMinutes(article.body)} minutes</p></div>
+    <div className="border-t border-on-surface py-6 md:border-t-0 md:pl-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Published</p><PublishedDate article={article} /></div>
+    {opinion && <p className="border-t border-on-surface py-4 text-sm italic text-on-surface-variant md:col-span-3">{opinionDisclaimer(article.locale)}</p>}
+  </div>
+}
 
-  return (
-    <>
-      <span aria-hidden className="bg-outline-variant h-8 w-px" />
-      <time dateTime={article.publishedAt} className="text-label-bold uppercase">
-        {new Intl.DateTimeFormat(article.locale, {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-          timeZone: 'UTC',
-        }).format(new Date(article.publishedAt))}
-      </time>
-    </>
-  )
+function PublishedDate({ article }: { article: ReadableArticle }): React.ReactElement {
+  if (article.publishedAt === null) return <span className="mt-2 block font-mono text-lg">Recently</span>
+  return <time dateTime={article.publishedAt} className="mt-2 block font-mono text-lg font-semibold">{new Intl.DateTimeFormat(article.locale, { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(article.publishedAt))}</time>
 }

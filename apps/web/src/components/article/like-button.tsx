@@ -22,9 +22,9 @@ export function LikeButton({
         onClick={like.toggle}
         disabled={like.pending}
         aria-pressed={like.liked}
-        className="border-outline-variant bg-white hover:border-primary hover:text-primary min-w-24 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-60"
+        className="min-w-32 border border-outline-variant border-l-4 border-l-secondary bg-surface-container-lowest px-4 py-3 text-left text-sm font-bold text-on-surface transition-colors hover:bg-secondary hover:text-on-secondary disabled:opacity-60"
       >
-        {like.liked ? 'Liked' : 'Like'} · {String(like.count)}
+        <span aria-hidden className="mr-2">{like.liked ? '♥' : '♡'}</span>{like.liked ? 'Liked' : 'Like'} · {String(like.count)}
       </button>
       {like.error !== null && (
         <p role="status" className="text-error mt-1 text-sm">

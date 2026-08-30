@@ -29,10 +29,10 @@ export function ShareButton({ title }: { title: string }): React.ReactElement {
     <button
       type="button"
       onClick={() => void share()}
-      className="border-outline-variant bg-white text-on-surface-variant hover:border-primary hover:text-primary flex h-11 w-11 items-center justify-center rounded-full border transition-colors"
+      className="min-w-32 border border-outline-variant border-l-4 border-l-on-surface bg-surface-container-lowest px-4 py-3 text-left text-sm font-bold text-on-surface transition-colors hover:bg-on-surface hover:text-surface"
       aria-label={copied ? 'Link copied' : 'Share this article'}
     >
-      <span aria-hidden>{copied ? '✓' : '↗'}</span>
+      <span aria-hidden className="mr-2">{copied ? '✓' : '↗'}</span>{copied ? 'Link copied' : 'Share story'}
     </button>
   )
 }

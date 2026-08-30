@@ -8,11 +8,11 @@ const HEAD = 'font-display text-on-surface mb-4 font-semibold tracking-[-0.02em]
  * Turns the Markdown tree into React children. Every string is escaped by
  * React. There is no dangerouslySetInnerHTML on this path.
  */
-export function MarkdownView({ source }: { source: string }): React.ReactElement {
+export function MarkdownView({ source, variant = 'standard' }: { source: string; variant?: 'standard' | 'article' }): React.ReactElement {
   const blocks = parseMarkdown(source)
 
   return (
-    <div className="max-w-[68ch]">
+    <div className={variant === 'article' ? 'max-w-[66ch] [&>p:first-child]:text-2xl [&>p:first-child]:font-medium [&>p:first-child]:leading-[1.55] [&>p:first-child:first-letter]:float-left [&>p:first-child:first-letter]:mr-3 [&>p:first-child:first-letter]:font-display [&>p:first-child:first-letter]:text-7xl [&>p:first-child:first-letter]:font-semibold [&>p:first-child:first-letter]:leading-[.8] [&>p:first-child:first-letter]:text-primary' : 'max-w-[68ch]'}>
       {blocks.map((block, index) => (
         <Block key={index} node={block} />
       ))}

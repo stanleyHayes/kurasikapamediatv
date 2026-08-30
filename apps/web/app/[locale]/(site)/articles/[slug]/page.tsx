@@ -12,6 +12,7 @@ import { LikeControl } from '@/components/article/like-control'
 import { ReadingBeacon } from '@/components/article/reading-beacon'
 import { SaveControl } from '@/components/article/save-control'
 import { StoryBanner } from '@/components/story/story-banner'
+import { ArticleSplash } from '@/components/article/article-splash'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
@@ -78,12 +79,7 @@ export default function ArticlePage({ params }: Params): React.ReactElement {
 }
 
 function ArticleSkeleton(): React.ReactElement {
-  return (
-    <div className="mx-auto max-w-[var(--container-page)] px-6 py-[var(--space-lg)]" aria-hidden>
-      <div className="bg-surface-container h-3 w-24 rounded-sm" />
-      <div className="bg-surface-container mt-6 h-12 w-3/4 rounded-sm" />
-    </div>
-  )
+  return <ArticleSplash />
 }
 
 async function Story({ params }: Params): Promise<React.ReactElement> {
@@ -104,7 +100,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
   )
 
   return (
-    <article className="pb-16">
+    <article className="pb-20">
       {/* Structured data for Google News and Discover. Escaped so a headline
           cannot close the script block — see seo/json-ld.ts. */}
       <script
@@ -112,48 +108,43 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
         dangerouslySetInnerHTML={{ __html: asScriptContent(jsonLd) }}
       />
 
-      <div className="border-b-2 border-on-surface bg-surface-container-lowest">
-        <div className="mx-auto grid max-w-[var(--container-page)] lg:grid-cols-[1.2fr_.8fr]">
-          <ArticleHeader article={article} />
-          <StoryBanner categoryId={article.categoryId} large />
-        </div>
+      <ArticleHeader article={article} />
+      <div className="mx-auto max-w-[var(--container-page)] border-x-2 border-b-2 border-on-surface">
+        <StoryBanner categoryId={article.categoryId} />
       </div>
       <div className="mx-auto max-w-[var(--container-page)] px-4 md:px-8">
-        <div className="grid grid-cols-1 gap-10 py-10 md:grid-cols-12 md:py-14">
-          <ArticleRail articleId={article.id} title={article.title} />
-          <div className="md:col-span-9 lg:col-span-7"><StoryColumn article={article} locale={locale} /></div>
+        <div className="grid gap-12 py-14 lg:grid-cols-[15rem_minmax(0,46rem)] lg:justify-center lg:py-20">
+          <ArticleRail article={article} />
+          <StoryBody article={article} locale={locale} />
         </div>
+        <div className="mx-auto max-w-5xl"><Suspense fallback={null}><RelatedArticles articleId={article.id} locale={locale} /></Suspense><Suspense fallback={null}><CommentThread articleId={article.id} /></Suspense></div>
       </div>
     </article>
   )
 }
 
-function ArticleRail({
-  articleId,
-  title,
-}: {
-  articleId: string
-  title: string
-}): React.ReactElement {
+function ArticleRail({ article }: { article: ReadableArticle }): React.ReactElement {
   return (
-    <div className="md:col-span-2">
-      <div className="sticky top-28 flex flex-row items-center gap-3 md:flex-col md:items-start">
+    <aside className="h-fit border-t-2 border-on-surface pt-5 lg:sticky lg:top-28">
+      <p className="text-[.65rem] font-bold uppercase tracking-[.2em] text-on-surface-variant">Reader tools</p>
+      <div className="mt-5 flex flex-wrap items-start gap-3 lg:flex-col">
         <Suspense fallback={null}>
-          <SaveControl articleId={articleId} />
+          <SaveControl articleId={article.id} />
         </Suspense>
         <Suspense fallback={null}>
-          <LikeControl articleId={articleId} />
+          <LikeControl articleId={article.id} />
         </Suspense>
         <Suspense fallback={null}>
-          <ReadingBeacon articleId={articleId} />
+          <ReadingBeacon articleId={article.id} />
         </Suspense>
-        <ShareButton title={title} />
+        <ShareButton title={article.title} />
       </div>
-    </div>
+      <p className="mt-7 border-t border-outline-variant pt-5 text-sm leading-relaxed text-on-surface-variant">Save the story, respond to the reporting or share the original link.</p>
+    </aside>
   )
 }
 
-function StoryColumn({
+function StoryBody({
   article,
   locale,
 }: {
@@ -161,7 +152,7 @@ function StoryColumn({
   locale: string
 }): React.ReactElement {
   return (
-    <>
+    <div className="article-prose">
       {article.body !== null && (
         <Suspense fallback={null}>
           <ReadingPanel
@@ -174,12 +165,6 @@ function StoryColumn({
         </Suspense>
       )}
       <ArticleBody body={article.body} />
-      <Suspense fallback={null}>
-        <RelatedArticles articleId={article.id} locale={locale} />
-      </Suspense>
-      <Suspense fallback={null}>
-        <CommentThread articleId={article.id} />
-      </Suspense>
-    </>
+    </div>
   )
 }

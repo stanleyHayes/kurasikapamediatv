@@ -10,11 +10,9 @@ import { MarkdownView } from '../../content/markdown-view'
 export function ArticleBody({ body }: { body: string | null }): React.ReactElement {
   if (body === null || body.trim() === '') {
     return (
-      <p className="text-on-surface-variant text-[length:var(--text-body-lg)]">
-        This article has no text yet.
-      </p>
+      <section className="border-y-2 border-on-surface py-10"><p className="font-display text-3xl font-semibold">The full report is being prepared.</p><p className="mt-3 text-on-surface-variant">Return shortly for the complete published story.</p></section>
     )
   }
 
-  return <MarkdownView source={body} />
+  return <MarkdownView source={body} variant="article" />
 }

@@ -212,3 +212,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** During the design audit, assign each related route a specific reader job and a route-specific content module before building shared visual primitives; verify at least one company, support and policy page in rendered form.
 
 **Principle:** A coherent page family should share visual grammar, not an identical content composition.
+
+### Observation 14: Story redesigns must cover the whole reading journey
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A news detail page needed a complete redesign alongside loading and missing-story states.
+**Skill:** redesign-existing-projects
+**Type:** open-source
+**Phase/Area:** Editorial reading experience
+
+**Issue:** Redesigning only the headline and hero leaves the reader with generic prose, utility controls, related stories and error states that feel disconnected from the publication.
+
+**Suggested improvement:** Treat the article as a sequence from arrival through orientation, reading, action, onward discovery and recovery; design the masthead, prose typography, reader tools, takeaways, related content, loading state and 404 as one editorial system.
+
+**Principle:** A complete news-detail redesign owns every state from first signal to the reader's next destination.
