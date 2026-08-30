@@ -12,6 +12,7 @@ export {
   RSS_SOURCES,
   SOCIAL_POSTS,
   BROADCASTS,
+  SITE_PAGES,
   CATEGORIES,
   ROLE_ASSIGNMENTS,
   type ArticleDocument,
@@ -29,6 +30,7 @@ export {
   type BroadcastDocument,
   type CategoryDocument,
   type RoleAssignmentDocument,
+  type SitePageDocument,
 } from './documents'
 export { ensureIndexes } from './indexes'
 export {
@@ -61,3 +63,4 @@ export { MongoAuditLog } from './mongo-audit-log'
 export { MongoRateLimiter } from './mongo-rate-limiter'
 export { MongoCredentialRepository } from './mongo-credential-repository'
 export { MongoRefreshTokenRepository } from './mongo-refresh-token-repository'
+export { MongoSitePageRepository } from './mongo-site-page-repository'

@@ -7,6 +7,7 @@ export {
   type RevisionTrigger,
 } from './editorial/revision'
 export { Category, LocaleNotCovered, type CategoryProps } from './editorial/category'
+export { EmptyPageContent, SITE_PAGE_KEYS, SitePage, type NewSitePage, type SitePageKey, type SitePageProps } from './editorial/site-page'
 export {
   ARTICLE_STATUSES,
   TRANSITIONS,

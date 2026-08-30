@@ -12,6 +12,7 @@ import type {
   EventBusPort,
   GetDraft,
   GetPublishedArticle,
+  GetSitePage,
   IdPort,
   IngestRssFeeds,
   LikeArticle,
@@ -28,6 +29,7 @@ import type {
   ListUsers,
   ListVisibleComments,
   ModerateComment,
+  ManageSitePages,
   PostComment,
   ProposeSocialCaption,
   PublishArticle,
@@ -52,6 +54,7 @@ import type {
   SendBreakingAlert,
   SendNewsletterDigest,
   SocialPostRepository,
+  SitePageRepository,
   SocialPublishPort,
   SubscribeNewsletter,
   SubscribePush,
@@ -112,6 +115,8 @@ export interface Container {
   readonly registerRssSource: RegisterRssSource
   readonly ingestRssFeeds: IngestRssFeeds
   readonly rssSources: RssSourceRepository
+  readonly manageSitePages: ManageSitePages
+  readonly sitePages: SitePageRepository
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -127,6 +132,7 @@ export interface Container {
   readonly listAwaitingReview: ListAwaitingReview
   readonly searchArticles: SearchArticles
   readonly resolveActor: ResolveActor
+  readonly getSitePage: GetSitePage
 
   // Ports exposed for interactive use (AI streams straight to the editor)
   readonly ai: AiPort

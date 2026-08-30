@@ -29,6 +29,7 @@ export interface StandingPage {
    * which is the sort of thing that makes a design system feel arbitrary.
    */
   readonly hero?: boolean
+  readonly body?: string
 }
 
 export type PageKey =

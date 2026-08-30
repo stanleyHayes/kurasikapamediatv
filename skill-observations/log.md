@@ -167,3 +167,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Use a serialisable collection entry contract carrying search/filter metadata and the existing rendered row as content, so one client control surface can paginate heterogeneous server-backed workflows without owning their business actions.
 
 **Principle:** Shared admin controls should coordinate workflow views, not absorb the workflows themselves.
+
+### Observation 11: CMS migrations need a safe public fallback and a real write-path check
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** Hard-coded public information pages were moved to localized Mongo-backed records while production content still needed migration.
+**Skill:** frontend-design
+**Type:** open-source
+**Phase/Area:** CMS migration
+
+**Issue:** Switching reads directly to a new empty collection would blank production pages, while verifying only the Studio form would not prove that saved content reached the public renderer.
+
+**Suggested improvement:** Keep approved repository copy as a temporary read fallback, seed it into the CMS collection, then browser-test the complete editor save to public-page render loop before removing the fallback in a later content migration.
+
+**Principle:** A CMS migration is complete only when approved content survives the cutover and an editor-authored change reaches the public route.

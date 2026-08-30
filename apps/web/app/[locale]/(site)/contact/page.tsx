@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { ContactForm } from '@/components/contact/contact-form'
 import { StandingPageView } from '@/components/standing-page'
 import { type StandingParams, standingRoute } from '@/content/standing-route'
-import { pageFor } from '@/content/pages'
+import { cmsPageFor } from '@/content/cms-page'
 
 const route = standingRoute('contact', 'contact')
 
@@ -23,7 +23,7 @@ async function Body({ params }: StandingParams): Promise<React.ReactElement> {
 
   return (
     <div>
-      <StandingPageView page={pageFor('contact', locale)} />
+      <StandingPageView page={await cmsPageFor('contact', locale)} pageKey="contact" />
       <section className="mx-auto max-w-[var(--container-page)] px-6 pb-[var(--space-xl)]">
         <h2 className="font-display text-on-surface text-[length:var(--text-headline-sm)] font-semibold">
           Write to the newsroom

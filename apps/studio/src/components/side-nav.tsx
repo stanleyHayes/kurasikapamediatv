@@ -15,6 +15,7 @@ const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
   { heading: 'Publishing', items: [
     { href: '/social', label: 'Social publishing', description: 'Schedule distribution', icon: 'social' },
     { href: '/rss', label: 'News sources', description: 'Manage inbound feeds', icon: 'rss' },
+    { href: '/pages', label: 'Public pages', description: 'About, legal and information', icon: 'desk' },
   ] },
   { heading: 'Administration', items: [
     { href: '/people', label: 'People & access', description: 'Roles and permissions', icon: 'people' },

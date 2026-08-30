@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { StandingPageView } from '@/components/standing-page'
-import { pageFor } from '@/content/pages'
+import { cmsPageFor } from '@/content/cms-page'
 
 const LEGAL = ['privacy', 'terms', 'cookies'] as const
 type LegalDoc = (typeof LEGAL)[number]
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!isLegal(doc)) return { title: 'Not found', robots: { index: false } }
 
   return {
-    title: pageFor(doc, locale).title,
+    title: (await cmsPageFor(doc, locale)).title,
     alternates: { canonical: `/${locale}/legal/${doc}` },
   }
 }
@@ -34,5 +34,5 @@ export default async function LegalPage({ params }: Params): Promise<React.React
 
   if (!isLegal(doc)) notFound()
 
-  return <StandingPageView page={pageFor(doc, locale)} />
+  return <StandingPageView page={await cmsPageFor(doc, locale)} pageKey={doc} />
 }

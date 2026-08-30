@@ -195,6 +195,7 @@ export const PUSH_SUBSCRIPTIONS = 'push_subscriptions'
 export const RSS_SOURCES = 'rss_sources'
 export const SOCIAL_POSTS = 'social_posts'
 export const BROADCASTS = 'broadcasts'
+export const SITE_PAGES = 'site_pages'
 /** Append-only. Product rule 4. */
 export const AUDIT_ENTRIES = 'audit_entries'
 /** Ephemeral counters, reaped by a TTL index. */
@@ -216,6 +217,8 @@ export interface RateLimitDocument {
   /** TTL anchor. Mongo reaps the document some time after this. */
   expiresAt: Date
 }
+
+export interface SitePageDocument { _id: string; key: string; locale: string; title: string; lead: string; body: string; updatedAt: Date }
 
 // --- identity: authentication (KUR-66) ---
 

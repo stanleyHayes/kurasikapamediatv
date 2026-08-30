@@ -1,41 +1,7 @@
 import { cacheLife } from 'next/cache'
 import Image from 'next/image'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
-import { FooterIcon, type FooterIconName } from './footer-icon'
-
-const GROUPS = [
-  {
-    title: 'Reporting',
-    icon: 'reporting' as const,
-    links: [
-      { href: '/news', label: 'Latest news', icon: 'newspaper' },
-      { href: '/sections/politics', label: 'Politics', icon: 'section' },
-      { href: '/sections/business', label: 'Business', icon: 'briefcase' },
-      { href: '/sections/education', label: 'Education', icon: 'building' },
-    ],
-  },
-  {
-    title: 'Kurasikapa',
-    icon: 'studio' as const,
-    links: [
-      { href: '/about', label: 'About us', icon: 'broadcast' },
-      { href: '/team', label: 'Our team', icon: 'people' },
-      { href: '/contact', label: 'Contact', icon: 'mail' },
-      { href: '/careers', label: 'Careers', icon: 'briefcase' },
-    ],
-  },
-  {
-    title: 'Information',
-    icon: 'help' as const,
-    links: [
-      { href: '/advertise', label: 'Advertise', icon: 'broadcast' },
-      { href: '/faq', label: 'Help and FAQ', icon: 'help' },
-      { href: '/legal/privacy', label: 'Privacy', icon: 'privacy' },
-      { href: '/legal/terms', label: 'Terms', icon: 'scale' },
-      { href: '/legal/cookies', label: 'Cookies', icon: 'cookie' },
-    ],
-  },
-] as const
+import { FooterNav } from './footer-nav'
 
 export function SiteFooter(): React.ReactElement {
   return (
@@ -53,16 +19,7 @@ export function SiteFooter(): React.ReactElement {
             <Image src="/brand-logo-transparent.png" alt="Kurasikapa Media" width={1536} height={1024} className="h-28 w-auto object-contain object-left" />
             <p className="mt-5 max-w-sm border-l-2 border-secondary pl-5 text-base leading-relaxed text-white/58">Independent television and digital journalism from Ghana. Reporting that informs, educates and keeps power in view.</p>
           </div>
-          <nav aria-label="Site information" className="grid grid-cols-2 gap-10 sm:grid-cols-3">
-            {GROUPS.map((group) => (
-              <div key={group.title}>
-                <p className="mb-5 flex items-center gap-2 border-b border-white/20 pb-3 text-sm font-semibold text-secondary"><FooterIcon name={group.icon} className="h-5 w-5" />{group.title}</p>
-                <ul className="space-y-3 text-sm text-white/68">
-                  {group.links.map((link) => <li key={link.href}><Link href={link.href} className="group/link flex items-center gap-2.5 transition-colors hover:text-white"><FooterIcon name={link.icon as FooterIconName} className="h-4 w-4 shrink-0 text-white/48 transition-colors group-hover/link:text-secondary" /><span className="editorial-link">{link.label}</span></Link></li>)}
-                </ul>
-              </div>
-            ))}
-          </nav>
+          <FooterNav />
         </div>
       </div>
 

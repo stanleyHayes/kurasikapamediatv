@@ -4,7 +4,9 @@ import {
   ApproveArticle,
   AssignRoles,
   CreateDraft,
+  GetSitePage,
   ListUsers,
+  ManageSitePages,
   PublishArticle,
   PublishDueArticles,
   ReadAuditLog,
@@ -62,6 +64,9 @@ export function buildContainer(infra: Infrastructure): Container {
     rateLimiter: new MongoRateLimiter(infra.db, infra.clock),
     ai: infra.ai,
     events: infra.events,
+    manageSitePages: new ManageSitePages({ pages: graph.sitePages, clock: infra.clock }),
+    getSitePage: new GetSitePage(graph.sitePages),
+    sitePages: graph.sitePages,
   }
 }
 

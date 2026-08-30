@@ -13,6 +13,7 @@ export type {
 } from './ports/article-repository'
 export { clampLimit, type Cursor, type LimitBounds, type Page } from './ports/pagination'
 export type { RevisionRepository } from './ports/revision-repository'
+export type { SitePageRepository } from './ports/site-page-repository'
 export type { CategoryRepository } from './ports/category-repository'
 export type { BookmarkRepository } from './ports/bookmark-repository'
 export type {
@@ -173,6 +174,8 @@ export {
 } from './editorial/revisions-history'
 
 export { excerptFrom } from './editorial/excerpt'
+export { GetSitePage } from './editorial/get-site-page'
+export { ManageSitePages, type ManageSitePageInput } from './editorial/manage-site-pages'
 
 export type { AuditLog } from './ports/audit'
 export { auditEntryFor } from './insight/audit-events'
