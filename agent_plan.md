@@ -856,3 +856,10 @@ are live. Custom-domain DNS remains an external registrar action.**
   managed `PORT`; the API service name has a collision-free hostname; the
   smoke script matches the real Go routes and fail-closed status codes; and
   Studio's `vercel.json` no longer uses an unsupported pseudo-comment key.
+- Follow-up entrypoint repair: the Studio project's bare Vercel host and
+  `/studio` now redirect to `/studio/en`, so the provider dashboard URL no
+  longer lands on a platform 404. This does not depend on a custom domain.
+- The public home and news routes now use a designed editorial holding state
+  instead of the bare “Nothing published yet” line: newsroom status, launch
+  context, reader actions, and a concise statement of what the first edition
+  will deliver.

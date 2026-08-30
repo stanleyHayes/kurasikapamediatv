@@ -62,3 +62,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Add a preflight that inventories scheduled jobs, required frequencies, runtime versions, monorepo roots, custom domains, and current account plans, then checks each requirement against live provider limits before creating resources.
 
 **Principle:** Deployment readiness includes the capabilities of the active provider plan, not only valid application configuration.
+
+### Observation 4: Base-path deployments need bare-host smoke checks
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A separately deployed Next.js Studio was healthy at its configured base path while its bare Vercel project URL showed a platform 404.
+**Skill:** New skill candidate: production deployment readiness
+**Type:** open-source
+**Phase/Area:** Post-deployment smoke testing
+
+**Issue:** Verifying only the canonical nested route proved that the deployment was healthy, but missed the entry URL a user naturally opens from the provider dashboard.
+
+**Suggested improvement:** For every base-path deployment, test the bare project host, the base path without a locale, and the canonical localized route; require intentional redirects for the first two.
+
+**Principle:** A deployment is reachable only when its natural entrypoints lead users to the working application.

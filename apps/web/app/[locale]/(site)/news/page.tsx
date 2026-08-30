@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { ArticleCard } from '@/components/article-card'
+import { EditorialEmptyState } from '@/components/editorial-empty-state'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { cachedLatest } from '@kurasikapa/web-kit/read-model/queries'
@@ -63,7 +64,7 @@ async function NewsBody({ params }: Params): Promise<React.ReactElement> {
       </header>
 
       {lead === undefined ? (
-        <p className="text-on-surface-variant">Nothing published yet.</p>
+        <EditorialEmptyState surface="news" />
       ) : (
         <div className="flex flex-col gap-[var(--space-lg)]">
           <NewsLead article={lead} />

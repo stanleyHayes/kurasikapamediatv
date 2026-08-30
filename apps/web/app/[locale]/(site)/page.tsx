@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { BriefingCard } from '@/components/home/briefing-card'
 import { Hero } from '@/components/home/hero'
 import { Trending } from '@/components/home/trending'
+import { EditorialEmptyState } from '@/components/editorial-empty-state'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { homeRails, type HomeRails } from '@kurasikapa/web-kit/read-model/home-rails'
 import { cachedLatest, cachedMostRead } from '@kurasikapa/web-kit/read-model/queries'
@@ -31,11 +32,7 @@ async function Front({ locale }: { locale: string }): Promise<React.ReactElement
     cachedMostRead(locale, RAIL_SIZE),
   ])
   if (items.length === 0) {
-    return (
-      <p className="text-on-surface-variant py-[var(--space-xl)]">
-        Nothing published yet.
-      </p>
-    )
+    return <EditorialEmptyState surface="home" />
   }
 
   return <HomeLayout {...homeRails(items, mostRead)} />
