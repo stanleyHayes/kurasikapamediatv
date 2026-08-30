@@ -71,12 +71,12 @@ describe('ListPublishedArticles', () => {
     )
 
   it('returns published articles only', async () => {
-    const page = await new ListPublishedArticles({ articles: seeded() }).execute({ locale: 'en' })
-    expect(page.items.map((a) => a.id)).toEqual(['art_1'])
+    const page = await new ListPublishedArticles({ articles: seeded(), revisions: new InMemoryRevisionRepository() }).execute({ locale: 'en' })
+    expect(page.items.map((item) => item.article.id)).toEqual(['art_1'])
   })
 
   it('filters by category', async () => {
-    const page = await new ListPublishedArticles({ articles: seeded() }).execute({
+    const page = await new ListPublishedArticles({ articles: seeded(), revisions: new InMemoryRevisionRepository() }).execute({
       locale: 'en',
       categoryId: categoryId('cat_sports'),
     })
@@ -87,7 +87,7 @@ describe('ListPublishedArticles', () => {
   it('passes the cursor through unchanged', async () => {
     const { articles, seen } = capturingRepo()
 
-    await new ListPublishedArticles({ articles }).execute({ locale: 'en', after: 'art_9' })
+    await new ListPublishedArticles({ articles, revisions: new InMemoryRevisionRepository() }).execute({ locale: 'en', after: 'art_9' })
 
     expect(seen[0]?.after).toBe('art_9')
   })
@@ -106,7 +106,7 @@ describe('ListPublishedArticles — limit clamping', () => {
     // for every article ever published.
     const { articles, seen } = capturingRepo()
 
-    await new ListPublishedArticles({ articles }).execute({ locale: 'en', limit: requested })
+    await new ListPublishedArticles({ articles, revisions: new InMemoryRevisionRepository() }).execute({ locale: 'en', limit: requested })
 
     expect(seen[0]?.limit).toBe(expected)
   })

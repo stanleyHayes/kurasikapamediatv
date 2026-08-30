@@ -3,7 +3,7 @@ import type { ArticleRepository } from '../ports/article-repository'
 import type { CategoryRepository } from '../ports/category-repository'
 import type { RevisionRepository } from '../ports/revision-repository'
 import { type Page, clampLimit } from '../ports/pagination'
-import { excerptFrom } from './excerpt'
+import { withApprovedListing } from './approved-listing'
 import type { UseCase } from '../ports/use-case'
 
 export interface BrowseCategoryDeps {
@@ -23,15 +23,13 @@ export interface ListedArticle {
   readonly article: Article
   /** Opening of the APPROVED revision. Null if the approval predates history. */
   readonly excerpt: string | null
+  readonly readingMinutes: number
 }
 
 export interface CategoryPage {
   readonly category: Category
   readonly articles: Page<ListedArticle>
 }
-
-/** Long enough for the design's three-line clamp, short enough not to ship the article. */
-const EXCERPT_CHARS = 220
 
 const LIMITS = { fallback: 12, max: 50 }
 
@@ -66,18 +64,6 @@ export class BrowseCategory implements UseCase<BrowseCategoryInput, CategoryPage
   }
 
   private async withExcerpts(articles: readonly Article[]): Promise<readonly ListedArticle[]> {
-    const ids = articles
-      .map((a) => a.snapshot().approvedRevisionId)
-      .filter((id): id is NonNullable<typeof id> => id !== null)
-
-    const revisions = await this.deps.revisions.findManyByIds(ids)
-    const byId = new Map(revisions.map((r) => [r.id, r.body]))
-
-    return articles.map((article) => {
-      const revisionId = article.snapshot().approvedRevisionId
-      const body = revisionId === null ? undefined : byId.get(revisionId)
-
-      return { article, excerpt: body === undefined ? null : excerptFrom(body, EXCERPT_CHARS) }
-    })
+    return withApprovedListing(articles, this.deps.revisions)
   }
 }

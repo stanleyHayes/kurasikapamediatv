@@ -1,5 +1,5 @@
 import { publicBylineName } from '@kurasikapa/application'
-import type { ArticleView, ListedArticleView, ReadableArticle } from '../read-model/article-view'
+import type { CardArticleView, ListedArticleView, ReadableArticle } from '../read-model/article-view'
 import { ApiProblem } from './problem'
 import {
   fetchPublic,
@@ -12,7 +12,7 @@ import {
 } from './public'
 
 export interface PublicPageView {
-  readonly items: readonly ArticleView[]
+  readonly items: readonly CardArticleView[]
   readonly nextCursor: string | null
 }
 
@@ -69,7 +69,10 @@ export async function loadPublishedList(
   if (input.after !== undefined && input.after !== '') query.set('after', input.after)
   const raw = await fetchPublic(apiUrl, `/public/${input.locale}/articles?${query.toString()}`)
   return {
-    items: itemsOf(raw).map((row) => toArticleViewFromDto(publicArticleFrom(row))),
+    items: itemsOf(raw).map((row) => {
+      const listed = listedFrom(row)
+      return { ...toArticleViewFromDto(listed.article), excerpt: listed.excerpt, readingMinutes: listed.readingMinutes }
+    }),
     nextCursor: nextCursorOf(raw),
   }
 }
@@ -90,6 +93,7 @@ export async function loadSectionPage(
       articles: raw.articles.items.map((row) => ({
         ...toArticleViewFromDto(row.article),
         excerpt: row.excerpt,
+        readingMinutes: row.readingMinutes,
       })),
     }
   })
@@ -108,10 +112,11 @@ function sectionFrom(raw: SectionDto | undefined): SectionDto {
 }
 
 function listedFrom(row: unknown): ListedPublicDto {
-  const item = row as { article?: unknown; excerpt?: unknown }
+  const item = row as { article?: unknown; excerpt?: unknown; readingMinutes?: unknown }
   return {
     article: publicArticleFrom(item.article),
     excerpt: typeof item.excerpt === 'string' ? item.excerpt : null,
+    readingMinutes: typeof item.readingMinutes === 'number' ? item.readingMinutes : 1,
   }
 }
 

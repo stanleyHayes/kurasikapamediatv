@@ -6,8 +6,8 @@ import (
 
 // PublicPage is one page of live articles.
 type PublicPage struct {
-	Items      []PublicArticle `json:"items"`
-	NextCursor string          `json:"nextCursor"`
+	Items      []ListedPublic `json:"items"`
+	NextCursor string         `json:"nextCursor"`
 }
 
 // ListPublishedArticles is the homepage rail and sitemap.
@@ -25,9 +25,9 @@ func (uc ListPublishedArticles) Execute(ctx context.Context, in PublicListInput)
 		return PublicPage{}, err
 	}
 
-	items := make([]PublicArticle, 0, len(page.Items))
-	for _, a := range visibleOnly(page.Items) {
-		items = append(items, publicFrom(a))
+	items, err := withApprovedExcerpts(ctx, uc.deps.Revisions, visibleOnly(page.Items))
+	if err != nil {
+		return PublicPage{}, err
 	}
 
 	return PublicPage{Items: items, NextCursor: page.NextCursor}, nil

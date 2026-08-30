@@ -113,7 +113,7 @@ func TestListPublishedArticles(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if len(got.Items) != 1 || got.Items[0].ID != "art_1" {
+		if len(got.Items) != 1 || got.Items[0].Article.ID != "art_1" {
 			t.Errorf("items = %+v", got.Items)
 		}
 	})

@@ -80,14 +80,7 @@ describe('load public path', () => {
         new Response(
           JSON.stringify({
             items: [
-              {
-                id: 'art_1',
-                slug: 'budget-2026',
-                locale: 'en',
-                title: 'Budget 2026',
-                categoryId: 'cat_business',
-                publishedAt: null,
-              },
+              { article: { id: 'art_1', slug: 'budget-2026', locale: 'en', title: 'Budget 2026', categoryId: 'cat_business', publishedAt: null }, excerpt: 'Opening.', readingMinutes: 3 },
             ],
             nextCursor: '',
           }),
@@ -102,6 +95,7 @@ describe('load public path', () => {
       vi.fn(),
     )
     expect(page.items).toHaveLength(1)
+    expect(page.items[0]).toMatchObject({ excerpt: 'Opening.', readingMinutes: 3 })
     expect(page.nextCursor).toBeNull()
   })
 
@@ -127,6 +121,7 @@ describe('load public path', () => {
                     publishedAt: null,
                   },
                   excerpt: 'Opening.',
+                  readingMinutes: 2,
                 },
               ],
               nextCursor: '',
@@ -143,5 +138,6 @@ describe('load public path', () => {
     const section = await loadSectionPage('business', 'en', 'http://api.test', vi.fn())
     expect(section?.name).toBe('Business')
     expect(section?.articles[0]?.excerpt).toBe('Opening.')
+    expect(section?.articles[0]?.readingMinutes).toBe(2)
   })
 })

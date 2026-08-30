@@ -39,7 +39,7 @@ export function editorialQueries(
   const { articles, revisions, search, roles, categories } = graph
   return {
     getPublishedArticle: new GetPublishedArticle({ articles, revisions }),
-    listPublishedArticles: new ListPublishedArticles({ articles }),
+    listPublishedArticles: new ListPublishedArticles({ articles, revisions }),
     browseCategory: new BrowseCategory({ categories, articles, revisions }),
     listSections: new ListSections({ categories }),
     listAuthoredArticles: new ListAuthoredArticles({ articles, revisions }),

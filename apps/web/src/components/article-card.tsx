@@ -1,33 +1,26 @@
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
-import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
+import type { ArticleView, CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
+import { ArticleMeta } from './story/article-meta'
+import { StoryBanner } from './story/story-banner'
 
 /**
  * Regal Precision: border-heavy rather than shadow-heavy, tonal surface shift
  * on hover, a 2px secondary rule that arrives on the entrance easing.
  */
-export function ArticleCard({ article }: { article: ArticleView }): React.ReactElement {
+type CardInput = ArticleView & Partial<Pick<CardArticleView, 'excerpt' | 'readingMinutes'>>
+
+export function ArticleCard({ article }: { article: CardInput }): React.ReactElement {
   return (
-    <article className="group editorial-card border-on-surface/25 hover:border-primary hover:bg-surface-container-lowest border-b">
-      {/* next-intl's Link adds the locale prefix; the path stays locale-free here. */}
-      <Link href={`/articles/${article.slug}`} className="grid gap-5 py-8 sm:grid-cols-[7rem_1fr_1.5rem] sm:items-start">
-        <div className="broadcast-kicker pt-1 text-secondary-ink">{article.categoryId.replace(/^cat_/u, '')}</div>
-        <div><h3 className="max-w-[30ch] font-display text-[1.45rem] leading-[1.08] text-on-surface transition-colors group-hover:text-primary">{article.title}</h3>{article.publishedAt !== null && <time dateTime={article.publishedAt} className="mt-4 block text-xs tabular-nums text-on-surface-variant">{formatDate(article.publishedAt, article.locale)}</time>}</div>
-        <span aria-hidden className="text-xl transition-transform group-hover:-translate-y-1 group-hover:translate-x-1">↗</span>
+    <article className="group editorial-card h-full border border-outline-variant bg-surface-container-lowest transition-colors hover:border-primary">
+      <Link href={`/articles/${article.slug}`} className="flex h-full flex-col">
+        <StoryBanner categoryId={article.categoryId} />
+        <div className="flex flex-1 flex-col p-6">
+          <div className="broadcast-kicker mb-4 text-secondary-ink">{article.categoryId.replace(/^cat_/u, '')}</div>
+          <h3 className="font-display text-[1.65rem] leading-[1.05] text-on-surface transition-colors group-hover:text-primary">{article.title}</h3>
+          {article.excerpt !== undefined && article.excerpt !== null && <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-on-surface-variant">{article.excerpt}</p>}
+          <div className="mt-auto border-t border-outline-variant pt-5"><ArticleMeta article={article} /></div>
+        </div>
       </Link>
     </article>
   )
-}
-
-/**
- * Formatted from the ISO string with an explicit locale and UTC time zone.
- * Without a fixed zone the server and the client can disagree about the day,
- * which React reports as a hydration mismatch.
- */
-function formatDate(iso: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(iso))
 }

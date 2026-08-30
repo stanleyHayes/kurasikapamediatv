@@ -1,5 +1,7 @@
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
-import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
+import type { CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
+import { ArticleMeta } from '@/components/story/article-meta'
+import { StoryBanner } from '@/components/story/story-banner'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 
@@ -10,33 +12,19 @@ const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
  * Border-heavy rather than shadow-heavy, which is the design system's stated
  * elevation rule.
  */
-export function BriefingCard({ article, index = 0 }: { article: ArticleView; index?: number }): React.ReactElement {
+export function BriefingCard({ article, index = 0 }: { article: CardArticleView; index?: number }): React.ReactElement {
   return (
-    <article className={`editorial-card reveal group flex h-full flex-col border-t-2 border-on-surface bg-surface-container-lowest ${index % 2 === 1 ? 'md:translate-y-10' : ''}`}>
+    <article className="editorial-card reveal group flex h-full flex-col border border-outline-variant bg-surface-container-lowest">
       <Link href={`/articles/${article.slug}`} className="flex h-full flex-col">
-        <div className="image-band signal-grid relative h-32 overflow-hidden border-b border-outline-variant bg-primary-container">
-          <div className="absolute bottom-0 right-0 h-3 w-2/3 bg-primary" />
-          <span className="eyebrow absolute left-4 top-4 border border-on-surface bg-surface-container-lowest px-3 py-2 text-[10px] text-on-surface">
-            {section(article.categoryId)}
-          </span>
-        </div>
+        <StoryBanner categoryId={article.categoryId} />
 
-        <div className="flex flex-grow flex-col p-6 md:p-7">
-          <h3 className="font-display text-on-surface group-hover:text-primary mb-5 text-[length:var(--text-headline-sm)] leading-tight transition-colors">
+        <div className="flex flex-grow flex-col p-6">
+          <div className="mb-4 flex items-center justify-between"><span className="broadcast-kicker text-secondary-ink">{section(article.categoryId)}</span><span className="text-[10px] font-bold text-on-surface-variant">0{index + 2}</span></div>
+          <h3 className="font-display text-on-surface group-hover:text-primary text-[length:var(--text-headline-sm)] leading-[1.08] transition-colors">
             {article.title}
           </h3>
-
-          <div className="mt-auto flex items-center justify-between border-t border-outline-variant pt-4 text-[10px] tracking-wider text-on-surface-variant uppercase">
-            {article.publishedAt !== null && (
-              <time dateTime={article.publishedAt}>
-                {new Intl.DateTimeFormat(article.locale, {
-                  day: 'numeric',
-                  month: 'short',
-                  timeZone: 'UTC',
-                }).format(new Date(article.publishedAt))}
-              </time>
-            )}<span aria-hidden>Read ↗</span>
-          </div>
+          {article.excerpt !== null && <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-on-surface-variant">{article.excerpt}</p>}
+          <div className="mt-auto border-t border-outline-variant pt-5"><ArticleMeta article={article} /></div>
         </div>
       </Link>
     </article>

@@ -2,6 +2,8 @@ package editorial
 
 import "strings"
 
+const wordsPerMinute = 200
+
 // ExcerptFrom is the standfirst a listing shows under a headline.
 //
 // Articles carry no separate excerpt field. Taking the opening of the body is
@@ -26,4 +28,15 @@ func ExcerptFrom(body string, limit int) string {
 	}
 
 	return string(cut) + "\u2026"
+}
+
+// ReadingTimeMinutes estimates the approved copy at a newsroom-standard pace.
+func ReadingTimeMinutes(body string) int {
+	words := len(strings.Fields(body))
+	minutes := (words + wordsPerMinute - 1) / wordsPerMinute
+	if minutes < 1 {
+		return 1
+	}
+
+	return minutes
 }

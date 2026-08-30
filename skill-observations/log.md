@@ -122,3 +122,33 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Before changing navigation arrays, inventory every existing destination and classify each as retained, relocated, intentionally removed, or not yet backed by a route; compare that inventory against the rendered desktop and mobile navigation after implementation.
 
 **Principle:** Better navigation hierarchy must not erase product capabilities by accident.
+
+### Observation 8: Local multi-app reviews need an origin preflight
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** A browser-based local design review initially launched the public app on a framework default port while authentication and Studio handoff were configured for a different port.
+**Skill:** browser:control-in-app-browser
+**Type:** open-source
+**Phase/Area:** Local application setup
+
+**Issue:** Both processes appeared healthy, but the origin mismatch caused auth rejection and made the protected app look broken, wasting visual-review time on states that were not representative.
+
+**Suggested improvement:** Before opening a multi-app system, compare dev commands with configured public URLs, start every app on its declared origin, verify local dependencies, and only then begin screenshots or interaction review.
+
+**Principle:** A visual review is trustworthy only when every local app is running on the same origins its authentication and cross-app links expect.
+
+### Observation 9: Reader metadata must come from approved copy
+
+**Status:** OPEN
+**Date:** 2026-08-30
+**Session context:** News cards needed excerpts and reading-time estimates while articles could have a newer unapproved revision in progress.
+**Skill:** frontend-design
+**Type:** open-source
+**Phase/Area:** Content-rich card architecture
+
+**Issue:** Calculating card metadata in components would either guess from headlines, issue one query per card, or risk exposing information from an unpublished revision.
+
+**Suggested improvement:** Treat excerpts and reading time as listing-use-case output, batch-load only approved revisions behind the revision port, and pass serialisable metadata through the read model to every card variant.
+
+**Principle:** Reader-facing metadata is editorial content and must follow the same approval boundary as the article body.

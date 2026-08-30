@@ -22,9 +22,12 @@ export interface ReadableArticle extends ArticleView {
   readonly authorName: string | null
 }
 
-export interface ListedArticleView extends ArticleView {
+export interface CardArticleView extends ArticleView {
   readonly excerpt: string | null
+  readonly readingMinutes: number
 }
+
+export type ListedArticleView = CardArticleView
 
 export const toArticleView = (article: Article): ArticleView => {
   const props = article.snapshot()

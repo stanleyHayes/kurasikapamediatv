@@ -20,6 +20,7 @@ export interface PublishedDto {
 export interface ListedPublicDto {
   readonly article: PublicArticleDto
   readonly excerpt: string | null
+  readonly readingMinutes: number
 }
 
 export interface SectionDto {

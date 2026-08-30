@@ -50,10 +50,10 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
 
   return (
     <main className="mx-auto w-full max-w-[var(--container-page)] px-4 py-6 md:px-8 md:py-10">
-      <header className="reveal signal-grid bg-primary relative mb-12 overflow-hidden border-r-[0.75rem] border-secondary px-7 py-16 text-white md:mb-16 md:px-14 md:py-24">
-        <div aria-hidden className="absolute -bottom-16 right-4 text-[22rem] font-black leading-none text-white/10">{section.name.slice(0, 1)}</div>
-        <p className="eyebrow text-secondary-container mb-5">Section desk / Kurasikapa</p>
-        <h1 className="relative font-display mb-4 text-[3.5rem] leading-[0.9] font-bold tracking-[-0.05em] md:text-[length:var(--text-display-lg)]">
+      <header className="reveal signal-grid bg-primary relative mb-10 overflow-hidden border-r-[0.75rem] border-secondary px-7 py-11 text-white md:px-14 md:py-14">
+        <div aria-hidden className="absolute -bottom-12 right-4 text-[15rem] font-black leading-none text-white/10">{section.name.slice(0, 1)}</div>
+        <p className="eyebrow text-secondary-container mb-4">Section desk / Kurasikapa</p>
+        <h1 className="relative font-display mb-3 text-[3.5rem] leading-[0.9] font-bold tracking-[-0.05em] md:text-[4.8rem]">
           {section.name}
         </h1>
 

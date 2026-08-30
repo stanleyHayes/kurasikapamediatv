@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import type { ArticleView } from './article-view'
+import type { CardArticleView } from './article-view'
 import { homeRails, trendingRail } from './home-rails'
 
-const story = (id: string): ArticleView => ({
+const story = (id: string): CardArticleView => ({
   id,
   slug: id,
   locale: 'en',
   title: id,
   categoryId: 'cat_news',
   publishedAt: '2026-08-11T10:00:00.000Z',
+  excerpt: 'Opening copy.',
+  readingMinutes: 2,
 })
 
 describe('trendingRail', () => {

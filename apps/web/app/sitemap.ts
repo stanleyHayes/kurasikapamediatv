@@ -3,7 +3,7 @@ import { loadPublishedList, loadSections } from '@kurasikapa/web-kit/bff/load-pu
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { routing } from '@kurasikapa/web-kit/i18n/routing'
-import { toArticleView, type ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
+import { toArticleView, type CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 
 /** Sitemaps cap at 50,000 URLs; we page well inside that and stop. */
 const PAGE_SIZE = 50
@@ -80,11 +80,16 @@ async function appendArticles(
 async function publishedViaTypeScript(
   locale: string,
   after: string | undefined,
-): Promise<{ items: ArticleView[]; nextCursor: string | null }> {
+): Promise<{ items: CardArticleView[]; nextCursor: string | null }> {
   const loaded = await container().listPublishedArticles.execute({
     locale,
     limit: PAGE_SIZE,
     after,
   })
-  return { items: loaded.items.map(toArticleView), nextCursor: loaded.nextCursor }
+  return {
+    items: loaded.items.map(({ article, excerpt, readingMinutes }) => ({
+      ...toArticleView(article), excerpt, readingMinutes,
+    })),
+    nextCursor: loaded.nextCursor,
+  }
 }

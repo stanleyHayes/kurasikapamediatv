@@ -5,6 +5,7 @@ import { container } from '../composition/container'
 import { env } from '../composition/env'
 import {
   type ArticleView,
+  type CardArticleView,
   type ListedArticleView,
   type ReadableArticle,
   toArticleView,
@@ -51,7 +52,7 @@ export async function cachedArticle(
 }
 
 export interface ArticleListView {
-  readonly items: readonly ArticleView[]
+  readonly items: readonly CardArticleView[]
   readonly nextCursor: string | null
 }
 
@@ -63,7 +64,9 @@ export async function cachedLatest(locale: string, limit: number): Promise<Artic
   return loadPublishedList({ locale, limit }, env().API_URL, async () => {
     const page = await container().listPublishedArticles.execute({ locale, limit })
     return {
-      items: page.items.map(toArticleView),
+      items: page.items.map(({ article, excerpt, readingMinutes }) => ({
+        ...toArticleView(article), excerpt, readingMinutes,
+      })),
       nextCursor: page.nextCursor,
     }
   })
@@ -130,9 +133,10 @@ export async function cachedSection(slug: string, locale: string): Promise<Secti
     return {
       name: loaded.category.nameIn(locale),
       description: loaded.category.descriptionIn(locale),
-      articles: loaded.articles.items.map(({ article, excerpt }) => ({
+      articles: loaded.articles.items.map(({ article, excerpt, readingMinutes }) => ({
         ...toArticleView(article),
         excerpt,
+        readingMinutes,
       })),
     }
   })

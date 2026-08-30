@@ -125,6 +125,7 @@ describe('standfirsts', () => {
     expect(result?.articles.items[0]?.excerpt).toBe(
       'The approved standfirst that readers should see.',
     )
+    expect(result?.articles.items[0]?.readingMinutes).toBe(1)
   })
 
   it('gives a null excerpt when the article has no approved revision stored', async () => {

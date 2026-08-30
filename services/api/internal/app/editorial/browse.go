@@ -10,8 +10,9 @@ import (
 
 // ListedPublic is a card on a section page: headline plus approved standfirst.
 type ListedPublic struct {
-	Article PublicArticle `json:"article"`
-	Excerpt *string       `json:"excerpt"`
+	Article        PublicArticle `json:"article"`
+	Excerpt        *string       `json:"excerpt"`
+	ReadingMinutes int           `json:"readingMinutes"`
 }
 
 // SectionPage is a category plus its live articles.
@@ -90,11 +91,12 @@ func withApprovedExcerpts(
 
 	out := make([]ListedPublic, 0, len(articles))
 	for _, a := range articles {
-		item := ListedPublic{Article: publicFrom(a)}
+		item := ListedPublic{Article: publicFrom(a), ReadingMinutes: 1}
 		if id, ok := a.ApprovedRevisionID(); ok {
 			if body, found := byID[id]; found {
 				ex := ExcerptFrom(body, publicExcerpt)
 				item.Excerpt = &ex
+				item.ReadingMinutes = ReadingTimeMinutes(body)
 			}
 		}
 		out = append(out, item)

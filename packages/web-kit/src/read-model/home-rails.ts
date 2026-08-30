@@ -1,16 +1,16 @@
-import type { ArticleView } from './article-view'
+import type { ArticleView, CardArticleView } from './article-view'
 
 export const TRENDING_SIZE = 3
 export const BRIEFING_SIZE = 4
 
 export interface HomeRails {
-  readonly lead: ArticleView | undefined
-  readonly briefing: readonly ArticleView[]
+  readonly lead: CardArticleView | undefined
+  readonly briefing: readonly CardArticleView[]
   readonly trending: readonly ArticleView[]
 }
 
 export function homeRails(
-  items: readonly ArticleView[],
+  items: readonly CardArticleView[],
   mostRead: readonly ArticleView[],
 ): HomeRails {
   const [lead, ...rest] = items
