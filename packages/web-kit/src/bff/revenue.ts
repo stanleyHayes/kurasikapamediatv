@@ -10,6 +10,10 @@ export interface MembershipPlanView {
   readonly interval: 'monthly' | 'yearly'; readonly price: MoneyView; readonly benefits: readonly string[]
 }
 export interface CheckoutView { readonly id: string; readonly provider: 'paystack' | 'stripe'; readonly checkoutURL: string }
+export interface RevenueCurrencyView { readonly currency: 'GHS' | 'EUR'; readonly grossMinor: number; readonly subscriptionMinor: number; readonly donationMinor: number; readonly mrrMinor: number }
+export interface RevenuePointView { readonly date: string; readonly currency: 'GHS' | 'EUR'; readonly minor: number }
+export interface SubscriberView { readonly id: string; readonly planId: string; readonly readerId: string; readonly email: string; readonly status: string; readonly price: MoneyView; readonly startedAt: string; readonly paidThrough: string | null }
+export interface RevenueReportView { readonly days: number; readonly generatedAt: string; readonly activeSubscribers: number; readonly pendingSubscribers: number; readonly canceledSubscribers: number; readonly successfulDonations: number; readonly currencies: readonly RevenueCurrencyView[]; readonly trend: readonly RevenuePointView[]; readonly subscribers: readonly SubscriberView[] }
 
 function record(value: unknown): Record<string, unknown> {
   return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
@@ -25,6 +29,18 @@ function plan(value: unknown): MembershipPlanView {
 function checkout(value: unknown): CheckoutView {
   const row = record(value)
   return { id: text(row['ID'] ?? row['id']), provider: row['Provider'] === 'stripe' || row['provider'] === 'stripe' ? 'stripe' : 'paystack', checkoutURL: text(row['CheckoutURL'] ?? row['checkoutURL']) }
+}
+function number(value: unknown): number { return typeof value === 'number' && Number.isFinite(value) ? value : 0 }
+function currency(value: unknown): 'GHS' | 'EUR' { return value === 'EUR' ? 'EUR' : 'GHS' }
+function money(value: unknown): MoneyView { const row = record(value); return { minor: number(row['minor'] ?? row['Minor']), currency: currency(row['currency'] ?? row['Currency']) } }
+function report(value: unknown): RevenueReportView {
+  const row = record(value)
+  return {
+    days: number(row['days']), generatedAt: text(row['generatedAt']), activeSubscribers: number(row['activeSubscribers']), pendingSubscribers: number(row['pendingSubscribers']), canceledSubscribers: number(row['canceledSubscribers']), successfulDonations: number(row['successfulDonations']),
+    currencies: Array.isArray(row['currencies']) ? row['currencies'].map((item) => { const value = record(item); return { currency: currency(value['currency']), grossMinor: number(value['grossMinor']), subscriptionMinor: number(value['subscriptionMinor']), donationMinor: number(value['donationMinor']), mrrMinor: number(value['mrrMinor']) } }) : [],
+    trend: Array.isArray(row['trend']) ? row['trend'].map((item) => { const value = record(item); return { date: text(value['date']), currency: currency(value['currency']), minor: number(value['minor']) } }) : [],
+    subscribers: Array.isArray(row['subscribers']) ? row['subscribers'].map((item) => { const value = record(item); return { id: text(value['id']), planId: text(value['planId']), readerId: text(value['readerId']), email: text(value['email']), status: text(value['status']), price: money(value['price']), startedAt: text(value['startedAt']), paidThrough: value['paidThrough'] === null ? null : text(value['paidThrough']) } }) : [],
+  }
 }
 
 export async function loadMembershipPlans(locale: string): Promise<readonly MembershipPlanView[]> {
@@ -59,6 +75,14 @@ export async function createAndActivateMembershipPlan(actor: Actor, input: unkno
   const id = text(created['id'])
   await adminPost(actor, `/revenue/membership-plans/${id}/activate`)
   return { id }
+}
+
+export async function loadRevenueReport(actor: Actor, days: 7 | 30 | 90): Promise<RevenueReportView> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return report({ days, currencies: [], trend: [], subscribers: [] })
+  const response = await fetch(joinUrl(apiUrl, `/revenue/report?days=${String(days)}`), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
+  if (!response.ok) throw await problemFromResponse(response)
+  return report(await response.json())
 }
 
 export async function startMembershipCheckout(actor: Actor, input: { readonly planID: string; readonly email: string; readonly returnURL: string }): Promise<CheckoutView> {

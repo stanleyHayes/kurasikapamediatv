@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { AnalyticsRoot } from '@/analytics/analytics-root'
+import { env } from '@kurasikapa/web-kit/composition/env'
 import { routing } from '@kurasikapa/web-kit/i18n/routing'
 import '../globals.css'
 
@@ -38,6 +39,7 @@ export async function generateMetadata({
   const { locale } = await params
 
   return {
+    metadataBase: new URL(env().APP_URL),
     title: { default: 'Kurasikapa Media TV', template: '%s · Kurasikapa Media TV' },
     description:
       'Television and digital journalism that educates, motivates and informs — from Kurasikapa Media TV.',
@@ -45,8 +47,8 @@ export async function generateMetadata({
       canonical: `/${locale}`,
       languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
     },
-    openGraph: { type: 'website', siteName: 'Kurasikapa Media TV', locale },
-    twitter: { card: 'summary_large_image' },
+    openGraph: { type: 'website', siteName: 'Kurasikapa Media TV', locale, images: [{ url: '/og-image', width: 1200, height: 630, alt: 'Kurasikapa Media TV' }] },
+    twitter: { card: 'summary_large_image', images: ['/og-image'] },
     appleWebApp: { capable: true, title: 'Kurasikapa', statusBarStyle: 'black-translucent' },
   }
 }

@@ -232,11 +232,13 @@ type MembershipPlanRepository interface {
 type SubscriptionRepository interface {
 	FindByID(context.Context, shared.SubscriptionID) (revenue.Subscription, error)
 	FindEntitledForReader(context.Context, shared.UserID, time.Time) (revenue.Subscription, error)
+	ListRecent(context.Context, time.Time, int) ([]revenue.Subscription, error)
 	Save(context.Context, revenue.Subscription) error
 }
 
 type DonationRepository interface {
 	FindByID(context.Context, shared.DonationID) (revenue.Donation, error)
+	ListRecent(context.Context, time.Time, int) ([]revenue.Donation, error)
 	Save(context.Context, revenue.Donation) error
 }
 

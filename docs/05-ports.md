@@ -187,7 +187,7 @@ cadence+locale+period so a second tick does not double-mail.
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
 
-**revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `ServePlacement`
+**revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `BuildRevenueReport` · `ServePlacement`
 
 `StartSubscription` and `RecordDonation` now create provider checkout sessions
 through `PaymentGateway` and persist pending records only after the provider
@@ -196,6 +196,11 @@ Paystack or Stripe event before `ConfirmSubscriptionPayment` or
 `ConfirmDonationPayment` runs. A return URL is navigation, never proof of
 payment. Entitlement is granted only by a confirmed subscription whose
 `paidThrough` boundary is still in the future.
+
+`BuildRevenueReport` requires `revenue:read`, reads bounded repository views,
+keeps GHS and EUR totals separate, derives confirmed gross revenue and MRR, and
+returns a recent subscriber ledger. It never treats a pending checkout as
+revenue and never invents an exchange rate.
 
 **insight** — `RecordPageView` · `BuildNewsroomReport` · `BuildSeoReport` · `BuildRevenueSnapshot`
 

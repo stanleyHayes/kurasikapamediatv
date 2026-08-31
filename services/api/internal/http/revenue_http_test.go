@@ -132,3 +132,14 @@ func TestVerifiedSubscriptionWebhookIsIdempotent(t *testing.T) {
 		}
 	}
 }
+
+func TestRevenueReportIsRoleProtectedAndReturnsLedger(t *testing.T) {
+	handler := revenueServer()
+	if response := request(handler, http.MethodGet, "/revenue/report?days=7", "", false); response.Code != http.StatusForbidden {
+		t.Fatalf("unsigned report: %d %s", response.Code, response.Body.String())
+	}
+	response := request(handler, http.MethodGet, "/revenue/report?days=7", "", true)
+	if response.Code != http.StatusOK || !bytes.Contains(response.Body.Bytes(), []byte(`"days":7`)) || !bytes.Contains(response.Body.Bytes(), []byte(`"subscribers":[]`)) {
+		t.Fatalf("report: %d %s", response.Code, response.Body.String())
+	}
+}

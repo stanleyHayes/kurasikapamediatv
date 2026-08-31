@@ -32,6 +32,7 @@ type SubscriptionState struct {
 	ID          shared.SubscriptionID
 	PlanID      shared.MembershipPlanID
 	ReaderID    shared.UserID
+	Email       string
 	Price       Money
 	Provider    PaymentProvider
 	ProviderRef string

@@ -21,6 +21,7 @@ export function newsArticleJsonLd(
   article: ArticleView & { readonly authorName?: string | null },
   publisher: Publisher,
   canonical: string,
+  image?: string,
 ): Record<string, unknown> {
   const json: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -36,6 +37,8 @@ export function newsArticleJsonLd(
       url: publisher.url,
     },
   }
+
+  if (image !== undefined && image !== '') json['image'] = [image]
 
   // Only present once the article is actually live. Emitting a publish date
   // for a draft would be a lie told to a crawler.

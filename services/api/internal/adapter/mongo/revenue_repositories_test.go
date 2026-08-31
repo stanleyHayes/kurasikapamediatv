@@ -32,7 +32,7 @@ func TestRevenueRepositoriesRoundTripAndResolveEntitlement(t *testing.T) {
 
 	paidThrough := testNow.Add(30 * 24 * time.Hour)
 	paidAt := testNow.Add(-time.Hour)
-	sub := revenue.ReconstituteSubscription(revenue.SubscriptionState{ID: "sub_1", PlanID: plan.ID(), ReaderID: "reader", Price: plan.State().Price, Provider: revenue.ProviderPaystack, ProviderRef: "checkout_1", PaymentRef: "payment_1", Status: revenue.SubscriptionActive, StartedAt: testNow.Add(-2 * time.Hour), PaidAt: &paidAt, PaidThrough: &paidThrough})
+	sub := revenue.ReconstituteSubscription(revenue.SubscriptionState{ID: "sub_1", PlanID: plan.ID(), ReaderID: "reader", Email: "reader@example.com", Price: plan.State().Price, Provider: revenue.ProviderPaystack, ProviderRef: "checkout_1", PaymentRef: "payment_1", Status: revenue.SubscriptionActive, StartedAt: testNow.Add(-2 * time.Hour), PaidAt: &paidAt, PaidThrough: &paidThrough})
 	if err = subscriptions.Save(ctx, sub); err != nil {
 		t.Fatal(err)
 	}
@@ -43,6 +43,10 @@ func TestRevenueRepositoriesRoundTripAndResolveEntitlement(t *testing.T) {
 	if _, err = subscriptions.FindEntitledForReader(ctx, "reader", paidThrough); !errors.Is(err, ports.ErrNotFound) {
 		t.Fatal(err)
 	}
+	recentSubscriptions, err := subscriptions.ListRecent(ctx, testNow.Add(-24*time.Hour), 10)
+	if err != nil || len(recentSubscriptions) != 1 || recentSubscriptions[0].State().Email != "reader@example.com" {
+		t.Fatal(recentSubscriptions, err)
+	}
 
 	donation := revenue.ReconstituteDonation(revenue.DonationState{ID: "don_1", Amount: revenue.Money{Minor: 5000, Currency: revenue.CurrencyGHS}, Provider: revenue.ProviderPaystack, ProviderRef: "don_checkout_1", PaymentRef: "don_payment_1", Email: "reader@example.com", Status: revenue.PaymentSucceeded, StartedAt: paidAt, PaidAt: &testNow})
 	if err = donations.Save(ctx, donation); err != nil {
@@ -51,6 +55,10 @@ func TestRevenueRepositoriesRoundTripAndResolveEntitlement(t *testing.T) {
 	gotDonation, err := donations.FindByID(ctx, shared.DonationID("don_1"))
 	if err != nil || gotDonation.State().PaymentRef != "don_payment_1" {
 		t.Fatal(err)
+	}
+	recentDonations, err := donations.ListRecent(ctx, testNow.Add(-24*time.Hour), 10)
+	if err != nil || len(recentDonations) != 1 {
+		t.Fatal(recentDonations, err)
 	}
 }
 
@@ -68,8 +76,8 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 	}
 	checks := map[string][]string{
 		adapter.CollMembershipPlans: {"membership_slug_unique", "active_membership_plans"},
-		adapter.CollSubscriptions:   {"subscription_provider_ref_unique", "reader_entitlement"},
-		adapter.CollDonations:       {"donation_provider_ref_unique", "donation_revenue_recent"},
+		adapter.CollSubscriptions:   {"subscription_provider_ref_unique", "reader_entitlement", "revenue_subscribers_recent"},
+		adapter.CollDonations:       {"donation_provider_ref_unique", "donation_revenue_recent", "donation_checkout_recent"},
 	}
 	for collection, expected := range checks {
 		names := indexNames(t, h, collection)

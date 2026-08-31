@@ -63,6 +63,7 @@ type Deps struct {
 	CheckEntitlement           apprevenue.CheckEntitlement
 	ConfirmSubscriptionPayment apprevenue.ConfirmSubscriptionPayment
 	ConfirmDonationPayment     apprevenue.ConfirmDonationPayment
+	BuildRevenueReport         apprevenue.BuildRevenueReport
 	PaymentWebhooks            ports.PaymentWebhookVerifier
 	Roles                      ports.RoleRepository
 	Clock                      ports.Clock
@@ -119,6 +120,7 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /revenue/subscriptions", deps.handleStartSubscription)
 	mux.HandleFunc("POST /public/donations", deps.handleRecordDonation)
 	mux.HandleFunc("GET /revenue/entitlement", deps.handleCheckEntitlement)
+	mux.HandleFunc("GET /revenue/report", deps.handleRevenueReport)
 	mux.HandleFunc("POST /webhooks/payments/{provider}", deps.handlePaymentWebhook)
 
 	return withRequestLogging(deps.Log, mux)

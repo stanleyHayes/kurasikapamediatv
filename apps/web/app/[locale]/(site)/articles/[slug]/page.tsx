@@ -28,6 +28,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   if (article === null) return { title: 'Not found', robots: { index: false } }
 
+  const socialImage = `/og-image?title=${encodeURIComponent(article.title)}`
+
   return {
     title: article.title,
     alternates: { canonical: `/${locale}/articles/${article.slug}` },
@@ -35,8 +37,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       type: 'article',
       title: article.title,
       locale,
+      images: [{ url: socialImage, width: 1200, height: 630, alt: article.title }],
       ...(article.publishedAt !== null ? { publishedTime: article.publishedAt } : {}),
     },
+    twitter: { card: 'summary_large_image', title: article.title, images: [socialImage] },
   }
 }
 
@@ -94,10 +98,12 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
   if (article === null) notFound()
 
   const canonical = `${env().APP_URL}/${locale}/articles/${article.slug}`
+  const socialImage = `${env().APP_URL}/og-image?title=${encodeURIComponent(article.title)}`
   const jsonLd = newsArticleJsonLd(
     article,
     { name: 'Kurasikapa Media TV', url: env().APP_URL },
     canonical,
+    socialImage,
   )
 
   return (

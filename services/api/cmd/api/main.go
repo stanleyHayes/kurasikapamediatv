@@ -189,6 +189,7 @@ func run(log *slog.Logger) error {
 		CheckEntitlement:           apprevenue.NewCheckEntitlement(revenueDeps),
 		ConfirmSubscriptionPayment: apprevenue.NewConfirmSubscriptionPayment(revenueDeps),
 		ConfirmDonationPayment:     apprevenue.NewConfirmDonationPayment(revenueDeps),
+		BuildRevenueReport:         apprevenue.NewBuildRevenueReport(revenueDeps),
 		PaymentWebhooks:            paymentWebhooks,
 		Roles:                      roles,
 		Clock:                      clock,

@@ -67,6 +67,15 @@ func (s *subStore) FindEntitledForReader(_ context.Context, reader shared.UserID
 	}
 	return domainrevenue.Subscription{}, ports.ErrNotFound
 }
+func (s *subStore) ListRecent(_ context.Context, since time.Time, limit int) ([]domainrevenue.Subscription, error) {
+	out := make([]domainrevenue.Subscription, 0, limit)
+	for _, value := range s.rows {
+		if !value.State().StartedAt.Before(since) && len(out) < limit {
+			out = append(out, value)
+		}
+	}
+	return out, nil
+}
 func (s *subStore) Save(_ context.Context, value domainrevenue.Subscription) error {
 	s.rows[value.ID()] = value
 	return nil
@@ -82,6 +91,15 @@ func (s *donationStore) FindByID(_ context.Context, id shared.DonationID) (domai
 		return domainrevenue.Donation{}, ports.ErrNotFound
 	}
 	return value, nil
+}
+func (s *donationStore) ListRecent(_ context.Context, since time.Time, limit int) ([]domainrevenue.Donation, error) {
+	out := make([]domainrevenue.Donation, 0, limit)
+	for _, value := range s.rows {
+		if !value.State().StartedAt.Before(since) && len(out) < limit {
+			out = append(out, value)
+		}
+	}
+	return out, nil
 }
 func (s *donationStore) Save(_ context.Context, value domainrevenue.Donation) error {
 	s.rows[value.ID()] = value

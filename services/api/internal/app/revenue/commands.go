@@ -92,7 +92,7 @@ func (u StartSubscription) Execute(ctx context.Context, input StartSubscriptionI
 		return CheckoutResult{}, err
 	}
 	subscription, err := domainrevenue.StartSubscription(domainrevenue.SubscriptionState{
-		ID: id, PlanID: plan.ID(), ReaderID: input.ReaderID, Price: plan.State().Price,
+		ID: id, PlanID: plan.ID(), ReaderID: input.ReaderID, Email: input.Email, Price: plan.State().Price,
 		Provider: session.Provider, ProviderRef: session.ProviderRef,
 	}, u.deps.Clock.Now())
 	if err != nil {

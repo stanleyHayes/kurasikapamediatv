@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
@@ -120,6 +121,21 @@ func (d Deps) handleCheckEntitlement(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, d.Log, http.StatusOK, map[string]bool{"entitled": allowed})
+}
+
+func (d Deps) handleRevenueReport(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	days, _ := strconv.Atoi(r.URL.Query().Get("days"))
+	report, err := d.BuildRevenueReport.Execute(r.Context(), actor, days)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, report)
 }
 
 func membershipPlanView(plan revenue.MembershipPlan) map[string]any {

@@ -79,6 +79,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		CheckEntitlement:           apprevenue.NewCheckEntitlement(revenueDeps),
 		ConfirmSubscriptionPayment: apprevenue.NewConfirmSubscriptionPayment(revenueDeps),
 		ConfirmDonationPayment:     apprevenue.NewConfirmDonationPayment(revenueDeps),
+		BuildRevenueReport:         apprevenue.NewBuildRevenueReport(revenueDeps),
 		PaymentWebhooks:            faketesting.PaymentWebhookFake{},
 		Roles:                      roles{granted: granted},
 		Clock:                      faketesting.FixedClock{At: now},

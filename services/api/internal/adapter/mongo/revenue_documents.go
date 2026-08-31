@@ -30,6 +30,7 @@ type subscriptionDoc struct {
 	ID          string     `bson:"_id"`
 	PlanID      string     `bson:"planId"`
 	ReaderID    string     `bson:"readerId"`
+	Email       string     `bson:"email"`
 	Price       moneyDoc   `bson:"price"`
 	Provider    string     `bson:"provider"`
 	ProviderRef string     `bson:"providerRef"`

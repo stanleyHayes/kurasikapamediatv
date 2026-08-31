@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { createAndActivateMembershipPlan, loadMembershipPlans, startDonationCheckout, startMembershipCheckout } from './revenue'
+import { createAndActivateMembershipPlan, loadMembershipPlans, loadRevenueReport, startDonationCheckout, startMembershipCheckout } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -52,5 +52,27 @@ describe('revenue BFF', () => {
     await expect(startDonationCheckout({ amount: { minor: 5000, currency: 'GHS' }, email: 'reader@example.com', message: '', anonymous: false, returnURL: 'https://site.test/support' })).rejects.toThrow(/Payments are not configured/u)
     vi.stubEnv('API_URL', undefined); resetEnv()
     await expect(createAndActivateMembershipPlan(new Actor(userId('admin'), ['administrator']), {})).rejects.toThrow(/API_URL/u)
+  })
+
+  it('loads and normalises the protected revenue report', async () => {
+    configure()
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ days: 7, activeSubscribers: 2, currencies: [{ currency: 'EUR', grossMinor: 12000, mrrMinor: 1000 }], trend: [{ date: '2026-08-31', currency: 'EUR', minor: 12000 }], subscribers: [{ id: 'sub_1', email: 'reader@example.com', status: 'active', price: { minor: 12000, currency: 'EUR' }, paidThrough: null }] }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    const actor = new Actor(userId('admin'), ['administrator'])
+    await expect(loadRevenueReport(actor, 7)).resolves.toMatchObject({ days: 7, activeSubscribers: 2, currencies: [{ currency: 'EUR', grossMinor: 12000 }] })
+    expect(fetcher.mock.calls[0]?.[1]?.headers).toMatchObject({ 'X-Kurasikapa-User': 'admin' })
+    vi.stubEnv('API_URL', undefined); resetEnv()
+    await expect(loadRevenueReport(actor, 30)).resolves.toMatchObject({ days: 30, subscribers: [] })
+  })
+
+  it('fails closed on report errors and normalises incomplete report rows', async () => {
+    configure()
+    const actor = new Actor(userId('admin'), ['administrator'])
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ type: 'not_permitted', title: 'Not permitted' }), { status: 403 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ days: 'bad', currencies: [{ currency: 'USD' }], trend: 'bad', subscribers: [{ price: { Minor: 500, Currency: 'GHS' }, paidThrough: '2026-09-30T00:00:00Z' }] }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(loadRevenueReport(actor, 90)).rejects.toThrow(/Not permitted/u)
+    await expect(loadRevenueReport(actor, 90)).resolves.toMatchObject({ days: 0, currencies: [{ currency: 'GHS', grossMinor: 0 }], trend: [], subscribers: [{ price: { minor: 500, currency: 'GHS' }, paidThrough: '2026-09-30T00:00:00Z' }] })
   })
 })
