@@ -301,3 +301,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Add a workflow-entry inventory to the redesign scan: trace every route that creates or edits the same entity, identify the canonical input primitives, search for native controls and simplified duplicates, and verify that loading boundaries use the same visual system.
 
 **Principle:** A premium workflow is only as coherent as its earliest entry point; shared data must use shared authoring primitives from creation through final editing.
+
+### Observation 20: Release loops must budget platform deployment quotas
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** Publishing repeated production fixes in a multi-deployment monorepo until a hosting provider rejected the final corrected build at its daily deployment cap.
+**Skill:** New skill candidate: release-budgeting
+**Type:** open-source
+**Phase/Area:** Production release planning
+
+**Issue:** Several small commits each triggered deployment work, consuming a shared hosting quota before the final entry-route correction could be published. Green code and CI were insufficient because the release transport itself had been exhausted.
+
+**Suggested improvement:** Before a long production-remediation loop, inspect provider deployment caps, batch tightly related fixes behind local and CI gates, and reserve at least one deployment for the final smoke-tested candidate. Record quota exhaustion as an external release blocker rather than representing code-complete work as live.
+
+**Principle:** Deployment capacity is a finite release dependency and should be budgeted like CI minutes, credentials, and maintenance windows.
