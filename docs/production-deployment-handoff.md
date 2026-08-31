@@ -4,6 +4,35 @@ Prepared 31 August 2026. Prices are USD, exclude tax and foreign-exchange fees,
 and must be rechecked at purchase. “Mid” is a credible launch setup; “high” is
 a growth budget, not an enterprise quote.
 
+## Environment audit completed
+
+The gitignored `.env.production` is the single updated local handoff file. It
+now contains the deployed Render `API_URL` plus newly generated, independent
+values for `BETTER_AUTH_SECRET`, `REVALIDATE_SECRET`, `CRON_SECRET` and the
+VAPID public/private key pair. Their values are deliberately not repeated in
+this document or source control.
+
+The following provider-issued values are still required before their matching
+features can be enabled. Do not upload blank entries to Vercel or Render:
+
+| Provider / owner | Values still to provide | What remains disabled |
+|---|---|---|
+| Google Cloud | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google sign-in |
+| Meta | Facebook OAuth pair plus `META_APP_ID`, `META_APP_SECRET`, Page token, Page ID and Instagram user ID | Facebook/Instagram sign-in and publishing |
+| Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
+| Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
+| Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
+| AWS | IVS region and least-privilege IAM access key pair | Live channel provisioning |
+| Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
+| Cloudflare | Turnstile site key and secret | Production CAPTCHA |
+| Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
+| SonarCloud | organization token, if private analysis is wanted | Hosted code-quality reporting only |
+
+`MONGODB_URI` and `ANTHROPIC_API_KEY` are present locally. Rotate either one if
+it has ever been shared outside the password manager. The old
+`APPLE_CLIENT_ID` / `APPLE_CLIENT_SECRET` entries are legacy placeholders and
+must not be deployed; the four-value Apple setup above is the one the code uses.
+
 ## What you need to provide
 
 ### Ownership and access
@@ -84,11 +113,11 @@ a ticket, source control or a screen recording.
 
 | Service | Mid/month | High/month | Assumption |
 |---|---:|---:|---|
-| Vercel | $40 | $150 | Pro base plus usage headroom for two Next deployments |
-| Render API | $25 | $170 | One 1 CPU/2 GB instance vs two 2 CPU/4 GB instances |
+| Vercel | $40 | $150 | $20 Pro platform fee plus a second deploying seat/usage allowance at mid; higher traffic and observability allowance at high |
+| Render API | $25 | $170 | One 1 CPU/2 GB service vs two 2 CPU/4 GB services for availability |
 | MongoDB Atlas | $58 | $394 | M10 vs M30, before backup/network overage |
 | Cloudinary | $99 | $249 | Plus vs Advanced media plan |
-| Resend | $20 | $90 | 50k vs 100k transactional emails |
+| Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
 | Anthropic | $50 | $300 | Editorial-assistance spending cap; usage based |
 | AWS IVS/live | $250 | $2,000 | Working allowance; driven mainly by viewer-hours |
 | Monitoring/DNS/domain | $25 | $150 | DNS can be free; includes domain amortisation and observability allowance |
@@ -98,8 +127,9 @@ a ticket, source control or a screen recording.
 The high Atlas figure uses the published M30 base rate of $0.54/hour (about
 $394 over a 730-hour month). The mid figure uses M10 at $0.08/hour (about $58).
 Live cost is the least predictable line: AWS charges input and viewer output
-separately. Standard input is $2/hour; output varies by resolution and viewer
-region. Set an AWS Budget alert before the first public broadcast.
+separately. Standard input is $2/hour; the first 10,000 HD viewer-hours in
+Europe are $0.072/hour, while Ghanaian viewers may be billed through another
+delivery region. Set an AWS Budget alert before the first public broadcast.
 
 Paystack is not included in the fixed total. Ghana pricing is 1.95% per local
 or international transaction, with no integration or maintenance fee; transfers
@@ -143,6 +173,9 @@ but the applicable rate and eligibility depend on the legal account country.
   through a locale.
 - Studio sign-in and the public Team route return HTTP 200; the Render API
   `/healthz` endpoint reports healthy.
+- The API's public newsroom-profile endpoint is deployed and returns HTTP 200.
+  The empty profile list is expected until approved journalist identities and
+  portraits are supplied and published from Studio.
 - `kurasikapa.tv` is attached to the Web project but does not currently resolve
   in DNS. Do not use it in launch announcements until DNS and TLS checks pass.
 - Vercel currently builds with Node 24.x while the repository requests Node

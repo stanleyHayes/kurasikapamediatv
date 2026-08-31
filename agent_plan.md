@@ -1152,7 +1152,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 23. KUR-84 — credible newsroom profiles and accountable bylines (2026-08-31)
 
-**Status: VERIFIED; production release active.**
+**Status: DEPLOYED; client identities remain the launch-content gate.**
 
 - Added a Go-owned `StaffProfile` identity aggregate and `profile:manage`
   permission. Profiles are translated per user and locale; updates return a
@@ -1179,3 +1179,24 @@ are live. Custom-domain DNS remains an external registrar action.**
   and use the existing recency fallback, keeping Vercel prerendering independent
   of Mongo while preserving the local TypeScript fallback until audience
   ranking is ported to Go.
+- Commit `5706c3b` passed CI run `33434346227`, including the Go service and
+  real-Mongo integration, package gates, builds, E2E/accessibility, Lighthouse
+  and secret scanning. Production smoke checks return 200 for API `/healthz`,
+  API `/public/en/team`, public `/en/team` and Studio
+  `/studio/en/sign-in`. The public profile list is intentionally empty until
+  the client approves real names, biographies and portraits.
+
+## 24. Production environment and client handoff refresh (2026-08-31)
+
+**Status: LOCAL HANDOFF READY; provider credentials and client material remain.**
+
+- Audited `.env.production` by key without printing secrets. Added the live
+  Render `API_URL`; generated valid high-entropy auth, revalidation and cron
+  secrets plus a valid P-256 VAPID key pair. The gitignored file is the only
+  local copy and none of its values entered source control.
+- Expanded `docs/production-deployment-handoff.md` with the exact provider-owned
+  values still required, the feature each one unlocks, current official pricing
+  assumptions and the verified deployment state.
+- Remaining launch inputs are external rather than invented: provider keys and
+  approvals, real newsroom identities/content/programming, final domain/DNS,
+  legal copy and named operational owners.
