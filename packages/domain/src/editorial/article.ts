@@ -21,6 +21,7 @@ export interface ArticleProps {
   readonly categoryId: CategoryId
   readonly tagIds: readonly TagId[]
   readonly hero?: ArticleHero | null
+  readonly narration?: ArticleNarration | null
   readonly status: ArticleStatus
   readonly approvedRevisionId: RevisionId | null
   readonly scheduledAt: Date | null
@@ -35,6 +36,15 @@ export interface ArticleHero {
   readonly credit: string
   readonly width: number
   readonly height: number
+}
+
+export interface ArticleNarration {
+  readonly assetId: AssetId
+  readonly sourceRevisionId: RevisionId
+  readonly secureUrl: string
+  readonly mimeType: 'audio/mpeg'
+  readonly durationSeconds: number
+  readonly voice: string
 }
 
 /** What a caller supplies to create a draft. Everything else is derived. */
@@ -72,6 +82,7 @@ export class Article {
       ...input,
       tagIds: input.tagIds ?? [],
       hero: null,
+      narration: null,
       authorId: actor.id,
       status: 'draft',
       approvedRevisionId: null,
@@ -156,11 +167,14 @@ export class Article {
 
   approve(actor: Actor, revisionId: RevisionId): Article {
     const next = this.transition('approve', actor)
-    return next.with({ approvedRevisionId: revisionId })
+    return next.with({
+      approvedRevisionId: revisionId,
+      narration: next.props.narration?.sourceRevisionId === revisionId ? next.props.narration : null,
+    })
   }
 
   reject(actor: Actor): Article {
-    return this.transition('reject', actor).with({ approvedRevisionId: null })
+    return this.transition('reject', actor).with({ approvedRevisionId: null, narration: null })
   }
 
   schedule(actor: Actor, at: Date, now: Date): Article {

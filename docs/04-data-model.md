@@ -53,8 +53,9 @@ erDiagram
 
 | Collection | Purpose | Notable fields |
 |---|---|---|
-| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `hero`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
+| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `hero`, approved `narration`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
 | `article_revisions` | immutable history | `articleId`, `seq`, `body`, `authorId`, `createdAt` |
+| `narration_jobs` | private asynchronous article-to-audio work | `articleId`, exact `revisionId`, locale, voice, status, provider task id, ready `assetId`, failure reason and timestamps |
 | `categories` | hierarchy | `parentId`, `slugs{locale}`, `names{locale}`, `order` |
 | `tags` | flat | `slug`, `names{locale}`, `usageCount` |
 | `role_assignments` | our RBAC, keyed by the auth user id | `roles[]` |

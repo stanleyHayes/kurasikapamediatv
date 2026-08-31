@@ -176,6 +176,14 @@ type. The Cloudinary adapter derives an `sp_auto` HLS manifest and first-frame
 poster lazily; the application and HTTP layers know nothing about Cloudinary
 transformation syntax.
 
+`NarrationProvider` starts and polls long-form synthesis without leaking Polly,
+S3 or Cloudinary types. `RequestArticleNarration` accepts only the current
+approved English or French revision; `ProcessNarrationJobs` promotes completed
+audio into a ready media asset; `AttachArticleNarration` requires
+`article:publish` and is the only operation that makes audio public. Twi is
+deliberately refused until a reviewed Twi-capable voice provider exists. The
+public player labels the voice as synthetic and links to the article transcript.
+
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 
 `SendBreakingAlert` is live in TypeScript: an editor with `article:publish` mails

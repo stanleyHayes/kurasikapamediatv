@@ -39,6 +39,15 @@ func articleToDomain(doc articleDoc) editorial.Article {
 			Width: doc.Hero.Width, Height: doc.Hero.Height,
 		}
 	}
+	var narration *editorial.ArticleNarration
+	if doc.Narration != nil {
+		narration = &editorial.ArticleNarration{
+			AssetID:          shared.AssetID(doc.Narration.AssetID),
+			SourceRevisionID: shared.RevisionID(doc.Narration.SourceRevisionID),
+			SecureURL:        doc.Narration.SecureURL, MIMEType: doc.Narration.MIMEType,
+			DurationSeconds: doc.Narration.DurationSeconds, Voice: doc.Narration.Voice,
+		}
+	}
 
 	return editorial.Reconstitute(editorial.ArticleState{
 		ID:                 shared.ArticleID(doc.ID),
@@ -50,6 +59,7 @@ func articleToDomain(doc articleDoc) editorial.Article {
 		CategoryID:         shared.CategoryID(doc.CategoryID),
 		TagIDs:             tags,
 		Hero:               hero,
+		Narration:          narration,
 		Status:             editorial.Status(doc.Status),
 		ApprovedRevisionID: approved,
 		ScheduledAt:        doc.ScheduledAt,
@@ -81,6 +91,14 @@ func articleToDoc(article editorial.Article, updatedAt time.Time) articleDoc {
 			Width: s.Hero.Width, Height: s.Hero.Height,
 		}
 	}
+	var narration *articleNarrationDoc
+	if s.Narration != nil {
+		narration = &articleNarrationDoc{
+			AssetID: s.Narration.AssetID.String(), SourceRevisionID: s.Narration.SourceRevisionID.String(),
+			SecureURL: s.Narration.SecureURL, MIMEType: s.Narration.MIMEType,
+			DurationSeconds: s.Narration.DurationSeconds, Voice: s.Narration.Voice,
+		}
+	}
 
 	return articleDoc{
 		ID:                 s.ID.String(),
@@ -92,6 +110,7 @@ func articleToDoc(article editorial.Article, updatedAt time.Time) articleDoc {
 		CategoryID:         s.CategoryID.String(),
 		TagIDs:             tags,
 		Hero:               hero,
+		Narration:          narration,
 		Status:             string(s.Status),
 		ApprovedRevisionID: approved,
 		ScheduledAt:        s.ScheduledAt,

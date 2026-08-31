@@ -6,12 +6,20 @@ import { publishArticle } from '@kurasikapa/web-kit/bff/publish-path'
 import { transitionArticle } from '@kurasikapa/web-kit/bff/transition-path'
 import { updateDraft } from '@kurasikapa/web-kit/bff/update-draft-path'
 import { attachArticleHero } from '@kurasikapa/web-kit/bff/media-library'
+import {
+  attachGeneratedNarration,
+  loadLatestArticleNarration,
+  requestArticleNarration,
+  type ArticleNarrationView,
+  type NarrationJobView,
+} from '@kurasikapa/web-kit/bff/article-narration'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { type ActionResult, attempt } from '@kurasikapa/web-kit/actions/result'
 import {
   approveSchema,
+  attachArticleNarrationSchema,
   attachArticleHeroSchema,
   articleRefSchema,
   createDraftSchema,
@@ -72,6 +80,27 @@ export async function attachArticleHeroAction(input: unknown): Promise<ActionRes
     return attachArticleHero(actor, parsed.articleId, {
       assetId: parsed.assetId, caption: parsed.caption, credit: parsed.credit,
     })
+  })
+}
+
+export async function requestArticleNarrationAction(input: unknown): Promise<ActionResult<NarrationJobView>> {
+  return attempt(async () => {
+    const { articleId } = parseInput(articleRefSchema, input)
+    return requestArticleNarration(await requireActor(), articleId)
+  })
+}
+
+export async function getArticleNarrationAction(input: unknown): Promise<ActionResult<NarrationJobView | null>> {
+  return attempt(async () => {
+    const { articleId } = parseInput(articleRefSchema, input)
+    return loadLatestArticleNarration(await requireActor(), articleId)
+  })
+}
+
+export async function attachArticleNarrationAction(input: unknown): Promise<ActionResult<ArticleNarrationView>> {
+  return attempt(async () => {
+    const parsed = parseInput(attachArticleNarrationSchema, input)
+    return attachGeneratedNarration(await requireActor(), parsed.articleId, parsed.jobId)
   })
 }
 

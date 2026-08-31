@@ -15,6 +15,7 @@ export interface ArticleView {
   readonly categoryId: string
   readonly publishedAt: string | null
   readonly hero: ArticleHeroView | null
+  readonly narration: ArticleNarrationView | null
 }
 
 export interface ArticleHeroView {
@@ -25,6 +26,15 @@ export interface ArticleHeroView {
   readonly credit: string
   readonly width: number
   readonly height: number
+}
+
+export interface ArticleNarrationView {
+  readonly assetId: string
+  readonly sourceRevisionId: string
+  readonly secureUrl: string
+  readonly mimeType: 'audio/mpeg'
+  readonly durationSeconds: number
+  readonly voice: string
 }
 
 export interface ReadableArticle extends ArticleView {
@@ -52,5 +62,6 @@ export const toArticleView = (article: Article): ArticleView => {
     categoryId: props.categoryId,
     publishedAt: props.publishedAt?.toISOString() ?? null,
     hero: props.hero ?? null,
+    narration: props.narration ?? null,
   }
 }

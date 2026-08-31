@@ -12,6 +12,11 @@ values for `BETTER_AUTH_SECRET`, `REVALIDATE_SECRET`, `CRON_SECRET` and the
 VAPID public/private key pair. Their values are deliberately not repeated in
 this document or source control.
 
+The ignored `apps/web/.env.production` and `apps/studio/.env.production` files
+are older developer placeholders and must not be used as deployment inputs.
+Either remove them locally or inject the audited root file into local production
+builds; provider dashboards remain the source of truth for deployed values.
+
 The following provider-issued values are still required before their matching
 features can be enabled. Do not upload blank entries to Vercel or Render:
 
@@ -22,16 +27,17 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
 | Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
 | Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
-| AWS | IVS region and least-privilege IAM access key pair | Live channel provisioning |
+| AWS | IVS IAM pair; separate Polly/S3 IAM pair, London region and private output bucket | Live channels and article narration |
 | Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
 | Cloudflare | Turnstile site key and secret | Production CAPTCHA |
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
 | SonarCloud | organization token, if private analysis is wanted | Hosted code-quality reporting only |
 
 `MONGODB_URI` and `ANTHROPIC_API_KEY` are present locally. Rotate either one if
-it has ever been shared outside the password manager. The old
-`APPLE_CLIENT_ID` / `APPLE_CLIENT_SECRET` entries are legacy placeholders and
-must not be deployed; the four-value Apple setup above is the one the code uses.
+it has ever been shared outside the password manager. The legacy two-field
+Apple entries have been removed from the handoff; the four-value Apple setup
+above is the one the code uses. Missing provider values remain commented so
+they cannot accidentally be uploaded as blank production variables.
 
 ## What you need to provide
 
@@ -53,7 +59,9 @@ must not be deployed; the four-value Apple setup above is the one the code uses.
 - Render API service URL after `/healthz` passes.
 - Cloudinary cloud name, API key and secret.
 - AWS account, least-privilege IVS IAM user, approved IVS quotas and billing
-  alarms. Never provide the AWS root credentials.
+  alarms. Add a separate least-privilege Polly/S3 principal and private London
+  staging bucket with a short lifecycle policy for article narration. Never
+  provide the AWS root credentials.
 - Resend API key plus a verified sending domain and DNS records. The application
   currently sends as `news@kurasikapa.tv`; this must change if another domain is
   selected.
@@ -113,16 +121,16 @@ a ticket, source control or a screen recording.
 
 | Service | Mid/month | High/month | Assumption |
 |---|---:|---:|---|
-| Vercel | $40 | $150 | $20 Pro platform fee plus a second deploying seat/usage allowance at mid; higher traffic and observability allowance at high |
+| Vercel | $20 | $150 | One Pro developer seat can own both projects; high adds another developer seat, traffic and observability allowance |
 | Render API | $25 | $170 | One 1 CPU/2 GB service vs two 2 CPU/4 GB services for availability |
 | MongoDB Atlas | $58 | $394 | M10 vs M30, before backup/network overage |
 | Cloudinary | $99 | $249 | Plus vs Advanced media plan |
 | Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
 | Anthropic | $50 | $300 | Editorial-assistance spending cap; usage based |
-| AWS IVS/live | $250 | $2,000 | Working allowance; driven mainly by viewer-hours |
+| AWS IVS/live + narration | $250 | $2,000 | Working allowance; live is driven by viewer-hours; narration is usage-based and comparatively small |
 | Monitoring/DNS/domain | $25 | $150 | DNS can be free; includes domain amortisation and observability allowance |
-| Contingency | $114 | $526 | About 20% for bandwidth, backups, tax and usage variance |
-| **Estimated total** | **$681/month** | **$4,029/month** | Excludes salaries, production gear, legal work and payment fees |
+| Contingency | $110 | $526 | About 20% for bandwidth, backups, tax and usage variance |
+| **Estimated total** | **$657/month** | **$4,029/month** | Excludes salaries, production gear, legal work and payment fees |
 
 The high Atlas figure uses the published M30 base rate of $0.54/hour (about
 $394 over a 730-hour month). The mid figure uses M10 at $0.08/hour (about $58).
@@ -130,6 +138,9 @@ Live cost is the least predictable line: AWS charges input and viewer output
 separately. Standard input is $2/hour; the first 10,000 HD viewer-hours in
 Europe are $0.072/hour, while Ghanaian viewers may be billed through another
 delivery region. Set an AWS Budget alert before the first public broadcast.
+Polly narration is billed per synthesized character and S3 holds only temporary
+private output before Cloudinary promotion; set a lifecycle rule even though a
+successful promotion deletes its staging object immediately.
 
 Paystack is not included in the fixed total. Ghana pricing is 1.95% per local
 or international transaction, with no integration or maintenance fee; transfers
@@ -145,6 +156,7 @@ but the applicable rate and eligibility depend on the legal account country.
 - [Cloudinary pricing](https://cloudinary.com/pricing)
 - [Resend pricing](https://resend.com/pricing)
 - [Amazon IVS pricing](https://aws.amazon.com/ivs/pricing/)
+- [Amazon Polly pricing](https://aws.amazon.com/polly/pricing/)
 - [Anthropic API pricing](https://platform.claude.com/docs/en/about-claude/pricing)
 - [Paystack Ghana pricing](https://paystack.com/gh/pricing)
 - [Stripe pricing](https://stripe.com/pricing)

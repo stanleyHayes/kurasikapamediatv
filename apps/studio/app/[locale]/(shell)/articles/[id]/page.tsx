@@ -11,6 +11,8 @@ import { ArticleNotFound } from '@kurasikapa/application'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { loadMediaAssets } from '@kurasikapa/web-kit/bff/media-library'
 import { ArticleHeroPicker } from '@/components/article-hero-picker'
+import { ArticleNarrationManager } from '@/components/article-narration-manager'
+import { loadLatestArticleNarration } from '@kurasikapa/web-kit/bff/article-narration'
 
 interface Params {
   params: Promise<{ locale: string; id: string }>
@@ -37,7 +39,7 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
     throw error
   })
   const assets = env().API_URL === undefined ? [] : await loadMediaAssets(actor, draft.locale)
-
+  const narrationJob = env().API_URL === undefined ? null : await loadLatestArticleNarration(actor, draft.id)
   return (
     <>
       <div className="mb-[var(--space-md)] flex items-center gap-3">
@@ -74,6 +76,13 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
       <div className="mt-7 lg:w-2/3 lg:pr-2">
         <ArticleHeroPicker articleId={draft.id} assets={assets} initialHero={draft.hero} editable={EDITABLE.includes(draft.status)} />
       </div>
+
+      <div className="mt-7 lg:w-2/3 lg:pr-2"><ArticleNarrationManager
+          articleId={draft.id}
+          initialJob={narrationJob}
+          initialNarration={draft.narration}
+          canManage={actor.can('article:publish')}
+        /></div>
 
       {draft.status === 'published' && <BreakingAlertButton articleId={draft.id} />}
     </>

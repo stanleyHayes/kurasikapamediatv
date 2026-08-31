@@ -13,6 +13,7 @@ const article: ArticleView = {
   categoryId: 'cat_business',
   publishedAt: '2026-08-08T10:00:00.000Z',
   hero: null,
+  narration: null,
 }
 
 describe('newsArticleJsonLd', () => {

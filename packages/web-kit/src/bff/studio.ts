@@ -1,5 +1,5 @@
 import type { DraftView } from '../read-model/studio-view'
-import type { ArticleHeroView } from '../read-model/article-view'
+import type { ArticleHeroView, ArticleNarrationView } from '../read-model/article-view'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -15,6 +15,7 @@ export interface StudioArticleDto {
   readonly scheduledAt: string | null
   readonly excerpt: string | null
   readonly hero: ArticleHeroView | null
+  readonly narration: ArticleNarrationView | null
 }
 
 export interface RevisionDto {
@@ -51,6 +52,16 @@ function hero(value: unknown): ArticleHeroView | null {
   return { assetId, secureUrl: text(row['secureUrl']), altText: text(row['altText']), caption: text(row['caption']), credit: text(row['credit']), width: Number(row['width']) || 0, height: Number(row['height']) || 0 }
 }
 
+function narration(value: unknown): ArticleNarrationView | null {
+  const row = asRecord(value)
+  if (text(row['assetId']) === '' || row['mimeType'] !== 'audio/mpeg') return null
+  return {
+    assetId: text(row['assetId']), sourceRevisionId: text(row['sourceRevisionId']),
+    secureUrl: text(row['secureUrl']), mimeType: 'audio/mpeg',
+    durationSeconds: Number(row['durationSeconds']) || 0, voice: text(row['voice']),
+  }
+}
+
 export function studioArticleFrom(raw: unknown): StudioArticleDto {
   const body = asRecord(raw)
   return {
@@ -65,6 +76,7 @@ export function studioArticleFrom(raw: unknown): StudioArticleDto {
     scheduledAt: instant(body['scheduledAt']),
     excerpt: typeof body['excerpt'] === 'string' ? body['excerpt'] : null,
     hero: hero(body['hero']),
+    narration: narration(body['narration']),
   }
 }
 

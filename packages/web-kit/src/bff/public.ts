@@ -1,4 +1,4 @@
-import type { ArticleHeroView, ArticleView } from '../read-model/article-view'
+import type { ArticleHeroView, ArticleNarrationView, ArticleView } from '../read-model/article-view'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -12,6 +12,7 @@ export interface PublicArticleDto {
   readonly publishedAt: string | null
   readonly authorName?: string | null | undefined
   readonly hero: ArticleHeroView | null
+  readonly narration: ArticleNarrationView | null
 }
 
 export interface PublishedDto {
@@ -57,6 +58,17 @@ function hero(value: unknown): ArticleHeroView | null {
   }
 }
 
+function narration(value: unknown): ArticleNarrationView | null {
+  const row = asRecord(value)
+  const assetId = text(row['assetId'])
+  const secureUrl = text(row['secureUrl'])
+  if (assetId === '' || secureUrl === '' || row['mimeType'] !== 'audio/mpeg') return null
+  return {
+    assetId, secureUrl, sourceRevisionId: text(row['sourceRevisionId']), mimeType: 'audio/mpeg',
+    durationSeconds: Number(row['durationSeconds']) || 0, voice: text(row['voice']),
+  }
+}
+
 export function publicArticleFrom(raw: unknown): PublicArticleDto {
   const body = asRecord(raw)
   return {
@@ -68,6 +80,7 @@ export function publicArticleFrom(raw: unknown): PublicArticleDto {
     categoryId: text(body['categoryId']),
     publishedAt: instant(body['publishedAt']),
     hero: hero(body['hero']),
+    narration: narration(body['narration']),
   }
 }
 
@@ -80,6 +93,7 @@ export function toArticleViewFromDto(dto: PublicArticleDto): ArticleView {
     categoryId: dto.categoryId,
     publishedAt: dto.publishedAt,
     hero: dto.hero,
+    narration: dto.narration,
   }
 }
 

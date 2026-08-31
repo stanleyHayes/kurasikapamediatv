@@ -29,23 +29,33 @@ const (
 // (Better Auth's `user` collection is the exception: it lets Mongo mint an
 // ObjectId, which is why the directory adapter has to convert.)
 type articleDoc struct {
-	ID                 string          `bson:"_id"`
-	FamilyID           string          `bson:"familyId"`
-	Locale             string          `bson:"locale"`
-	Slug               string          `bson:"slug"`
-	Title              string          `bson:"title"`
-	AuthorID           string          `bson:"authorId"`
-	CategoryID         string          `bson:"categoryId"`
-	TagIDs             []string        `bson:"tagIds"`
-	Hero               *articleHeroDoc `bson:"hero,omitempty"`
-	Status             string          `bson:"status"`
-	ApprovedRevisionID *string         `bson:"approvedRevisionId"`
-	ScheduledAt        *time.Time      `bson:"scheduledAt"`
-	PublishedAt        *time.Time      `bson:"publishedAt"`
+	ID                 string               `bson:"_id"`
+	FamilyID           string               `bson:"familyId"`
+	Locale             string               `bson:"locale"`
+	Slug               string               `bson:"slug"`
+	Title              string               `bson:"title"`
+	AuthorID           string               `bson:"authorId"`
+	CategoryID         string               `bson:"categoryId"`
+	TagIDs             []string             `bson:"tagIds"`
+	Hero               *articleHeroDoc      `bson:"hero,omitempty"`
+	Narration          *articleNarrationDoc `bson:"narration,omitempty"`
+	Status             string               `bson:"status"`
+	ApprovedRevisionID *string              `bson:"approvedRevisionId"`
+	ScheduledAt        *time.Time           `bson:"scheduledAt"`
+	PublishedAt        *time.Time           `bson:"publishedAt"`
 	// UpdatedAt is persistence metadata, not a domain concept. It exists so
 	// the CMS can sort "my drafts" by recency without the domain modelling a
 	// field no business rule reads.
 	UpdatedAt time.Time `bson:"updatedAt"`
+}
+
+type articleNarrationDoc struct {
+	AssetID          string  `bson:"assetId"`
+	SourceRevisionID string  `bson:"sourceRevisionId"`
+	SecureURL        string  `bson:"secureUrl"`
+	MIMEType         string  `bson:"mimeType"`
+	DurationSeconds  float64 `bson:"durationSeconds"`
+	Voice            string  `bson:"voice"`
 }
 
 type articleHeroDoc struct {

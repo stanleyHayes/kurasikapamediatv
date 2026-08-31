@@ -34,6 +34,7 @@ describe('round trip', () => {
       scheduledAt: at('2026-09-01T08:00:00Z'),
       approvedRevisionId: null,
       hero: { assetId: assetId('asset_1'), secureUrl: 'https://cdn.test/report.jpg', altText: 'A reporter', caption: 'At Makola.', credit: 'Kurasikapa / Ama', width: 1600, height: 900 },
+      narration: { assetId: assetId('asset_audio'), sourceRevisionId: revisionId('rev_audio'), secureUrl: 'https://cdn.test/report.mp3', mimeType: 'audio/mpeg', durationSeconds: 95, voice: 'Florian' },
     })
     await repo.save(original)
 

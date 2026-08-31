@@ -38,6 +38,14 @@ export interface ArticleDocument {
     width: number
     height: number
   }
+  narration?: {
+    assetId: string
+    sourceRevisionId: string
+    secureUrl: string
+    mimeType: 'audio/mpeg'
+    durationSeconds: number
+    voice: string
+  }
   status: ArticleStatus
   approvedRevisionId: string | null
   scheduledAt: Date | null

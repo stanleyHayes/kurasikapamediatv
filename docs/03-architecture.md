@@ -47,6 +47,7 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 | Social fan-out, scheduled publishing | `services/api` | Retryable queue work, not request-scoped |
 | RSS ingest, sitemap generation, digests | `services/api` | Cron-driven |
 | Live TV, VOD, transcode orchestration | `services/api` | Long-lived, Amazon IVS + Cloudinary (R3) |
+| Article narration jobs | `services/api` | Async Polly/S3 generation, editor approval, Cloudinary delivery |
 
 ---
 
@@ -80,6 +81,13 @@ services/api/
   internal/app/        use cases + port interfaces
   internal/adapter/    mongo, anthropic, cloudinary, resend, ivs
 ```
+
+Article narration follows the same inward dependency flow: Studio requests a
+job for the exact approved revision; the Go application calls a provider port;
+AWS Polly writes privately to a same-region S3 staging bucket; the adapter
+promotes a completed MP3 to Cloudinary and removes the staging object. The
+recording stays private until an editor with `article:publish` explicitly
+attaches it. Public reads expose only that immutable approved snapshot.
 
 ### The dependency rule, as code
 

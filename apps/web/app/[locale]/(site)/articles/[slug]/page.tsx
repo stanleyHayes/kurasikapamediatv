@@ -20,6 +20,7 @@ import { env } from '@kurasikapa/web-kit/composition/env'
 import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
 import { loadStaffProfileByUser } from '@kurasikapa/web-kit/bff/staff-profiles'
+import { ArticleNarrationPlayer } from '@/components/article/article-narration-player'
 
 interface Params {
   params: Promise<{ locale: string; slug: string }>
@@ -178,6 +179,7 @@ function StoryBody({
 }): React.ReactElement {
   return (
     <div className="article-prose">
+      {article.narration !== null && <ArticleNarrationPlayer narration={article.narration} />}
       {article.body !== null && (
         <Suspense fallback={null}>
           <ReadingPanel
@@ -189,7 +191,7 @@ function StoryBody({
           />
         </Suspense>
       )}
-      <ArticleBody body={article.body} />
+      <div id="article-transcript"><ArticleBody body={article.body} /></div>
       <Suspense fallback={null}><AdPlacement locale={locale} slot="article_inline" /></Suspense>
     </div>
   )

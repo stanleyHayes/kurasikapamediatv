@@ -60,6 +60,9 @@ func problemFor(err error) Problem {
 	case errors.Is(err, ports.ErrInvalidPaymentWebhook):
 		return Problem{Type: "invalid_webhook", Title: "The payment event could not be verified", Status: http.StatusUnauthorized}
 
+	case errors.Is(err, ports.ErrNarrationNotConfigured):
+		return Problem{Type: "narration_unavailable", Title: "Article narration is not configured", Status: http.StatusServiceUnavailable}
+
 	case errors.Is(err, editorial.ErrNotOwnArticle):
 		return Problem{
 			Type:   "not_own_article",
@@ -95,7 +98,11 @@ func problemFor(err error) Problem {
 		errors.Is(err, domainmedia.ErrEmptyEpisodeTitle),
 		errors.Is(err, domainmedia.ErrEpisodeNeedsAudio),
 		errors.Is(err, domainmedia.ErrEpisodeNeedsTranscript),
-		errors.Is(err, domainmedia.ErrInvalidEpisodeChapter):
+		errors.Is(err, domainmedia.ErrInvalidEpisodeChapter),
+		errors.Is(err, domainmedia.ErrInvalidNarrationJob),
+		errors.Is(err, domainmedia.ErrUnsupportedNarrationLocale),
+		errors.Is(err, appeditorial.ErrNarrationTextTooLong),
+		errors.Is(err, appeditorial.ErrNarrationTextEmpty):
 		// Fall through to the shared invalid-input response.
 		fallthrough
 	case errors.Is(err, domainrevenue.ErrInvalidAmount),
@@ -124,6 +131,10 @@ func problemFor(err error) Problem {
 		errors.Is(err, appmedia.ErrEpisodeAudioNotReady),
 		errors.Is(err, appmedia.ErrTranscriptNotReady),
 		errors.Is(err, appeditorial.ErrHeroAssetNotUsable),
+		errors.Is(err, appeditorial.ErrNarrationJobNotUsable),
+		errors.Is(err, editorial.ErrInvalidArticleNarration),
+		errors.Is(err, editorial.ErrNarrationRevisionMismatch),
+		errors.Is(err, domainmedia.ErrNarrationJobTransition),
 		errors.Is(err, appidentity.ErrInvalidStaffPortrait),
 		errors.Is(err, domainrevenue.ErrCampaignEnded):
 		// 409: the request is well-formed and the article is simply not in a

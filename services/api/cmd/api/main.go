@@ -21,10 +21,12 @@ import (
 
 	adaptercloudinary "github.com/kurasikapa/api/internal/adapter/cloudinary"
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
+	adapternarration "github.com/kurasikapa/api/internal/adapter/narration"
 	adapterpayments "github.com/kurasikapa/api/internal/adapter/payments"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appidentity "github.com/kurasikapa/api/internal/app/identity"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
+	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
 	kurahttp "github.com/kurasikapa/api/internal/http"
 )
@@ -72,6 +74,7 @@ func run(log *slog.Logger) error {
 	programmes := adaptermongo.NewProgrammeRepository(televisionStore)
 	schedule := adaptermongo.NewScheduleRepository(televisionStore)
 	assets := adaptermongo.NewAssetRepository(db)
+	narrationJobs := adaptermongo.NewNarrationJobRepository(db)
 	podcasts := adaptermongo.NewPodcastRepository(db)
 	episodes := adaptermongo.NewEpisodeRepository(db)
 	galleries := adaptermongo.NewGalleryRepository(db)
@@ -84,6 +87,19 @@ func run(log *slog.Logger) error {
 	videoDelivery := adaptercloudinary.NewDelivery()
 	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
 	paymentWebhooks := adapterpayments.NewWebhookVerifier(cfg.PaystackSecretKey, cfg.StripeWebhookSecret)
+	var narrationProvider ports.NarrationProvider = adapternarration.Unavailable{}
+	if cfg.NarrationBucket != "" {
+		provider, providerErr := adapternarration.New(ctx, adapternarration.Config{
+			Region: cfg.NarrationRegion, Bucket: cfg.NarrationBucket,
+			CloudName: cfg.CloudinaryCloudName, CloudinaryKey: cfg.CloudinaryAPIKey,
+			CloudinarySecret: cfg.CloudinaryAPISecret, Folder: "kurasikapa/narrations",
+			Clock: clock,
+		})
+		if providerErr != nil {
+			return providerErr
+		}
+		narrationProvider = provider
+	}
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
 		// Fatal, not a warning. The unique (articleId, seq) index is what makes
@@ -114,6 +130,9 @@ func run(log *slog.Logger) error {
 		return err
 	}
 	if err := assets.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := narrationJobs.EnsureIndexes(ctx); err != nil {
 		return err
 	}
 	if err := podcasts.EnsureIndexes(ctx); err != nil {
@@ -166,6 +185,10 @@ func run(log *slog.Logger) error {
 		CreateDraft:                appeditorial.NewCreateDraft(deps),
 		UpdateDraft:                appeditorial.NewUpdateDraft(deps),
 		AttachArticleHero:          appeditorial.NewAttachArticleHero(deps),
+		RequestArticleNarration:    appeditorial.NewRequestArticleNarration(deps, narrationJobs, narrationProvider),
+		GetLatestNarration:         appeditorial.NewGetLatestArticleNarration(deps, narrationJobs),
+		AttachArticleNarration:     appeditorial.NewAttachArticleNarration(deps, narrationJobs),
+		ProcessNarrationJobs:       appeditorial.NewProcessNarrationJobs(deps, narrationJobs, narrationProvider),
 		GetDraft:                   appeditorial.NewGetDraft(deps),
 		ListAuthoredArticles:       appeditorial.NewListAuthoredArticles(deps),
 		ListAwaitingReview:         appeditorial.NewListAwaitingReview(deps),

@@ -19,6 +19,8 @@ export const createDraftSchema = z.object({
 
 export const articleRefSchema = z.object({ articleId: id })
 
+export const attachArticleNarrationSchema = z.object({ articleId: id, jobId: id })
+
 export const attachArticleHeroSchema = z.object({
   articleId: id,
   assetId: id,

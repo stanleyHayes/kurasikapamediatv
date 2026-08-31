@@ -28,8 +28,9 @@ import (
 // distinguish "absent" from "broken", and rarely need to know which collection
 // was absent.
 var (
-	ErrNotFound              = errors.New("not found")
-	ErrInvalidPaymentWebhook = errors.New("invalid payment webhook")
+	ErrNotFound               = errors.New("not found")
+	ErrInvalidPaymentWebhook  = errors.New("invalid payment webhook")
+	ErrNarrationNotConfigured = errors.New("article narration is not configured")
 )
 
 // Clock supplies the current time.
@@ -191,6 +192,39 @@ type AssetRepository interface {
 	FindByID(context.Context, shared.AssetID) (media.Asset, error)
 	List(context.Context, string, int) ([]media.Asset, error)
 	Save(context.Context, media.Asset) error
+}
+
+type NarrationJobRepository interface {
+	FindByID(context.Context, shared.NarrationJobID) (media.NarrationJob, error)
+	FindLatestForArticle(context.Context, shared.ArticleID) (media.NarrationJob, error)
+	ListProcessing(context.Context, int) ([]media.NarrationJob, error)
+	Save(context.Context, media.NarrationJob) error
+}
+
+type NarrationRequest struct {
+	JobID  shared.NarrationJobID
+	Text   string
+	Locale string
+	Voice  string
+}
+
+type NarrationProviderStatus string
+
+const (
+	NarrationProviderProcessing NarrationProviderStatus = "processing"
+	NarrationProviderReady      NarrationProviderStatus = "ready"
+	NarrationProviderFailed     NarrationProviderStatus = "failed"
+)
+
+type NarrationProviderResult struct {
+	Status        NarrationProviderStatus
+	FailureReason string
+	Delivery      media.AssetDelivery
+}
+
+type NarrationProvider interface {
+	Start(context.Context, NarrationRequest) (string, error)
+	Check(context.Context, shared.NarrationJobID, string) (NarrationProviderResult, error)
 }
 
 type PodcastRepository interface {

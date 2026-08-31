@@ -40,6 +40,7 @@ type Article struct {
 	categoryID         shared.CategoryID
 	tagIDs             []shared.TagID
 	hero               *ArticleHero
+	narration          *ArticleNarration
 	status             Status
 	approvedRevisionID *shared.RevisionID
 	scheduledAt        *time.Time
@@ -57,6 +58,7 @@ type ArticleState struct {
 	CategoryID         shared.CategoryID
 	TagIDs             []shared.TagID
 	Hero               *ArticleHero
+	Narration          *ArticleNarration
 	Status             Status
 	ApprovedRevisionID *shared.RevisionID
 	ScheduledAt        *time.Time
@@ -72,7 +74,7 @@ func Reconstitute(s ArticleState) Article {
 	return Article{
 		id: s.ID, familyID: s.FamilyID, locale: s.Locale, slug: s.Slug,
 		title: s.Title, authorID: s.AuthorID, categoryID: s.CategoryID,
-		tagIDs: s.TagIDs, hero: s.Hero, status: s.Status,
+		tagIDs: s.TagIDs, hero: s.Hero, narration: s.Narration, status: s.Status,
 		approvedRevisionID: s.ApprovedRevisionID,
 		scheduledAt:        s.ScheduledAt, publishedAt: s.PublishedAt,
 	}
@@ -83,7 +85,7 @@ func (a Article) State() ArticleState {
 	return ArticleState{
 		ID: a.id, FamilyID: a.familyID, Locale: a.locale, Slug: a.slug,
 		Title: a.title, AuthorID: a.authorID, CategoryID: a.categoryID,
-		TagIDs: a.tagIDs, Hero: a.hero, Status: a.status,
+		TagIDs: a.tagIDs, Hero: a.hero, Narration: a.narration, Status: a.status,
 		ApprovedRevisionID: a.approvedRevisionID,
 		ScheduledAt:        a.scheduledAt, PublishedAt: a.publishedAt,
 	}
@@ -195,6 +197,9 @@ func (a Article) Approve(revisionID shared.RevisionID, articleOfRevision shared.
 	}
 
 	next.approvedRevisionID = &revisionID
+	if next.narration != nil && next.narration.SourceRevisionID != revisionID {
+		next.narration = nil
+	}
 
 	return next, nil
 }
@@ -209,6 +214,7 @@ func (a Article) Reject(actor identity.Actor) (Article, error) {
 	// Clearing the approval is the point of a rejection. Leaving it would let
 	// the next publish call ship the text that was just refused.
 	next.approvedRevisionID = nil
+	next.narration = nil
 
 	return next, nil
 }

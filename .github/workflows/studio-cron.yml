@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  STUDIO_ORIGIN: https://kurasikapa-studio-hayfordstanleys-projects.vercel.app
+  STUDIO_ORIGIN: https://kurasikapa-studio.vercel.app
 
 jobs:
   publishing:
@@ -27,6 +27,13 @@ jobs:
           --request POST
           --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
           "$STUDIO_ORIGIN/studio/api/cron/publish-due"
+
+      - name: Process article narrations
+        run: >-
+          curl --fail-with-body --silent --show-error --retry 3
+          --request POST
+          --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          "$STUDIO_ORIGIN/studio/api/cron/process-narrations"
 
       - name: Publish due social posts
         if: vars.ENABLE_SOCIAL_CRON == 'true'

@@ -24,6 +24,10 @@ type Deps struct {
 	CreateDraft                appeditorial.CreateDraft
 	UpdateDraft                appeditorial.UpdateDraft
 	AttachArticleHero          appeditorial.AttachArticleHero
+	RequestArticleNarration    appeditorial.RequestArticleNarration
+	GetLatestNarration         appeditorial.GetLatestArticleNarration
+	AttachArticleNarration     appeditorial.AttachArticleNarration
+	ProcessNarrationJobs       appeditorial.ProcessNarrationJobs
 	GetDraft                   appeditorial.GetDraft
 	ListAuthoredArticles       appeditorial.ListAuthoredArticles
 	ListAwaitingReview         appeditorial.ListAwaitingReview
@@ -96,6 +100,9 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /articles/{id}", deps.handleGetDraft)
 	mux.HandleFunc("PATCH /articles/{id}", deps.handleUpdateDraft)
 	mux.HandleFunc("PUT /articles/{id}/hero", deps.handleAttachArticleHero)
+	mux.HandleFunc("POST /articles/{id}/narrations", deps.handleRequestArticleNarration)
+	mux.HandleFunc("GET /articles/{id}/narrations/latest", deps.handleGetLatestNarration)
+	mux.HandleFunc("POST /articles/{id}/narrations/{jobId}/attach", deps.handleAttachArticleNarration)
 	mux.HandleFunc("GET /articles/{id}/revisions", deps.handleListRevisions)
 	mux.HandleFunc("POST /articles/{id}/revisions/{rid}/restore", deps.handleRestore)
 	mux.HandleFunc("POST /articles/{id}/submit", deps.handleSubmit)
@@ -105,6 +112,7 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /articles/{id}/publish", deps.handlePublish)
 	mux.HandleFunc("POST /articles/{id}/unpublish", deps.handleUnpublish)
 	mux.HandleFunc("POST /internal/publish-due", deps.handlePublishDue)
+	mux.HandleFunc("POST /internal/process-narrations", deps.handleProcessNarrations)
 	mux.HandleFunc("GET /public/{locale}/articles/{slug}", deps.handleGetPublished)
 	mux.HandleFunc("GET /public/{locale}/articles", deps.handleListPublished)
 	mux.HandleFunc("GET /public/{locale}/sections/{slug}", deps.handleBrowseCategory)

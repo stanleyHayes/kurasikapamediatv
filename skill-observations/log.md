@@ -346,3 +346,17 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Reproduce the pinned CI toolchain before release when practical, keep deliberate coverage margin above the configured floor, and add meaningful failure-path tests instead of lowering the threshold or relying on cached results.
 
 **Principle:** Coverage at the exact floor is unstable release evidence; pinned-toolchain parity and tested headroom make the gate trustworthy.
+### Observation 23: Production env handoffs should omit unavailable variables
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** Auditing a multi-deployment production environment and its provider handoff.
+**Skill:** New skill candidate: production-environment-handoff
+**Type:** open-source
+**Phase/Area:** Environment validation
+
+**Issue:** An environment checklist used active empty assignments for unavailable providers. Several runtimes distinguish an absent variable from an empty value, and dashboard bulk imports can preserve those empty entries in surprising ways.
+
+**Suggested improvement:** Derive the handoff from runtime reads, keep generated or supplied values active, and leave unavailable optional provider keys commented with format-safe examples. Validate that no active assignment is empty before delivery.
+
+**Principle:** Production environment handoffs should encode absence explicitly and be validated against runtime consumption rather than copied mechanically from an example file.

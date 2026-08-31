@@ -17,6 +17,7 @@ describe('toArticleView', () => {
       categoryId: 'cat_business',
       publishedAt: '2026-08-08T10:00:00.000Z',
       hero: null,
+      narration: null,
     })
   })
 
@@ -36,6 +37,11 @@ describe('toArticleView', () => {
   it('serialises the credited lead image snapshot', () => {
     const hero = { assetId: assetId('asset_1'), secureUrl: 'https://cdn.test/report.jpg', altText: 'A market reporter', caption: 'Reporting at Makola.', credit: 'Kurasikapa / Ama', width: 1600, height: 900 }
     expect(toArticleView(anArticle({ hero })).hero).toEqual(hero)
+  })
+
+  it('serialises the approved narration snapshot', () => {
+    const narration = { assetId: assetId('asset_audio'), sourceRevisionId: revisionId('rev_1'), secureUrl: 'https://cdn.test/report.mp3', mimeType: 'audio/mpeg' as const, durationSeconds: 95, voice: 'Amy' }
+    expect(toArticleView(anArticle({ narration })).narration).toEqual(narration)
   })
 
   it('keeps a non-ASCII slug intact', () => {

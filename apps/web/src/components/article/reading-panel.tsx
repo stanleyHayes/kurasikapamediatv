@@ -4,11 +4,9 @@ import { cachedTakeaways } from '@kurasikapa/web-kit/read-model/queries'
 /**
  * The "AI Enhanced Reading" panel from the Stitch article design.
  *
- * Two of the design's three affordances are real: Key Takeaways comes from
- * the same `AiPort.summarise` the newsroom uses, and Translate switches to the
- * article's other locale. The third — Listen — is text-to-speech, which is R3
- * with the audio work; a button that plays nothing is worse than its absence,
- * so it is not rendered.
+ * Key Takeaways comes from the same `AiPort.summarise` the newsroom uses, and
+ * Translate switches to the article's other locale. Approved article audio is
+ * rendered separately above this panel when a narration exists.
  *
  * The whole panel disappears when there are no takeaways. An empty box
  * announcing an AI feature that produced nothing is not a neutral outcome.

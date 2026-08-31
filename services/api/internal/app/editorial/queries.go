@@ -25,17 +25,18 @@ type DraftView struct {
 
 // StudioArticle is what the CMS lists and the editor header needs.
 type StudioArticle struct {
-	ID          string           `json:"id"`
-	FamilyID    string           `json:"familyId"`
-	Locale      string           `json:"locale"`
-	Slug        string           `json:"slug"`
-	Title       string           `json:"title"`
-	Status      string           `json:"status"`
-	CategoryID  string           `json:"categoryId"`
-	PublishedAt *time.Time       `json:"publishedAt"`
-	ScheduledAt *time.Time       `json:"scheduledAt"`
-	Excerpt     *string          `json:"excerpt"`
-	Hero        *ArticleHeroView `json:"hero"`
+	ID          string                `json:"id"`
+	FamilyID    string                `json:"familyId"`
+	Locale      string                `json:"locale"`
+	Slug        string                `json:"slug"`
+	Title       string                `json:"title"`
+	Status      string                `json:"status"`
+	CategoryID  string                `json:"categoryId"`
+	PublishedAt *time.Time            `json:"publishedAt"`
+	ScheduledAt *time.Time            `json:"scheduledAt"`
+	Excerpt     *string               `json:"excerpt"`
+	Hero        *ArticleHeroView      `json:"hero"`
+	Narration   *ArticleNarrationView `json:"narration"`
 }
 
 // RevisionView is one history row. Excerpt is for the panel; Body is the text.
@@ -52,7 +53,7 @@ func studioFrom(a editorial.Article) StudioArticle {
 	view := StudioArticle{
 		ID: a.ID().String(), FamilyID: a.FamilyID().String(), Locale: a.Locale(),
 		Slug: a.Slug().String(), Title: a.Title(), Status: string(a.Status()),
-		CategoryID: a.CategoryID().String(), Hero: heroViewOf(a),
+		CategoryID: a.CategoryID().String(), Hero: heroViewOf(a), Narration: narrationViewOf(a),
 	}
 	if at, ok := a.PublishedAt(); ok {
 		view.PublishedAt = &at

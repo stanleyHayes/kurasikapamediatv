@@ -49,6 +49,8 @@ type (
 	EpisodeID string
 	// GalleryID identifies one curated photo or video collection.
 	GalleryID string
+	// NarrationJobID identifies one article-to-audio generation attempt.
+	NarrationJobID string
 	// MembershipPlanID identifies one purchasable membership tier.
 	MembershipPlanID string
 	// SubscriptionID identifies one reader membership lifecycle.
@@ -75,6 +77,7 @@ func (id ScheduleSlotID) String() string   { return string(id) }
 func (id PodcastID) String() string        { return string(id) }
 func (id EpisodeID) String() string        { return string(id) }
 func (id GalleryID) String() string        { return string(id) }
+func (id NarrationJobID) String() string   { return string(id) }
 func (id MembershipPlanID) String() string { return string(id) }
 func (id SubscriptionID) String() string   { return string(id) }
 func (id DonationID) String() string       { return string(id) }

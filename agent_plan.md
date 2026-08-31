@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment to articles now runs through Go domain/application/API/Mongo and renders across Studio, public cards, story pages and social metadata. Uploaded video reports now receive adaptive Cloudinary HLS playback and generated posters through a provider port while retaining mandatory captions. Live-recording ingestion, article-to-audio and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. Live-recording ingestion and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
@@ -360,17 +360,18 @@ Article hero-image attachment is implemented with ready-image validation,
 required alternative text and visible credit. Uploaded video reports now use
 Cloudinary's adaptive `sp_auto` HLS delivery plus generated first-frame posters;
 the public player shares the tested HLS recovery engine with Live TV and keeps
-caption tracks mandatory. Still unbuilt: ingestion of completed live recordings,
-article-to-audio (TTS) and voice-to-article.
+caption tracks mandatory. Article-to-audio is implemented as an asynchronous,
+editor-approved English/French workflow using Polly, private S3 staging and
+Cloudinary delivery; Twi fails closed until a reviewed voice exists. Still
+unbuilt: ingestion of completed live recordings and voice-to-article.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;
 **Cloudinary** for images, VOD and podcasts. Mux is superseded, unbuilt.
 
-Four places in `apps/web` are deliberately holding space for R3 — hero images on
-the homepage and briefing cards (tonal stand-ins), the article hero (omitted, not
-stubbed), the "Listen" button (not rendered), and the Live indicator in the header
-(present, links nowhere).
+Remaining public R3 placeholders are limited to live-recording inventory and
+voice-to-article; approved article audio now renders with native controls,
+synthetic-voice disclosure and a transcript link.
 
 ### 5.4 R4 — Revenue
 
@@ -1226,3 +1227,28 @@ are live. Custom-domain DNS remains an external registrar action.**
   routes return HTTP 200, the API gallery endpoint returns HTTP 200, and the
   live Web CSP now contains the exact Cloudinary connect/media origins required
   for HLS manifests and segments.
+
+## 26. KUR-87 — editor-approved article narration (2026-08-31)
+
+**Status: IMPLEMENTED; full release verification and provider activation remain.**
+
+- Added a Go-owned narration job aggregate and use cases for request, polling,
+  private review and explicit attachment. Jobs are pinned to the exact approved
+  revision; changing approval invalidates stale audio.
+- Added indexed Mongo persistence and an asynchronous provider port. The AWS
+  adapter synthesizes supported English/French voices to private same-region S3,
+  promotes the completed MP3 to Cloudinary and deletes the staging object only
+  after successful promotion. Unconfigured providers and unsupported Twi fail
+  closed.
+- Studio exposes generate/retry state, animated disabled controls, private audio
+  review and a separate publishing-editor approval action. The stable Studio
+  cron now polls jobs every five minutes through the authenticated Go endpoint.
+- Public articles expose only attached narration, use native audio controls,
+  identify the voice as synthetic and link directly to the approved article
+  body as the transcript.
+- TypeScript type-check, lint and targeted Go domain/application/HTTP/adapter
+  tests pass. Full `pnpm verify`, production builds, CI and deployment smoke are
+  still required before this item can be marked deployed.
+- Activation inputs: `AWS_POLLY_OUTPUT_BUCKET`, least-privilege AWS credentials
+  with Polly/S3 access, and the existing Cloudinary credentials. See
+  [ADR-0013](docs/decisions/adr-0013-article-narration.md).
