@@ -68,7 +68,9 @@ erDiagram
 | `rss_sources` | syndication in | `url`, `lastFetchedAt`, `etag` |
 | `bookmarks` `reading_history` `comments` | reader activity | `readerId`, `articleId` |
 | `ad_campaigns` `placements` | ad serving | `advertiserId`, `slot`, `targeting`, `budget`, `impressions` |
-| `subscriptions` `donations` | revenue | `provider`, `providerRef`, `currency`, `status` |
+| `membership_plans` | recurring support offers | slug, interval, minor-unit GHS/EUR price, benefits, explicit activation |
+| `subscriptions` | reader entitlement lifecycle | `planId`, `readerId`, price, provider references, status, `paidThrough`, cancellation |
+| `donations` | one-time support | amount, provider references, optional supporter message/privacy, status and `paidAt` |
 | `page_views` | insight, append-only | `articleId`, `locale`, hashed `visitorHash`, acquisition `channel`, `occurredAt`; TTL after 400 days |
 | `seo_reports` `revenue_snapshots` | insight, append-only | future time-series collections |
 | `audit_logs` | who did what | `actorId`, `action`, `entity`, `before`, `after`, `at` |
@@ -76,6 +78,12 @@ erDiagram
 ---
 
 ## 4. Indexes
+
+Revenue indexes are named and mandatory: `membership_slug_unique`,
+`active_membership_plans`, `subscription_provider_ref_unique`,
+`reader_entitlement`, `donation_provider_ref_unique` and
+`donation_revenue_recent`. Provider references are unique so a retried webhook
+cannot create a second commercial event.
 
 Every one of these exists because a specific screen or gate needs it.
 

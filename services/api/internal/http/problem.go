@@ -18,6 +18,7 @@ import (
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
 	domainmedia "github.com/kurasikapa/api/internal/domain/media"
+	domainrevenue "github.com/kurasikapa/api/internal/domain/revenue"
 )
 
 // Problem is the error body, following RFC 7807's shape.
@@ -55,6 +56,9 @@ func problemFor(err error) Problem {
 		// their own article had vanished.
 		return Problem{Type: "not_permitted", Title: "Not permitted", Status: http.StatusForbidden}
 
+	case errors.Is(err, ports.ErrInvalidPaymentWebhook):
+		return Problem{Type: "invalid_webhook", Title: "The payment event could not be verified", Status: http.StatusUnauthorized}
+
 	case errors.Is(err, editorial.ErrNotOwnArticle):
 		return Problem{
 			Type:   "not_own_article",
@@ -87,6 +91,15 @@ func problemFor(err error) Problem {
 		errors.Is(err, domainmedia.ErrEpisodeNeedsAudio),
 		errors.Is(err, domainmedia.ErrEpisodeNeedsTranscript),
 		errors.Is(err, domainmedia.ErrInvalidEpisodeChapter):
+		// Fall through to the shared invalid-input response.
+		fallthrough
+	case errors.Is(err, domainrevenue.ErrInvalidAmount),
+		errors.Is(err, domainrevenue.ErrUnsupportedCurrency),
+		errors.Is(err, domainrevenue.ErrInvalidProvider),
+		errors.Is(err, domainrevenue.ErrEmptyPlanName),
+		errors.Is(err, domainrevenue.ErrEmptyPlanSlug),
+		errors.Is(err, domainrevenue.ErrInvalidInterval),
+		errors.Is(err, domainrevenue.ErrPlanNeedsBenefits):
 		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
 
 	case errors.Is(err, editorial.ErrIllegalTransition),

@@ -189,6 +189,14 @@ cadence+locale+period so a second tick does not double-mail.
 
 **revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `ServePlacement`
 
+`StartSubscription` and `RecordDonation` now create provider checkout sessions
+through `PaymentGateway` and persist pending records only after the provider
+returns a usable reference. `PaymentWebhookVerifier` authenticates the raw
+Paystack or Stripe event before `ConfirmSubscriptionPayment` or
+`ConfirmDonationPayment` runs. A return URL is navigation, never proof of
+payment. Entitlement is granted only by a confirmed subscription whose
+`paidThrough` boundary is still in the future.
+
 **insight** — `RecordPageView` · `BuildNewsroomReport` · `BuildSeoReport` · `BuildRevenueSnapshot`
 
 `RecordPageView` accepts only a SHA-256 visitor token produced at the web

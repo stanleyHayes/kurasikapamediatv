@@ -54,7 +54,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
-| Revenue | **QUEUED** | Advertising inventory, memberships, subscriptions, donations, products and revenue reporting behind payment ports. |
+| Revenue | **IN PROGRESS** | Provider-neutral memberships, donations, entitlement, Paystack/Stripe checkout and signed webhook confirmation are implemented; reporting, advertising, products, classifieds and affiliates remain. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
@@ -64,7 +64,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast publishing is deployed. Photo/video galleries now have domain/app/API/Mongo, Studio builder and public presentation with full verification; Studio and API are live while the public route awaits Vercel quota reset. Article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
-| Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
+| Monetisation | Membership tiers, recurring subscriptions, one-time donations, domain entitlement, GHS Paystack/EUR Stripe checkout, signed idempotent webhooks, Studio tier management and the public support page are implemented locally. Provider credentials, production release, revenue reporting, products, advertising, classifieds and affiliates remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
@@ -250,10 +250,10 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_media_live_tv_gallery` | `/live` + `/galleries` | ✅ live/schedule/replay plus photo and caption-gated video galleries deployed (KUR-77) |
 | `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
 | `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
-| `kurasikapa_media_membership_donations` | — | ❌ no route (R4) |
-| `support_membership_kurasikapa_media_tv` | — | ❌ no route (R4) |
+| `kurasikapa_media_membership_donations` | `/support` | ◑ memberships and one-time contributions implemented; provider credentials and release remain (KUR-80) |
+| `support_membership_kurasikapa_media_tv` | `/support` | ◑ public GHS/EUR support journey implemented with honest empty state and provider handoff (KUR-80) |
 | `monetization_dashboard_kurasikapa_admin` | — | ❌ no route (R4) |
-| `kurasikapa_admin_subscriptions_revenue` | — | ❌ no route (R4) |
+| `kurasikapa_admin_subscriptions_revenue` | `/studio/revenue` | ◑ membership tier creation/activation implemented; subscriber ledger and revenue reporting remain (KUR-80) |
 | `kurasikapa_admin_analytics_hub` | `/studio/analytics` | ✅ first-party audience KPIs, traffic/acquisition/retention and content/newsletter visualisations deployed; revenue and campaign data move with R4 |
 | `seo_center_kurasikapa_admin` | — | ❌ no route (R5) |
 
@@ -1035,3 +1035,27 @@ are live. Custom-domain DNS remains an external registrar action.**
   contrast failures. CI run `33411985796` is green; the production Studio
   analytics route returns HTTP 200, and the same public deployment promoted
   the analytics beacon, gallery route and two-day news sitemap.
+
+## 19. KUR-80 — memberships, donations and trusted payment confirmation (2026-08-31)
+
+**Status: VERIFIED LOCALLY — provider credentials and release pending.**
+
+- Added the Go revenue context with GHS/EUR money, membership tiers, pending,
+  active and canceled subscriptions, one-time donations and domain-owned
+  article entitlement. Pending checkout never grants access; cancellation
+  preserves access only to the paid-through boundary.
+- Added repository and payment ports, real Mongo persistence with named unique
+  provider-reference and reader-entitlement indexes, and direct Paystack/Stripe
+  checkout adapters. Missing provider credentials fail closed without creating
+  a pending record.
+- Paystack SHA-512 and Stripe timestamped SHA-256 webhook verification is the
+  only confirmation path. Provider retries are idempotent, and browser return
+  URLs cannot activate a membership or manufacture donation revenue.
+- Added `/support` with GHS/EUR choice controls, useful membership empty state,
+  secure checkout handoff and disabled animated busy states; Studio has a
+  non-native-control membership manager at `/revenue`.
+- Evidence: Go domain coverage is 96.7% overall and 100% for revenue; the
+  application/HTTP gate is 90.0%; adapter, use-case, HTTP and BFF tests pass.
+  Full monorepo verification, CI, provider credentials and production smoke
+  remain before this slice can be called deployed. Advertising, products,
+  classifieds, affiliates and revenue dashboards remain separate R4 slices.

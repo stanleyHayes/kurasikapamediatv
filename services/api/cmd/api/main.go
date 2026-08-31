@@ -21,8 +21,10 @@ import (
 
 	adaptercloudinary "github.com/kurasikapa/api/internal/adapter/cloudinary"
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
+	adapterpayments "github.com/kurasikapa/api/internal/adapter/payments"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
+	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
 	kurahttp "github.com/kurasikapa/api/internal/http"
 )
 
@@ -71,7 +73,12 @@ func run(log *slog.Logger) error {
 	podcasts := adaptermongo.NewPodcastRepository(db)
 	episodes := adaptermongo.NewEpisodeRepository(db)
 	galleries := adaptermongo.NewGalleryRepository(db)
+	plans := adaptermongo.NewMembershipPlanRepository(db)
+	subscriptions := adaptermongo.NewSubscriptionRepository(db)
+	donations := adaptermongo.NewDonationRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
+	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
+	paymentWebhooks := adapterpayments.NewWebhookVerifier(cfg.PaystackSecretKey, cfg.StripeWebhookSecret)
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
 		// Fatal, not a warning. The unique (articleId, seq) index is what makes
@@ -110,6 +117,15 @@ func run(log *slog.Logger) error {
 	if err := galleries.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := plans.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := subscriptions.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := donations.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 
 	deps := appeditorial.Deps{
 		Articles:   articles,
@@ -124,46 +140,60 @@ func run(log *slog.Logger) error {
 		Podcasts: podcasts, Episodes: episodes, Galleries: galleries, Assets: assets,
 		Clock: clock, IDs: uuidIDs{},
 	}
+	revenueDeps := apprevenue.Deps{
+		Plans: plans, Subscriptions: subscriptions, Donations: donations,
+		Payments: payments, Clock: clock, IDs: uuidIDs{},
+	}
 
 	handler := kurahttp.NewRouter(kurahttp.Deps{
-		CreateDraft:           appeditorial.NewCreateDraft(deps),
-		UpdateDraft:           appeditorial.NewUpdateDraft(deps),
-		GetDraft:              appeditorial.NewGetDraft(deps),
-		ListAuthoredArticles:  appeditorial.NewListAuthoredArticles(deps),
-		ListAwaitingReview:    appeditorial.NewListAwaitingReview(deps),
-		ListRevisions:         appeditorial.NewListRevisions(deps),
-		RestoreRevision:       appeditorial.NewRestoreRevision(deps),
-		SubmitForReview:       appeditorial.NewSubmitForReview(deps),
-		ApproveArticle:        appeditorial.NewApproveArticle(deps),
-		RejectArticle:         appeditorial.NewRejectArticle(deps),
-		SchedulePublication:   appeditorial.NewSchedulePublication(deps),
-		PublishArticle:        appeditorial.NewPublishArticle(deps),
-		UnpublishArticle:      appeditorial.NewUnpublishArticle(deps),
-		PublishDueArticles:    appeditorial.NewPublishDueArticles(deps),
-		GetPublishedArticle:   appeditorial.NewGetPublishedArticle(deps),
-		ListPublishedArticles: appeditorial.NewListPublishedArticles(deps),
-		BrowseCategory:        appeditorial.NewBrowseCategory(deps),
-		ListSections:          appeditorial.NewListSections(deps),
-		CreatePresenter:       appmedia.NewCreatePresenter(mediaDeps),
-		PublishPresenter:      appmedia.NewPublishPresenter(mediaDeps),
-		CreateProgramme:       appmedia.NewCreateProgramme(mediaDeps),
-		PublishProgramme:      appmedia.NewPublishProgramme(mediaDeps),
-		ScheduleProgramme:     appmedia.NewScheduleProgramme(mediaDeps),
-		ListTelevisionGuide:   appmedia.NewListTelevisionGuide(mediaDeps),
-		CreateAssetUpload:     appmedia.NewCreateAssetUpload(mediaDeps, assets, uploads),
-		CompleteAssetUpload:   appmedia.NewCompleteAssetUpload(assets, uploads),
-		ListAssets:            appmedia.NewListAssets(assets),
-		CreatePodcast:         appmedia.NewCreatePodcast(mediaDeps),
-		PublishPodcast:        appmedia.NewPublishPodcast(mediaDeps),
-		CreateEpisode:         appmedia.NewCreateEpisode(mediaDeps),
-		PublishEpisode:        appmedia.NewPublishEpisode(mediaDeps),
-		ListPodcastLibrary:    appmedia.NewListPodcastLibrary(mediaDeps),
-		CreateGallery:         appmedia.NewCreateGallery(mediaDeps),
-		PublishGallery:        appmedia.NewPublishGallery(mediaDeps),
-		ListGalleryLibrary:    appmedia.NewListGalleryLibrary(mediaDeps),
-		Roles:                 roles,
-		Log:                   log,
-		CronSecret:            cfg.CronSecret,
+		CreateDraft:                appeditorial.NewCreateDraft(deps),
+		UpdateDraft:                appeditorial.NewUpdateDraft(deps),
+		GetDraft:                   appeditorial.NewGetDraft(deps),
+		ListAuthoredArticles:       appeditorial.NewListAuthoredArticles(deps),
+		ListAwaitingReview:         appeditorial.NewListAwaitingReview(deps),
+		ListRevisions:              appeditorial.NewListRevisions(deps),
+		RestoreRevision:            appeditorial.NewRestoreRevision(deps),
+		SubmitForReview:            appeditorial.NewSubmitForReview(deps),
+		ApproveArticle:             appeditorial.NewApproveArticle(deps),
+		RejectArticle:              appeditorial.NewRejectArticle(deps),
+		SchedulePublication:        appeditorial.NewSchedulePublication(deps),
+		PublishArticle:             appeditorial.NewPublishArticle(deps),
+		UnpublishArticle:           appeditorial.NewUnpublishArticle(deps),
+		PublishDueArticles:         appeditorial.NewPublishDueArticles(deps),
+		GetPublishedArticle:        appeditorial.NewGetPublishedArticle(deps),
+		ListPublishedArticles:      appeditorial.NewListPublishedArticles(deps),
+		BrowseCategory:             appeditorial.NewBrowseCategory(deps),
+		ListSections:               appeditorial.NewListSections(deps),
+		CreatePresenter:            appmedia.NewCreatePresenter(mediaDeps),
+		PublishPresenter:           appmedia.NewPublishPresenter(mediaDeps),
+		CreateProgramme:            appmedia.NewCreateProgramme(mediaDeps),
+		PublishProgramme:           appmedia.NewPublishProgramme(mediaDeps),
+		ScheduleProgramme:          appmedia.NewScheduleProgramme(mediaDeps),
+		ListTelevisionGuide:        appmedia.NewListTelevisionGuide(mediaDeps),
+		CreateAssetUpload:          appmedia.NewCreateAssetUpload(mediaDeps, assets, uploads),
+		CompleteAssetUpload:        appmedia.NewCompleteAssetUpload(assets, uploads),
+		ListAssets:                 appmedia.NewListAssets(assets),
+		CreatePodcast:              appmedia.NewCreatePodcast(mediaDeps),
+		PublishPodcast:             appmedia.NewPublishPodcast(mediaDeps),
+		CreateEpisode:              appmedia.NewCreateEpisode(mediaDeps),
+		PublishEpisode:             appmedia.NewPublishEpisode(mediaDeps),
+		ListPodcastLibrary:         appmedia.NewListPodcastLibrary(mediaDeps),
+		CreateGallery:              appmedia.NewCreateGallery(mediaDeps),
+		PublishGallery:             appmedia.NewPublishGallery(mediaDeps),
+		ListGalleryLibrary:         appmedia.NewListGalleryLibrary(mediaDeps),
+		CreateMembershipPlan:       apprevenue.NewCreateMembershipPlan(revenueDeps),
+		ActivateMembershipPlan:     apprevenue.NewActivateMembershipPlan(revenueDeps),
+		ListMembershipPlans:        apprevenue.NewListMembershipPlans(revenueDeps),
+		StartSubscription:          apprevenue.NewStartSubscription(revenueDeps),
+		RecordDonation:             apprevenue.NewRecordDonation(revenueDeps),
+		CheckEntitlement:           apprevenue.NewCheckEntitlement(revenueDeps),
+		ConfirmSubscriptionPayment: apprevenue.NewConfirmSubscriptionPayment(revenueDeps),
+		ConfirmDonationPayment:     apprevenue.NewConfirmDonationPayment(revenueDeps),
+		PaymentWebhooks:            paymentWebhooks,
+		Roles:                      roles,
+		Clock:                      clock,
+		Log:                        log,
+		CronSecret:                 cfg.CronSecret,
 	})
 
 	server := &http.Server{

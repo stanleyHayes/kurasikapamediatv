@@ -18,6 +18,9 @@ type config struct {
 	CloudinaryCloudName string
 	CloudinaryAPIKey    string
 	CloudinaryAPISecret string
+	PaystackSecretKey   string
+	StripeSecretKey     string
+	StripeWebhookSecret string
 }
 
 var errMissingEnv = errors.New("missing required environment")
@@ -31,6 +34,9 @@ func loadConfig() (config, error) {
 		CloudinaryCloudName: os.Getenv("CLOUDINARY_CLOUD_NAME"),
 		CloudinaryAPIKey:    os.Getenv("CLOUDINARY_API_KEY"),
 		CloudinaryAPISecret: os.Getenv("CLOUDINARY_API_SECRET"),
+		PaystackSecretKey:   os.Getenv("PAYSTACK_SECRET_KEY"),
+		StripeSecretKey:     os.Getenv("STRIPE_SECRET_KEY"),
+		StripeWebhookSecret: os.Getenv("STRIPE_WEBHOOK_SECRET"),
 	}
 
 	if cfg.MongoURI == "" {

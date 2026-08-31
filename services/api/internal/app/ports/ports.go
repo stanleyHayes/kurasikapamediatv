@@ -18,6 +18,7 @@ import (
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
 	"github.com/kurasikapa/api/internal/domain/media"
+	"github.com/kurasikapa/api/internal/domain/revenue"
 	"github.com/kurasikapa/api/internal/domain/shared"
 )
 
@@ -26,7 +27,10 @@ import (
 // One sentinel rather than one per repository: callers almost always want to
 // distinguish "absent" from "broken", and rarely need to know which collection
 // was absent.
-var ErrNotFound = errors.New("not found")
+var (
+	ErrNotFound              = errors.New("not found")
+	ErrInvalidPaymentWebhook = errors.New("invalid payment webhook")
+)
 
 // Clock supplies the current time.
 //
@@ -217,4 +221,48 @@ type UploadReceipt struct {
 type MediaUploadPort interface {
 	SignUpload(UploadRequest) (UploadTicket, error)
 	VerifyUpload(UploadReceipt) error
+}
+
+type MembershipPlanRepository interface {
+	FindByID(context.Context, shared.MembershipPlanID) (revenue.MembershipPlan, error)
+	ListActive(context.Context) ([]revenue.MembershipPlan, error)
+	Save(context.Context, revenue.MembershipPlan) error
+}
+
+type SubscriptionRepository interface {
+	FindByID(context.Context, shared.SubscriptionID) (revenue.Subscription, error)
+	FindEntitledForReader(context.Context, shared.UserID, time.Time) (revenue.Subscription, error)
+	Save(context.Context, revenue.Subscription) error
+}
+
+type DonationRepository interface {
+	FindByID(context.Context, shared.DonationID) (revenue.Donation, error)
+	Save(context.Context, revenue.Donation) error
+}
+
+type CheckoutRequest struct {
+	Reference string
+	Purpose   string
+	Amount    revenue.Money
+	Interval  revenue.BillingInterval
+	Email     string
+	ReturnURL string
+}
+
+type CheckoutSession struct {
+	Provider    revenue.PaymentProvider
+	ProviderRef string
+	CheckoutURL string
+}
+
+type PaymentGateway interface {
+	StartCheckout(context.Context, CheckoutRequest) (CheckoutSession, error)
+}
+
+type VerifiedPayment struct {
+	Purpose, ResourceID, PaymentRef string
+}
+
+type PaymentWebhookVerifier interface {
+	Verify(revenue.PaymentProvider, string, []byte, time.Time) (VerifiedPayment, error)
 }

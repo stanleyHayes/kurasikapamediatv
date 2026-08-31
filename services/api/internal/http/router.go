@@ -12,6 +12,7 @@ import (
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
+	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
 	"github.com/kurasikapa/api/internal/domain/shared"
@@ -19,44 +20,54 @@ import (
 
 // Deps is what the transport layer needs. Use cases and ports, never adapters.
 type Deps struct {
-	CreateDraft           appeditorial.CreateDraft
-	UpdateDraft           appeditorial.UpdateDraft
-	GetDraft              appeditorial.GetDraft
-	ListAuthoredArticles  appeditorial.ListAuthoredArticles
-	ListAwaitingReview    appeditorial.ListAwaitingReview
-	ListRevisions         appeditorial.ListRevisions
-	RestoreRevision       appeditorial.RestoreRevision
-	SubmitForReview       appeditorial.SubmitForReview
-	ApproveArticle        appeditorial.ApproveArticle
-	RejectArticle         appeditorial.RejectArticle
-	SchedulePublication   appeditorial.SchedulePublication
-	PublishArticle        appeditorial.PublishArticle
-	UnpublishArticle      appeditorial.UnpublishArticle
-	PublishDueArticles    appeditorial.PublishDueArticles
-	GetPublishedArticle   appeditorial.GetPublishedArticle
-	ListPublishedArticles appeditorial.ListPublishedArticles
-	BrowseCategory        appeditorial.BrowseCategory
-	ListSections          appeditorial.ListSections
-	CreatePresenter       appmedia.CreatePresenter
-	PublishPresenter      appmedia.PublishPresenter
-	CreateProgramme       appmedia.CreateProgramme
-	PublishProgramme      appmedia.PublishProgramme
-	ScheduleProgramme     appmedia.ScheduleProgramme
-	ListTelevisionGuide   appmedia.ListTelevisionGuide
-	CreateAssetUpload     appmedia.CreateAssetUpload
-	CompleteAssetUpload   appmedia.CompleteAssetUpload
-	ListAssets            appmedia.ListAssets
-	CreatePodcast         appmedia.CreatePodcast
-	PublishPodcast        appmedia.PublishPodcast
-	CreateEpisode         appmedia.CreateEpisode
-	PublishEpisode        appmedia.PublishEpisode
-	ListPodcastLibrary    appmedia.ListPodcastLibrary
-	CreateGallery         appmedia.CreateGallery
-	PublishGallery        appmedia.PublishGallery
-	ListGalleryLibrary    appmedia.ListGalleryLibrary
-	Roles                 ports.RoleRepository
-	Log                   *slog.Logger
-	CronSecret            string
+	CreateDraft                appeditorial.CreateDraft
+	UpdateDraft                appeditorial.UpdateDraft
+	GetDraft                   appeditorial.GetDraft
+	ListAuthoredArticles       appeditorial.ListAuthoredArticles
+	ListAwaitingReview         appeditorial.ListAwaitingReview
+	ListRevisions              appeditorial.ListRevisions
+	RestoreRevision            appeditorial.RestoreRevision
+	SubmitForReview            appeditorial.SubmitForReview
+	ApproveArticle             appeditorial.ApproveArticle
+	RejectArticle              appeditorial.RejectArticle
+	SchedulePublication        appeditorial.SchedulePublication
+	PublishArticle             appeditorial.PublishArticle
+	UnpublishArticle           appeditorial.UnpublishArticle
+	PublishDueArticles         appeditorial.PublishDueArticles
+	GetPublishedArticle        appeditorial.GetPublishedArticle
+	ListPublishedArticles      appeditorial.ListPublishedArticles
+	BrowseCategory             appeditorial.BrowseCategory
+	ListSections               appeditorial.ListSections
+	CreatePresenter            appmedia.CreatePresenter
+	PublishPresenter           appmedia.PublishPresenter
+	CreateProgramme            appmedia.CreateProgramme
+	PublishProgramme           appmedia.PublishProgramme
+	ScheduleProgramme          appmedia.ScheduleProgramme
+	ListTelevisionGuide        appmedia.ListTelevisionGuide
+	CreateAssetUpload          appmedia.CreateAssetUpload
+	CompleteAssetUpload        appmedia.CompleteAssetUpload
+	ListAssets                 appmedia.ListAssets
+	CreatePodcast              appmedia.CreatePodcast
+	PublishPodcast             appmedia.PublishPodcast
+	CreateEpisode              appmedia.CreateEpisode
+	PublishEpisode             appmedia.PublishEpisode
+	ListPodcastLibrary         appmedia.ListPodcastLibrary
+	CreateGallery              appmedia.CreateGallery
+	PublishGallery             appmedia.PublishGallery
+	ListGalleryLibrary         appmedia.ListGalleryLibrary
+	CreateMembershipPlan       apprevenue.CreateMembershipPlan
+	ActivateMembershipPlan     apprevenue.ActivateMembershipPlan
+	ListMembershipPlans        apprevenue.ListMembershipPlans
+	StartSubscription          apprevenue.StartSubscription
+	RecordDonation             apprevenue.RecordDonation
+	CheckEntitlement           apprevenue.CheckEntitlement
+	ConfirmSubscriptionPayment apprevenue.ConfirmSubscriptionPayment
+	ConfirmDonationPayment     apprevenue.ConfirmDonationPayment
+	PaymentWebhooks            ports.PaymentWebhookVerifier
+	Roles                      ports.RoleRepository
+	Clock                      ports.Clock
+	Log                        *slog.Logger
+	CronSecret                 string
 }
 
 // NewRouter wires the HTTP surface.
@@ -102,6 +113,13 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /media/galleries", deps.handleCreateGallery)
 	mux.HandleFunc("POST /media/galleries/{id}/publish", deps.handlePublishGallery)
 	mux.HandleFunc("GET /public/{locale}/galleries", deps.handleGalleryLibrary)
+	mux.HandleFunc("POST /revenue/membership-plans", deps.handleCreateMembershipPlan)
+	mux.HandleFunc("POST /revenue/membership-plans/{id}/activate", deps.handleActivateMembershipPlan)
+	mux.HandleFunc("GET /public/{locale}/membership-plans", deps.handleListMembershipPlans)
+	mux.HandleFunc("POST /revenue/subscriptions", deps.handleStartSubscription)
+	mux.HandleFunc("POST /public/donations", deps.handleRecordDonation)
+	mux.HandleFunc("GET /revenue/entitlement", deps.handleCheckEntitlement)
+	mux.HandleFunc("POST /webhooks/payments/{provider}", deps.handlePaymentWebhook)
 
 	return withRequestLogging(deps.Log, mux)
 }
