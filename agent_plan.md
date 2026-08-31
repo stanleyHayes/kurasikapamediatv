@@ -40,7 +40,7 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 | People operations patterns from RentOS/Xtiitch | **DONE** | Combined secure invite lifecycle with searchable members, pending visibility, role/status operations and concise role explanations. |
 | Dashboard KPIs and visualisations | **DONE** | Sourced workflow, review, moderation and language-publication KPIs plus workflow bars, queue bars and language chart; no invented totals. |
 | Full gates, production deploy and live workflow smoke tests | **DONE** | Lint, typecheck, boundaries, all TS suites, duplication and Go verification passed. Both Vercel projects reached Ready; live Studio sign-in/create-story and public Careers/invitation routes responded successfully. |
-| Client-demo presentation pass | **IN PROGRESS** | Shared animated empty-state frame now covers public collections, search, reader libraries, comments and Studio queues; Studio has a dedicated newsroom splash and the login logo no longer sits on a white plate. Demo seed now provides 35 EN/FR stories, 11 sections, comments, FAQ, Help and Careers records, tagged for a one-command selective clear. Full gates, rendered review and production seed/deploy remain. |
+| Client-demo presentation pass | **DONE** | Shared animated empty-state frame covers public collections, search, reader libraries, comments and Studio queues; Studio has a dedicated newsroom splash and the login logo no longer sits on a white plate. Production now contains 35 EN/FR stories, 11 sections, comments, FAQ, Help and Careers records, all ownership-tagged for a one-command selective clear. `pnpm verify` passed; both Vercel projects are Ready and the live FAQ and independent Studio login smokes return 200. |
 
 ### Discovery completion programme
 
@@ -50,8 +50,8 @@ Work remains release-shaped so each slice can ship and be verified independently
 
 | Programme | State | Exit evidence |
 |---|---|---|
-| Demo-ready editorial surface | **IN PROGRESS** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review and production deployment. |
-| Television and multimedia | **QUEUED** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
+| Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
+| Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **QUEUED** | News sitemap/Search Console operations, acquisition/engagement analytics, semantic search, related and personalised recommendations. |
 | Revenue | **QUEUED** | Advertising inventory, memberships, subscriptions, donations, products and revenue reporting behind payment ports. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
