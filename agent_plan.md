@@ -1205,7 +1205,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 25. KUR-86 — adaptive VOD delivery for accessible video reports (2026-08-31)
 
-**Status: VERIFIED; production release active.**
+**Status: DEPLOYED; real licensed video inventory remains a client input.**
 
 - Added the provider-neutral Go `VideoDeliveryPort`. The Cloudinary adapter
   deterministically projects verified video originals into adaptive `sp_auto`
@@ -1220,4 +1220,9 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Full `pnpm verify` passes, including lint, types, boundaries, every package
   coverage floor, duplication, Go vet/race tests and 95% domain / 90%
   application coverage. Explicit Web and Studio production builds also pass
-  against the deployed API; production deployment is the remaining gate.
+  against the deployed API.
+- Commit `423d3f6` passed CI run `33437132914`, including Lighthouse and all 39
+  browser/accessibility journeys. The stable public gallery and Studio gallery
+  routes return HTTP 200, the API gallery endpoint returns HTTP 200, and the
+  live Web CSP now contains the exact Cloudinary connect/media origins required
+  for HLS manifests and segments.
