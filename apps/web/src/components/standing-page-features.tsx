@@ -53,7 +53,7 @@ export function StandingPageFeatures({ pageKey, locale }: { pageKey: PageKey; lo
   return <section className="border-t-2 border-on-surface bg-primary-container/25">
     <div className="mx-auto max-w-[var(--container-page)] px-4 py-16 md:px-8 md:py-24">
       <div className="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
-        <div><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">At a glance</p><h2 className="mt-5 font-display text-4xl font-semibold leading-[.95] tracking-[-.045em]">What matters here</h2></div>
+        <div><p className="text-xs font-bold uppercase tracking-[.2em] text-primary-ink">At a glance</p><h2 className="mt-5 font-display text-4xl font-semibold leading-[.95] tracking-[-.045em]">What matters here</h2></div>
         <ol className="border-t-2 border-on-surface">{items.map((item, index) => <li key={item.title} className="group grid gap-3 border-b border-on-surface py-7 md:grid-cols-[3rem_15rem_1fr] md:items-start">
           <span className="font-mono text-sm text-secondary-ink">{String(index + 1).padStart(2, '0')}</span><h3 className="font-display text-2xl font-semibold transition-colors group-hover:text-primary">{item.title}</h3><p className="max-w-[48ch] leading-relaxed text-on-surface-variant">{item.copy}</p>
         </li>)}</ol>

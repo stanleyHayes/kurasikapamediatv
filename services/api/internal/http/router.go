@@ -42,6 +42,9 @@ type Deps struct {
 	PublishProgramme      appmedia.PublishProgramme
 	ScheduleProgramme     appmedia.ScheduleProgramme
 	ListTelevisionGuide   appmedia.ListTelevisionGuide
+	CreateAssetUpload     appmedia.CreateAssetUpload
+	CompleteAssetUpload   appmedia.CompleteAssetUpload
+	ListAssets            appmedia.ListAssets
 	Roles                 ports.RoleRepository
 	Log                   *slog.Logger
 	CronSecret            string
@@ -79,6 +82,9 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /television/programmes", deps.handleCreateProgramme)
 	mux.HandleFunc("POST /television/programmes/{id}/publish", deps.handlePublishProgramme)
 	mux.HandleFunc("POST /television/schedule", deps.handleScheduleProgramme)
+	mux.HandleFunc("POST /media/assets/uploads", deps.handleCreateAssetUpload)
+	mux.HandleFunc("POST /media/assets/{id}/complete", deps.handleCompleteAssetUpload)
+	mux.HandleFunc("GET /media/assets", deps.handleListAssets)
 
 	return withRequestLogging(deps.Log, mux)
 }

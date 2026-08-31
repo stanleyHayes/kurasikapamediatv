@@ -131,7 +131,7 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 
 **identity** — `RegisterReader` · `SignInWithProvider` · `AssignRole` · `EnableTwoFactor` · `AuthorizeAction`
 
-**media** — `UploadAsset` · `StartLiveStream` · `EndLiveStream` · `CreatePresenter` ·
+**media** — `CreateAssetUpload` · `CompleteAssetUpload` · `ListAssets` · `StartLiveStream` · `EndLiveStream` · `CreatePresenter` ·
 `PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·
 `ListTelevisionGuide` · `PublishEpisode` · `TranscodeVod`
 
@@ -144,6 +144,12 @@ presenter, programme and schedule repositories feed `ListTelevisionGuide`.
 Production HTTP exposes `GET /public/{locale}/television` plus authenticated
 presenter, programme and schedule commands; Next.js reaches them through the
 shared `web-kit` BFF rather than importing a Go adapter or connecting to Mongo.
+
+The asset workflow is also Go-owned. `MediaUploadPort` signs a short-lived,
+browser-to-provider upload ticket and verifies the provider receipt before an
+asset can become ready; `AssetRepository` persists only provider-neutral
+metadata. Images require alternative text in the domain. Missing Cloudinary
+configuration fails closed, and the API secret is never returned to Studio.
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 

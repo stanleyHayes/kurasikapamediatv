@@ -11,20 +11,26 @@ import (
 // A missing MONGODB_URI should fail here with a readable message, not as a
 // connection error inside the first request that needs it.
 type config struct {
-	MongoURI   string
-	MongoDB    string
-	Port       string
-	CronSecret string
+	MongoURI            string
+	MongoDB             string
+	Port                string
+	CronSecret          string
+	CloudinaryCloudName string
+	CloudinaryAPIKey    string
+	CloudinaryAPISecret string
 }
 
 var errMissingEnv = errors.New("missing required environment")
 
 func loadConfig() (config, error) {
 	cfg := config{
-		MongoURI:   os.Getenv("MONGODB_URI"),
-		MongoDB:    envOr("MONGODB_DB", "kurasikapa"),
-		Port:       envOr("PORT", "8080"),
-		CronSecret: os.Getenv("CRON_SECRET"),
+		MongoURI:            os.Getenv("MONGODB_URI"),
+		MongoDB:             envOr("MONGODB_DB", "kurasikapa"),
+		Port:                envOr("PORT", "8080"),
+		CronSecret:          os.Getenv("CRON_SECRET"),
+		CloudinaryCloudName: os.Getenv("CLOUDINARY_CLOUD_NAME"),
+		CloudinaryAPIKey:    os.Getenv("CLOUDINARY_API_KEY"),
+		CloudinaryAPISecret: os.Getenv("CLOUDINARY_API_SECRET"),
 	}
 
 	if cfg.MongoURI == "" {

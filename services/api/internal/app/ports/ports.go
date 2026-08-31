@@ -174,3 +174,29 @@ type ScheduleRepository interface {
 	ListReplays(context.Context, string, int) ([]media.ScheduleSlot, error)
 	Save(context.Context, media.ScheduleSlot) error
 }
+
+type AssetRepository interface {
+	FindByID(context.Context, shared.AssetID) (media.Asset, error)
+	List(context.Context, string, int) ([]media.Asset, error)
+	Save(context.Context, media.Asset) error
+}
+
+type UploadRequest struct {
+	AssetID   shared.AssetID
+	Kind      media.AssetKind
+	Timestamp time.Time
+}
+type UploadTicket struct {
+	URL, APIKey, Signature, PublicID, ResourceType, Folder string
+	Timestamp                                              int64
+}
+type UploadReceipt struct {
+	PublicID, SecureURL, Signature string
+	Version, Bytes                 int64
+	Width, Height                  int
+	DurationSeconds                float64
+}
+type MediaUploadPort interface {
+	SignUpload(UploadRequest) (UploadTicket, error)
+	VerifyUpload(UploadReceipt) error
+}

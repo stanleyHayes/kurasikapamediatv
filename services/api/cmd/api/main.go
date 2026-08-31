@@ -19,6 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
+	adaptercloudinary "github.com/kurasikapa/api/internal/adapter/cloudinary"
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
@@ -66,6 +67,8 @@ func run(log *slog.Logger) error {
 	presenters := adaptermongo.NewPresenterRepository(televisionStore)
 	programmes := adaptermongo.NewProgrammeRepository(televisionStore)
 	schedule := adaptermongo.NewScheduleRepository(televisionStore)
+	assets := adaptermongo.NewAssetRepository(db)
+	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
 		// Fatal, not a warning. The unique (articleId, seq) index is what makes
@@ -90,6 +93,9 @@ func run(log *slog.Logger) error {
 		return err
 	}
 	if err := televisionStore.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := assets.EnsureIndexes(ctx); err != nil {
 		return err
 	}
 
@@ -131,6 +137,9 @@ func run(log *slog.Logger) error {
 		PublishProgramme:      appmedia.NewPublishProgramme(mediaDeps),
 		ScheduleProgramme:     appmedia.NewScheduleProgramme(mediaDeps),
 		ListTelevisionGuide:   appmedia.NewListTelevisionGuide(mediaDeps),
+		CreateAssetUpload:     appmedia.NewCreateAssetUpload(mediaDeps, assets, uploads),
+		CompleteAssetUpload:   appmedia.NewCompleteAssetUpload(assets, uploads),
+		ListAssets:            appmedia.NewListAssets(assets),
 		Roles:                 roles,
 		Log:                   log,
 		CronSecret:            cfg.CronSecret,

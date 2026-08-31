@@ -7,6 +7,7 @@ const TITLES = [
   { href: '/articles/new', title: 'Create story', description: 'Start original reporting for Kurasikapa.' },
   { href: '/live-control', title: 'Live control room', description: 'Provision, monitor and end broadcasts.' },
   { href: '/television', title: 'TV programming', description: 'Manage programmes, presenters and the public schedule.' },
+  { href: '/media', title: 'Media library', description: 'Manage verified images, video, audio and accessibility files.' },
   { href: '/review', title: 'Review queue', description: 'Make confident publishing decisions.' }, { href: '/social', title: 'Social publishing', description: 'Plan and monitor story distribution.' },
   { href: '/rss', title: 'News sources', description: 'Turn trusted feeds into newsroom drafts.' }, { href: '/comments', title: 'Comment moderation', description: 'Keep reader conversations constructive.' },
   { href: '/pages', title: 'Public pages', description: 'Publish organisation and legal information.' },

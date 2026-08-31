@@ -92,7 +92,7 @@ test.describe('search', () => {
   test('says so when nothing matches, rather than showing everything', async ({ page }) => {
     await page.goto('/en/search?q=zzzznothing')
 
-    await expect(page.getByText(/nothing matched/iu)).toBeVisible()
+    await expect(page.getByText(/no reporting matched/iu)).toBeVisible()
   })
 })
 
@@ -107,7 +107,7 @@ test.describe('sections', () => {
   test('the localised slug reaches the same section', async ({ page }) => {
     await page.goto('/fr/sections/economie')
 
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Économie', level: 1, exact: true })).toBeVisible()
   })
 
   test('an English slug does not resolve under a French URL', async ({ page }) => {

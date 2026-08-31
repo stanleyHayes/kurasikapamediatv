@@ -17,6 +17,7 @@ const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
   { heading: 'Publishing', items: [
     { href: '/live-control', label: 'Go live', description: 'Broadcast control room', icon: 'live' },
     { href: '/television', label: 'TV programming', description: 'Shows, presenters and schedule', icon: 'live' },
+    { href: '/media', label: 'Media library', description: 'Images, video, audio and captions', icon: 'desk' },
     { href: '/social', label: 'Social publishing', description: 'Schedule distribution', icon: 'social' },
     { href: '/rss', label: 'News sources', description: 'Manage inbound feeds', icon: 'rss' },
     { href: '/pages', label: 'Public pages', description: 'About, legal and information', icon: 'desk' },
@@ -49,5 +50,5 @@ export function StudioSideNav({ collapsed, mobileOpen, onClose }: { collapsed: b
 }
 
 function NavLink({ item, active, compact, onClose }: { item: NavItem; active: boolean; compact: boolean; onClose: () => void }): React.ReactElement {
-  return <li><Link href={item.href} prefetch onClick={onClose} title={compact ? item.label : undefined} aria-current={active ? 'page' : undefined} className={`group flex min-h-14 items-center gap-3 border-l-4 px-3 py-2 transition-[background-color,color,border-color,transform] active:translate-x-0.5 ${active ? 'border-secondary bg-white/12 text-white' : 'border-transparent text-white/60 hover:bg-white/7 hover:text-white'}`}><StudioIcon name={item.icon} className={`size-5 shrink-0 ${active ? 'text-secondary' : ''}`} />{!compact && <span className="min-w-0"><strong className="block text-sm font-semibold">{item.label}</strong><small className="block truncate text-[10px] text-white/40 group-hover:text-white/60">{item.description}</small></span>}</Link></li>
+  return <li><Link href={item.href} prefetch={false} onClick={onClose} title={compact ? item.label : undefined} aria-current={active ? 'page' : undefined} className={`group flex min-h-14 items-center gap-3 border-l-4 px-3 py-2 transition-[background-color,color,border-color,transform] active:translate-x-0.5 ${active ? 'border-secondary bg-white/12 text-white' : 'border-transparent text-white/60 hover:bg-white/7 hover:text-white'}`}><StudioIcon name={item.icon} className={`size-5 shrink-0 ${active ? 'text-secondary' : ''}`} />{!compact && <span className="min-w-0"><strong className="block text-sm font-semibold">{item.label}</strong><small className="block truncate text-[10px] text-white/40 group-hover:text-white/60">{item.description}</small></span>}</Link></li>
 }

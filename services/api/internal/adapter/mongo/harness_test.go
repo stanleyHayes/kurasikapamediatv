@@ -79,6 +79,7 @@ func newHarness(t *testing.T) harness {
 
 // sanitise turns a Go test name into something Mongo accepts as a database name.
 func sanitise(name string) string {
+	const maxDatabaseSuffixLength = 53
 	out := make([]rune, 0, len(name))
 
 	for _, r := range name {
@@ -88,6 +89,10 @@ func sanitise(name string) string {
 		default:
 			out = append(out, '_')
 		}
+	}
+
+	if len(out) > maxDatabaseSuffixLength {
+		out = out[:maxDatabaseSuffixLength]
 	}
 
 	return string(out)

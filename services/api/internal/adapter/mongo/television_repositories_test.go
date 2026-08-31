@@ -73,3 +73,31 @@ func TestTelevisionRepositoriesRoundTripAndFilterPublicGuide(t *testing.T) {
 		}
 	}
 }
+
+func TestAssetRepositoryRoundTripAndIndexes(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	repo := adapter.NewAssetRepository(h.DB)
+	ctx := context.Background()
+	if err := repo.EnsureIndexes(ctx); err != nil {
+		t.Fatal(err)
+	}
+	asset := domainmedia.ReconstituteAsset(domainmedia.AssetState{ID: "asset", Kind: domainmedia.AssetVideo, Filename: "report.mp4", MIMEType: "video/mp4", Locale: "en", Status: domainmedia.AssetPending, CreatedBy: "manager"})
+	if err := repo.Save(ctx, asset); err != nil {
+		t.Fatal(err)
+	}
+	got, err := repo.FindByID(ctx, asset.ID())
+	if err != nil || got.State().Filename != "report.mp4" {
+		t.Fatalf("%+v %v", got.State(), err)
+	}
+	listed, err := repo.List(ctx, "en", 20)
+	if err != nil || len(listed) != 1 {
+		t.Fatalf("%d %v", len(listed), err)
+	}
+	names := indexNames(t, h, adapter.CollMediaAssets)
+	for _, name := range []string{"library_locale_status", "provider_asset_unique"} {
+		if !names[name] {
+			t.Errorf("missing %s", name)
+		}
+	}
+}

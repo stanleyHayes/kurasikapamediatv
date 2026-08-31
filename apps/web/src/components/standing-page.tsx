@@ -71,7 +71,7 @@ function ManagedBody({ page, pageKey }: { page: StandingPage; pageKey: PageKey }
 function PageIndex({ page, pageKey }: { page: StandingPage; pageKey: PageKey }): React.ReactElement {
   const headings = page.sections.flatMap((section) => section.heading === undefined ? [] : [section.heading])
   return <aside className="h-fit lg:sticky lg:top-28"><p className="text-xs font-bold uppercase tracking-[.18em] text-on-surface-variant">In this file</p><div className="mt-4 h-1 w-12 bg-secondary" />
-    {headings.length > 0 && <ol className="mt-7 space-y-4">{headings.map((heading, index) => <li key={heading} className="grid grid-cols-[2rem_1fr] text-sm"><span className="font-mono text-primary">{String(index + 1).padStart(2, '0')}</span><span className="font-semibold">{heading}</span></li>)}</ol>}
+    {headings.length > 0 && <ol className="mt-7 space-y-4">{headings.map((heading, index) => <li key={heading} className="grid grid-cols-[2rem_1fr] text-sm"><span className="font-mono text-primary-ink">{String(index + 1).padStart(2, '0')}</span><span className="font-semibold">{heading}</span></li>)}</ol>}
     <p className="mt-8 border-t border-outline-variant pt-5 text-sm leading-relaxed text-on-surface-variant">{supportCopy(pageKey)}</p>
   </aside>
 }

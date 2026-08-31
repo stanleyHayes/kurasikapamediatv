@@ -74,7 +74,7 @@ test.describe('signed in', () => {
     // The studio's own shell, not the public masthead: the Stitch editorial CMS
     // is a full-screen admin surface, so reaching it must show its top bar AND
     // must not show the reader's site chrome.
-    await expect(page.getByRole('heading', { name: 'Editorial Workflow', level: 1 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Editorial desk', level: 1 })).toBeVisible()
     await expect(page.locator('footer')).toHaveCount(0)
   })
 
@@ -122,7 +122,9 @@ test.describe('workflow transitions', () => {
     await page.getByRole('button', { name: 'Approve' }).click()
     await expect(page.getByText('Approved', { exact: true })).toBeVisible()
 
-    await page.getByLabel('Publication date and time').fill(inOneDay())
+    const [date, time] = inOneDay().split('T') as [string, string]
+    await page.getByLabel('Date').fill(date)
+    await page.getByLabel('Time').fill(time)
     await page.getByRole('button', { name: 'Schedule' }).click()
     await expect(page.getByText('Scheduled')).toBeVisible()
   })

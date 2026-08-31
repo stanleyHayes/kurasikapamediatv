@@ -59,7 +59,7 @@ erDiagram
 | `tags` | flat | `slug`, `names{locale}`, `usageCount` |
 | `role_assignments` | our RBAC, keyed by the auth user id | `roles[]` |
 | `user` `session` `account` `verification` | Better Auth | managed by the library — **do not hand-edit**. Roles live in `role_assignments`, ours. |
-| `assets` | images, audio, video | `kind`, `storageKey`, `providerAssetId`, `width`, `height`, `alt{locale}` |
+| `media_assets` | signed Cloudinary uploads for images, video, audio, captions, transcripts and documents | `kind`, `status`, `providerId`, `secureUrl`, `altText`, `caption`, `locale`, dimensions and duration |
 | `podcasts` / `episodes` | audio series | `episodes.assetId`, `duration`, `transcript` |
 | `live_streams` | Live TV | `providerStreamId`, `state`, `startedAt`, `viewerPeak` |
 | `social_posts` | outbound queue | `articleId`, `platform`, `caption`, `scheduledAt`, `state`, `attempts` |
@@ -97,6 +97,9 @@ db.articles.createIndex({ scheduledAt: 1 }, { partialFilterExpression: { status:
 db.article_revisions.createIndex({ articleId: 1, seq: -1 }, { unique: true })
 db.social_posts.createIndex({ state: 1, scheduledAt: 1 })
 db.audit_logs.createIndex({ entity: 1, entityId: 1, at: -1 })
+
+// Studio media library
+db.media_assets.createIndex({ locale: 1, status: 1, _id: -1 })
 
 // reader activity
 db.bookmarks.createIndex({ readerId: 1, articleId: 1 }, { unique: true })

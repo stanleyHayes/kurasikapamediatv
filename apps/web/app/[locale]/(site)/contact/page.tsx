@@ -25,7 +25,7 @@ async function Body({ params }: StandingParams): Promise<React.ReactElement> {
     <StandingPageView page={pageFor('contact', locale)} pageKey="contact" locale={locale}>
       <section className="border-t-2 border-on-surface bg-surface-container-low">
         <div className="mx-auto grid max-w-[var(--container-page)] gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[.8fr_1.2fr]">
-          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Send a private note</p><h2 className="mt-5 max-w-[10ch] font-display text-5xl font-semibold leading-[.9] tracking-[-.05em]">Write to the newsroom</h2><p className="mt-6 max-w-md text-lg leading-relaxed text-on-surface-variant">Corrections, tips and press enquiries. We reply by email; nothing from this form is published.</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-primary-ink">Send a private note</p><h2 className="mt-5 max-w-[10ch] font-display text-5xl font-semibold leading-[.9] tracking-[-.05em]">Write to the newsroom</h2><p className="mt-6 max-w-md text-lg leading-relaxed text-on-surface-variant">Corrections, tips and press enquiries. We reply by email; nothing from this form is published.</p></div>
           <div className="border-l-4 border-secondary bg-surface-container-lowest p-5 md:p-8"><ContactForm /></div>
         </div>
       </section>

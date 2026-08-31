@@ -7,6 +7,7 @@ import (
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
+	"github.com/kurasikapa/api/internal/app/ports"
 	faketesting "github.com/kurasikapa/api/internal/app/testing"
 	"github.com/kurasikapa/api/internal/domain/identity"
 	"github.com/kurasikapa/api/internal/domain/shared"
@@ -19,6 +20,11 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		Schedule: faketesting.NewScheduleStore(), Clock: faketesting.FixedClock{At: now},
 		IDs: &faketesting.SequentialIDs{},
 	}
+	assets := faketesting.NewAssetStore()
+	uploads := &faketesting.MediaUploadFake{Ticket: ports.UploadTicket{
+		URL: "https://api.cloudinary.test/upload", APIKey: "key", Signature: "signature",
+		PublicID: "id_1", ResourceType: "video", Folder: "kurasikapa/media", Timestamp: now.Unix(),
+	}}
 	return kurahttp.Deps{
 		CreateDraft:           appeditorial.NewCreateDraft(app),
 		UpdateDraft:           appeditorial.NewUpdateDraft(app),
@@ -44,6 +50,9 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		PublishProgramme:      appmedia.NewPublishProgramme(mediaDeps),
 		ScheduleProgramme:     appmedia.NewScheduleProgramme(mediaDeps),
 		ListTelevisionGuide:   appmedia.NewListTelevisionGuide(mediaDeps),
+		CreateAssetUpload:     appmedia.NewCreateAssetUpload(mediaDeps, assets, uploads),
+		CompleteAssetUpload:   appmedia.NewCompleteAssetUpload(assets, uploads),
+		ListAssets:            appmedia.NewListAssets(assets),
 		Roles:                 roles{granted: granted},
 		Log:                   slog.New(slog.NewTextHandler(io.Discard, nil)),
 		CronSecret:            "s3cret-value-of-known-length-0000",

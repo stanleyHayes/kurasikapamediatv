@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata now exist. Asset upload, podcast, episode, gallery, transcript, caption-file and VOD processing contexts, Cloudinary adapter and shared Studio media library remain unbuilt. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media-asset aggregate, Mongo repository, signed Cloudinary direct-upload adapter, authenticated API/BFF and Studio library now cover image, video, audio, caption, transcript and document intake; images require alt text and provider receipts are verified before readiness. Podcast, episode, gallery, article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
 | Newsroom intelligence | Operational workflow KPIs, moderation counts, language publication charts, GA consent/instrumentation and privacy-safe unique-reader ranking exist. Traffic, acquisition, author/category performance, newsletter growth, retention, search and revenue dashboards do not. | **PARTIAL — R5** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
@@ -249,7 +249,7 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_media_podcast_library` | — | ❌ no route (R3) |
 | `kurasikapa_media_live_tv_gallery` | — | ❌ no route (R3) |
 | `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
-| `kurasikapa_admin_media_library` | — | ❌ no route (R3) |
+| `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
 | `kurasikapa_media_membership_donations` | — | ❌ no route (R4) |
 | `support_membership_kurasikapa_media_tv` | — | ❌ no route (R4) |
 | `monetization_dashboard_kurasikapa_admin` | — | ❌ no route (R4) |
@@ -342,11 +342,17 @@ programme and schedule aggregates; tested Mongo adapters; a Studio television
 manager; public guide, reminders and replay presentation; and a domain rule that
 recorded replays require captions. The Go API exposes authenticated programming
 commands and a public guide, and both Next.js applications prefer that BFF path
-when `API_URL` is set. Full verification and production promotion are active.
+when `API_URL` is set.
 
-Still unbuilt: the shared asset library and CDN workflow, VOD processing, video
-and image galleries, podcast library with chapters/transcripts, article-to-audio
-(TTS) and voice-to-article.
+The shared Studio media library now creates pending assets in Go, signs direct
+Cloudinary browser uploads, verifies signed receipts server-side and persists
+ready assets in Mongo. It covers image, video, audio, caption, transcript and
+document files, requires image alt text, and fails closed without provider
+credentials. Production promotion and credentials remain active.
+
+Still unbuilt: attaching assets to articles, VOD processing, video and image
+galleries, podcast library with chapters/transcripts, article-to-audio (TTS) and
+voice-to-article.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;

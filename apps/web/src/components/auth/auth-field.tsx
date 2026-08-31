@@ -38,7 +38,7 @@ export function AuthField(props: AuthFieldProps): React.ReactElement {
         {isPassword && (
           <button
             type="button"
-            aria-label={revealed ? 'Hide password' : 'Show password'}
+            aria-label={revealed ? 'Conceal entry' : 'Reveal entry'}
             aria-pressed={revealed}
             onClick={() => {
               setRevealed((visible) => !visible)

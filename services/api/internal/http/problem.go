@@ -16,6 +16,7 @@ import (
 	"github.com/kurasikapa/api/internal/app/ports"
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
+	domainmedia "github.com/kurasikapa/api/internal/domain/media"
 )
 
 // Problem is the error body, following RFC 7807's shape.
@@ -62,6 +63,12 @@ func problemFor(err error) Problem {
 
 	case errors.Is(err, appeditorial.ErrUntitled):
 		// 400: the title yields no slug. The request itself is the problem.
+		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
+
+	case errors.Is(err, domainmedia.ErrInvalidAssetKind),
+		errors.Is(err, domainmedia.ErrEmptyAssetFilename),
+		errors.Is(err, domainmedia.ErrImageNeedsAltText),
+		errors.Is(err, domainmedia.ErrInvalidAssetDelivery):
 		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
 
 	case errors.Is(err, editorial.ErrIllegalTransition),
