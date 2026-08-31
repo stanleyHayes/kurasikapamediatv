@@ -31,7 +31,8 @@ type recordingImportDoc struct {
 	DurationSeconds      float64                     `bson:"durationSeconds"`
 	Status               media.RecordingImportStatus `bson:"status"`
 	RequestedBy          string                      `bson:"requestedBy"`
-	CreatedAt, UpdatedAt time.Time                   `bson:"createdAt"`
+	CreatedAt            time.Time                   `bson:"createdAt"`
+	UpdatedAt            time.Time                   `bson:"updatedAt"`
 }
 
 type RecordingImportRepository struct{ rows *mongo.Collection }
