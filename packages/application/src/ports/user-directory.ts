@@ -18,6 +18,7 @@ export interface DirectoryUser {
  * ("replacing it is a data copy, not a redesign") true rather than aspirational.
  */
 export interface UserDirectory {
+  create(user: Omit<DirectoryUser, 'roles'>): Promise<void>
   list(cursor: Cursor): Promise<Page<DirectoryUser>>
   /**
    * One user, or null. Invalid ids (fixture strings that are not ObjectIds)

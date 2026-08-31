@@ -34,6 +34,8 @@ import {
   type RevisionDocument,
   type CredentialDocument,
   type RefreshTokenDocument,
+  INVITATIONS,
+  type InvitationDocument,
 } from './documents'
 
 /**
@@ -155,6 +157,11 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
   // document unreachable, and the index is housekeeping rather than correctness.
   await db.collection(RATE_LIMITS).createIndexes([
     { key: { expiresAt: 1 }, name: 'rate_limit_ttl', expireAfterSeconds: 0 },
+  ])
+  await db.collection<InvitationDocument>(INVITATIONS).createIndexes([
+    { key: { tokenHash: 1 }, unique: true, name: 'invitation_token_unique' },
+    { key: { email: 1 }, unique: true, name: 'one_pending_invitation_per_email', partialFilterExpression: { state: 'pending' } },
+    { key: { createdAt: -1 }, name: 'invitation_recent' },
   ])
 
   /*

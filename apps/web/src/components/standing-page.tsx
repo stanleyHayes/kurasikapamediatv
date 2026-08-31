@@ -21,8 +21,8 @@ export function StandingPageView({ page, pageKey, locale, children }: { page: St
   return <article className="overflow-hidden bg-surface text-on-surface">
     <DossierHero page={page} meta={META[pageKey]} />
     {page.body === undefined ? <StaticSections page={page} pageKey={pageKey} /> : <ManagedBody page={page} pageKey={pageKey} />}
-    <StandingPageFeatures pageKey={pageKey} locale={locale} />
     {children}
+    <StandingPageFeatures pageKey={pageKey} locale={locale} />
     <PageClose pageKey={pageKey} locale={locale} />
   </article>
 }

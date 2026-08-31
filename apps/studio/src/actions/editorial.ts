@@ -24,7 +24,7 @@ import {
  * Editorial Server Actions: parse → Actor → use case → result.
  * No business rules here. Cache invalidation is on the event bus, not here.
  */
-export async function createDraftAction(input: unknown): Promise<ActionResult<{ slug: string }>> {
+export async function createDraftAction(input: unknown): Promise<ActionResult<{ id: string; slug: string }>> {
   return attempt(async () => {
     const parsed = parseInput(createDraftSchema, input)
     const actor = await requireActor()

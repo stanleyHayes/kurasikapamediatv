@@ -272,3 +272,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Place route-shaped loading boundaries inside persistent shells, prefetch primary navigation, and reserve branded full-page splashes for initial application entry.
 
 **Principle:** Navigation continuity is controlled as much by suspense-boundary placement as by the link primitive.
+
+### Observation 18: Source ingestion can obscure the primary editorial workflow
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** A newsroom had a complete draft-review-publish pipeline, but its only prominent creation entry was RSS ingestion, making the product appear to republish other sites rather than support original reporting.
+**Skill:** task-observer
+**Type:** open-source
+**Phase/Area:** Information architecture and workflow discovery
+
+**Issue:** Capability audits that inspect use cases without tracing visible entry points can call a workflow complete even when users cannot discover its first action.
+
+**Suggested improvement:** For each core workflow, trace the primary action from navigation and dashboard through completion; label secondary ingestion tools by their editorial role and never let them visually replace original authoring.
+
+**Principle:** A workflow does not exist for users until its first action is visible and correctly prioritised.

@@ -17,12 +17,14 @@ const USERS = 'user'
  */
 interface AuthUserDocument {
   _id: ObjectId
+  userId?: string
   email: string
   name: string
 }
 
 /** The id shape the rest of the system uses: Better Auth's `user.id`. */
 const hex = (id: ObjectId): string => id.toHexString()
+const publicId = (doc: AuthUserDocument): string => doc.userId ?? hex(doc._id)
 
 const KNOWN: ReadonlySet<string> = new Set(ROLES)
 
@@ -41,6 +43,10 @@ export class MongoUserDirectory implements UserDirectory {
   constructor(db: Db) {
     this.users = db.collection<AuthUserDocument>(USERS)
     this.assignments = db.collection<RoleAssignmentDocument>(ROLE_ASSIGNMENTS)
+  }
+
+  async create(user: Omit<DirectoryUser, 'roles'>): Promise<void> {
+    await this.users.insertOne({ _id: new ObjectId(), userId: user.id, email: user.email, name: user.name })
   }
 
   async list(cursor: Cursor): Promise<Page<DirectoryUser>> {
@@ -62,14 +68,14 @@ export class MongoUserDirectory implements UserDirectory {
 
     // One query for the page's roles rather than one per user: a 200-row
     // directory would otherwise be 201 round trips.
-    const roles = await this.rolesFor(page.map((d) => hex(d._id)))
+    const roles = await this.rolesFor(page.map(publicId))
 
     return {
       items: page.map((doc) => ({
-        id: userId(hex(doc._id)),
+        id: userId(publicId(doc)),
         email: doc.email,
         name: doc.name,
-        roles: roles.get(hex(doc._id)) ?? [],
+        roles: roles.get(publicId(doc)) ?? [],
       })),
       nextCursor: hasMore && last !== undefined ? hex(last._id) : null,
     }
@@ -77,24 +83,21 @@ export class MongoUserDirectory implements UserDirectory {
 
   async findById(id: UserId): Promise<DirectoryUser | null> {
     const oid = objectIdOf(id)
-    if (oid === null) return null
-
-    const doc = await this.users.findOne({ _id: oid })
+    const doc = await this.users.findOne(oid === null ? { userId: id } : { $or: [{ _id: oid }, { userId: id }] })
     if (doc === null) return null
 
-    const roles = await this.rolesFor([hex(doc._id)])
+    const roles = await this.rolesFor([publicId(doc)])
     return {
-      id: userId(hex(doc._id)),
+      id: userId(publicId(doc)),
       email: doc.email,
       name: doc.name,
-      roles: roles.get(hex(doc._id)) ?? [],
+      roles: roles.get(publicId(doc)) ?? [],
     }
   }
 
   async updateName(id: UserId, name: string): Promise<void> {
     const oid = objectIdOf(id)
-    if (oid === null) return
-    await this.users.updateOne({ _id: oid }, { $set: { name } })
+    await this.users.updateOne(oid === null ? { userId: id } : { $or: [{ _id: oid }, { userId: id }] }, { $set: { name } })
   }
 
   private async rolesFor(ids: readonly string[]): Promise<Map<string, Role[]>> {

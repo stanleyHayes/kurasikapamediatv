@@ -9,6 +9,7 @@ import { StudioIcon, type StudioIconName } from './studio-icon'
 interface NavItem { readonly href: string; readonly label: string; readonly description: string; readonly icon: StudioIconName }
 const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
   { heading: 'Newsroom', items: [
+    { href: '/articles/new', label: 'Create story', description: 'Start original reporting', icon: 'desk' },
     { href: '/', label: 'Editorial desk', description: 'Drafts and live pipeline', icon: 'desk' },
     { href: '/review', label: 'Review queue', description: 'Approve newsroom copy', icon: 'review' },
     { href: '/comments', label: 'Comments', description: 'Moderate conversations', icon: 'comments' },

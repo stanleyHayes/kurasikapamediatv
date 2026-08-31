@@ -20,6 +20,7 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   'src/actions/contact-actions.ts',
   'src/actions/account-actions.ts',
   'src/actions/push.ts',
+  'src/actions/invitations.ts',
   // Vendor client construction, browser-only — the same category as web-kit's
   // composition/auth.ts. Exercised by the auth E2E journey.
   'src/lib/auth-client.ts',
@@ -31,6 +32,9 @@ const base = baseConfig(COVERAGE_FLOORS.web, [
   'src/components/**/*.tsx',
   'src/content/markdown-view.tsx',
   'src/content/standing-route.tsx',
+  // Request-time composition only; structured entry decoding is covered in
+  // web-kit and the rendered markup belongs to the standing-page E2E path.
+  'src/content/cms-page.ts',
   'src/analytics/**/*.tsx',
   'src/pwa/service-worker-register.tsx',
   // Opt-in is gated on production SW + Notification; covered by the policy

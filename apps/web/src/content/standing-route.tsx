@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { setRequestLocale } from 'next-intl/server'
 import type { SitePageKey } from '@kurasikapa/domain'
 import { StandingPageView } from '../components/standing-page'
+import { StandingPageEntries } from '../components/standing-page-entries'
 import { type PageKey } from './pages'
-import { cmsPageFor } from './cms-page'
+import { sitePageEntriesFor } from './cms-page'
 import { pageFor } from './pages'
 
 export interface StandingParams {
@@ -29,7 +30,7 @@ export function standingRoute(
   return {
     generateMetadata: async ({ params }: StandingParams): Promise<Metadata> => {
       const { locale } = await params
-      const page = await cmsPageFor(key, locale)
+      const page = pageFor(key, locale)
 
       return {
         title: page.title,
@@ -42,7 +43,8 @@ export function standingRoute(
       const { locale } = await params
       setRequestLocale(locale)
 
-      return <StandingPageView page={await cmsPageFor(key, locale)} pageKey={key} locale={locale} />
+      const entries = await sitePageEntriesFor(key, locale)
+      return <StandingPageView page={pageFor(key, locale)} pageKey={key} locale={locale}><StandingPageEntries pageKey={key} entries={entries} /></StandingPageView>
     },
   }
 }

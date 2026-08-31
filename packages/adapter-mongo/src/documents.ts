@@ -1,5 +1,19 @@
 import type { ArticleStatus, BroadcastState, RevisionTrigger } from '@kurasikapa/domain'
 
+export const INVITATIONS = 'user_invitations'
+
+export interface InvitationDocument {
+  _id: string
+  email: string
+  name: string
+  roles: string[]
+  tokenHash: string
+  invitedBy: string
+  createdAt: Date
+  expiresAt: Date
+  state: string
+}
+
 /**
  * The shape on disk. Deliberately not the domain shape.
  *

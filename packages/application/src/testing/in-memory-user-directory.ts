@@ -7,6 +7,11 @@ export class InMemoryUserDirectory implements UserDirectory {
 
   constructor(private readonly users: DirectoryUser[] = []) {}
 
+  create(user: Omit<DirectoryUser, 'roles'>): Promise<void> {
+    this.users.push({ ...user, roles: [] })
+    return Promise.resolve()
+  }
+
   list(cursor: Cursor): Promise<Page<DirectoryUser>> {
     this.calls.push(cursor)
     return Promise.resolve({ items: this.users.slice(0, cursor.limit), nextCursor: null })

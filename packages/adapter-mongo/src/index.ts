@@ -31,6 +31,8 @@ export {
   type CategoryDocument,
   type RoleAssignmentDocument,
   type SitePageDocument,
+  INVITATIONS,
+  type InvitationDocument,
 } from './documents'
 export { ensureIndexes, ensureBroadcastIndexes } from './indexes'
 export {
@@ -64,3 +66,4 @@ export { MongoRateLimiter } from './mongo-rate-limiter'
 export { MongoCredentialRepository } from './mongo-credential-repository'
 export { MongoRefreshTokenRepository } from './mongo-refresh-token-repository'
 export { MongoSitePageRepository } from './mongo-site-page-repository'
+export { MongoInvitationRepository } from './mongo-invitation-repository'

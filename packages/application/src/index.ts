@@ -36,6 +36,11 @@ export { ProposeSocialSummary, type ProposeSocialSummaryDeps, type ProposeSocial
 export { PublishDuePosts, type PublishDuePostsDeps, type PublishDuePostsResult } from './distribution/publish-due-posts'
 export type { RoleRepository } from './ports/role-repository'
 export type { DirectoryUser, UserDirectory } from './ports/user-directory'
+export { PendingInvitationExists, type InvitationRecord, type InvitationRepository, type InvitationState } from './ports/invitation-repository'
+export { InviteUser, type InviteUserInput, type InviteUserResult } from './identity/invite-user'
+export { AcceptInvitation, InvitationUnusable } from './identity/accept-invitation'
+export { RevokeInvitation } from './identity/revoke-invitation'
+export { ResendInvitation } from './identity/resend-invitation'
 export {
   ListUsers,
   type ListUsersDeps,

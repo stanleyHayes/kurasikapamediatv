@@ -28,8 +28,8 @@ export async function createDraft(
     categoryId: CategoryId
     tagIds?: TagId[]
     familyId?: FamilyId
-  }) => Promise<{ slug: string }>,
-): Promise<{ slug: string }> {
+  }) => Promise<{ articleId: string; slug: string }>,
+): Promise<{ id: string; slug: string }> {
   if (apiUrl !== undefined) {
     const article = await createDraftViaApi({
       baseUrl: apiUrl,
@@ -41,10 +41,10 @@ export async function createDraft(
       ...(parsed.familyId ? { familyId: parsed.familyId } : {}),
     })
 
-    return { slug: article.slug }
+    return { id: article.id, slug: article.slug }
   }
 
-  return viaTypeScript({
+  const created = await viaTypeScript({
     actor,
     locale: parsed.locale,
     title: parsed.title,
@@ -53,4 +53,5 @@ export async function createDraft(
     ...(parsed.tagIds ? { tagIds: parsed.tagIds as TagId[] } : {}),
     ...(parsed.familyId ? { familyId: parsed.familyId as FamilyId } : {}),
   })
+  return { id: created.articleId, slug: created.slug }
 }

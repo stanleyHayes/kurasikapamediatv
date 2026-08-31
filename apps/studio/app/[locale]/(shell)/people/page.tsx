@@ -6,6 +6,8 @@ import { MemberRow } from '@/components/member-row'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { CollectionView } from '@/components/collection-view'
+import { InvitationPanel } from '@/components/invitation-panel'
+import { invitationGraph } from '@kurasikapa/web-kit/composition/invitation-graph'
 
 interface Person {
   readonly id: string
@@ -21,7 +23,7 @@ interface Person {
  * zero forever and calling it a feature. Replaced with the count that actually
  * matters on this screen: how many people hold no role at all.
  */
-const metricsFor = (people: readonly Person[]): readonly Metric[] => [
+const metricsFor = (people: readonly Person[], pending: number): readonly Metric[] => [
   { label: 'People', value: people.length, icon: '☰' },
   {
     label: 'Can assign roles',
@@ -29,7 +31,7 @@ const metricsFor = (people: readonly Person[]): readonly Metric[] => [
     icon: '◈',
     emphasis: true,
   },
-  { label: 'No role yet', value: people.filter((p) => p.roles.length === 0).length, icon: '○' },
+  { label: 'Pending invitations', value: pending, icon: '○' },
 ]
 
 export default async function PeoplePage({
@@ -57,6 +59,8 @@ export default async function PeoplePage({
     name: p.name,
     roles: [...p.roles],
   }))
+  const invitations = (await invitationGraph().invitations.list()).map((item) => ({ ...item, invitedBy: String(item.invitedBy), createdAt: item.createdAt.toISOString(), expiresAt: item.expiresAt.toISOString() }))
+  const pendingInvitations = invitations.filter((item) => item.state === 'pending')
 
   return (
     <div className="space-y-8 pb-20">
@@ -71,7 +75,9 @@ export default async function PeoplePage({
         </div>
       </header>
 
-      <MetricCards metrics={metricsFor(people)} />
+      <MetricCards metrics={metricsFor(people, pendingInvitations.length)} />
+
+      <InvitationPanel invitations={invitations} />
 
       <MembersTable people={people} selfId={actor.id} />
     </div>
