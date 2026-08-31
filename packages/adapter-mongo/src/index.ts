@@ -67,3 +67,15 @@ export { MongoCredentialRepository } from './mongo-credential-repository'
 export { MongoRefreshTokenRepository } from './mongo-refresh-token-repository'
 export { MongoSitePageRepository } from './mongo-site-page-repository'
 export { MongoInvitationRepository } from './mongo-invitation-repository'
+export { MongoPresenterRepository } from './mongo-presenter-repository'
+export { MongoProgrammeRepository } from './mongo-programme-repository'
+export { MongoScheduleRepository } from './mongo-schedule-repository'
+export {
+  PRESENTERS,
+  PROGRAMMES,
+  SCHEDULE_SLOTS,
+  type PresenterDocument,
+  type ProgrammeDocument,
+  type ScheduleSlotDocument,
+} from './television-documents'
+export { ensureTelevisionIndexes } from './television-indexes'

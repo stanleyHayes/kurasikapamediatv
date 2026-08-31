@@ -12,6 +12,9 @@ export type UserId = Branded<'UserId'>
 export type AssetId = Branded<'AssetId'>
 export type CommentId = Branded<'CommentId'>
 export type BroadcastId = Branded<'BroadcastId'>
+export type ProgrammeId = Branded<'ProgrammeId'>
+export type PresenterId = Branded<'PresenterId'>
+export type ScheduleSlotId = Branded<'ScheduleSlotId'>
 
 const asId = <B extends string>(value: string, kind: B): Branded<B> => {
   if (value.trim() === '') throw new EmptyIdentifier(kind)
@@ -27,6 +30,9 @@ export const userId = (v: string): UserId => asId(v, 'UserId')
 export const assetId = (v: string): AssetId => asId(v, 'AssetId')
 export const commentId = (v: string): CommentId => asId(v, 'CommentId')
 export const broadcastId = (v: string): BroadcastId => asId(v, 'BroadcastId')
+export const programmeId = (v: string): ProgrammeId => asId(v, 'ProgrammeId')
+export const presenterId = (v: string): PresenterId => asId(v, 'PresenterId')
+export const scheduleSlotId = (v: string): ScheduleSlotId => asId(v, 'ScheduleSlotId')
 
 export class EmptyIdentifier extends Error {
   constructor(kind: string) {

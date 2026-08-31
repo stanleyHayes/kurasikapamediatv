@@ -18,6 +18,9 @@ import {
   MongoUserDirectory,
   MongoSitePageRepository,
   MongoBroadcastRepository,
+  MongoPresenterRepository,
+  MongoProgrammeRepository,
+  MongoScheduleRepository,
 } from '@kurasikapa/adapter-mongo'
 import {
   ConfirmNewsletter,
@@ -66,6 +69,9 @@ import {
   type UserDirectory,
   type SitePageRepository,
   type BroadcastRepository,
+  type PresenterRepository,
+  type ProgrammeRepository,
+  type ScheduleRepository,
 } from '@kurasikapa/application'
 import type { Db } from 'mongodb'
 
@@ -89,6 +95,9 @@ export interface MongoGraph {
   readonly categories: CategoryRepository
   readonly sitePages: SitePageRepository
   readonly broadcasts: BroadcastRepository
+  readonly presenters: PresenterRepository
+  readonly programmes: ProgrammeRepository
+  readonly schedule: ScheduleRepository
 }
 
 /**
@@ -116,6 +125,9 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     categories: new MongoCategoryRepository(db),
     sitePages: new MongoSitePageRepository(db),
     broadcasts: new MongoBroadcastRepository(db),
+    presenters: new MongoPresenterRepository(db),
+    programmes: new MongoProgrammeRepository(db),
+    schedule: new MongoScheduleRepository(db),
   }
 }
 

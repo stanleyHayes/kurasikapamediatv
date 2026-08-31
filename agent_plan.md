@@ -62,8 +62,8 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Audit requirement | Current evidence | State |
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
-| Television identity | Independent Live page, public HLS player, Studio broadcast control room, fail-closed provider and transmission history are live. Programme schedule, programme/presenter directories, reminders and replay/video rails do not exist. | **PARTIAL — ACTIVE R3** |
-| Multimedia system | Live broadcast aggregate exists. Asset, podcast, episode, gallery, transcript, caption and VOD contexts, Cloudinary adapter and Studio media library do not. | **NOT BUILT — ACTIVE R3** |
+| Television identity | The Live page and broadcast control room now have a tested TypeScript foundation for presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. Domain/application coverage, real Mongo repositories, Studio management UI and public rendering pass `pnpm verify`. Production still reads through the Go API, so the Go media context and BFF endpoints must land before this slice can be released. | **FOUNDATION COMPLETE — GO API ACTIVE** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata now exist. Asset upload, podcast, episode, gallery, transcript, caption-file and VOD processing contexts, Cloudinary adapter and shared Studio media library remain unbuilt. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
 | Newsroom intelligence | Operational workflow KPIs, moderation counts, language publication charts, GA consent/instrumentation and privacy-safe unique-reader ranking exist. Traffic, acquisition, author/category performance, newsletter growth, retention, search and revenue dashboards do not. | **PARTIAL — R5** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
@@ -337,10 +337,15 @@ failure; rate-limited; nothing is persisted.
 
 ### 5.3 R3 — Multimedia
 
-Nothing built. The `media` bounded context has no files in either language.
-Live TV page, VOD library, video and image galleries, podcast library with
-chapters and transcripts, media asset library, article-to-audio (TTS),
-voice-to-article.
+The TypeScript media context now includes live broadcast plus presenter,
+programme and schedule aggregates; tested Mongo adapters; a Studio television
+manager; public guide, reminders and replay presentation; and a domain rule that
+recorded replays require captions. Production persistence is owned by the Go API,
+so the equivalent Go context and HTTP/BFF seam are the active release blocker.
+
+Still unbuilt: the shared asset library and CDN workflow, VOD processing, video
+and image galleries, podcast library with chapters/transcripts, article-to-audio
+(TTS) and voice-to-article.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;

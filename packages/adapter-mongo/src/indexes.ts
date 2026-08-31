@@ -1,4 +1,5 @@
 import type { Db } from 'mongodb'
+import { ensureTelevisionIndexes } from './television-indexes'
 import {
   ARTICLES,
   AUDIT_ENTRIES,
@@ -103,7 +104,7 @@ export async function ensureIndexes(db: Db): Promise<void> {
   ])
 
   await ensureAudienceIndexes(db)
-  await ensureBroadcastIndexes(db)
+  await ensureMediaIndexes(db)
 
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.
@@ -118,6 +119,11 @@ export async function ensureIndexes(db: Db): Promise<void> {
     // "What happened to this article" is the second question anyone asks.
     { key: { subjectId: 1, occurredAt: -1 }, name: 'audit_by_subject' },
   ])
+}
+
+async function ensureMediaIndexes(db: Db): Promise<void> {
+  await ensureBroadcastIndexes(db)
+  await ensureTelevisionIndexes(db)
 }
 
 async function ensureAudienceIndexes(db: Db): Promise<void> {

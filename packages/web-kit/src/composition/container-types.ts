@@ -32,6 +32,12 @@ import type {
   GetCurrentBroadcast,
   StartBroadcast,
   EndBroadcast,
+  CreatePresenter,
+  PublishPresenter,
+  CreateProgramme,
+  PublishProgramme,
+  ScheduleProgramme,
+  ListTelevisionGuide,
   LiveVideoPort,
   ModerateComment,
   ManageSitePages,
@@ -126,6 +132,12 @@ export interface Container {
   readonly endBroadcast: EndBroadcast
   readonly getCurrentBroadcast: GetCurrentBroadcast
   readonly listBroadcasts: ListBroadcasts
+  readonly createPresenter: CreatePresenter
+  readonly publishPresenter: PublishPresenter
+  readonly createProgramme: CreateProgramme
+  readonly publishProgramme: PublishProgramme
+  readonly scheduleProgramme: ScheduleProgramme
+  readonly listTelevisionGuide: ListTelevisionGuide
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle

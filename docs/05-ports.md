@@ -29,6 +29,12 @@ Same shape for `RevisionRepository`, `CategoryRepository`, `TagRepository`, `Use
 `AssetRepository`, `SubscriptionRepository`, `AdCampaignRepository`, `CommentRepository`,
 `LikeRepository`, `ReadingRepository`, `NewsletterRepository`.
 
+Television scheduling is split across `PresenterRepository`, `ProgrammeRepository`
+and `ScheduleRepository`. This keeps people, repeatable programme metadata and
+individual transmission windows independently addressable. Public guide queries
+join those aggregates in `ListTelevisionGuide`; repository documents never leak
+into the route or UI.
+
 `ReadingRepository` has no `findById` — a reader's history is not id-addressable.
 It does expose `rankByReaders(limit)`: unique readers per article, no identities.
 That powers the public most-read rail. Category-based related articles are live
@@ -125,7 +131,13 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 
 **identity** — `RegisterReader` · `SignInWithProvider` · `AssignRole` · `EnableTwoFactor` · `AuthorizeAction`
 
-**media** — `UploadAsset` · `StartLiveStream` · `EndLiveStream` · `PublishEpisode` · `TranscodeVod`
+**media** — `UploadAsset` · `StartLiveStream` · `EndLiveStream` · `CreatePresenter` ·
+`PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·
+`ListTelevisionGuide` · `PublishEpisode` · `TranscodeVod`
+
+`ScheduleProgramme` accepts only published programmes. A recorded replay cannot
+be published without a caption asset; this accessibility rule lives in the
+schedule aggregate, not in a form or route handler.
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 

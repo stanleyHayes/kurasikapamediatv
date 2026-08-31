@@ -30,6 +30,9 @@ export {
   UnfilteredBroadcastRepository,
 } from './in-memory-broadcast-repository'
 export { InMemoryCategoryRepository } from './in-memory-category-repository'
+export { InMemoryPresenterRepository } from './in-memory-presenter-repository'
+export { InMemoryProgrammeRepository } from './in-memory-programme-repository'
+export { InMemoryScheduleRepository } from './in-memory-schedule-repository'
 export {
   FlakySocial,
   InMemorySocialPostRepository,

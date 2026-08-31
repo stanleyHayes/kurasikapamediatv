@@ -3,10 +3,19 @@ import {
   GetCurrentBroadcast,
   ListBroadcasts,
   StartBroadcast,
+  CreatePresenter,
+  PublishPresenter,
+  CreateProgramme,
+  PublishProgramme,
+  ScheduleProgramme,
+  ListTelevisionGuide,
   type BroadcastRepository,
   type ClockPort,
   type IdPort,
   type LiveVideoPort,
+  type PresenterRepository,
+  type ProgrammeRepository,
+  type ScheduleRepository,
 } from '@kurasikapa/application'
 
 export interface MediaCommands {
@@ -14,6 +23,12 @@ export interface MediaCommands {
   readonly endBroadcast: EndBroadcast
   readonly getCurrentBroadcast: GetCurrentBroadcast
   readonly listBroadcasts: ListBroadcasts
+  readonly createPresenter: CreatePresenter
+  readonly publishPresenter: PublishPresenter
+  readonly createProgramme: CreateProgramme
+  readonly publishProgramme: PublishProgramme
+  readonly scheduleProgramme: ScheduleProgramme
+  readonly listTelevisionGuide: ListTelevisionGuide
 }
 
 /**
@@ -36,13 +51,22 @@ export function mediaCommands(input: {
   readonly live: LiveVideoPort
   readonly clock: ClockPort
   readonly ids: IdPort
+  readonly presenters: PresenterRepository
+  readonly programmes: ProgrammeRepository
+  readonly schedule: ScheduleRepository
 }): MediaCommands {
-  const { broadcasts, live, clock, ids } = input
+  const { broadcasts, live, clock, ids, presenters, programmes, schedule } = input
 
   return {
     startBroadcast: new StartBroadcast({ broadcasts, live, clock, ids }),
     endBroadcast: new EndBroadcast({ broadcasts, live, clock }),
     getCurrentBroadcast: new GetCurrentBroadcast({ broadcasts }),
     listBroadcasts: new ListBroadcasts({ broadcasts }),
+    createPresenter: new CreatePresenter({ presenters, ids }),
+    publishPresenter: new PublishPresenter({ presenters }),
+    createProgramme: new CreateProgramme({ presenters, programmes, ids }),
+    publishProgramme: new PublishProgramme({ presenters, programmes }),
+    scheduleProgramme: new ScheduleProgramme({ programmes, schedule, clock, ids }),
+    listTelevisionGuide: new ListTelevisionGuide({ presenters, programmes, schedule }),
   }
 }

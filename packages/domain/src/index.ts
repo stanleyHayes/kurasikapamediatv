@@ -94,6 +94,9 @@ export {
   type ArticleId,
   type AssetId,
   type BroadcastId,
+  type ProgrammeId,
+  type PresenterId,
+  type ScheduleSlotId,
   type CommentId,
   type Branded,
   type CategoryId,
@@ -104,6 +107,9 @@ export {
   articleId,
   assetId,
   broadcastId,
+  programmeId,
+  presenterId,
+  scheduleSlotId,
   commentId,
   categoryId,
   familyId,
@@ -189,5 +195,28 @@ export {
 } from './media/broadcast'
 export { BROADCAST_STATES, type BroadcastState } from './media/broadcast-state'
 export { AlreadyLive, BroadcastHasEnded, NotLive } from './media/errors'
+export {
+  EmptyPresenterName,
+  Presenter,
+  type NewPresenter,
+  type PresenterProps,
+} from './media/presenter'
+export {
+  EmptyProgrammeTitle,
+  Programme,
+  ProgrammeNeedsPresenter,
+  type NewProgramme,
+  type ProgrammeProps,
+} from './media/programme'
+export {
+  InvalidScheduleWindow,
+  ReplayNeedsCaptions,
+  ScheduleSlotInPast,
+  ScheduleSlot,
+  SlotAlreadyCancelled,
+  type NewScheduleSlot,
+  type ScheduleSlotProps,
+  type ScheduleSlotState,
+} from './media/schedule-slot'
 
 export { AuditEntry, type AuditEntryProps } from './insight/audit-entry'

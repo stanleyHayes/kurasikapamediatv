@@ -41,3 +41,20 @@ export {
   type ListBroadcastsDeps,
   type ListBroadcastsInput,
 } from './list-broadcasts'
+export type { PresenterRepository } from '../ports/presenter-repository'
+export type { ProgrammeRepository } from '../ports/programme-repository'
+export type { ScheduleRepository } from '../ports/schedule-repository'
+export { CreatePresenter, type CreatePresenterDeps, type CreatePresenterInput } from './create-presenter'
+export { PublishPresenter, type PublishPresenterInput } from './publish-presenter'
+export { CreateProgramme, type CreateProgrammeDeps, type CreateProgrammeInput } from './create-programme'
+export { PublishProgramme, type PublishProgrammeDeps, type PublishProgrammeInput } from './publish-programme'
+export { ScheduleProgramme, type ScheduleProgrammeDeps, type ScheduleProgrammeInput } from './schedule-programme'
+export {
+  ListTelevisionGuide,
+  type ListTelevisionGuideDeps,
+  type ListTelevisionGuideInput,
+  type TelevisionGuide,
+  type TelevisionProgramme,
+  type TelevisionSlot,
+} from './list-television-guide'
+export { ProgrammeNotFound, PresenterNotFound, UnpublishedPresenter, UnpublishedProgramme } from './programme-errors'

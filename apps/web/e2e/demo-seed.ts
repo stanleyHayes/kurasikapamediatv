@@ -226,13 +226,36 @@ async function seedSections(db: Db): Promise<void> {
   }
 }
 
+async function seedTelevision(db: Db): Promise<void> {
+  const presenters = [
+    { _id: 'demo_presenter_ama', name: 'Ama Nyarko — Preview profile', slug: 'ama-nyarko-preview', locale: 'en', role: 'Host, The Civic Desk', biography: 'Client-preview biography for a weekly public-affairs presenter. Replace with the verified team member, portrait and approved biography before launch.', portraitAssetId: null, published: true, createdBy: 'usr_demo_author' },
+    { _id: 'demo_presenter_kojo', name: 'Kojo Mensah — Preview profile', slug: 'kojo-mensah-preview', locale: 'en', role: 'Anchor, Evening Bulletin', biography: 'Client-preview biography for the evening news anchor. Replace with verified newsroom information before launch.', portraitAssetId: null, published: true, createdBy: 'usr_demo_author' },
+    { _id: 'demo_presenter_adwoa', name: 'Adwoa Sarpong — Preview profile', slug: 'adwoa-sarpong-preview', locale: 'en', role: 'Host, Culture Exchange', biography: 'Client-preview biography for an arts and culture host. Replace with verified presenter details before launch.', portraitAssetId: null, published: true, createdBy: 'usr_demo_author' },
+  ]
+  const programmes = [
+    { _id: 'demo_programme_civic', title: 'The Civic Desk', slug: 'the-civic-desk', locale: 'en', summary: 'A weekly examination of public decisions, essential services and the people responsible for delivering them.', category: 'Current affairs', presenterIds: ['demo_presenter_ama'], artworkAssetId: null, published: true, createdBy: 'usr_demo_author' },
+    { _id: 'demo_programme_evening', title: 'Evening Bulletin', slug: 'evening-bulletin', locale: 'en', summary: 'The day’s verified headlines, field reports and concise context from Ghana and across West Africa.', category: 'News', presenterIds: ['demo_presenter_kojo'], artworkAssetId: null, published: true, createdBy: 'usr_demo_author' },
+    { _id: 'demo_programme_culture', title: 'Culture Exchange', slug: 'culture-exchange', locale: 'en', summary: 'Conversations with artists, makers and cultural organisers about the work shaping contemporary Ghana.', category: 'Arts & culture', presenterIds: ['demo_presenter_adwoa'], artworkAssetId: null, published: true, createdBy: 'usr_demo_author' },
+  ]
+  const slots = [
+    { _id: 'demo_slot_evening', programmeId: 'demo_programme_evening', locale: 'en', startsAt: inDays(1), endsAt: inDays(1.04), isLive: true, state: 'scheduled', replayAssetId: null, captionAssetId: null, createdBy: 'usr_demo_author' },
+    { _id: 'demo_slot_civic', programmeId: 'demo_programme_civic', locale: 'en', startsAt: inDays(2), endsAt: inDays(2.04), isLive: true, state: 'scheduled', replayAssetId: null, captionAssetId: null, createdBy: 'usr_demo_author' },
+    { _id: 'demo_slot_culture', programmeId: 'demo_programme_culture', locale: 'en', startsAt: inDays(3), endsAt: inDays(3.04), isLive: false, state: 'scheduled', replayAssetId: null, captionAssetId: null, createdBy: 'usr_demo_author' },
+  ]
+  await db.collection<Record<string, unknown> & { _id: string }>('presenters').insertMany(presenters)
+  await db.collection<Record<string, unknown> & { _id: string }>('programmes').insertMany(programmes)
+  await db.collection<Record<string, unknown> & { _id: string }>('schedule_slots').insertMany(slots)
+}
+
 async function main(): Promise<void> {
   const client = new MongoClient(URI)
   await client.connect()
   const db = client.db(DB)
 
-  for (const name of ['articles', 'article_revisions', 'categories', 'comments']) {
-    await db.collection(name).deleteMany({ demoSeed: DEMO_SEED })
+  for (const name of ['articles', 'article_revisions', 'categories', 'comments', 'presenters', 'programmes', 'schedule_slots']) {
+    const collection = db.collection<Record<string, unknown> & { _id: string }>(name)
+    await collection.deleteMany({ demoSeed: DEMO_SEED })
+    await collection.deleteMany({ _id: { $regex: '^demo_' } })
   }
 
   await seedSections(db)
@@ -257,11 +280,12 @@ async function main(): Promise<void> {
   await seedStories(db, articles)
   await seedComments(db)
   await seedSitePages(db)
+  await seedTelevision(db)
 
   const published = articles.filter((a) => a.status === 'published').length
   console.error(
     `seeded ${String(published)} published, 1 draft, 1 in review, 1 scheduled, ` +
-      `${String(SECTIONS.length)} sections, ${String(COMMENTS.length)} comments and ${String(SITE_PAGES.length)} managed pages`,
+      `${String(SECTIONS.length)} sections, ${String(COMMENTS.length)} comments, ${String(SITE_PAGES.length)} managed pages, 3 presenters, 3 programmes and 3 schedule slots`,
   )
 
   await client.close()

@@ -74,6 +74,9 @@ export function buildContainer(infra: Infrastructure): Container {
       live: infra.live ?? failClosedIvs(),
       clock: infra.clock,
       ids: infra.ids,
+      presenters: graph.presenters,
+      programmes: graph.programmes,
+      schedule: graph.schedule,
     }),
   }
 }

@@ -16,6 +16,7 @@ const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
   ] },
   { heading: 'Publishing', items: [
     { href: '/live-control', label: 'Go live', description: 'Broadcast control room', icon: 'live' },
+    { href: '/television', label: 'TV programming', description: 'Shows, presenters and schedule', icon: 'live' },
     { href: '/social', label: 'Social publishing', description: 'Schedule distribution', icon: 'social' },
     { href: '/rss', label: 'News sources', description: 'Manage inbound feeds', icon: 'rss' },
     { href: '/pages', label: 'Public pages', description: 'About, legal and information', icon: 'desk' },
