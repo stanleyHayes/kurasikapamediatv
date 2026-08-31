@@ -33,13 +33,13 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 | Workstream | State | Acceptance evidence |
 |---|---|---|
 | Independent Studio auth, recovery, branded login and navigation shell | **DONE** | Studio production auth and password recovery verified; nested shell loading prevents sidebar navigation from replacing the whole app shell. |
-| Original news creation | **IMPLEMENTED — verification pending** | `/studio/{locale}/articles/new` creates a private original draft and opens the existing editor; dashboard and sidebar make it the primary newsroom action. Existing review, approval, schedule and publish transitions remain the control. |
-| RSS source intake distinction | **IMPLEMENTED — verification pending** | RSS is labelled Source monitor and remains optional draft intake. Imported material never bypasses editorial review or auto-publishes. |
-| Careers, FAQ and Help | **IMPLEMENTED — verification pending** | Permanent public framing remains static. Studio manages structured open-role, FAQ and help records; public routes render those records with useful empty states and EN fallback. |
-| Role-specific invitations | **IMPLEMENTED — verification pending** | People supports role selection, seven-day one-time links, hashed tokens, pending KPIs, resend, revoke and recipient account activation. Application invitation suite passes. |
-| People operations patterns from RentOS/Xtiitch | **IMPLEMENTED — verification pending** | Combined secure invite lifecycle with searchable members, pending visibility, role/status operations and concise role explanations. |
+| Original news creation | **DONE** | `/studio/{locale}/articles/new` creates a private original draft and opens the existing editor; dashboard and sidebar make it the primary newsroom action. Existing review, approval, schedule and publish transitions remain the control. |
+| RSS source intake distinction | **DONE** | RSS is labelled Source monitor and remains optional draft intake. Imported material never bypasses editorial review or auto-publishes. |
+| Careers, FAQ and Help | **DONE** | Permanent public framing remains static. Studio manages structured open-role, FAQ and help records; public routes render those records with useful empty states and EN fallback. |
+| Role-specific invitations | **DONE** | People supports role selection, seven-day one-time links, hashed tokens, pending KPIs, resend, revoke and recipient account activation. Application and real-Mongo invitation suites pass. |
+| People operations patterns from RentOS/Xtiitch | **DONE** | Combined secure invite lifecycle with searchable members, pending visibility, role/status operations and concise role explanations. |
 | Dashboard KPIs and visualisations | **DONE** | Sourced workflow, review, moderation and language-publication KPIs plus workflow bars, queue bars and language chart; no invented totals. |
-| Full gates, production deploy and live workflow smoke tests | **IN PROGRESS** | Must pass `pnpm verify`, both production builds, Vercel deploys and live route/workflow checks before this delivery is marked done. |
+| Full gates, production deploy and live workflow smoke tests | **DONE** | Lint, typecheck, boundaries, all TS suites, duplication and Go verification passed. Both Vercel projects reached Ready; live Studio sign-in/create-story and public Careers/invitation routes responded successfully. |
 
 Implementation rule for this delivery: original reporting is the primary content
 workflow. RSS sources are an optional monitoring and draft-intake tool, never a
