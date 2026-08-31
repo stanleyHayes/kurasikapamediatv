@@ -1,14 +1,14 @@
-import { SignInFailed, TooManyAttempts } from '@kurasikapa/application'
+import { startPasswordSession } from '@kurasikapa/web-kit/bff/password-session-http'
 import { authGraph } from '@kurasikapa/web-kit/composition/auth-graph'
 import { refreshCookieName } from '@kurasikapa/web-kit/composition/session-cookies'
 import {
   clearedCookies,
-  issuedCookies,
   withCookies,
 } from '@kurasikapa/web-kit/composition/session-transport'
 import { env } from '@kurasikapa/web-kit/composition/env'
-import { callerKey } from '@kurasikapa/web-kit/security/rate-limit'
 import { cookies } from 'next/headers'
+
+const json = (body: unknown, status: number): Response => Response.json(body, { status })
 
 /**
  * The session itself: POST to start one, DELETE to end it.
@@ -19,51 +19,8 @@ import { cookies } from 'next/headers'
  * appeared to succeed. Nothing else in the app sets a session cookie.
  */
 
-interface Body {
-  readonly email?: unknown
-  readonly password?: unknown
-}
-
-const json = (body: unknown, status: number): Response =>
-  Response.json(body, { status })
-
-const str = (value: unknown): string => (typeof value === 'string' ? value : '')
-
 export async function POST(request: Request): Promise<Response> {
-  let body: Body
-  try {
-    body = (await request.json()) as Body
-  } catch {
-    return json({ message: 'Expected a JSON body.' }, 400)
-  }
-
-  try {
-    const outcome = await authGraph().signIn.execute({
-      email: str(body.email),
-      password: str(body.password),
-      callerKey: await callerKey(null),
-    })
-
-    // A challenge is NOT a session. It goes back in the body, never in a
-    // cookie: a second factor that rides along with every request is a second
-    // factor the browser can be tricked into presenting.
-    if (outcome.kind === 'second-factor-required') {
-      return json({ secondFactor: true, challengeToken: outcome.challengeToken }, 200)
-    }
-
-    return withCookies(json({ secondFactor: false }, 200), issuedCookies(outcome.tokens))
-  } catch (error) {
-    if (error instanceof TooManyAttempts) {
-      return json({ message: error.message }, 429)
-    }
-    if (error instanceof SignInFailed) {
-      // The use case already collapses unknown-email, wrong-password and
-      // provider-only into one message. Do not enrich it here.
-      return json({ message: error.message }, 401)
-    }
-
-    throw error
-  }
+  return startPasswordSession(request)
 }
 
 /**

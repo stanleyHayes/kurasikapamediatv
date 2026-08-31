@@ -74,7 +74,7 @@ a change to one fails loudly rather than 404ing in production.
 
 ## Deployment shapes
 
-Both are supported. Pick one and set the environment to match.
+Three shapes are supported. Pick one and set the environment to match.
 
 ### 1. Same origin (default)
 
@@ -104,6 +104,25 @@ no error anywhere.
 
 `trustedOrigins` is derived from `SITE_URL` and `STUDIO_URL`, so Better Auth
 accepts the cross-origin OAuth return.
+
+### 3. Independent Vercel host
+
+Before a custom Studio subdomain exists, the CMS may run at a provider host
+such as `kurasikapa-studio.vercel.app`. That host and `kurasikapa.tv` do not
+share a registrable domain, so no valid `COOKIE_DOMAIN` can make a site cookie
+available to both.
+
+In this shape the Studio owns password and second-factor session endpoints and
+its sign-in page at `/studio/{locale}/sign-in`. They call the same application
+use cases as the public site; only the HTTP driving adapter and host-scoped
+cookies are local to the deployment.
+
+| Variable | Public site | Studio |
+|---|---|---|
+| `APP_URL` | `https://kurasikapa.tv` | `https://kurasikapa-studio.vercel.app` |
+| `SITE_URL` | `https://kurasikapa.tv` | `https://kurasikapa.tv` |
+| `STUDIO_URL` | `https://kurasikapa-studio.vercel.app/studio` | same |
+| `COOKIE_DOMAIN` | unset | unset |
 
 ## Cache invalidation across the boundary
 
@@ -173,13 +192,16 @@ a missing line succeeds. Comment keys out rather than blanking them.
 
 ## Authentication
 
-The studio mounts **no** `/api/auth` routes. It does not need them:
+The studio mounts **no** Better Auth `/api/auth` routes. In the independent
+Vercel-host shape it does mount the native `/api/session` password and MFA
+routes because a cookie cannot cross from the public domain:
 
 - **Reading a session** is server-side — `auth().api.getSession({ headers })`
   straight from the cookie and the shared Mongo. That is all `currentActor()`
   ever did.
-- **Signing in** stays on the public site, where the providers, 2FA, captcha and
-  rate limiting were already built and tested.
+- **Signing in** stays on the public site for same-parent-domain deployments.
+  On an unrelated provider domain, Studio exposes password and 2FA forms backed
+  by the same rate-limited use cases and credential store.
 - **Signing out** is a server action in the studio calling
   `auth().api.signOut()`, which clears the cookie through the `nextCookies`
   plugin and redirects to the site.
