@@ -14,6 +14,9 @@ export interface RevenueCurrencyView { readonly currency: 'GHS' | 'EUR'; readonl
 export interface RevenuePointView { readonly date: string; readonly currency: 'GHS' | 'EUR'; readonly minor: number }
 export interface SubscriberView { readonly id: string; readonly planId: string; readonly readerId: string; readonly email: string; readonly status: string; readonly price: MoneyView; readonly startedAt: string; readonly paidThrough: string | null }
 export interface RevenueReportView { readonly days: number; readonly generatedAt: string; readonly activeSubscribers: number; readonly pendingSubscribers: number; readonly canceledSubscribers: number; readonly successfulDonations: number; readonly currencies: readonly RevenueCurrencyView[]; readonly trend: readonly RevenuePointView[]; readonly subscribers: readonly SubscriberView[] }
+export type AdSlotView = 'home_leaderboard' | 'article_inline' | 'live_companion'
+export interface AdPlacementView { readonly id: string; readonly advertiser: string; readonly creativeUrl: string; readonly altText: string; readonly landingUrl: string }
+export interface AdCampaignView { readonly id: string; readonly name: string; readonly advertiser: string; readonly slot: AdSlotView; readonly active: boolean; readonly budget: MoneyView; readonly impressions: number; readonly clicks: number; readonly estimatedSpendMinor: number; readonly ctr: number; readonly startsAt: string; readonly endsAt: string }
 
 function record(value: unknown): Record<string, unknown> {
   return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
@@ -42,6 +45,16 @@ function report(value: unknown): RevenueReportView {
     subscribers: Array.isArray(row['subscribers']) ? row['subscribers'].map((item) => { const value = record(item); return { id: text(value['id']), planId: text(value['planId']), readerId: text(value['readerId']), email: text(value['email']), status: text(value['status']), price: money(value['price']), startedAt: text(value['startedAt']), paidThrough: value['paidThrough'] === null ? null : text(value['paidThrough']) } }) : [],
   }
 }
+
+function adSlot(value: unknown): AdSlotView {
+  if (value === 'article_inline' || value === 'live_companion') return value
+  return 'home_leaderboard'
+}
+function adCampaign(value: unknown): AdCampaignView {
+  const row = record(value)
+  return { id: text(prefer(row, 'id', 'ID')), name: text(prefer(row, 'name', 'Name')), advertiser: text(prefer(row, 'advertiser', 'Advertiser')), slot: adSlot(prefer(row, 'slot', 'Slot')), active: prefer(row, 'active', 'Active') === true, budget: money(prefer(row, 'budget', 'Budget')), impressions: number(prefer(row, 'impressions', 'Impressions')), clicks: number(prefer(row, 'clicks', 'Clicks')), estimatedSpendMinor: number(prefer(row, 'estimatedSpendMinor', 'EstimatedSpendMinor')), ctr: number(prefer(row, 'ctr', 'CTR')), startsAt: text(prefer(row, 'startsAt', 'StartsAt')), endsAt: text(prefer(row, 'endsAt', 'EndsAt')) }
+}
+function prefer(row: Record<string, unknown>, current: string, legacy: string): unknown { return row[current] ?? row[legacy] }
 
 export async function loadMembershipPlans(locale: string): Promise<readonly MembershipPlanView[]> {
   const apiUrl = env().API_URL
@@ -83,6 +96,39 @@ export async function loadRevenueReport(actor: Actor, days: 7 | 30 | 90): Promis
   const response = await fetch(joinUrl(apiUrl, `/revenue/report?days=${String(days)}`), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
   if (!response.ok) throw await problemFromResponse(response)
   return report(await response.json())
+}
+
+export async function createAndActivateAdCampaign(actor: Actor, input: unknown): Promise<{ readonly id: string }> {
+  const created = await adminPost(actor, '/revenue/ad-campaigns', input)
+  const id = text(created['id'] ?? created['ID'])
+  await adminPost(actor, `/revenue/ad-campaigns/${id}/activate`)
+  return { id }
+}
+
+export async function loadAdReport(actor: Actor): Promise<readonly AdCampaignView[]> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return []
+  const response = await fetch(joinUrl(apiUrl, '/revenue/ad-report'), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
+  if (!response.ok) throw await problemFromResponse(response)
+  const body = record(await response.json())
+  return Array.isArray(body['campaigns']) ? body['campaigns'].map(adCampaign) : []
+}
+
+export async function loadAdPlacement(locale: string, slot: AdSlotView): Promise<AdPlacementView | null> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return null
+  const body = record(await fetchPublic(apiUrl, `/public/${locale}/ads/${slot}`))
+  const value = body['placement']
+  if (value === null || value === undefined) return null
+  const row = record(value)
+  return { id: text(row['id']), advertiser: text(row['advertiser']), creativeUrl: text(row['creativeUrl']), altText: text(row['altText']), landingUrl: text(row['landingUrl']) }
+}
+
+export async function recordAdEvent(campaignId: string, kind: 'impression' | 'click'): Promise<void> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return
+  const response = await fetch(joinUrl(apiUrl, `/public/ads/${encodeURIComponent(campaignId)}/events`), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind }), cache: 'no-store' })
+  if (!response.ok) throw await problemFromResponse(response)
 }
 
 export async function startMembershipCheckout(actor: Actor, input: { readonly planID: string; readonly email: string; readonly returnURL: string }): Promise<CheckoutView> {

@@ -3,6 +3,7 @@ import { connection } from 'next/server'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { LiveSignal } from '@/components/live/live-signal'
 import { TelevisionGuide, type GuideData } from '@/components/live/television-guide'
+import { AdPlacement } from '@/components/advertising/ad-placement'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { loadTelevisionGuide } from '@kurasikapa/web-kit/bff/television'
 
@@ -51,5 +52,5 @@ export default async function LivePage({ params }: Params): Promise<React.ReactE
       programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
     })),
   }
-  return <main className="mx-auto w-full max-w-[var(--container-page)] px-4 py-8 md:px-8 md:py-12"><LiveSignal locale={locale} copy={{ title: t('title'), description: t('description'), status: t('status'), onAir: t('onAir'), nowPlaying: t('nowPlaying'), emptyTitle: t('emptyTitle'), emptyDescription: t('emptyDescription') }} /><TelevisionGuide locale={locale} guide={view} /></main>
+  return <main className="mx-auto w-full max-w-[var(--container-page)] px-4 py-8 md:px-8 md:py-12"><LiveSignal locale={locale} copy={{ title: t('title'), description: t('description'), status: t('status'), onAir: t('onAir'), nowPlaying: t('nowPlaying'), emptyTitle: t('emptyTitle'), emptyDescription: t('emptyDescription') }} /><AdPlacement locale={locale} slot="live_companion" /><TelevisionGuide locale={locale} guide={view} /></main>
 }

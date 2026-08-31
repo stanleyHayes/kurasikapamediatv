@@ -4,6 +4,7 @@ import { BriefingCard } from '@/components/home/briefing-card'
 import { Hero } from '@/components/home/hero'
 import { Trending } from '@/components/home/trending'
 import { EditorialEmptyState } from '@/components/editorial-empty-state'
+import { AdPlacement } from '@/components/advertising/ad-placement'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { homeRails, type HomeRails } from '@kurasikapa/web-kit/read-model/home-rails'
 import { cachedLatest, cachedMostRead } from '@kurasikapa/web-kit/read-model/queries'
@@ -35,13 +36,15 @@ async function Front({ locale }: { locale: string }): Promise<React.ReactElement
     return <EditorialEmptyState surface="home" />
   }
 
-  return <HomeLayout {...homeRails(items, mostRead)} />
+  return <HomeLayout {...homeRails(items, mostRead)} locale={locale} />
 }
 
-function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement {
+function HomeLayout({ lead, briefing, trending, locale }: HomeRails & { readonly locale: string }): React.ReactElement {
   return (
     <>
       {lead !== undefined && <Hero article={lead} />}
+
+      <Suspense fallback={null}><AdPlacement locale={locale} slot="home_leaderboard" /></Suspense>
 
       <section className="mx-auto max-w-[var(--container-page)] px-4 py-[var(--space-xl)] md:px-8">
         <div className="grid grid-cols-1 gap-[var(--space-lg)] lg:grid-cols-12">

@@ -5,7 +5,7 @@ import { attempt, type ActionResult } from '@kurasikapa/web-kit/actions/result'
 import { parseInput } from '@kurasikapa/web-kit/actions/schemas'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { env } from '@kurasikapa/web-kit/composition/env'
-import { startDonationCheckout, startMembershipCheckout, type CheckoutView } from '@kurasikapa/web-kit/bff/revenue'
+import { recordAdEvent, startDonationCheckout, startMembershipCheckout, type CheckoutView } from '@kurasikapa/web-kit/bff/revenue'
 
 const locale = z.enum(['en', 'fr'])
 const email = z.email().max(320)
@@ -24,6 +24,14 @@ export async function startDonationAction(input: unknown): Promise<ActionResult<
     const parsed = parseInput(z.object({ amountMinor: z.number().int().min(500).max(10_000_000), currency: z.enum(['GHS', 'EUR']), email, message: z.string().trim().max(500), anonymous: z.boolean(), locale }), input)
     return startDonationCheckout({ amount: { minor: parsed.amountMinor, currency: parsed.currency }, email: parsed.email,
       message: parsed.message, anonymous: parsed.anonymous, returnURL: returnURL(parsed.locale) })
+  })
+}
+
+export async function recordAdEventAction(input: unknown): Promise<ActionResult<Record<string, never>>> {
+  return attempt(async () => {
+    const parsed = parseInput(z.object({ campaignId: z.string().min(1).max(100), kind: z.enum(['impression', 'click']) }), input)
+    await recordAdEvent(parsed.campaignId, parsed.kind)
+    return {}
   })
 }
 

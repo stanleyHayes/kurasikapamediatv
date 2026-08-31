@@ -14,6 +14,7 @@ import { SaveControl } from '@/components/article/save-control'
 import { StoryBanner } from '@/components/story/story-banner'
 import { ArticleSplash } from '@/components/article/article-splash'
 import { ArticleViewBeacon } from '@/analytics/article-view-beacon'
+import { AdPlacement } from '@/components/advertising/ad-placement'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
@@ -173,6 +174,7 @@ function StoryBody({
         </Suspense>
       )}
       <ArticleBody body={article.body} />
+      <Suspense fallback={null}><AdPlacement locale={locale} slot="article_inline" /></Suspense>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { createAndActivateMembershipPlan, loadMembershipPlans, loadRevenueReport, startDonationCheckout, startMembershipCheckout } from './revenue'
+import { createAndActivateAdCampaign, createAndActivateMembershipPlan, loadAdPlacement, loadAdReport, loadMembershipPlans, loadRevenueReport, recordAdEvent, startDonationCheckout, startMembershipCheckout } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -74,5 +74,38 @@ describe('revenue BFF', () => {
     vi.stubGlobal('fetch', fetcher)
     await expect(loadRevenueReport(actor, 90)).rejects.toThrow(/Not permitted/u)
     await expect(loadRevenueReport(actor, 90)).resolves.toMatchObject({ days: 0, currencies: [{ currency: 'GHS', grossMinor: 0 }], trend: [], subscribers: [{ price: { minor: 500, currency: 'GHS' }, paidThrough: '2026-09-30T00:00:00Z' }] })
+  })
+
+  it('manages campaigns and normalises advertising reports', async () => {
+    configure()
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'ad_1' }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'ad_1', Active: true }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ campaigns: [{ ID: 'ad_1', Name: 'Launch', Advertiser: 'Acme', Slot: 'article_inline', Active: true, Budget: { Minor: 10000, Currency: 'GHS' }, Impressions: 2500, Clicks: 125, EstimatedSpendMinor: 2500, CTR: 5, StartsAt: '2026-08-31', EndsAt: '2026-09-30' }] }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    const actor = new Actor(userId('admin'), ['administrator'])
+    await expect(createAndActivateAdCampaign(actor, { name: 'Launch' })).resolves.toEqual({ id: 'ad_1' })
+    await expect(loadAdReport(actor)).resolves.toEqual([expect.objectContaining({ id: 'ad_1', slot: 'article_inline', impressions: 2500, ctr: 5, budget: { minor: 10000, currency: 'GHS' } })])
+  })
+
+  it('loads public placements and records anonymous delivery events', async () => {
+    configure()
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ placement: { id: 'ad_1', advertiser: 'Acme', creativeUrl: 'https://cdn.test/ad.jpg', altText: 'Solar panels', landingUrl: 'https://example.com' } }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ placement: null }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(loadAdPlacement('en', 'home_leaderboard')).resolves.toMatchObject({ id: 'ad_1', advertiser: 'Acme' })
+    await recordAdEvent('ad_1', 'impression')
+    expect(fetcher.mock.calls[1]?.[1]).toMatchObject({ method: 'POST', body: '{"kind":"impression"}' })
+    await expect(loadAdPlacement('fr', 'live_companion')).resolves.toBeNull()
+  })
+
+  it('uses safe advertising fallbacks without an API seam', async () => {
+    configure(); vi.stubEnv('API_URL', undefined); resetEnv()
+    const actor = new Actor(userId('admin'), ['administrator'])
+    await expect(loadAdReport(actor)).resolves.toEqual([])
+    await expect(loadAdPlacement('en', 'article_inline')).resolves.toBeNull()
+    await expect(recordAdEvent('ad_1', 'click')).resolves.toBeUndefined()
   })
 })

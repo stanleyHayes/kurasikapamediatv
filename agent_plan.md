@@ -1089,7 +1089,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 21. KUR-82 — advertising inventory and delivery foundation (2026-08-31)
 
-**Status: BACKEND COMPLETE; Studio/public surfaces remain active.**
+**Status: CODE COMPLETE; production release active.**
 
 - Added accessible ad campaigns with explicit slot, locale, HTTPS creative and
   destination, alt text, GHS/EUR budget, CPM, priority and bounded delivery
@@ -1102,6 +1102,15 @@ are live. Custom-domain DNS remains an external registrar action.**
   public placement/event endpoints and permission-gated campaign reporting.
   Public responses expose only the disclosure/rendering fields required by an
   ad placement.
+- Studio Revenue now includes campaign creation, explicit activation, language
+  and placement controls, accessible creative text, delivery windows,
+  currency-separated budget/spend, impressions, clicks and CTR. It uses no
+  native select controls and preserves the shared depth-grid visual language.
+- Home, article and Live render the three supported placements. Every creative
+  is visibly labelled as an advertisement and paid placement, uses sponsored
+  link semantics and records anonymous delivery events without reader identity.
 - Evidence: `make -C services/api verify` passes with 96.6% domain and 90.0%
   application/HTTP coverage; domain, application, Mongo and HTTP lifecycle
   tests cover validation, budget enforcement, placement, events and reporting.
+  Full `pnpm verify` passes; web has 77 tests and 93.75% function coverage, and
+  web-kit has 301 tests with 80.70% branch coverage.
