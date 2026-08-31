@@ -937,12 +937,13 @@ are live. Custom-domain DNS remains an external registrar action.**
   managed `PORT`; the API service name has a collision-free hostname; the
   smoke script matches the real Go routes and fail-closed status codes; and
   Studio's `vercel.json` no longer uses an unsupported pseudo-comment key.
-- Follow-up entrypoint repair: the Studio project's bare Vercel host and
-  `/studio` now redirect to the public Vercel host's `/studio/en`, so the
-  provider dashboard URL no longer lands on a platform 404. The public project
-  rewrites `/studio/*` to the separately deployed Studio project. This is the
-  documented same-origin shape: it needs no custom domain and keeps editor
-  session cookies valid across the public and Studio surfaces.
+- Follow-up independent-auth repair: Studio owns its password/MFA session
+  endpoints, so its bare Vercel host and `/studio` now stay on the Studio
+  deployment and redirect locally to `/studio/en/sign-in`. Protected page
+  loaders also redirect signed-out deep links before they can surface a
+  `NotSignedIn` render error. Commit `41009b1` is awaiting production because
+  Vercel rejected the manual release after the account exceeded the hard
+  100-deployments-per-24-hours Hobby quota.
 - The public home and news routes now use a designed editorial holding state
   instead of the bare “Nothing published yet” line: newsroom status, launch
   context, reader actions, and a concise statement of what the first edition
@@ -1038,7 +1039,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 19. KUR-80 — memberships, donations and trusted payment confirmation (2026-08-31)
 
-**Status: VERIFIED LOCALLY — provider credentials and release pending.**
+**Status: PUBLIC WEB DEPLOYED; STUDIO/API RELEASE BLOCKED — provider credentials pending.**
 
 - Added the Go revenue context with GHS/EUR money, membership tiers, pending,
   active and canceled subscriptions, one-time donations and domain-owned
@@ -1054,8 +1055,11 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Added `/support` with GHS/EUR choice controls, useful membership empty state,
   secure checkout handoff and disabled animated busy states; Studio has a
   non-native-control membership manager at `/revenue`.
-- Evidence: Go domain coverage is 96.7% overall and 100% for revenue; the
-  application/HTTP gate is 90.0%; adapter, use-case, HTTP and BFF tests pass.
-  Full monorepo verification, CI, provider credentials and production smoke
-  remain before this slice can be called deployed. Advertising, products,
-  classifieds, affiliates and revenue dashboards remain separate R4 slices.
+- Evidence: Go domain coverage is 96.7% overall and 100% for revenue; a
+  cache-cleared application/HTTP run is 91.2%; adapter, use-case, HTTP and BFF
+  tests pass. Public deployment `dpl_FgTkaGd1gECjDxnduKXWGisp8Mnb` is Ready.
+  CI run `33417848504` is green. The Studio/API release remains before this
+  slice can be called fully deployed; Vercel is currently rejecting additional
+  Studio builds at its 100-deployments-per-24-hours limit. Advertising,
+  products, classifieds, affiliates and revenue dashboards remain separate R4
+  slices.
