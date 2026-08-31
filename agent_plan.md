@@ -57,6 +57,19 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Revenue | **QUEUED** | Advertising inventory, memberships, subscriptions, donations, products and revenue reporting behind payment ports. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
+### Production-readiness audit reconciliation — 2026-08-31
+
+| Audit requirement | Current evidence | State |
+|---|---|---|
+| Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
+| Television identity | Independent Live page, public HLS player, Studio broadcast control room, fail-closed provider and transmission history are live. Programme schedule, programme/presenter directories, reminders and replay/video rails do not exist. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast aggregate exists. Asset, podcast, episode, gallery, transcript, caption and VOD contexts, Cloudinary adapter and Studio media library do not. | **NOT BUILT — ACTIVE R3** |
+| Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
+| Newsroom intelligence | Operational workflow KPIs, moderation counts, language publication charts, GA consent/instrumentation and privacy-safe unique-reader ranking exist. Traffic, acquisition, author/category performance, newsletter growth, retention, search and revenue dashboards do not. | **PARTIAL — R5** |
+| Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
+| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. A rolling two-day `/news-sitemap.xml` is implemented and under verification; Search Console ownership/submission and indexing monitoring require access to the publisher account. | **IN REVIEW / EXTERNAL ACCESS** |
+| Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
+
 Implementation rule for this delivery: original reporting is the primary content
 workflow. RSS sources are an optional monitoring and draft-intake tool, never a
 substitute for authoring and never a path around editor approval.
