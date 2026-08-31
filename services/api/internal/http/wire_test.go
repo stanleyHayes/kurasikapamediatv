@@ -19,7 +19,8 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		Presenters: faketesting.NewPresenterStore(), Programmes: faketesting.NewProgrammeStore(),
 		Schedule: faketesting.NewScheduleStore(), Clock: faketesting.FixedClock{At: now},
 		Podcasts: faketesting.NewPodcastStore(), Episodes: faketesting.NewEpisodeStore(),
-		IDs: &faketesting.SequentialIDs{},
+		Galleries: faketesting.NewGalleryStore(),
+		IDs:       &faketesting.SequentialIDs{},
 	}
 	assets := faketesting.NewAssetStore()
 	mediaDeps.Assets = assets
@@ -60,6 +61,9 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		CreateEpisode:         appmedia.NewCreateEpisode(mediaDeps),
 		PublishEpisode:        appmedia.NewPublishEpisode(mediaDeps),
 		ListPodcastLibrary:    appmedia.NewListPodcastLibrary(mediaDeps),
+		CreateGallery:         appmedia.NewCreateGallery(mediaDeps),
+		PublishGallery:        appmedia.NewPublishGallery(mediaDeps),
+		ListGalleryLibrary:    appmedia.NewListGalleryLibrary(mediaDeps),
 		Roles:                 roles{granted: granted},
 		Log:                   slog.New(slog.NewTextHandler(io.Discard, nil)),
 		CronSecret:            "s3cret-value-of-known-length-0000",

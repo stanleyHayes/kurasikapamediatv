@@ -28,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({ url: `${base}/${locale}/feed.xml`, changeFrequency: 'hourly', priority: 0.6 })
     entries.push({ url: `${base}/${locale}/podcasts`, changeFrequency: 'weekly', priority: 0.7 })
     entries.push({ url: `${base}/${locale}/podcasts/feed.xml`, changeFrequency: 'daily', priority: 0.5 })
+    entries.push({ url: `${base}/${locale}/galleries`, changeFrequency: 'daily', priority: 0.7 })
     entries.push({ url: `${base}/${locale}/search`, changeFrequency: 'monthly', priority: 0.3 })
     await appendSections(entries, locale, base, apiUrl)
     await appendArticles(entries, locale, base, apiUrl)

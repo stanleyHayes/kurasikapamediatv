@@ -19,6 +19,7 @@ const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
     { href: '/television', label: 'TV programming', description: 'Shows, presenters and schedule', icon: 'live' },
     { href: '/media', label: 'Media library', description: 'Images, video, audio and captions', icon: 'desk' },
     { href: '/podcasts', label: 'Podcasts', description: 'Series, episodes and transcripts', icon: 'social' },
+    { href: '/galleries', label: 'Visual galleries', description: 'Photo stories and captioned video', icon: 'desk' },
     { href: '/social', label: 'Social publishing', description: 'Schedule distribution', icon: 'social' },
     { href: '/rss', label: 'News sources', description: 'Manage inbound feeds', icon: 'rss' },
     { href: '/pages', label: 'Public pages', description: 'About, legal and information', icon: 'desk' },

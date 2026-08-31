@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast series and episodes now have explicit Studio publishing, required ready audio and transcripts, chapter metadata, indexed Mongo persistence, a public accessible player and Podcasting 2.0 RSS feed. Galleries, article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast publishing is deployed. Photo/video galleries now have domain/app/API/Mongo, Studio builder and public presentation with full local verification; release remains. Article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
 | Newsroom intelligence | Operational workflow KPIs, moderation counts, language publication charts, GA consent/instrumentation and privacy-safe unique-reader ranking exist. Traffic, acquisition, author/category performance, newsletter growth, retention, search and revenue dashboards do not. | **PARTIAL — R5** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
@@ -246,8 +246,8 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_admin_ai_content_editor` | `/studio/articles/{id}` | ✅ KUR-41 — two-pane workspace with a tabbed co-pilot |
 | `social_media_publishing_kurasikapa_admin` | `/studio/social` | ✅ KUR-33 — queue + compose (calendar design not copied; send path needs Meta) |
 | `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |
-| `kurasikapa_media_podcast_library` | `/podcasts` | ✅ accessible series/episode library, chapters, transcripts and RSS feed (KUR-76; release pending) |
-| `kurasikapa_media_live_tv_gallery` | — | ❌ no route (R3) |
+| `kurasikapa_media_podcast_library` | `/podcasts` | ✅ accessible series/episode library, chapters, transcripts and RSS feed (KUR-76; deployed) |
+| `kurasikapa_media_live_tv_gallery` | `/live` + `/galleries` | ◑ live/schedule/replay deployed; photo and caption-gated video gallery code is fully verified locally and awaiting release (KUR-77) |
 | `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
 | `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
 | `kurasikapa_media_membership_donations` | — | ❌ no route (R4) |
@@ -968,7 +968,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 16. KUR-76 — accessible podcast publishing (2026-08-31)
 
-**Status: CODE COMPLETE — all local gates green; production release pending.**
+**Status: DEPLOYED — CI and production routes verified.**
 
 - Go domain and application layers now own podcast series and episodes behind
   separate repository ports. Series publication is explicit; episode
@@ -984,5 +984,26 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Evidence: `pnpm verify` is green; the clean Go race/coverage gate reports
   domain 96.6% and application/HTTP 90.1%; real-Mongo adapter integration is
   green; the editorial transition completes in 6.9s under Playwright; and the
-  new `/en/podcasts` route has no axe WCAG 2.2 AA violations. Production smoke
-  remains before this status can move to deployed.
+  new `/en/podcasts` route has no axe WCAG 2.2 AA violations. CI run
+  `33405841662` is green; public web, Studio and Render podcast endpoints each
+  returned HTTP 200 in production.
+
+## 17. KUR-77 — photo and video gallery publishing (2026-08-31)
+
+**Status: VERIFIED LOCALLY — release active.**
+
+- Added a Go gallery aggregate with photo/video permissions, explicit
+  publication, required editorial captions and immutable publication time.
+  Video publication additionally requires a synchronized caption asset.
+- Application validation resolves every gallery item to a ready asset of the
+  correct type; Mongo persists ordered media, caption references and credits
+  behind a named public-library index; authenticated commands and a public
+  locale endpoint are wired through the API composition root.
+- Studio now curates multiple visual assets without native selects, captures
+  per-item captions and credits, and assigns captions per video. The public
+  `/galleries` route uses an editorial dimensional grid, meaningful empty
+  state, image alt text, native video controls and caption tracks.
+- Evidence: `pnpm verify` is green; the clean Go race/coverage gate reports
+  domain 96.6% and application/HTTP 91.5%; the real-Mongo adapter integration
+  suite passes; and `/en/galleries` has no axe WCAG 2.2 AA violations. CI and
+  production smoke remain before deployment can be claimed.

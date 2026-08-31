@@ -51,6 +51,9 @@ type Deps struct {
 	CreateEpisode         appmedia.CreateEpisode
 	PublishEpisode        appmedia.PublishEpisode
 	ListPodcastLibrary    appmedia.ListPodcastLibrary
+	CreateGallery         appmedia.CreateGallery
+	PublishGallery        appmedia.PublishGallery
+	ListGalleryLibrary    appmedia.ListGalleryLibrary
 	Roles                 ports.RoleRepository
 	Log                   *slog.Logger
 	CronSecret            string
@@ -96,6 +99,9 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /media/episodes", deps.handleCreateEpisode)
 	mux.HandleFunc("POST /media/episodes/{id}/publish", deps.handlePublishEpisode)
 	mux.HandleFunc("GET /public/{locale}/podcasts", deps.handlePodcastLibrary)
+	mux.HandleFunc("POST /media/galleries", deps.handleCreateGallery)
+	mux.HandleFunc("POST /media/galleries/{id}/publish", deps.handlePublishGallery)
+	mux.HandleFunc("GET /public/{locale}/galleries", deps.handleGalleryLibrary)
 
 	return withRequestLogging(deps.Log, mux)
 }

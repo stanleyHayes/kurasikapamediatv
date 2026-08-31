@@ -77,6 +77,12 @@ func problemFor(err error) Problem {
 		errors.Is(err, domainmedia.ErrInvalidAssetDelivery),
 		errors.Is(err, domainmedia.ErrEmptyPodcastTitle),
 		errors.Is(err, domainmedia.ErrEmptyPodcastSummary),
+		errors.Is(err, domainmedia.ErrInvalidGalleryKind),
+		errors.Is(err, domainmedia.ErrEmptyGalleryTitle),
+		errors.Is(err, domainmedia.ErrEmptyGallerySummary),
+		errors.Is(err, domainmedia.ErrGalleryNeedsItems),
+		errors.Is(err, domainmedia.ErrInvalidGalleryItem),
+		errors.Is(err, domainmedia.ErrVideoNeedsCaptions),
 		errors.Is(err, domainmedia.ErrEmptyEpisodeTitle),
 		errors.Is(err, domainmedia.ErrEpisodeNeedsAudio),
 		errors.Is(err, domainmedia.ErrEpisodeNeedsTranscript),
@@ -89,6 +95,8 @@ func problemFor(err error) Problem {
 		errors.Is(err, editorial.ErrScheduleInPast),
 		errors.Is(err, editorial.ErrRevisionNotOfArticle),
 		errors.Is(err, appmedia.ErrPodcastNotPublished),
+		errors.Is(err, appmedia.ErrGalleryAssetNotReady),
+		errors.Is(err, appmedia.ErrGalleryCaptionNotReady),
 		errors.Is(err, appmedia.ErrEpisodeAudioNotReady),
 		errors.Is(err, appmedia.ErrTranscriptNotReady):
 		// 409: the request is well-formed and the article is simply not in a

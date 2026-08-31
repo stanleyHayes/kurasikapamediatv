@@ -73,4 +73,7 @@ func TestIDsStringify(t *testing.T) {
 	if shared.EpisodeID("ep_1").String() != "ep_1" {
 		t.Error("EpisodeID")
 	}
+	if shared.GalleryID("gal_1").String() != "gal_1" {
+		t.Error("GalleryID")
+	}
 }

@@ -9,6 +9,7 @@ import { isNavItemActive, localizedHref } from './site-header-state'
 const PRIMARY = [
   { paths: { en: '/live', fr: '/live' }, key: 'live' },
   { paths: { en: '/podcasts', fr: '/podcasts' }, key: 'podcasts' },
+  { paths: { en: '/galleries', fr: '/galleries' }, key: 'galleries' },
   { paths: { en: '/news', fr: '/news' }, key: 'latest' },
   { paths: { en: '/sections/ghana', fr: '/sections/ghana' }, key: 'ghana' },
   { paths: { en: '/sections/africa', fr: '/sections/afrique' }, key: 'africa' },

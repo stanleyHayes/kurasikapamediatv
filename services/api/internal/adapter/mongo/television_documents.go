@@ -9,6 +9,7 @@ const (
 	CollMediaAssets   = "media_assets"
 	CollPodcasts      = "podcasts"
 	CollEpisodes      = "episodes"
+	CollGalleries     = "galleries"
 )
 
 type presenterDoc struct {
@@ -98,4 +99,23 @@ type episodeDoc struct {
 	DurationSeconds   float64             `bson:"durationSeconds"`
 	Published         bool                `bson:"published"`
 	PublishedAt       *time.Time          `bson:"publishedAt"`
+}
+
+type galleryItemDoc struct {
+	AssetID        string  `bson:"assetId"`
+	CaptionAssetID *string `bson:"captionAssetId,omitempty"`
+	Caption        string  `bson:"caption"`
+	Credit         string  `bson:"credit"`
+}
+type galleryDoc struct {
+	ID          string           `bson:"_id"`
+	Kind        string           `bson:"kind"`
+	Title       string           `bson:"title"`
+	Slug        string           `bson:"slug"`
+	Locale      string           `bson:"locale"`
+	Summary     string           `bson:"summary"`
+	Items       []galleryItemDoc `bson:"items"`
+	Published   bool             `bson:"published"`
+	PublishedAt *time.Time       `bson:"publishedAt"`
+	CreatedBy   string           `bson:"createdBy"`
 }

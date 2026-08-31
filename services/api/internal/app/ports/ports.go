@@ -193,6 +193,12 @@ type EpisodeRepository interface {
 	Save(context.Context, media.Episode) error
 }
 
+type GalleryRepository interface {
+	FindByID(context.Context, shared.GalleryID) (media.Gallery, error)
+	ListPublished(context.Context, string, int) ([]media.Gallery, error)
+	Save(context.Context, media.Gallery) error
+}
+
 type UploadRequest struct {
 	AssetID   shared.AssetID
 	Kind      media.AssetKind

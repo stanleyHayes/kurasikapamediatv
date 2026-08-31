@@ -134,7 +134,8 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 **media** — `CreateAssetUpload` · `CompleteAssetUpload` · `ListAssets` · `StartLiveStream` · `EndLiveStream` · `CreatePresenter` ·
 `PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·
 `ListTelevisionGuide` · `CreatePodcast` · `PublishPodcast` · `CreateEpisode` ·
-`PublishEpisode` · `ListPodcastLibrary` · `TranscodeVod`
+`PublishEpisode` · `ListPodcastLibrary` · `CreateGallery` · `PublishGallery` ·
+`ListGalleryLibrary` · `TranscodeVod`
 
 `ScheduleProgramme` accepts only published programmes. A recorded replay cannot
 be published without a caption asset; this accessibility rule lives in the
@@ -157,6 +158,12 @@ published before an episode can be created; an episode cannot be published
 until its audio and transcript both resolve to ready assets of the correct
 kind. `ListPodcastLibrary` joins only published records with provider-neutral
 asset delivery metadata for the public player and RSS feed.
+
+`GalleryRepository` persists ordered visual stories. `PublishGallery` resolves
+every item through `AssetRepository`; photos must be ready images and videos
+must be ready video assets paired with ready synchronized-caption assets.
+`ListGalleryLibrary` exposes delivery URLs, alt text, editorial captions and
+credits without leaking provider documents.
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 

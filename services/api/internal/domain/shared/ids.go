@@ -45,6 +45,8 @@ type (
 	PodcastID string
 	// EpisodeID identifies one instalment of a podcast.
 	EpisodeID string
+	// GalleryID identifies one curated photo or video collection.
+	GalleryID string
 )
 
 func (id ArticleID) String() string      { return string(id) }
@@ -59,6 +61,7 @@ func (id ProgrammeID) String() string    { return string(id) }
 func (id ScheduleSlotID) String() string { return string(id) }
 func (id PodcastID) String() string      { return string(id) }
 func (id EpisodeID) String() string      { return string(id) }
+func (id GalleryID) String() string      { return string(id) }
 
 // NewArticleID validates and wraps an article identifier.
 func NewArticleID(raw string) (ArticleID, error) {

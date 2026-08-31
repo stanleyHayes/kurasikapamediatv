@@ -20,6 +20,7 @@ type Deps struct {
 	Schedule   ports.ScheduleRepository
 	Podcasts   ports.PodcastRepository
 	Episodes   ports.EpisodeRepository
+	Galleries  ports.GalleryRepository
 	Assets     ports.AssetRepository
 	Clock      ports.Clock
 	IDs        ports.IDs

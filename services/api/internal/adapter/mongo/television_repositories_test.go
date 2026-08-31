@@ -148,3 +148,30 @@ func TestPodcastRepositoriesRoundTripAndIndexes(t *testing.T) {
 		}
 	}
 }
+
+func TestGalleryRepositoryRoundTripAndIndexes(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	repo := adapter.NewGalleryRepository(h.DB)
+	ctx := context.Background()
+	if err := repo.EnsureIndexes(ctx); err != nil {
+		t.Fatal(err)
+	}
+	caption := shared.AssetID("captions")
+	publishedAt := testNow.Add(-time.Hour)
+	gallery := domainmedia.ReconstituteGallery(domainmedia.GalleryState{ID: "gallery", Kind: domainmedia.GalleryVideo, Title: "Accra dispatch", Slug: "accra-dispatch", Locale: "en", Summary: "Field reporting", Items: []domainmedia.GalleryItem{{AssetID: "video", CaptionAssetID: &caption, Caption: "At the market", Credit: "Kurasikapa"}}, Published: true, PublishedAt: &publishedAt, CreatedBy: "manager"})
+	if err := repo.Save(ctx, gallery); err != nil {
+		t.Fatal(err)
+	}
+	got, err := repo.FindByID(ctx, gallery.ID())
+	if err != nil || got.State().Items[0].Credit != "Kurasikapa" {
+		t.Fatalf("%+v %v", got.State(), err)
+	}
+	listed, err := repo.ListPublished(ctx, "en", 20)
+	if err != nil || len(listed) != 1 {
+		t.Fatalf("%d %v", len(listed), err)
+	}
+	if !indexNames(t, h, adapter.CollGalleries)["public_gallery_library"] {
+		t.Error("missing public_gallery_library")
+	}
+}

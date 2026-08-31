@@ -70,6 +70,7 @@ func run(log *slog.Logger) error {
 	assets := adaptermongo.NewAssetRepository(db)
 	podcasts := adaptermongo.NewPodcastRepository(db)
 	episodes := adaptermongo.NewEpisodeRepository(db)
+	galleries := adaptermongo.NewGalleryRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
@@ -106,6 +107,9 @@ func run(log *slog.Logger) error {
 	if err := episodes.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := galleries.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 
 	deps := appeditorial.Deps{
 		Articles:   articles,
@@ -117,7 +121,7 @@ func run(log *slog.Logger) error {
 	}
 	mediaDeps := appmedia.Deps{
 		Presenters: presenters, Programmes: programmes, Schedule: schedule,
-		Podcasts: podcasts, Episodes: episodes, Assets: assets,
+		Podcasts: podcasts, Episodes: episodes, Galleries: galleries, Assets: assets,
 		Clock: clock, IDs: uuidIDs{},
 	}
 
@@ -154,6 +158,9 @@ func run(log *slog.Logger) error {
 		CreateEpisode:         appmedia.NewCreateEpisode(mediaDeps),
 		PublishEpisode:        appmedia.NewPublishEpisode(mediaDeps),
 		ListPodcastLibrary:    appmedia.NewListPodcastLibrary(mediaDeps),
+		CreateGallery:         appmedia.NewCreateGallery(mediaDeps),
+		PublishGallery:        appmedia.NewPublishGallery(mediaDeps),
+		ListGalleryLibrary:    appmedia.NewListGalleryLibrary(mediaDeps),
 		Roles:                 roles,
 		Log:                   log,
 		CronSecret:            cfg.CronSecret,
