@@ -1,7 +1,7 @@
 # agent_plan.md — what is built, what is available, what is next
 
 > **Status doc, not a design doc.** Every claim here was verified against the
-> repository on 2026-08-09 at `3bebf4a`. Where something is *not* built, it says
+> repository on 2026-08-31. Where something is *not* built, it says
 > so plainly. Where something is built but unreachable from the UI, it says that
 > too — that distinction is the point of this file.
 >
@@ -17,14 +17,14 @@
 |---|---|
 | Release in progress | **R1 — Foundation & Publishing** (near complete), first R2 slices landed |
 | Backend language | **Go** — see [ADR-0009](docs/decisions/adr-0009-go-owns-the-backend.md). Migration just started. |
-| HEAD | `feature/KUR-65-split-studio-deployable` — the studio split, branched off `ecdd55e` (KUR-64) |
+| HEAD | `main` — public Web and independent Studio deployables |
 | Commits | 65 (`KUR-1` … `KUR-65`) |
 | Unit tests (TS) | 912 passing — domain 233 · application 271 · adapter-mongo 115 · adapter-anthropic 28 · web 265 |
 | Unit tests (Go) | `services/api` — editorial domain + app + HTTP, 97.3% domain / 90.2% app |
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
 | Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.22% · `next build` 0 · `go vet`/`gofmt`/`go test -race` 0 |
 | Deployables | **Three:** `apps/web` (public), `apps/studio` (CMS, basePath `/studio`), `services/api` (Go). See [ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md). |
-| Deployed | **No.** Nothing is on Vercel or Render yet. Local only. |
+| Deployed | **Web + Studio on Vercel.** Studio is canonical at `kurasikapa-studio.vercel.app/studio`; the Go API still needs its independent production host. |
 
 Run `pnpm verify` before claiming any task is done. It runs the gates in CI order.
 
@@ -165,6 +165,14 @@ Adapter tests run against **real MongoDB via Testcontainers**, never a mocked dr
 Guarded by `studio/layout.tsx`, which wraps `children` rather than checking
 above them — see the Suspense rule in CLAUDE.md.
 
+The editorial desk now includes four sourced KPI cards and three operational
+visualisations: the signed-in editor's workflow mix, the latest published
+English/French inventory, and the review/moderation decision queues. Publication
+figures are explicitly labelled as a 50-item-per-language snapshot; the Studio
+does not present sampled data as lifetime totals. Route loading stays inside the
+workspace canvas so sidebar navigation preserves the shell instead of flashing
+the full-page startup splash.
+
 ### 3.6 Server Actions (`apps/web/src/actions/`)
 
 - `editorial.ts` — createDraft, updateDraft, submitForReview, approve, reject,
@@ -200,7 +208,7 @@ brand variants. All **21 base desktop screens** are extracted into
 | `support_membership_kurasikapa_media_tv` | — | ❌ no route (R4) |
 | `monetization_dashboard_kurasikapa_admin` | — | ❌ no route (R4) |
 | `kurasikapa_admin_subscriptions_revenue` | — | ❌ no route (R4) |
-| `kurasikapa_admin_analytics_hub` | — | ❌ no route (R5) |
+| `kurasikapa_admin_analytics_hub` | `/studio` | ◑ operational editorial KPIs and queue/publication visualisations are live; acquisition, traffic trends and retention still wait on the R5 insight context |
 | `seo_center_kurasikapa_admin` | — | ❌ no route (R5) |
 
 The full 50MB `stitch_kurasikapa_ai_media_platform.zip` is at the repo root and
@@ -231,7 +239,7 @@ the wiring is missing.
 
 | Item | State |
 |---|---|
-| **Deployment to Vercel + Render** | Not done. R1's exit criterion says "on production". `render.yaml` + [docs/operations/deploy-api.md](docs/operations/deploy-api.md) + `scripts/smoke-api.sh` are ready; what remains is the hosting decision itself (credentials + who owns the Render/Vercel accounts). |
+| **Deployment to Vercel + Render** | Web and independent Studio are live on Vercel. The Go API remains the outstanding Render/independent-host deployment. `render.yaml` + [docs/operations/deploy-api.md](docs/operations/deploy-api.md) + `scripts/smoke-api.sh` are ready. |
 | **The Go backend itself** | Domain → HTTP serving done (KUR-29 … KUR-43). Editorial BFF cutover done (KUR-45) for CMS writes/reads and public-site reads when `API_URL` is set. Remaining: delete TS editorial packages once a deployed API is the only live path. |
 | ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
 | ~~**Rich-text editor**~~ | **DONE.** Textarea + Markdown toolbar (bold/italic/heading/link). `ArticleBody` parses a safe subset into React children — still no HTML, still no sanitiser dependency. |

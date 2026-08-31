@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { completeSecondFactor, takeChallenge } from '../../lib/auth-client'
+import { FormSubmitButton } from '@kurasikapa/ui/form-submit-button'
 
 const FIELD =
   'h-14 w-full border-outline-variant bg-surface-container-lowest text-on-surface border px-4 text-center text-xl tracking-[0.35em] outline-none transition-colors'
@@ -51,6 +52,7 @@ export function TwoFactorForm({ destination }: { destination: string }): React.R
           name="code"
           inputMode="numeric"
           autoComplete="one-time-code"
+          placeholder="000 000"
           required
           className={FIELD}
         />
@@ -62,12 +64,9 @@ export function TwoFactorForm({ destination }: { destination: string }): React.R
         </p>
       )}
 
-      <button
-        type="submit"
-        className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-colors"
-      >
+      <FormSubmitButton pendingLabel="Verifying" className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-[background-color,opacity,transform] active:translate-y-px disabled:cursor-wait disabled:opacity-65">
         Verify
-      </button>
+      </FormSubmitButton>
     </form>
   )
 }

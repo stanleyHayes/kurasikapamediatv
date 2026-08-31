@@ -242,3 +242,33 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** For every create-remote-then-save-local workflow, test the dual-failure branch explicitly and surface a non-secret provider handle through a typed incident, secure logging and an operator reconciliation path.
 
 **Principle:** Compensation is not complete until failure of the compensation itself remains visible and actionable.
+
+### Observation 16: Deployment fixes are incomplete until published and observed
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** A production build failure was diagnosed and locally verified, but the provider remained failed because the deployment configuration change was left uncommitted.
+**Skill:** New skill candidate: production deployment readiness
+**Type:** open-source
+**Phase/Area:** Publish and provider verification
+
+**Issue:** A passing local production build was reported as resolved even though the change that should trigger the provider had not been committed or pushed, so the provider had no new revision to deploy.
+
+**Suggested improvement:** Treat publish, provider build observation and final Ready status as mandatory completion gates whenever the user reports an active deployment failure and publishing is in scope.
+
+**Principle:** A provider failure is resolved only when the provider has built the published fix successfully.
+
+### Observation 17: Route loading boundaries define whether an app feels client-side
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** A Next.js Studio used framework links correctly, but every sidebar transition appeared to reload because the nearest loading boundary replaced the entire authenticated shell with a full-page splash.
+**Skill:** redesign-existing-projects
+**Type:** open-source
+**Phase/Area:** Application-shell navigation
+
+**Issue:** Auditing only the link component misdiagnoses perceived full-page reloads when a high-level `loading.tsx` temporarily removes persistent navigation and chrome.
+
+**Suggested improvement:** Place route-shaped loading boundaries inside persistent shells, prefetch primary navigation, and reserve branded full-page splashes for initial application entry.
+
+**Principle:** Navigation continuity is controlled as much by suspense-boundary placement as by the link primitive.

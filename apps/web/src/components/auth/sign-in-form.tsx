@@ -6,6 +6,7 @@ import { rememberChallenge, signInWithPassword } from '../../lib/auth-client'
 import { AuthField } from './auth-field'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
+import { FormSubmitButton } from '@kurasikapa/ui/form-submit-button'
 
 export interface SignInFormProps {
   /**
@@ -78,12 +79,12 @@ export function SignInForm(props: SignInFormProps): React.ReactElement {
             {error}
           </p>
         )}
-        <button
-          type="submit"
-          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-colors"
+        <FormSubmitButton
+          pendingLabel="Signing in"
+          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-[background-color,opacity,transform] active:translate-y-px disabled:cursor-wait disabled:opacity-65"
         >
           Sign in
-        </button>
+        </FormSubmitButton>
       </form>
       <SocialButtons providers={props.providers} callbackURL={props.callbackURL} />
     </div>

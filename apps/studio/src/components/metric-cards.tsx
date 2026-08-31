@@ -15,11 +15,12 @@ export interface Metric {
   readonly value: number
   readonly icon: string
   readonly emphasis?: boolean
+  readonly detail?: string
 }
 
 export function MetricCards({ metrics }: { metrics: readonly Metric[] }): React.ReactElement {
   return (
-    <section className="grid grid-cols-1 border-y-2 border-on-surface bg-surface-container-lowest md:grid-cols-3">
+    <section className="grid grid-cols-1 border-y-2 border-on-surface bg-surface-container-lowest sm:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
         <div
           key={metric.label}
@@ -42,7 +43,8 @@ export function MetricCards({ metrics }: { metrics: readonly Metric[] }): React.
 
           <div>
             <p className={`text-label-bold mb-2 uppercase ${metric.emphasis ? 'text-white/65' : 'text-on-surface-variant'}`}>{metric.label}</p>
-            <p className={`font-display text-4xl font-semibold ${metric.emphasis ? 'text-white' : 'text-on-surface'}`}>{metric.value}</p>
+            <p className={`font-display text-4xl font-semibold tabular-nums ${metric.emphasis ? 'text-white' : 'text-on-surface'}`}>{metric.value}</p>
+            {metric.detail !== undefined && <p className={`mt-1 text-xs ${metric.emphasis ? 'text-white/70' : 'text-on-surface-variant'}`}>{metric.detail}</p>}
           </div>
         </div>
       ))}

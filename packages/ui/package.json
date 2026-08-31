@@ -10,12 +10,15 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "react": "19.2.8"
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@kurasikapa/config": "workspace:*",
     "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
     "react": "19.2.8",
+    "react-dom": "19.2.8",
     "typescript": "5.9.3"
   }
 }

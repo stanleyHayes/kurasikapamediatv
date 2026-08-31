@@ -9,23 +9,42 @@ import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { type DraftView, byWorkflowPriority, toDraftView } from '@kurasikapa/web-kit/read-model/studio-view'
 import { CollectionView } from '@/components/collection-view'
+import { DashboardInsights, type DashboardDatum } from '@/components/dashboard-insights'
 
 /**
  * The design's figures are Total Articles, AI Tokens Used and Alerts. Only the
  * first can be sourced — there is no token accounting and no alerting until R5 —
- * and a dashboard is the one screen where an invented number does real damage,
- * because an editor acts on it. These three are all derived from the list below.
+ * and a dashboard is the one screen where an invented number does real damage.
+ * These figures come from existing editorial and moderation queries.
  */
-const metricsFor = (drafts: readonly DraftView[]): readonly Metric[] => [
-  { label: 'Your articles', value: drafts.length, icon: '▤' },
+const metricsFor = (drafts: readonly DraftView[], review: number, comments: number, published: number): readonly Metric[] => [
+  { label: 'Your articles', value: drafts.length, icon: '▤', detail: 'Current workspace' },
   {
     label: 'Awaiting review',
-    value: drafts.filter((d) => d.status === 'in_review').length,
+    value: review,
     icon: '◷',
     emphasis: true,
   },
-  { label: 'Live', value: drafts.filter((d) => d.status === 'published').length, icon: '◉' },
+  { label: 'Comments waiting', value: comments, icon: '¶', detail: 'Needs moderation' },
+  { label: 'Published snapshot', value: published, icon: '◉', detail: 'Latest EN + FR' },
 ]
+
+const workflowData = (drafts: readonly DraftView[]): readonly DashboardDatum[] => [
+  { label: 'Drafting', value: drafts.filter((item) => item.status === 'draft' || item.status === 'unpublished').length, color: 'bg-primary' },
+  { label: 'In review', value: drafts.filter((item) => item.status === 'in_review').length, color: 'bg-secondary' },
+  { label: 'Approved / scheduled', value: drafts.filter((item) => item.status === 'approved' || item.status === 'scheduled').length, color: 'bg-on-surface' },
+  { label: 'Published', value: drafts.filter((item) => item.status === 'published').length, color: 'bg-primary/55' },
+]
+
+async function loadDashboardSignals(actor: Awaited<ReturnType<typeof requireActor>>): Promise<{ review: number; comments: number; english: number; french: number }> {
+  const [review, comments, english, french] = await Promise.all([
+    actor.can('article:approve') ? container().listAwaitingReview.execute({ actor, limit: 100 }) : Promise.resolve({ items: [] }),
+    actor.can('comment:moderate') ? container().listPendingComments.execute({ actor, limit: 100 }) : Promise.resolve({ items: [] }),
+    container().listPublishedArticles.execute({ locale: 'en', limit: 50 }),
+    container().listPublishedArticles.execute({ locale: 'fr', limit: 50 }),
+  ])
+  return { review: review.items.length, comments: comments.items.length, english: english.items.length, french: french.items.length }
+}
 
 export default async function StudioPage({
   params,
@@ -44,6 +63,8 @@ export default async function StudioPage({
       return page.items.map(({ article, excerpt }) => toDraftView(article, excerpt))
     })
   ).slice().sort(byWorkflowPriority)
+  const signals = await loadDashboardSignals(actor)
+  const published = signals.english + signals.french
 
   // Not cached, so reading the clock here is legal — this render IS the
   // request. The public listings differ because they are prerendered.
@@ -51,7 +72,13 @@ export default async function StudioPage({
 
   return (
     <div className="space-y-8 pb-20">
-      <MetricCards metrics={metricsFor(drafts)} />
+      <MetricCards metrics={metricsFor(drafts, signals.review, signals.comments, published)} />
+
+      <DashboardInsights
+        workflow={workflowData(drafts)}
+        published={[{ label: 'English', value: signals.english, color: 'bg-primary' }, { label: 'French', value: signals.french, color: 'bg-secondary' }]}
+        attention={[{ label: 'Editorial review', value: signals.review, color: 'bg-secondary' }, { label: 'Comment moderation', value: signals.comments, color: 'bg-primary' }]}
+      />
 
       <DashboardActions />
 
