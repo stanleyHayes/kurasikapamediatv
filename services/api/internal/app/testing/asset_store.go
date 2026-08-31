@@ -70,3 +70,13 @@ func (f *MediaUploadFake) VerifyUpload(receipt ports.UploadReceipt) error {
 	f.LastReceipt = receipt
 	return f.VerifyErr
 }
+
+type VideoDeliveryFake struct{ Delivery ports.VideoDelivery }
+
+func (f VideoDeliveryFake) Project(asset domainmedia.Asset) ports.VideoDelivery {
+	if f.Delivery.PlaybackURL != "" {
+		return f.Delivery
+	}
+	state := asset.State()
+	return ports.VideoDelivery{PlaybackURL: state.SecureURL, MIMEType: state.MIMEType}
+}

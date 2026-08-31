@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment to articles now runs through Go domain/application/API/Mongo and renders across Studio, public cards, story pages and social metadata. VOD processing, article-to-audio and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment to articles now runs through Go domain/application/API/Mongo and renders across Studio, public cards, story pages and social metadata. Uploaded video reports now receive adaptive Cloudinary HLS playback and generated posters through a provider port while retaining mandatory captions. Live-recording ingestion, article-to-audio and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
@@ -357,9 +357,11 @@ library, and the public site renders a native accessible player plus a
 Podcasting 2.0 RSS feed with transcript metadata. Production release remains.
 
 Article hero-image attachment is implemented with ready-image validation,
-required alternative text and visible credit. Still unbuilt: VOD processing,
-article-to-audio (TTS) and voice-to-article. Photo and caption-gated video galleries are
-implemented and CI-green; their public route awaits the Vercel quota reset.
+required alternative text and visible credit. Uploaded video reports now use
+Cloudinary's adaptive `sp_auto` HLS delivery plus generated first-frame posters;
+the public player shares the tested HLS recovery engine with Live TV and keeps
+caption tracks mandatory. Still unbuilt: ingestion of completed live recordings,
+article-to-audio (TTS) and voice-to-article.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;
@@ -1200,3 +1202,22 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Remaining launch inputs are external rather than invented: provider keys and
   approvals, real newsroom identities/content/programming, final domain/DNS,
   legal copy and named operational owners.
+
+## 25. KUR-86 — adaptive VOD delivery for accessible video reports (2026-08-31)
+
+**Status: VERIFIED; production release active.**
+
+- Added the provider-neutral Go `VideoDeliveryPort`. The Cloudinary adapter
+  deterministically projects verified video originals into adaptive `sp_auto`
+  HLS manifests and generated first-frame JPEG posters, while preserving the
+  original URL as a safe fallback for non-Cloudinary assets.
+- `ListGalleryLibrary` now owns that projection, so the HTTP route exposes only
+  playback metadata and never provider transformation rules. Video publication
+  still refuses any report without a ready synchronized-caption asset.
+- The public gallery uses a resilient HLS.js/native-HLS VOD player with poster,
+  captions, accessible failure copy and retry. Content Security Policy now
+  permits the exact Cloudinary playback host for manifests and media segments.
+- Full `pnpm verify` passes, including lint, types, boundaries, every package
+  coverage floor, duplication, Go vet/race tests and 95% domain / 90%
+  application coverage. Explicit Web and Studio production builds also pass
+  against the deployed API; production deployment is the remaining gate.

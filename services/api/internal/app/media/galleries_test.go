@@ -32,9 +32,13 @@ func TestVideoGalleryPublishingAndPublicLibrary(t *testing.T) {
 	if err != nil || !gallery.State().Published {
 		t.Fatal(err)
 	}
-	library, err := appmedia.NewListGalleryLibrary(d).Execute(context.Background(), "en", 20)
+	delivery := fakes.VideoDeliveryFake{Delivery: ports.VideoDelivery{PlaybackURL: "https://cdn.test/report.m3u8", PosterURL: "https://cdn.test/poster.jpg", MIMEType: "application/vnd.apple.mpegurl"}}
+	library, err := appmedia.NewListGalleryLibrary(d, delivery).Execute(context.Background(), "en", 20)
 	if err != nil || len(library) != 1 || len(library[0].Media) != 1 || library[0].Media[0].CaptionAsset == nil {
 		t.Fatalf("%+v %v", library, err)
+	}
+	if library[0].Media[0].Delivery.PlaybackURL != "https://cdn.test/report.m3u8" || library[0].Media[0].Delivery.PosterURL == "" {
+		t.Fatalf("delivery: %+v", library[0].Media[0].Delivery)
 	}
 }
 
@@ -89,7 +93,7 @@ func TestPhotoGalleryLibraryAndRepositoryFailures(t *testing.T) {
 	if err != nil || !gallery.State().Published {
 		t.Fatal(err)
 	}
-	library, err := appmedia.NewListGalleryLibrary(d).Execute(context.Background(), "en", 10)
+	library, err := appmedia.NewListGalleryLibrary(d, fakes.VideoDeliveryFake{}).Execute(context.Background(), "en", 10)
 	if err != nil || len(library) != 1 || library[0].Media[0].CaptionAsset != nil {
 		t.Fatalf("%+v %v", library, err)
 	}
@@ -101,7 +105,7 @@ func TestPhotoGalleryLibraryAndRepositoryFailures(t *testing.T) {
 	if _, err = appmedia.NewPublishGallery(d).Execute(context.Background(), photographer, "missing"); !errors.Is(err, sentinel) {
 		t.Fatal(err)
 	}
-	if _, err = appmedia.NewListGalleryLibrary(d).Execute(context.Background(), "en", 10); !errors.Is(err, sentinel) {
+	if _, err = appmedia.NewListGalleryLibrary(d, fakes.VideoDeliveryFake{}).Execute(context.Background(), "en", 10); !errors.Is(err, sentinel) {
 		t.Fatal(err)
 	}
 }

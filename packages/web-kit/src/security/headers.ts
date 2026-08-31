@@ -60,9 +60,9 @@ export function contentSecurityPolicy(isDev: boolean): string {
     // data: for the inlined font subsets next/font emits.
     ['font-src', "'self'", 'data:'],
 
-    // Narrow this to the Cloudinary delivery host when MediaPort lands (R3).
-    // `https:` is a placeholder wide enough to be worth closing, and naming a
-    // host we do not use yet would be theatre.
+    // Editorial media is Cloudinary-backed. The broader https: allowance stays
+    // for administrator-approved advertising creatives, which may be hosted by
+    // a campaign's own CDN and are validated as secure URLs before activation.
     ['img-src', "'self'", 'data:', 'blob:', 'https:'],
 
     [
@@ -73,12 +73,13 @@ export function contentSecurityPolicy(isDev: boolean): string {
       'https://www.googletagmanager.com',
       'https://challenges.cloudflare.com',
       'https://*.playback.live-video.net',
+      'https://res.cloudinary.com',
       ...(isDev ? ['ws:'] : []),
     ],
 
     // Amazon IVS playback manifests and segments. Ingest never reaches a
     // browser; only the public playback estate is allowed here.
-    ['media-src', "'self'", 'blob:', 'https://*.playback.live-video.net'],
+    ['media-src', "'self'", 'blob:', 'https://*.playback.live-video.net', 'https://res.cloudinary.com'],
 
     // No plugins, no embedded frames, and nobody may frame us. Clickjacking a
     // publish button is a real attack on a newsroom.

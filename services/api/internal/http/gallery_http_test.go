@@ -19,7 +19,7 @@ func TestVideoGalleryLifecycleAndPublicLibrary(t *testing.T) {
 		t.Fatalf("publish: %d %s", published.Code, published.Body.String())
 	}
 	library := request(handler, http.MethodGet, "/public/en/galleries", "", false)
-	if library.Code != http.StatusOK || !bytes.Contains(library.Body.Bytes(), []byte(`"captionUrl"`)) || !bytes.Contains(library.Body.Bytes(), []byte("Accra dispatch")) {
+	if library.Code != http.StatusOK || !bytes.Contains(library.Body.Bytes(), []byte(`"captionUrl"`)) || !bytes.Contains(library.Body.Bytes(), []byte(`"posterUrl"`)) || !bytes.Contains(library.Body.Bytes(), []byte("report.m3u8")) || !bytes.Contains(library.Body.Bytes(), []byte("Accra dispatch")) {
 		t.Fatalf("library: %d %s", library.Code, library.Body.String())
 	}
 }

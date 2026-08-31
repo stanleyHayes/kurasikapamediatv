@@ -15,10 +15,11 @@ describe('gallery BFF', () => {
 
   it('maps the public gallery library', async () => {
     configure()
-    vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ items: [{ id: 'gallery', kind: 'video', title: 'Accra dispatch', media: [{ assetId: 'video', url: 'https://cdn.test/video.mp4', captionUrl: 'https://cdn.test/video.vtt', caption: 'At the market' }] }] }), { status: 200 })))
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ items: [{ id: 'gallery', kind: 'video', title: 'Accra dispatch', media: [{ assetId: 'video', url: 'https://cdn.test/video.m3u8', posterUrl: 'https://cdn.test/video.jpg', captionUrl: 'https://cdn.test/video.vtt', caption: 'At the market' }] }] }), { status: 200 })))
     const galleries = await loadGalleries('en')
     expect(galleries[0]).toMatchObject({ id: 'gallery', kind: 'video', title: 'Accra dispatch' })
     expect(galleries[0]?.media[0]?.captionUrl).toContain('.vtt')
+    expect(galleries[0]?.media[0]?.posterUrl).toContain('.jpg')
   })
 
   it('creates then explicitly publishes a gallery', async () => {

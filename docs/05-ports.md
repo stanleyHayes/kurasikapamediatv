@@ -142,7 +142,7 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 `PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·
 `ListTelevisionGuide` · `CreatePodcast` · `PublishPodcast` · `CreateEpisode` ·
 `PublishEpisode` · `ListPodcastLibrary` · `CreateGallery` · `PublishGallery` ·
-`ListGalleryLibrary` · `TranscodeVod`
+`ListGalleryLibrary`
 
 `ScheduleProgramme` accepts only published programmes. A recorded replay cannot
 be published without a caption asset; this accessibility rule lives in the
@@ -170,7 +170,11 @@ asset delivery metadata for the public player and RSS feed.
 every item through `AssetRepository`; photos must be ready images and videos
 must be ready video assets paired with ready synchronized-caption assets.
 `ListGalleryLibrary` exposes delivery URLs, alt text, editorial captions and
-credits without leaking provider documents.
+credits without leaking provider documents. Its `VideoDeliveryPort` projects a
+ready provider-neutral video into an adaptive playback URL, poster URL and MIME
+type. The Cloudinary adapter derives an `sp_auto` HLS manifest and first-frame
+poster lazily; the application and HTTP layers know nothing about Cloudinary
+transformation syntax.
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 

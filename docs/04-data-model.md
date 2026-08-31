@@ -197,6 +197,16 @@ the public-team index orders published profiles by display name. Editing a live
 profile returns it to draft, and publication resolves a ready image through the
 media library before exposing its delivery metadata.
 
+### VOD delivery projection
+
+Video originals remain immutable `media_assets`; derived renditions are not new
+database records. `VideoDeliveryPort` projects a ready video at read time into
+Cloudinary's adaptive `sp_auto` HLS manifest and a first-frame JPEG poster. This
+keeps cacheable provider URLs deterministic, avoids persisting transient
+transformation state and preserves the original as the fallback for assets
+outside Cloudinary. Video-gallery publication still requires a separate ready
+caption asset before any rendition is publicly reachable.
+
 ## 5. Consistency rules
 
 MongoDB gives us no foreign keys, so these are enforced in the domain and verified by integration tests:

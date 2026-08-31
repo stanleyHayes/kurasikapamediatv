@@ -1,9 +1,30 @@
 import Image from 'next/image'
 import type { GalleryView } from '@kurasikapa/web-kit/bff/galleries'
+import { VodPlayer } from './vod-player'
 
 export function GalleryLibrary({ locale, galleries }: { locale: string; galleries: readonly GalleryView[] }): React.ReactElement {
   if (galleries.length === 0) return <Empty locale={locale}/>
-  return <div className="space-y-20">{galleries.map((gallery, index) => <section key={gallery.id} className="border-t-2 border-on-surface pt-8"><header className="grid gap-5 md:grid-cols-[7rem_1fr]"><span className="font-mono text-4xl text-primary-ink">{String(index + 1).padStart(2, '0')}</span><div><p className="broadcast-kicker text-primary">{gallery.kind === 'video' ? 'Video reports' : 'Photo story'} · {gallery.media.length} frames</p><h2 className="mt-3 max-w-4xl font-display text-5xl font-bold tracking-[-.05em] md:text-6xl">{gallery.title}</h2><p className="mt-4 max-w-3xl text-lg leading-8 text-on-surface-variant">{gallery.summary}</p></div></header><div className="mt-10 grid gap-7 md:grid-cols-2">{gallery.media.map((item, itemIndex) => <figure key={item.assetId} className={`${itemIndex === 0 ? 'md:col-span-2' : ''} group border border-outline-variant bg-surface-container-lowest p-3 shadow-[7px_8px_0_rgba(16,75,42,.11)]`}>{gallery.kind === 'photo' ? <div className={`relative overflow-hidden bg-surface-container-low ${itemIndex === 0 ? 'aspect-[16/8]' : 'aspect-[4/3]'}`}><Image src={item.url} alt={item.altText} fill sizes={itemIndex === 0 ? '100vw' : '(max-width: 768px) 100vw, 50vw'} className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"/></div> : <video controls preload="metadata" className="aspect-video w-full bg-black" aria-label={item.caption}><source src={item.url} type={item.mimeType}/>{item.captionUrl !== '' && <track default kind="captions" src={item.captionUrl} srcLang={locale} label={locale === 'fr' ? 'Français' : 'English'}/>}</video>}<figcaption className="grid gap-2 p-4 md:grid-cols-[1fr_auto]"><span className="leading-7">{item.caption}</span>{item.credit !== '' && <span className="text-xs font-bold uppercase tracking-[.12em] text-primary-ink">{item.credit}</span>}</figcaption></figure>)}</div></section>)}</div>
+  return <div className="space-y-20">{galleries.map((gallery, index) => (
+    <section key={gallery.id} className="border-t-2 border-on-surface pt-8">
+      <GalleryHeader gallery={gallery} index={index}/>
+      <div className="mt-10 grid gap-7 md:grid-cols-2">{gallery.media.map((item, itemIndex) => (
+        <figure key={item.assetId} className={`${itemIndex === 0 ? 'md:col-span-2' : ''} group border border-outline-variant bg-surface-container-lowest p-3 shadow-[7px_8px_0_rgba(16,75,42,.11)]`}>
+          {gallery.kind === 'photo' ? (
+            <div className={`relative overflow-hidden bg-surface-container-low ${itemIndex === 0 ? 'aspect-[16/8]' : 'aspect-[4/3]'}`}>
+              <Image src={item.url} alt={item.altText} fill sizes={itemIndex === 0 ? '100vw' : '(max-width: 768px) 100vw, 50vw'} className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"/>
+            </div>
+          ) : (
+            <VodPlayer source={item.url} poster={item.posterUrl} captionSource={item.captionUrl} locale={locale} title={item.caption}/>
+          )}
+          <figcaption className="grid gap-2 p-4 md:grid-cols-[1fr_auto]"><span className="leading-7">{item.caption}</span>{item.credit !== '' && <span className="text-xs font-bold uppercase tracking-[.12em] text-primary-ink">{item.credit}</span>}</figcaption>
+        </figure>
+      ))}</div>
+    </section>
+  ))}</div>
+}
+
+function GalleryHeader({ gallery, index }: { readonly gallery: GalleryView; readonly index: number }): React.ReactElement {
+  return <header className="grid gap-5 md:grid-cols-[7rem_1fr]"><span className="font-mono text-4xl text-primary-ink">{String(index + 1).padStart(2, '0')}</span><div><p className="broadcast-kicker text-primary">{gallery.kind === 'video' ? 'Video reports' : 'Photo story'} · {gallery.media.length} frames</p><h2 className="mt-3 max-w-4xl font-display text-5xl font-bold tracking-[-.05em] md:text-6xl">{gallery.title}</h2><p className="mt-4 max-w-3xl text-lg leading-8 text-on-surface-variant">{gallery.summary}</p></div></header>
 }
 
 function Empty({ locale }: { locale: string }): React.ReactElement {

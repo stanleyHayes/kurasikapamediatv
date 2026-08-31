@@ -60,10 +60,11 @@ describe('contentSecurityPolicy', () => {
     expect(directives(false).get('script-src')).toContain('https://www.googletagmanager.com')
   })
 
-  it('allows only the Amazon IVS playback estate for live media', () => {
+  it('allows only the IVS and Cloudinary playback estates for media', () => {
     expect(directives(false).get('connect-src')).toContain('https://*.playback.live-video.net')
+    expect(directives(false).get('connect-src')).toContain('https://res.cloudinary.com')
     expect(directives(false).get('media-src')).toBe(
-      "'self' blob: https://*.playback.live-video.net",
+      "'self' blob: https://*.playback.live-video.net https://res.cloudinary.com",
     )
   })
 })

@@ -84,7 +84,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ListPodcastLibrary:         appmedia.NewListPodcastLibrary(mediaDeps),
 		CreateGallery:              appmedia.NewCreateGallery(mediaDeps),
 		PublishGallery:             appmedia.NewPublishGallery(mediaDeps),
-		ListGalleryLibrary:         appmedia.NewListGalleryLibrary(mediaDeps),
+		ListGalleryLibrary:         appmedia.NewListGalleryLibrary(mediaDeps, faketesting.VideoDeliveryFake{Delivery: ports.VideoDelivery{PlaybackURL: "https://cdn.test/report.m3u8", PosterURL: "https://cdn.test/poster.jpg", MIMEType: "application/vnd.apple.mpegurl"}}),
 		CreateMembershipPlan:       apprevenue.NewCreateMembershipPlan(revenueDeps),
 		ActivateMembershipPlan:     apprevenue.NewActivateMembershipPlan(revenueDeps),
 		ListMembershipPlans:        apprevenue.NewListMembershipPlans(revenueDeps),

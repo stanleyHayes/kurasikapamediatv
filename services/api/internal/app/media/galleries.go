@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/kurasikapa/api/internal/app/ports"
 	"github.com/kurasikapa/api/internal/domain/identity"
 	domainmedia "github.com/kurasikapa/api/internal/domain/media"
 	"github.com/kurasikapa/api/internal/domain/shared"
@@ -76,14 +77,20 @@ type GalleryMedia struct {
 	Item         domainmedia.GalleryItem
 	Asset        domainmedia.Asset
 	CaptionAsset *domainmedia.Asset
+	Delivery     ports.VideoDelivery
 }
 type GalleryLibraryItem struct {
 	Gallery domainmedia.Gallery
 	Media   []GalleryMedia
 }
-type ListGalleryLibrary struct{ deps Deps }
+type ListGalleryLibrary struct {
+	deps     Deps
+	delivery ports.VideoDeliveryPort
+}
 
-func NewListGalleryLibrary(deps Deps) ListGalleryLibrary { return ListGalleryLibrary{deps: deps} }
+func NewListGalleryLibrary(deps Deps, delivery ports.VideoDeliveryPort) ListGalleryLibrary {
+	return ListGalleryLibrary{deps: deps, delivery: delivery}
+}
 func (u ListGalleryLibrary) Execute(ctx context.Context, locale string, limit int) ([]GalleryLibraryItem, error) {
 	galleries, err := u.deps.Galleries.ListPublished(ctx, locale, limit)
 	if err != nil {
@@ -98,6 +105,9 @@ func (u ListGalleryLibrary) Execute(ctx context.Context, locale string, limit in
 				return nil, findErr
 			}
 			media := GalleryMedia{Item: item, Asset: asset}
+			if gallery.State().Kind == domainmedia.GalleryVideo {
+				media.Delivery = u.delivery.Project(asset)
+			}
 			if item.CaptionAssetID != nil {
 				caption, captionErr := u.deps.Assets.FindByID(ctx, *item.CaptionAssetID)
 				if captionErr != nil {

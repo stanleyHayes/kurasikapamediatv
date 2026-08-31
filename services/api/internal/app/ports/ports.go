@@ -231,6 +231,16 @@ type MediaUploadPort interface {
 	VerifyUpload(UploadReceipt) error
 }
 
+// VideoDelivery is a provider-neutral projection of one ready video. The
+// original upload remains the source of truth; adapters derive renditions.
+type VideoDelivery struct {
+	PlaybackURL, PosterURL, MIMEType string
+}
+
+type VideoDeliveryPort interface {
+	Project(media.Asset) VideoDelivery
+}
+
 type MembershipPlanRepository interface {
 	FindByID(context.Context, shared.MembershipPlanID) (revenue.MembershipPlan, error)
 	ListActive(context.Context) ([]revenue.MembershipPlan, error)

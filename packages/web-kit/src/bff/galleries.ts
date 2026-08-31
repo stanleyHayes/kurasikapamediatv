@@ -6,7 +6,7 @@ import { joinUrl } from './url'
 
 export interface GalleryMediaView {
   readonly assetId: string; readonly url: string; readonly mimeType: string; readonly altText: string
-  readonly caption: string; readonly credit: string; readonly captionUrl: string
+  readonly caption: string; readonly credit: string; readonly captionUrl: string; readonly posterUrl: string
 }
 export interface GalleryView {
   readonly id: string; readonly kind: 'photo' | 'video'; readonly title: string; readonly slug: string
@@ -15,7 +15,7 @@ export interface GalleryView {
 
 function record(value: unknown): Record<string, unknown> { return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {} }
 function text(value: unknown): string { return typeof value === 'string' ? value : '' }
-function media(raw: unknown): GalleryMediaView { const row = record(raw); return { assetId: text(row['assetId']), url: text(row['url']), mimeType: text(row['mimeType']), altText: text(row['altText']), caption: text(row['caption']), credit: text(row['credit']), captionUrl: text(row['captionUrl']) } }
+function media(raw: unknown): GalleryMediaView { const row = record(raw); return { assetId: text(row['assetId']), url: text(row['url']), mimeType: text(row['mimeType']), altText: text(row['altText']), caption: text(row['caption']), credit: text(row['credit']), captionUrl: text(row['captionUrl']), posterUrl: text(row['posterUrl']) } }
 function gallery(raw: unknown): GalleryView {
   const row = record(raw); const kind = row['kind'] === 'video' ? 'video' : 'photo'
   return { id: text(row['id']), kind, title: text(row['title']), slug: text(row['slug']), locale: text(row['locale']), summary: text(row['summary']), publishedAt: text(row['publishedAt']), media: Array.isArray(row['media']) ? row['media'].map(media) : [] }

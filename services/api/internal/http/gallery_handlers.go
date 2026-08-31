@@ -69,6 +69,10 @@ func galleryView(gallery domainmedia.Gallery) map[string]any {
 }
 func galleryMediaView(item appmedia.GalleryMedia) map[string]any {
 	view := map[string]any{"assetId": item.Item.AssetID.String(), "url": item.Asset.State().SecureURL, "mimeType": item.Asset.State().MIMEType, "altText": item.Asset.State().AltText, "caption": item.Item.Caption, "credit": item.Item.Credit}
+	if item.Delivery.PlaybackURL != "" {
+		view["url"], view["mimeType"] = item.Delivery.PlaybackURL, item.Delivery.MIMEType
+		view["posterUrl"] = item.Delivery.PosterURL
+	}
 	if item.CaptionAsset != nil {
 		view["captionUrl"] = item.CaptionAsset.State().SecureURL
 	}

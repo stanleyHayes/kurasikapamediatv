@@ -81,6 +81,7 @@ func run(log *slog.Logger) error {
 	adCampaigns := adaptermongo.NewAdCampaignRepository(db)
 	adEvents := adaptermongo.NewAdEventRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
+	videoDelivery := adaptercloudinary.NewDelivery()
 	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
 	paymentWebhooks := adapterpayments.NewWebhookVerifier(cfg.PaystackSecretKey, cfg.StripeWebhookSecret)
 
@@ -201,7 +202,7 @@ func run(log *slog.Logger) error {
 		ListPodcastLibrary:         appmedia.NewListPodcastLibrary(mediaDeps),
 		CreateGallery:              appmedia.NewCreateGallery(mediaDeps),
 		PublishGallery:             appmedia.NewPublishGallery(mediaDeps),
-		ListGalleryLibrary:         appmedia.NewListGalleryLibrary(mediaDeps),
+		ListGalleryLibrary:         appmedia.NewListGalleryLibrary(mediaDeps, videoDelivery),
 		CreateMembershipPlan:       apprevenue.NewCreateMembershipPlan(revenueDeps),
 		ActivateMembershipPlan:     apprevenue.NewActivateMembershipPlan(revenueDeps),
 		ListMembershipPlans:        apprevenue.NewListMembershipPlans(revenueDeps),
