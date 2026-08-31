@@ -112,10 +112,11 @@ such as `kurasikapa-studio.vercel.app`. That host and `kurasikapa.tv` do not
 share a registrable domain, so no valid `COOKIE_DOMAIN` can make a site cookie
 available to both.
 
-In this shape the Studio owns password and second-factor session endpoints and
-its sign-in page at `/studio/{locale}/sign-in`. They call the same application
-use cases as the public site; only the HTTP driving adapter and host-scoped
-cookies are local to the deployment.
+In this shape the Studio owns password and second-factor session endpoints,
+its sign-in page at `/studio/{locale}/sign-in`, and the human-reviewed account
+recovery entrypoint beside it. They call the same application use cases as the
+public site; only the HTTP driving adapter and host-scoped cookies are local to
+the deployment.
 
 | Variable | Public site | Studio |
 |---|---|---|

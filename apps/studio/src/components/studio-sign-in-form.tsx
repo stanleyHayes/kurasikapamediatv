@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 interface Props {
   readonly destination: string
+  readonly forgotPasswordUrl: string
   readonly sessionEndpoint: string
 }
 
@@ -15,7 +16,7 @@ interface Payload {
 const FIELD = 'h-14 w-full border border-outline-variant bg-surface-container-lowest px-4 text-on-surface outline-none focus:border-primary'
 const FAILED = 'Those details did not match an account.'
 
-export function StudioSignInForm({ destination, sessionEndpoint }: Props): React.ReactElement {
+export function StudioSignInForm({ destination, forgotPasswordUrl, sessionEndpoint }: Props): React.ReactElement {
   const [error, setError] = useState<string | null>(null)
   const [challenge, setChallenge] = useState<string | null>(null)
 
@@ -49,7 +50,7 @@ export function StudioSignInForm({ destination, sessionEndpoint }: Props): React
 
   return (
     <form action={submit} className="flex flex-col gap-5">
-      {challenge === null ? <PasswordFields /> : <CodeField />}
+      {challenge === null ? <PasswordFields forgotPasswordUrl={forgotPasswordUrl} /> : <CodeField />}
       {error !== null && <p role="alert" className="text-error text-sm">{error}</p>}
       <button type="submit" className="bg-primary text-on-primary h-13 px-5 text-sm font-bold">
         {challenge === null ? 'Sign in to Studio' : 'Verify and continue'}
@@ -58,8 +59,8 @@ export function StudioSignInForm({ destination, sessionEndpoint }: Props): React
   )
 }
 
-function PasswordFields(): React.ReactElement {
-  return <><Field label="Email" name="email" type="email" autoComplete="email" /><Field label="Password" name="password" type="password" autoComplete="current-password" /></>
+function PasswordFields({ forgotPasswordUrl }: { forgotPasswordUrl: string }): React.ReactElement {
+  return <><Field label="Email" name="email" type="email" autoComplete="email" /><Field label="Password" name="password" type="password" autoComplete="current-password" /><a href={forgotPasswordUrl} className="text-primary -mt-2 self-end text-sm font-bold underline underline-offset-4">Forgot password?</a></>
 }
 
 function CodeField(): React.ReactElement {
