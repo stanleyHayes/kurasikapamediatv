@@ -13,7 +13,12 @@ export function StudioAuthShell(props: Props): React.ReactElement {
       <section className="bg-primary text-on-primary relative hidden min-h-screen overflow-hidden p-12 lg:flex lg:flex-col lg:justify-between xl:p-16">
         <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border border-white/15" />
         <div className="absolute -bottom-32 left-20 h-96 w-96 rounded-full border border-secondary/30" />
-        <p className="relative text-sm font-extrabold uppercase tracking-[0.24em]">Kurasikapa Media TV</p>
+        <div className="relative flex items-center gap-4">
+          <span className="grid h-16 w-24 place-items-center border border-white/20 bg-white/95 px-2">
+            <Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media TV" width={1536} height={1024} className="h-12 w-auto object-contain" priority />
+          </span>
+          <span><strong className="block font-display text-xl">Kurasikapa</strong><small className="mt-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Newsroom studio</small></span>
+        </div>
         <div className="relative max-w-xl">
           <p className="text-secondary text-xs font-bold uppercase tracking-[0.24em]">Independent newsroom</p>
           <h2 className="mt-5 text-5xl font-extrabold leading-[1.02] xl:text-6xl">{props.asideTitle}</h2>
@@ -25,8 +30,10 @@ export function StudioAuthShell(props: Props): React.ReactElement {
       <section className="flex min-h-screen items-center justify-center p-6 sm:p-10 lg:p-14">
         <div className="w-full max-w-md">
           <div className="mb-9 flex items-center gap-3 lg:hidden">
-            <span className="bg-primary text-on-primary grid h-11 w-11 place-items-center text-sm font-black">KM</span>
-            <span className="text-sm font-extrabold uppercase tracking-[0.16em]">Kurasikapa Studio</span>
+            <span className="grid h-14 w-20 place-items-center border border-outline-variant bg-surface-container-lowest px-2">
+              <Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media TV" width={1536} height={1024} className="h-10 w-auto object-contain" priority />
+            </span>
+            <span><strong className="block font-display text-base">Kurasikapa</strong><small className="block text-[9px] font-bold uppercase tracking-[0.16em] text-primary">Newsroom studio</small></span>
           </div>
           <p className="text-primary text-xs font-bold uppercase tracking-[0.22em]">{props.eyebrow}</p>
           <h1 className="text-on-surface mt-3 text-4xl font-extrabold tracking-tight">{props.title}</h1>
@@ -37,3 +44,4 @@ export function StudioAuthShell(props: Props): React.ReactElement {
     </main>
   )
 }
+import Image from 'next/image'
