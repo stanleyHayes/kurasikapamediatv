@@ -7,6 +7,8 @@ const (
 	CollProgrammes    = "programmes"
 	CollScheduleSlots = "schedule_slots"
 	CollMediaAssets   = "media_assets"
+	CollPodcasts      = "podcasts"
+	CollEpisodes      = "episodes"
 )
 
 type presenterDoc struct {
@@ -62,4 +64,38 @@ type scheduleSlotDoc struct {
 	ReplayAssetID  *string   `bson:"replayAssetId"`
 	CaptionAssetID *string   `bson:"captionAssetId"`
 	CreatedBy      string    `bson:"createdBy"`
+}
+
+type podcastDoc struct {
+	ID             string  `bson:"_id"`
+	Title          string  `bson:"title"`
+	Slug           string  `bson:"slug"`
+	Locale         string  `bson:"locale"`
+	Summary        string  `bson:"summary"`
+	Author         string  `bson:"author"`
+	CreatedBy      string  `bson:"createdBy"`
+	ArtworkAssetID *string `bson:"artworkAssetId"`
+	Published      bool    `bson:"published"`
+}
+
+type episodeChapterDoc struct {
+	Title       string  `bson:"title"`
+	StartsAtSec float64 `bson:"startsAtSec"`
+}
+
+type episodeDoc struct {
+	ID                string              `bson:"_id"`
+	PodcastID         string              `bson:"podcastId"`
+	Title             string              `bson:"title"`
+	Slug              string              `bson:"slug"`
+	Locale            string              `bson:"locale"`
+	Summary           string              `bson:"summary"`
+	CreatedBy         string              `bson:"createdBy"`
+	AudioAssetID      *string             `bson:"audioAssetId,omitempty"`
+	TranscriptAssetID *string             `bson:"transcriptAssetId,omitempty"`
+	ArtworkAssetID    *string             `bson:"artworkAssetId,omitempty"`
+	Chapters          []episodeChapterDoc `bson:"chapters"`
+	DurationSeconds   float64             `bson:"durationSeconds"`
+	Published         bool                `bson:"published"`
+	PublishedAt       *time.Time          `bson:"publishedAt"`
 }

@@ -58,4 +58,19 @@ func TestIDsStringify(t *testing.T) {
 	if shared.AssetID("ast_1").String() != "ast_1" {
 		t.Error("AssetID")
 	}
+	if shared.PresenterID("pre_1").String() != "pre_1" {
+		t.Error("PresenterID")
+	}
+	if shared.ProgrammeID("pro_1").String() != "pro_1" {
+		t.Error("ProgrammeID")
+	}
+	if shared.ScheduleSlotID("slot_1").String() != "slot_1" {
+		t.Error("ScheduleSlotID")
+	}
+	if shared.PodcastID("pod_1").String() != "pod_1" {
+		t.Error("PodcastID")
+	}
+	if shared.EpisodeID("ep_1").String() != "ep_1" {
+		t.Error("EpisodeID")
+	}
 }

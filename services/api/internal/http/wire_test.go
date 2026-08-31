@@ -18,9 +18,11 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	mediaDeps := appmedia.Deps{
 		Presenters: faketesting.NewPresenterStore(), Programmes: faketesting.NewProgrammeStore(),
 		Schedule: faketesting.NewScheduleStore(), Clock: faketesting.FixedClock{At: now},
+		Podcasts: faketesting.NewPodcastStore(), Episodes: faketesting.NewEpisodeStore(),
 		IDs: &faketesting.SequentialIDs{},
 	}
 	assets := faketesting.NewAssetStore()
+	mediaDeps.Assets = assets
 	uploads := &faketesting.MediaUploadFake{Ticket: ports.UploadTicket{
 		URL: "https://api.cloudinary.test/upload", APIKey: "key", Signature: "signature",
 		PublicID: "id_1", ResourceType: "video", Folder: "kurasikapa/media", Timestamp: now.Unix(),
@@ -53,6 +55,11 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		CreateAssetUpload:     appmedia.NewCreateAssetUpload(mediaDeps, assets, uploads),
 		CompleteAssetUpload:   appmedia.NewCompleteAssetUpload(assets, uploads),
 		ListAssets:            appmedia.NewListAssets(assets),
+		CreatePodcast:         appmedia.NewCreatePodcast(mediaDeps),
+		PublishPodcast:        appmedia.NewPublishPodcast(mediaDeps),
+		CreateEpisode:         appmedia.NewCreateEpisode(mediaDeps),
+		PublishEpisode:        appmedia.NewPublishEpisode(mediaDeps),
+		ListPodcastLibrary:    appmedia.NewListPodcastLibrary(mediaDeps),
 		Roles:                 roles{granted: granted},
 		Log:                   slog.New(slog.NewTextHandler(io.Discard, nil)),
 		CronSecret:            "s3cret-value-of-known-length-0000",

@@ -139,6 +139,7 @@ const SWEPT_PATHS = [
   '/en/contact',
   '/en/about',
   '/en/newsletter',
+  '/en/podcasts',
   '/en/sign-in',
 ]
 

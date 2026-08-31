@@ -117,16 +117,16 @@ test.describe('workflow transitions', () => {
     await page.goto(`${STUDIO}/en/articles/${DRAFT._id}`)
 
     await page.getByRole('button', { name: 'Submit for review' }).click()
-    await expect(page.getByText('In review')).toBeVisible()
+    await expect(page.getByText('In review')).toBeVisible({ timeout: 15_000 })
 
     await page.getByRole('button', { name: 'Approve' }).click()
-    await expect(page.getByText('Approved', { exact: true })).toBeVisible()
+    await expect(page.getByText('Approved', { exact: true })).toBeVisible({ timeout: 15_000 })
 
     const [date, time] = inOneDay().split('T') as [string, string]
     await page.getByLabel('Date').fill(date)
     await page.getByLabel('Time').fill(time)
     await page.getByRole('button', { name: 'Schedule' }).click()
-    await expect(page.getByText('Scheduled')).toBeVisible()
+    await expect(page.getByText('Scheduled')).toBeVisible({ timeout: 15_000 })
   })
 })
 

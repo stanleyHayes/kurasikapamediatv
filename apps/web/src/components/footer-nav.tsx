@@ -4,7 +4,7 @@ import { Link, usePathname } from '@kurasikapa/web-kit/i18n/navigation'
 import { FooterIcon } from './footer-icon'
 
 const GROUPS = [
-  { title: 'Reporting', icon: 'reporting', links: [{ href: '/news', label: 'Latest news', icon: 'newspaper' }, { href: '/sections/politics', label: 'Politics', icon: 'section' }, { href: '/sections/business', label: 'Business', icon: 'briefcase' }, { href: '/sections/education', label: 'Education', icon: 'building' }] },
+  { title: 'Reporting', icon: 'reporting', links: [{ href: '/news', label: 'Latest news', icon: 'newspaper' }, { href: '/podcasts', label: 'Podcasts', icon: 'broadcast' }, { href: '/sections/politics', label: 'Politics', icon: 'section' }, { href: '/sections/business', label: 'Business', icon: 'briefcase' }, { href: '/sections/education', label: 'Education', icon: 'building' }] },
   { title: 'Kurasikapa', icon: 'studio', links: [{ href: '/about', label: 'About us', icon: 'broadcast' }, { href: '/team', label: 'Our team', icon: 'people' }, { href: '/contact', label: 'Contact', icon: 'mail' }, { href: '/careers', label: 'Careers', icon: 'briefcase' }] },
   { title: 'Information', icon: 'help', links: [{ href: '/advertise', label: 'Advertise', icon: 'broadcast' }, { href: '/help', label: 'Help centre', icon: 'help' }, { href: '/faq', label: 'FAQ', icon: 'help' }, { href: '/legal/privacy', label: 'Privacy', icon: 'privacy' }, { href: '/legal/terms', label: 'Terms', icon: 'scale' }, { href: '/legal/cookies', label: 'Cookies', icon: 'cookie' }] },
 ] as const

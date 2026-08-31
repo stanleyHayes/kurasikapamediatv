@@ -18,6 +18,9 @@ type Deps struct {
 	Presenters ports.PresenterRepository
 	Programmes ports.ProgrammeRepository
 	Schedule   ports.ScheduleRepository
+	Podcasts   ports.PodcastRepository
+	Episodes   ports.EpisodeRepository
+	Assets     ports.AssetRepository
 	Clock      ports.Clock
 	IDs        ports.IDs
 }

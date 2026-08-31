@@ -101,3 +101,50 @@ func TestAssetRepositoryRoundTripAndIndexes(t *testing.T) {
 		}
 	}
 }
+
+func TestPodcastRepositoriesRoundTripAndIndexes(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	podcasts := adapter.NewPodcastRepository(h.DB)
+	episodes := adapter.NewEpisodeRepository(h.DB)
+	ctx := context.Background()
+	if err := podcasts.EnsureIndexes(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err := episodes.EnsureIndexes(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	artwork, audio, transcript := shared.AssetID("artwork"), shared.AssetID("audio"), shared.AssetID("transcript")
+	podcast := domainmedia.ReconstitutePodcast(domainmedia.PodcastState{ID: "podcast", Title: "The Brief", Slug: "the-brief", Locale: "en", Summary: "The week's essential stories.", Author: "Kurasikapa Newsroom", ArtworkAssetID: &artwork, Published: true, CreatedBy: "manager"})
+	if err := podcasts.Save(ctx, podcast); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := podcasts.FindByID(ctx, podcast.ID()); err != nil || got.State().Title != "The Brief" {
+		t.Fatalf("%+v %v", got.State(), err)
+	}
+	if listed, err := podcasts.ListPublished(ctx, "en", 20); err != nil || len(listed) != 1 {
+		t.Fatalf("podcasts %d %v", len(listed), err)
+	}
+
+	publishedAt := testNow.Add(-time.Hour)
+	episode := domainmedia.ReconstituteEpisode(domainmedia.EpisodeState{ID: "episode", PodcastID: podcast.ID(), Title: "Market close", Slug: "market-close", Locale: "en", Summary: "A clear look at today's markets.", AudioAssetID: &audio, TranscriptAssetID: &transcript, Chapters: []domainmedia.EpisodeChapter{{Title: "Opening", StartsAtSec: 0}, {Title: "Cedi watch", StartsAtSec: 60}}, DurationSeconds: 180, Published: true, PublishedAt: &publishedAt, CreatedBy: "manager"})
+	if err := episodes.Save(ctx, episode); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := episodes.FindByID(ctx, episode.ID()); err != nil || len(got.State().Chapters) != 2 {
+		t.Fatalf("%+v %v", got.State(), err)
+	}
+	if listed, err := episodes.ListPublished(ctx, podcast.ID(), 20); err != nil || len(listed) != 1 {
+		t.Fatalf("episodes %d %v", len(listed), err)
+	}
+
+	for collection, name := range map[string]string{
+		adapter.CollPodcasts: "public_podcast_library",
+		adapter.CollEpisodes: "public_episode_library",
+	} {
+		if !indexNames(t, h, collection)[name] {
+			t.Errorf("%s missing %s", collection, name)
+		}
+	}
+}

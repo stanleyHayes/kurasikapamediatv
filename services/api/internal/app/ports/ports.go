@@ -181,6 +181,18 @@ type AssetRepository interface {
 	Save(context.Context, media.Asset) error
 }
 
+type PodcastRepository interface {
+	FindByID(context.Context, shared.PodcastID) (media.Podcast, error)
+	ListPublished(context.Context, string, int) ([]media.Podcast, error)
+	Save(context.Context, media.Podcast) error
+}
+
+type EpisodeRepository interface {
+	FindByID(context.Context, shared.EpisodeID) (media.Episode, error)
+	ListPublished(context.Context, shared.PodcastID, int) ([]media.Episode, error)
+	Save(context.Context, media.Episode) error
+}
+
 type UploadRequest struct {
 	AssetID   shared.AssetID
 	Kind      media.AssetKind

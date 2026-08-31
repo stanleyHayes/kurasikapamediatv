@@ -133,7 +133,8 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 
 **media** — `CreateAssetUpload` · `CompleteAssetUpload` · `ListAssets` · `StartLiveStream` · `EndLiveStream` · `CreatePresenter` ·
 `PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·
-`ListTelevisionGuide` · `PublishEpisode` · `TranscodeVod`
+`ListTelevisionGuide` · `CreatePodcast` · `PublishPodcast` · `CreateEpisode` ·
+`PublishEpisode` · `ListPodcastLibrary` · `TranscodeVod`
 
 `ScheduleProgramme` accepts only published programmes. A recorded replay cannot
 be published without a caption asset; this accessibility rule lives in the
@@ -150,6 +151,12 @@ browser-to-provider upload ticket and verifies the provider receipt before an
 asset can become ready; `AssetRepository` persists only provider-neutral
 metadata. Images require alternative text in the domain. Missing Cloudinary
 configuration fails closed, and the API secret is never returned to Studio.
+
+Podcast and episode repositories are separate aggregate ports. Series must be
+published before an episode can be created; an episode cannot be published
+until its audio and transcript both resolve to ready assets of the correct
+kind. `ListPodcastLibrary` joins only published records with provider-neutral
+asset delivery metadata for the public player and RSS feed.
 
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 

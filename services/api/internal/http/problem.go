@@ -13,6 +13,7 @@ import (
 	"net/http"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
@@ -73,14 +74,23 @@ func problemFor(err error) Problem {
 	case errors.Is(err, domainmedia.ErrInvalidAssetKind),
 		errors.Is(err, domainmedia.ErrEmptyAssetFilename),
 		errors.Is(err, domainmedia.ErrImageNeedsAltText),
-		errors.Is(err, domainmedia.ErrInvalidAssetDelivery):
+		errors.Is(err, domainmedia.ErrInvalidAssetDelivery),
+		errors.Is(err, domainmedia.ErrEmptyPodcastTitle),
+		errors.Is(err, domainmedia.ErrEmptyPodcastSummary),
+		errors.Is(err, domainmedia.ErrEmptyEpisodeTitle),
+		errors.Is(err, domainmedia.ErrEpisodeNeedsAudio),
+		errors.Is(err, domainmedia.ErrEpisodeNeedsTranscript),
+		errors.Is(err, domainmedia.ErrInvalidEpisodeChapter):
 		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
 
 	case errors.Is(err, editorial.ErrIllegalTransition),
 		errors.Is(err, editorial.ErrNotEditable),
 		errors.Is(err, editorial.ErrNoApprovedRevision),
 		errors.Is(err, editorial.ErrScheduleInPast),
-		errors.Is(err, editorial.ErrRevisionNotOfArticle):
+		errors.Is(err, editorial.ErrRevisionNotOfArticle),
+		errors.Is(err, appmedia.ErrPodcastNotPublished),
+		errors.Is(err, appmedia.ErrEpisodeAudioNotReady),
+		errors.Is(err, appmedia.ErrTranscriptNotReady):
 		// 409: the request is well-formed and the article is simply not in a
 		// state where it can happen. 400 would suggest the caller sent
 		// something malformed and should change the payload.

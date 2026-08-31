@@ -8,6 +8,7 @@ const TITLES = [
   { href: '/live-control', title: 'Live control room', description: 'Provision, monitor and end broadcasts.' },
   { href: '/television', title: 'TV programming', description: 'Manage programmes, presenters and the public schedule.' },
   { href: '/media', title: 'Media library', description: 'Manage verified images, video, audio and accessibility files.' },
+  { href: '/podcasts', title: 'Podcasts', description: 'Publish original audio series, episodes, chapters and transcripts.' },
   { href: '/review', title: 'Review queue', description: 'Make confident publishing decisions.' }, { href: '/social', title: 'Social publishing', description: 'Plan and monitor story distribution.' },
   { href: '/rss', title: 'News sources', description: 'Turn trusted feeds into newsroom drafts.' }, { href: '/comments', title: 'Comment moderation', description: 'Keep reader conversations constructive.' },
   { href: '/pages', title: 'Public pages', description: 'Publish organisation and legal information.' },

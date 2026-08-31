@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media-asset aggregate, Mongo repository, signed Cloudinary direct-upload adapter, authenticated API/BFF and Studio library now cover image, video, audio, caption, transcript and document intake; images require alt text and provider receipts are verified before readiness. Podcast, episode, gallery, article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast series and episodes now have explicit Studio publishing, required ready audio and transcripts, chapter metadata, indexed Mongo persistence, a public accessible player and Podcasting 2.0 RSS feed. Galleries, article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
 | Newsroom intelligence | Operational workflow KPIs, moderation counts, language publication charts, GA consent/instrumentation and privacy-safe unique-reader ranking exist. Traffic, acquisition, author/category performance, newsletter growth, retention, search and revenue dashboards do not. | **PARTIAL — R5** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
@@ -246,7 +246,7 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_admin_ai_content_editor` | `/studio/articles/{id}` | ✅ KUR-41 — two-pane workspace with a tabbed co-pilot |
 | `social_media_publishing_kurasikapa_admin` | `/studio/social` | ✅ KUR-33 — queue + compose (calendar design not copied; send path needs Meta) |
 | `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |
-| `kurasikapa_media_podcast_library` | — | ❌ no route (R3) |
+| `kurasikapa_media_podcast_library` | `/podcasts` | ✅ accessible series/episode library, chapters, transcripts and RSS feed (KUR-76; release pending) |
 | `kurasikapa_media_live_tv_gallery` | — | ❌ no route (R3) |
 | `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
 | `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
@@ -350,9 +350,14 @@ ready assets in Mongo. It covers image, video, audio, caption, transcript and
 document files, requires image alt text, and fails closed without provider
 credentials. Production promotion and credentials remain active.
 
+Podcast publishing is now implemented end to end: Studio creates and explicitly
+publishes series and episodes, publication requires ready audio and transcript
+assets, chapters are validated against duration, Mongo indexes the public
+library, and the public site renders a native accessible player plus a
+Podcasting 2.0 RSS feed with transcript metadata. Production release remains.
+
 Still unbuilt: attaching assets to articles, VOD processing, video and image
-galleries, podcast library with chapters/transcripts, article-to-audio (TTS) and
-voice-to-article.
+galleries, article-to-audio (TTS) and voice-to-article.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;
@@ -960,3 +965,24 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Production now has the 14 root-level bilingual section records. They were
   written through an idempotent, one-use secret-protected seed and the route
   and secret were removed immediately afterward.
+
+## 16. KUR-76 — accessible podcast publishing (2026-08-31)
+
+**Status: CODE COMPLETE — all local gates green; production release pending.**
+
+- Go domain and application layers now own podcast series and episodes behind
+  separate repository ports. Series publication is explicit; episode
+  publication requires ready audio and transcript assets, and chapters must be
+  ordered inside the recording duration.
+- Mongo repositories round-trip series, episodes, artwork and chapters and
+  provide named public-library indexes. Authenticated API commands and the
+  public locale library are wired through the Go composition root.
+- Studio has a dedicated podcast manager with branded asset choices, explicit
+  busy/disabled feedback, chapter entry and meaningful empty states. The public
+  site has a bilingual podcast route, native audio controls, transcript links,
+  chapters and a Podcasting 2.0 RSS feed.
+- Evidence: `pnpm verify` is green; the clean Go race/coverage gate reports
+  domain 96.6% and application/HTTP 90.1%; real-Mongo adapter integration is
+  green; the editorial transition completes in 6.9s under Playwright; and the
+  new `/en/podcasts` route has no axe WCAG 2.2 AA violations. Production smoke
+  remains before this status can move to deployed.

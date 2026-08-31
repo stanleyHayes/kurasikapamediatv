@@ -60,7 +60,7 @@ erDiagram
 | `role_assignments` | our RBAC, keyed by the auth user id | `roles[]` |
 | `user` `session` `account` `verification` | Better Auth | managed by the library — **do not hand-edit**. Roles live in `role_assignments`, ours. |
 | `media_assets` | signed Cloudinary uploads for images, video, audio, captions, transcripts and documents | `kind`, `status`, `providerId`, `secureUrl`, `altText`, `caption`, `locale`, dimensions and duration |
-| `podcasts` / `episodes` | audio series | `episodes.assetId`, `duration`, `transcript` |
+| `podcasts` / `episodes` | publishable audio series and accessible episodes | locale, slug, artwork; `audioAssetId`, `transcriptAssetId`, `durationSeconds`, ordered chapters, `publishedAt` |
 | `live_streams` | Live TV | `providerStreamId`, `state`, `startedAt`, `viewerPeak` |
 | `social_posts` | outbound queue | `articleId`, `platform`, `caption`, `scheduledAt`, `state`, `attempts` |
 | `newsletter_subscribers` | digests | `email`, `locales[]`, `cadence`, `confirmedAt` |
@@ -100,6 +100,8 @@ db.audit_logs.createIndex({ entity: 1, entityId: 1, at: -1 })
 
 // Studio media library
 db.media_assets.createIndex({ locale: 1, status: 1, _id: -1 })
+db.podcasts.createIndex({ locale: 1, published: 1, _id: -1 })
+db.episodes.createIndex({ podcastId: 1, published: 1, publishedAt: -1, _id: -1 })
 
 // reader activity
 db.bookmarks.createIndex({ readerId: 1, articleId: 1 }, { unique: true })
