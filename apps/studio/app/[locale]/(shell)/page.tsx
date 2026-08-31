@@ -56,7 +56,7 @@ export default async function StudioPage({
 
   // Never cached. A CMS showing an editor stale workflow state is worse than a
   // slower one — they would act on it.
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   const drafts = (
     await loadAuthoredPipeline(actor, async () => {
       const page = await container().listAuthoredArticles.execute({ actor })

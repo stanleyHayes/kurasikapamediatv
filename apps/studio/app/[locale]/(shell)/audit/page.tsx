@@ -22,7 +22,7 @@ export default async function AuditPage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
 
   const page = await container()
     .readAuditLog.execute({ actor })

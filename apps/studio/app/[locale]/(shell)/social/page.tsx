@@ -41,7 +41,7 @@ export default async function SocialPage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
 
   // Convenience, not security: QueueSocialPost re-checks this, so a
   // hand-crafted POST is refused whatever the UI decides to render.

@@ -28,7 +28,7 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
   const { locale, id } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   const draft = await loadStudioDraft(actor, id).catch((error: unknown) => {
     if (error instanceof ArticleNotFound) notFound()
     throw error

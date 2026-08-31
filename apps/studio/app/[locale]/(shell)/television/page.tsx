@@ -7,7 +7,7 @@ import { loadTelevisionGuide } from '@kurasikapa/web-kit/bff/television'
 export default async function TelevisionPage({ params }: { params: Promise<{ locale: string }> }): Promise<React.ReactElement> {
   const { locale } = await params
   setRequestLocale(locale)
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   if (!actor.can('stream:manage')) throw new Error('Not permitted to manage television programming')
   const guide = await loadTelevisionGuide(locale, async () => {
     const loaded = await container().listTelevisionGuide.execute({ locale, from: new Date() })

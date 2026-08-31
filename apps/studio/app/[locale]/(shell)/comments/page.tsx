@@ -14,7 +14,7 @@ export default async function CommentsQueuePage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   const page = await container()
     .listPendingComments.execute({ actor })
     .catch((error: unknown) => {

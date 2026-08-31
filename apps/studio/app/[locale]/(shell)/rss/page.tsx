@@ -13,7 +13,7 @@ export default async function RssPage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   if (!actor.can('article:publish')) redirect(`/${locale}`)
 
   const [sources, sections] = await Promise.all([

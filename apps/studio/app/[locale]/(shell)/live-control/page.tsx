@@ -6,7 +6,7 @@ import { container } from '@kurasikapa/web-kit/composition/container'
 export default async function LiveControlPage({ params }: { params: Promise<{ locale: string }> }): Promise<React.ReactElement> {
   const { locale } = await params
   setRequestLocale(locale)
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   const current = await container().getCurrentBroadcast.execute({ locale })
   const history = await container().listBroadcasts.execute({ actor, locale, limit: 10 })
 

@@ -1,10 +1,13 @@
 import { assertUsable, type Actor } from '@kurasikapa/domain'
+import type { Route } from 'next'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { systemClock } from './ambient'
 import { authGraph } from './auth-graph'
 import { container } from './container'
 import { env } from './env'
 import { accessCookieName } from './session-cookies'
+import { studioUrl } from './origins'
 
 /**
  * The bridge between authentication and authorisation.
@@ -65,8 +68,11 @@ export class NotSignedIn extends Error {
  * For Server Actions that cannot proceed anonymously. Throws rather than
  * returning null, so a caller cannot forget the check and pass `null` onward.
  */
-export async function requireActor(): Promise<Actor> {
+export async function requireActor(studioLocale?: string): Promise<Actor> {
   const actor = await currentActor()
+  if (actor === null && studioLocale !== undefined) {
+    redirect(`${studioUrl(env())}/${studioLocale}/sign-in` as Route)
+  }
   if (actor === null) throw new NotSignedIn()
 
   return actor

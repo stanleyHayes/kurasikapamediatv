@@ -10,7 +10,7 @@ const period = (value: string | undefined): 7 | 30 | 90 => value === '7' || valu
 export default async function AnalyticsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ days?: string }> }): Promise<React.ReactElement> {
   const [{ locale }, query] = await Promise.all([params, searchParams])
   setRequestLocale(locale)
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
   const days = period(query.days)
   const report = await container().buildNewsroomReport.execute({ actor, days }).catch((error: unknown) => {
     if (error instanceof NotPermitted) redirect(`/${locale}`)

@@ -43,7 +43,7 @@ export default async function PeoplePage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
 
   const page = await container()
     .listUsers.execute({ actor })

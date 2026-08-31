@@ -15,7 +15,7 @@ export default async function ReviewQueuePage({
   const { locale } = await params
   setRequestLocale(locale)
 
-  const actor = await requireActor()
+  const actor = await requireActor(locale)
 
   const queue = await loadReviewQueue(actor, async () => {
     const page = await container().listAwaitingReview.execute({ actor })
