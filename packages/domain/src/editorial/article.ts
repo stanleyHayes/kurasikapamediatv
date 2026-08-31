@@ -1,5 +1,5 @@
 import { type Actor, requirePermission } from '../identity/actor'
-import type { ArticleId, CategoryId, FamilyId, RevisionId, TagId, UserId } from '../shared/ids'
+import type { ArticleId, AssetId, CategoryId, FamilyId, RevisionId, TagId, UserId } from '../shared/ids'
 import type { Slug } from '../shared/slug'
 import { type ArticleStatus, type Transition, isAllowedFrom, ruleFor } from './article-status'
 import {
@@ -20,10 +20,21 @@ export interface ArticleProps {
   readonly authorId: UserId
   readonly categoryId: CategoryId
   readonly tagIds: readonly TagId[]
+  readonly hero?: ArticleHero | null
   readonly status: ArticleStatus
   readonly approvedRevisionId: RevisionId | null
   readonly scheduledAt: Date | null
   readonly publishedAt: Date | null
+}
+
+export interface ArticleHero {
+  readonly assetId: AssetId
+  readonly secureUrl: string
+  readonly altText: string
+  readonly caption: string
+  readonly credit: string
+  readonly width: number
+  readonly height: number
 }
 
 /** What a caller supplies to create a draft. Everything else is derived. */
@@ -60,6 +71,7 @@ export class Article {
     return new Article({
       ...input,
       tagIds: input.tagIds ?? [],
+      hero: null,
       authorId: actor.id,
       status: 'draft',
       approvedRevisionId: null,

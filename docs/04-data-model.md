@@ -53,7 +53,7 @@ erDiagram
 
 | Collection | Purpose | Notable fields |
 |---|---|---|
-| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
+| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `hero`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
 | `article_revisions` | immutable history | `articleId`, `seq`, `body`, `authorId`, `createdAt` |
 | `categories` | hierarchy | `parentId`, `slugs{locale}`, `names{locale}`, `order` |
 | `tags` | flat | `slug`, `names{locale}`, `usageCount` |
@@ -176,6 +176,16 @@ Embeddings are written by `media-svc` on publish, not on save — drafts change 
 
 - **`_id` is our own id string**, not an `ObjectId`. Ids are minted by `IdPort`, so the domain owns identity and an exported document still means something.
 - **`articles.updatedAt`** exists only so the CMS can sort "my drafts" by recency. No business rule reads it, so it is not on the `Article` entity — the repository stamps it from an injected `ClockPort`, which keeps it deterministic in tests.
+
+### Credited article hero snapshot
+
+`articles.hero` stores the selected ready image's `assetId`, immutable delivery URL,
+alt text, caption, credit and dimensions. The article keeps this publish-time
+snapshot so its byline media remains attributable and renderable even if the
+media-library record is later reorganised. Studio may attach only a ready image
+from the article's locale (or a locale-neutral asset); the domain requires an
+HTTPS delivery URL, useful alternative text, a visible credit and positive
+dimensions.
 
 ## 5. Consistency rules
 

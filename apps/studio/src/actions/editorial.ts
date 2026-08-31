@@ -5,12 +5,14 @@ import { createDraft } from '@kurasikapa/web-kit/bff/create-draft-path'
 import { publishArticle } from '@kurasikapa/web-kit/bff/publish-path'
 import { transitionArticle } from '@kurasikapa/web-kit/bff/transition-path'
 import { updateDraft } from '@kurasikapa/web-kit/bff/update-draft-path'
+import { attachArticleHero } from '@kurasikapa/web-kit/bff/media-library'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { type ActionResult, attempt } from '@kurasikapa/web-kit/actions/result'
 import {
   approveSchema,
+  attachArticleHeroSchema,
   articleRefSchema,
   createDraftSchema,
   parseInput,
@@ -19,6 +21,7 @@ import {
   unpublishSchema,
   updateDraftSchema,
 } from '@kurasikapa/web-kit/actions/schemas'
+import type { ArticleHeroView } from '@kurasikapa/web-kit/read-model/article-view'
 
 /**
  * Editorial Server Actions: parse → Actor → use case → result.
@@ -59,6 +62,16 @@ export async function updateDraftAction(
       env().API_URL,
       (args) => container().updateDraft.execute(args),
     )
+  })
+}
+
+export async function attachArticleHeroAction(input: unknown): Promise<ActionResult<ArticleHeroView>> {
+  return attempt(async () => {
+    const parsed = parseInput(attachArticleHeroSchema, input)
+    const actor = await requireActor()
+    return attachArticleHero(actor, parsed.articleId, {
+      assetId: parsed.assetId, caption: parsed.caption, credit: parsed.credit,
+    })
   })
 }
 

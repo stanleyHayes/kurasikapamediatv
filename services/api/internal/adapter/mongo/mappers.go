@@ -31,6 +31,14 @@ func articleToDomain(doc articleDoc) editorial.Article {
 	for _, t := range doc.TagIDs {
 		tags = append(tags, shared.TagID(t))
 	}
+	var hero *editorial.ArticleHero
+	if doc.Hero != nil {
+		hero = &editorial.ArticleHero{
+			AssetID: shared.AssetID(doc.Hero.AssetID), SecureURL: doc.Hero.SecureURL,
+			AltText: doc.Hero.AltText, Caption: doc.Hero.Caption, Credit: doc.Hero.Credit,
+			Width: doc.Hero.Width, Height: doc.Hero.Height,
+		}
+	}
 
 	return editorial.Reconstitute(editorial.ArticleState{
 		ID:                 shared.ArticleID(doc.ID),
@@ -41,6 +49,7 @@ func articleToDomain(doc articleDoc) editorial.Article {
 		AuthorID:           shared.UserID(doc.AuthorID),
 		CategoryID:         shared.CategoryID(doc.CategoryID),
 		TagIDs:             tags,
+		Hero:               hero,
 		Status:             editorial.Status(doc.Status),
 		ApprovedRevisionID: approved,
 		ScheduledAt:        doc.ScheduledAt,
@@ -64,6 +73,14 @@ func articleToDoc(article editorial.Article, updatedAt time.Time) articleDoc {
 	for _, t := range s.TagIDs {
 		tags = append(tags, t.String())
 	}
+	var hero *articleHeroDoc
+	if s.Hero != nil {
+		hero = &articleHeroDoc{
+			AssetID: s.Hero.AssetID.String(), SecureURL: s.Hero.SecureURL,
+			AltText: s.Hero.AltText, Caption: s.Hero.Caption, Credit: s.Hero.Credit,
+			Width: s.Hero.Width, Height: s.Hero.Height,
+		}
+	}
 
 	return articleDoc{
 		ID:                 s.ID.String(),
@@ -74,6 +91,7 @@ func articleToDoc(article editorial.Article, updatedAt time.Time) articleDoc {
 		AuthorID:           s.AuthorID.String(),
 		CategoryID:         s.CategoryID.String(),
 		TagIDs:             tags,
+		Hero:               hero,
 		Status:             string(s.Status),
 		ApprovedRevisionID: approved,
 		ScheduledAt:        s.ScheduledAt,

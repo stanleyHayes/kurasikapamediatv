@@ -1,4 +1,5 @@
 import type { DraftView } from '../read-model/studio-view'
+import type { ArticleHeroView } from '../read-model/article-view'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -13,6 +14,7 @@ export interface StudioArticleDto {
   readonly publishedAt: string | null
   readonly scheduledAt: string | null
   readonly excerpt: string | null
+  readonly hero: ArticleHeroView | null
 }
 
 export interface RevisionDto {
@@ -42,6 +44,13 @@ function instant(value: unknown): string | null {
   return typeof value === 'string' && value !== '' ? value : null
 }
 
+function hero(value: unknown): ArticleHeroView | null {
+  const row = asRecord(value)
+  const assetId = text(row['assetId'])
+  if (assetId === '') return null
+  return { assetId, secureUrl: text(row['secureUrl']), altText: text(row['altText']), caption: text(row['caption']), credit: text(row['credit']), width: Number(row['width']) || 0, height: Number(row['height']) || 0 }
+}
+
 export function studioArticleFrom(raw: unknown): StudioArticleDto {
   const body = asRecord(raw)
   return {
@@ -55,6 +64,7 @@ export function studioArticleFrom(raw: unknown): StudioArticleDto {
     publishedAt: instant(body['publishedAt']),
     scheduledAt: instant(body['scheduledAt']),
     excerpt: typeof body['excerpt'] === 'string' ? body['excerpt'] : null,
+    hero: hero(body['hero']),
   }
 }
 

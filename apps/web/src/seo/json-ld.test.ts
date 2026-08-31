@@ -12,6 +12,7 @@ const article: ArticleView = {
   title: 'Budget 2026 Explained',
   categoryId: 'cat_business',
   publishedAt: '2026-08-08T10:00:00.000Z',
+  hero: null,
 }
 
 describe('newsArticleJsonLd', () => {

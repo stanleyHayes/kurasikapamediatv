@@ -24,6 +24,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		IDs:       &faketesting.SequentialIDs{},
 	}
 	assets := faketesting.NewAssetStore()
+	app.Assets = assets
 	mediaDeps.Assets = assets
 	uploads := &faketesting.MediaUploadFake{Ticket: ports.UploadTicket{
 		URL: "https://api.cloudinary.test/upload", APIKey: "key", Signature: "signature",
@@ -40,6 +41,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	return kurahttp.Deps{
 		CreateDraft:                appeditorial.NewCreateDraft(app),
 		UpdateDraft:                appeditorial.NewUpdateDraft(app),
+		AttachArticleHero:          appeditorial.NewAttachArticleHero(app),
 		GetDraft:                   appeditorial.NewGetDraft(app),
 		ListAuthoredArticles:       appeditorial.NewListAuthoredArticles(app),
 		ListAwaitingReview:         appeditorial.NewListAwaitingReview(app),

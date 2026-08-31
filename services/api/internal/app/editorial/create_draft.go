@@ -34,6 +34,7 @@ type Deps struct {
 	Articles   ports.ArticleRepository
 	Revisions  ports.RevisionRepository
 	Categories ports.CategoryRepository
+	Assets     ports.AssetRepository
 	Clock      ports.Clock
 	IDs        ports.IDs
 	Events     ports.EventBus

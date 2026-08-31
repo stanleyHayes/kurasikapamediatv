@@ -1,4 +1,4 @@
-import { Slug, articleId, categoryId, familyId, revisionId, userId } from '@kurasikapa/domain'
+import { Slug, articleId, assetId, categoryId, familyId, revisionId, userId } from '@kurasikapa/domain'
 import { anArticle } from '@kurasikapa/domain/testing'
 import { describe, expect, it } from 'vitest'
 import { toArticleView } from './article-view'
@@ -16,6 +16,7 @@ describe('toArticleView', () => {
       title: 'Budget 2026',
       categoryId: 'cat_business',
       publishedAt: '2026-08-08T10:00:00.000Z',
+      hero: null,
     })
   })
 
@@ -30,6 +31,11 @@ describe('toArticleView', () => {
 
   it('represents an unpublished article with a null date, not an invalid one', () => {
     expect(toArticleView(anArticle()).publishedAt).toBeNull()
+  })
+
+  it('serialises the credited lead image snapshot', () => {
+    const hero = { assetId: assetId('asset_1'), secureUrl: 'https://cdn.test/report.jpg', altText: 'A market reporter', caption: 'Reporting at Makola.', credit: 'Kurasikapa / Ama', width: 1600, height: 900 }
+    expect(toArticleView(anArticle({ hero })).hero).toEqual(hero)
   })
 
   it('keeps a non-ASCII slug intact', () => {

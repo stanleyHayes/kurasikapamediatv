@@ -39,6 +39,7 @@ type Article struct {
 	authorID           shared.UserID
 	categoryID         shared.CategoryID
 	tagIDs             []shared.TagID
+	hero               *ArticleHero
 	status             Status
 	approvedRevisionID *shared.RevisionID
 	scheduledAt        *time.Time
@@ -55,6 +56,7 @@ type ArticleState struct {
 	AuthorID           shared.UserID
 	CategoryID         shared.CategoryID
 	TagIDs             []shared.TagID
+	Hero               *ArticleHero
 	Status             Status
 	ApprovedRevisionID *shared.RevisionID
 	ScheduledAt        *time.Time
@@ -70,7 +72,7 @@ func Reconstitute(s ArticleState) Article {
 	return Article{
 		id: s.ID, familyID: s.FamilyID, locale: s.Locale, slug: s.Slug,
 		title: s.Title, authorID: s.AuthorID, categoryID: s.CategoryID,
-		tagIDs: s.TagIDs, status: s.Status,
+		tagIDs: s.TagIDs, hero: s.Hero, status: s.Status,
 		approvedRevisionID: s.ApprovedRevisionID,
 		scheduledAt:        s.ScheduledAt, publishedAt: s.PublishedAt,
 	}
@@ -81,7 +83,7 @@ func (a Article) State() ArticleState {
 	return ArticleState{
 		ID: a.id, FamilyID: a.familyID, Locale: a.locale, Slug: a.slug,
 		Title: a.title, AuthorID: a.authorID, CategoryID: a.categoryID,
-		TagIDs: a.tagIDs, Status: a.status,
+		TagIDs: a.tagIDs, Hero: a.hero, Status: a.status,
 		ApprovedRevisionID: a.approvedRevisionID,
 		ScheduledAt:        a.scheduledAt, PublishedAt: a.publishedAt,
 	}

@@ -76,6 +76,7 @@ func problemFor(err error) Problem {
 		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
 
 	case errors.Is(err, domainmedia.ErrInvalidAssetKind),
+		errors.Is(err, editorial.ErrInvalidArticleHero),
 		errors.Is(err, domainmedia.ErrEmptyAssetFilename),
 		errors.Is(err, domainmedia.ErrImageNeedsAltText),
 		errors.Is(err, domainmedia.ErrInvalidAssetDelivery),
@@ -118,6 +119,7 @@ func problemFor(err error) Problem {
 		errors.Is(err, appmedia.ErrGalleryCaptionNotReady),
 		errors.Is(err, appmedia.ErrEpisodeAudioNotReady),
 		errors.Is(err, appmedia.ErrTranscriptNotReady),
+		errors.Is(err, appeditorial.ErrHeroAssetNotUsable),
 		errors.Is(err, domainrevenue.ErrCampaignEnded):
 		// 409: the request is well-formed and the article is simply not in a
 		// state where it can happen. 400 would suggest the caller sent

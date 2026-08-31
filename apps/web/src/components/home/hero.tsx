@@ -1,7 +1,7 @@
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import type { CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { ArticleMeta } from '@/components/story/article-meta'
-import { StoryBanner } from '@/components/story/story-banner'
+import { StoryVisual } from '@/components/story/story-visual'
 
 export function Hero({ article }: { article: CardArticleView }): React.ReactElement {
   return (
@@ -25,7 +25,7 @@ export function Hero({ article }: { article: CardArticleView }): React.ReactElem
               <div className="mt-8"><ArticleMeta article={article} /></div>
             </div>
           </div>
-          <div className="border-t-2 border-on-surface lg:border-l-2 lg:border-t-0"><StoryBanner categoryId={article.categoryId} large /></div>
+          <div className="border-t-2 border-on-surface lg:border-l-2 lg:border-t-0"><StoryVisual article={article} large /></div>
         </div>
       </article>
     </section>

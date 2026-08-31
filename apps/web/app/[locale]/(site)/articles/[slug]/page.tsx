@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   if (article === null) return { title: 'Not found', robots: { index: false } }
 
-  const socialImage = `/og-image?title=${encodeURIComponent(article.title)}`
+  const social = socialCard(article)
 
   return {
     title: article.title,
@@ -38,11 +39,18 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       type: 'article',
       title: article.title,
       locale,
-      images: [{ url: socialImage, width: 1200, height: 630, alt: article.title }],
+      images: [social],
       ...(article.publishedAt !== null ? { publishedTime: article.publishedAt } : {}),
     },
-    twitter: { card: 'summary_large_image', title: article.title, images: [socialImage] },
+    twitter: { card: 'summary_large_image', title: article.title, images: [social.url] },
   }
+}
+
+function socialCard(article: ReadableArticle): { url: string; width: number; height: number; alt: string } {
+  if (article.hero === null) {
+    return { url: `/og-image?title=${encodeURIComponent(article.title)}`, width: 1200, height: 630, alt: article.title }
+  }
+  return { url: article.hero.secureUrl, width: article.hero.width, height: article.hero.height, alt: article.hero.altText }
 }
 
 /**
@@ -99,7 +107,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
   if (article === null) notFound()
 
   const canonical = `${env().APP_URL}/${locale}/articles/${article.slug}`
-  const socialImage = `${env().APP_URL}/og-image?title=${encodeURIComponent(article.title)}`
+  const socialImage = article.hero?.secureUrl ?? `${env().APP_URL}/og-image?title=${encodeURIComponent(article.title)}`
   const jsonLd = newsArticleJsonLd(
     article,
     { name: 'Kurasikapa Media TV', url: env().APP_URL },
@@ -118,6 +126,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
       />
 
       <ArticleHeader article={article} />
+      {article.hero !== null && <ArticleHero hero={article.hero} />}
       <div className="mx-auto max-w-[var(--container-page)] border-x-2 border-b-2 border-on-surface">
         <StoryBanner categoryId={article.categoryId} />
       </div>
@@ -130,6 +139,10 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
       </div>
     </article>
   )
+}
+
+function ArticleHero({ hero }: { hero: NonNullable<ReadableArticle['hero']> }): React.ReactElement {
+  return <figure className="mx-auto max-w-[var(--container-page)] border-x-2 border-on-surface bg-inverse-surface"><div className="relative aspect-[16/9] overflow-hidden"><Image src={hero.secureUrl} alt={hero.altText} fill priority sizes="(min-width:1280px) 1200px, 100vw" className="object-cover" /></div><figcaption className="flex flex-wrap justify-between gap-2 border-t border-white/20 px-4 py-3 text-xs text-white/75 md:px-8"><span>{hero.caption}</span><strong className="text-white">{hero.credit}</strong></figcaption></figure>
 }
 
 function ArticleRail({ article }: { article: ReadableArticle }): React.ReactElement {

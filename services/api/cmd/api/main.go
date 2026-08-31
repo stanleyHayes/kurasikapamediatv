@@ -139,6 +139,7 @@ func run(log *slog.Logger) error {
 		Articles:   articles,
 		Revisions:  revisions,
 		Categories: categories,
+		Assets:     assets,
 		Clock:      clock,
 		IDs:        uuidIDs{},
 		Events:     loggingBus{log: log},
@@ -157,6 +158,7 @@ func run(log *slog.Logger) error {
 	handler := kurahttp.NewRouter(kurahttp.Deps{
 		CreateDraft:                appeditorial.NewCreateDraft(deps),
 		UpdateDraft:                appeditorial.NewUpdateDraft(deps),
+		AttachArticleHero:          appeditorial.NewAttachArticleHero(deps),
 		GetDraft:                   appeditorial.NewGetDraft(deps),
 		ListAuthoredArticles:       appeditorial.NewListAuthoredArticles(deps),
 		ListAwaitingReview:         appeditorial.NewListAwaitingReview(deps),

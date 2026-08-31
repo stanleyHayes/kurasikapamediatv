@@ -19,6 +19,13 @@ export const createDraftSchema = z.object({
 
 export const articleRefSchema = z.object({ articleId: id })
 
+export const attachArticleHeroSchema = z.object({
+  articleId: id,
+  assetId: id,
+  caption: z.string().trim().max(500),
+  credit: z.string().trim().min(1).max(200),
+})
+
 export const subscribePushSchema = z.object({
   endpoint: z.url(),
   p256dh: z.string().trim().min(1).max(500),

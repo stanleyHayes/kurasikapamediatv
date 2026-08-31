@@ -11,6 +11,7 @@ import (
 	faketesting "github.com/kurasikapa/api/internal/app/testing"
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
+	"github.com/kurasikapa/api/internal/domain/media"
 	"github.com/kurasikapa/api/internal/domain/shared"
 )
 
@@ -33,6 +34,7 @@ type harness struct {
 	articles   *faketesting.ArticleStore
 	revisions  *faketesting.RevisionStore
 	categories *faketesting.CategoryStore
+	assets     *faketesting.AssetStore
 	events     *faketesting.RecordingEventBus
 }
 
@@ -41,17 +43,59 @@ func newHarness(seed ...editorial.Article) harness {
 	revisions := faketesting.NewRevisionStore()
 	categories := faketesting.NewCategoryStore()
 	events := &faketesting.RecordingEventBus{}
+	assets := faketesting.NewAssetStore()
 
 	return harness{
 		deps: app.Deps{
 			Articles:   articles,
 			Revisions:  revisions,
 			Categories: categories,
+			Assets:     assets,
 			Clock:      faketesting.FixedClock{At: now},
 			IDs:        &faketesting.SequentialIDs{},
 			Events:     events,
 		},
-		articles: articles, revisions: revisions, categories: categories, events: events,
+		articles: articles, revisions: revisions, categories: categories, assets: assets, events: events,
+	}
+}
+
+func TestAttachArticleHeroUsesOnlyReadyLocalisedImages(t *testing.T) {
+	t.Parallel()
+
+	slug, _ := shared.NewSlug("market-report")
+	article := editorial.Reconstitute(editorial.ArticleState{
+		ID: "art_hero", FamilyID: "family_hero", Locale: "en", Slug: slug,
+		Title: "Market report", AuthorID: author().ID(), Status: editorial.StatusDraft,
+	})
+	asset := media.ReconstituteAsset(media.AssetState{
+		ID: "asset_1", Kind: media.AssetImage, Locale: "en", Status: media.AssetReady,
+		SecureURL: "https://res.cloudinary.com/demo/image/upload/report.jpg",
+		AltText:   "A reporter interviewing traders", Width: 1600, Height: 900,
+	})
+	h := newHarness(article)
+	h.assets.Items[asset.ID()] = asset
+
+	got, err := app.NewAttachArticleHero(h.deps).Execute(context.Background(), app.AttachArticleHeroInput{
+		Actor: author(), ArticleID: article.ID(), AssetID: asset.ID(),
+		Caption: "Traders discuss food prices.", Credit: "Kurasikapa / Ama Mensah",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.AssetID != asset.ID().String() || got.Credit == "" {
+		t.Fatalf("hero = %+v", got)
+	}
+
+	wrong := media.ReconstituteAsset(media.AssetState{
+		ID: "asset_2", Kind: media.AssetVideo, Locale: "en", Status: media.AssetReady,
+		SecureURL: "https://res.cloudinary.com/demo/video/upload/report.mp4",
+	})
+	h.assets.Items[wrong.ID()] = wrong
+	_, err = app.NewAttachArticleHero(h.deps).Execute(context.Background(), app.AttachArticleHeroInput{
+		Actor: author(), ArticleID: article.ID(), AssetID: wrong.ID(), Credit: "Newsroom",
+	})
+	if !errors.Is(err, app.ErrHeroAssetNotUsable) {
+		t.Fatalf("video hero error = %v, want ErrHeroAssetNotUsable", err)
 	}
 }
 

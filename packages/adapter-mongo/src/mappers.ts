@@ -8,6 +8,7 @@ import {
   revisionId,
   tagId,
   userId,
+  assetId,
 } from '@kurasikapa/domain'
 import type { ArticleDocument, RevisionDocument } from './documents'
 
@@ -27,6 +28,7 @@ export const articleToDomain = (doc: ArticleDocument): Article =>
     authorId: userId(doc.authorId),
     categoryId: categoryId(doc.categoryId),
     tagIds: doc.tagIds.map(tagId),
+    hero: doc.hero === undefined ? null : { ...doc.hero, assetId: assetId(doc.hero.assetId) },
     status: doc.status,
     approvedRevisionId: doc.approvedRevisionId === null ? null : revisionId(doc.approvedRevisionId),
     scheduledAt: doc.scheduledAt,
@@ -45,6 +47,7 @@ export const articleToDocument = (article: Article, updatedAt: Date): ArticleDoc
     authorId: props.authorId,
     categoryId: props.categoryId,
     tagIds: [...props.tagIds],
+    ...(props.hero === undefined || props.hero === null ? {} : { hero: props.hero }),
     status: props.status,
     approvedRevisionId: props.approvedRevisionId,
     scheduledAt: props.scheduledAt,

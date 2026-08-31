@@ -1,4 +1,4 @@
-import type { ArticleView } from '../read-model/article-view'
+import type { ArticleHeroView, ArticleView } from '../read-model/article-view'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -10,6 +10,7 @@ export interface PublicArticleDto {
   readonly categoryId: string
   readonly publishedAt: string | null
   readonly authorName?: string | null | undefined
+  readonly hero: ArticleHeroView | null
 }
 
 export interface PublishedDto {
@@ -44,6 +45,17 @@ function instant(value: unknown): string | null {
   return typeof value === 'string' && value !== '' ? value : null
 }
 
+function hero(value: unknown): ArticleHeroView | null {
+  const row = asRecord(value)
+  const assetId = text(row['assetId'])
+  const secureUrl = text(row['secureUrl'])
+  if (assetId === '' || secureUrl === '') return null
+  return {
+    assetId, secureUrl, altText: text(row['altText']), caption: text(row['caption']),
+    credit: text(row['credit']), width: Number(row['width']) || 0, height: Number(row['height']) || 0,
+  }
+}
+
 export function publicArticleFrom(raw: unknown): PublicArticleDto {
   const body = asRecord(raw)
   return {
@@ -53,6 +65,7 @@ export function publicArticleFrom(raw: unknown): PublicArticleDto {
     title: text(body['title']),
     categoryId: text(body['categoryId']),
     publishedAt: instant(body['publishedAt']),
+    hero: hero(body['hero']),
   }
 }
 
@@ -64,6 +77,7 @@ export function toArticleViewFromDto(dto: PublicArticleDto): ArticleView {
     title: dto.title,
     categoryId: dto.categoryId,
     publishedAt: dto.publishedAt,
+    hero: dto.hero,
   }
 }
 

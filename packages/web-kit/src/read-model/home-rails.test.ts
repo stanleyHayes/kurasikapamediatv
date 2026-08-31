@@ -9,6 +9,7 @@ const story = (id: string): CardArticleView => ({
   title: id,
   categoryId: 'cat_news',
   publishedAt: '2026-08-11T10:00:00.000Z',
+  hero: null,
   excerpt: 'Opening copy.',
   readingMinutes: 2,
 })

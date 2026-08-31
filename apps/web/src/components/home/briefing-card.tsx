@@ -1,7 +1,7 @@
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import type { CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { ArticleMeta } from '@/components/story/article-meta'
-import { StoryBanner } from '@/components/story/story-banner'
+import { StoryVisual } from '@/components/story/story-visual'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 
@@ -16,7 +16,7 @@ export function BriefingCard({ article, index = 0 }: { article: CardArticleView;
   return (
     <article className="editorial-card reveal group flex h-full flex-col border border-outline-variant bg-surface-container-lowest">
       <Link href={`/articles/${article.slug}`} className="flex h-full flex-col">
-        <StoryBanner categoryId={article.categoryId} />
+        <StoryVisual article={article} />
 
         <div className="flex flex-grow flex-col p-6">
           <div className="mb-4 flex items-center justify-between"><span className="broadcast-kicker text-secondary-ink">{section(article.categoryId)}</span><span className="text-[10px] font-bold text-on-surface-variant">0{index + 2}</span></div>

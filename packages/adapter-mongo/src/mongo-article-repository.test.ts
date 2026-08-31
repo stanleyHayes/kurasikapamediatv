@@ -1,4 +1,4 @@
-import { articleId, revisionId, userId } from '@kurasikapa/domain'
+import { articleId, assetId, revisionId, userId } from '@kurasikapa/domain'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { ARTICLES, type ArticleDocument } from './documents'
 import { MongoArticleRepository } from './mongo-article-repository'
@@ -33,6 +33,7 @@ describe('round trip', () => {
       status: 'scheduled',
       scheduledAt: at('2026-09-01T08:00:00Z'),
       approvedRevisionId: null,
+      hero: { assetId: assetId('asset_1'), secureUrl: 'https://cdn.test/report.jpg', altText: 'A reporter', caption: 'At Makola.', credit: 'Kurasikapa / Ama', width: 1600, height: 900 },
     })
     await repo.save(original)
 

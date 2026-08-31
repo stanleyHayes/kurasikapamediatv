@@ -1,7 +1,7 @@
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import type { ArticleView, CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { ArticleMeta } from './story/article-meta'
-import { StoryBanner } from './story/story-banner'
+import { StoryVisual } from './story/story-visual'
 
 /**
  * Regal Precision: border-heavy rather than shadow-heavy, tonal surface shift
@@ -13,7 +13,7 @@ export function ArticleCard({ article }: { article: CardInput }): React.ReactEle
   return (
     <article className="group editorial-card h-full border border-outline-variant bg-surface-container-lowest transition-colors hover:border-primary">
       <Link href={`/articles/${article.slug}`} className="flex h-full flex-col">
-        <StoryBanner categoryId={article.categoryId} />
+        <StoryVisual article={article} />
         <div className="flex flex-1 flex-col p-6">
           <div className="broadcast-kicker mb-4 text-secondary-ink">{article.categoryId.replace(/^cat_/u, '')}</div>
           <h3 className="font-display text-[1.65rem] leading-[1.05] text-on-surface transition-colors group-hover:text-primary">{article.title}</h3>

@@ -29,6 +29,10 @@ func TestSignedAssetUploadWorkflow(t *testing.T) {
 	if err != nil || len(listed) != 1 {
 		t.Fatal(err)
 	}
+	author := identity.NewActor("author", []identity.Role{identity.RoleAuthor})
+	if _, err := appmedia.NewListAssets(assets).Execute(context.Background(), author, "en", 20); err != nil {
+		t.Fatalf("article authors must be able to choose verified media: %v", err)
+	}
 }
 
 func TestAssetUseCasesFailClosed(t *testing.T) {

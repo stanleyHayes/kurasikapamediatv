@@ -65,7 +65,9 @@ type ListAssets struct{ assets ports.AssetRepository }
 
 func NewListAssets(assets ports.AssetRepository) ListAssets { return ListAssets{assets} }
 func (u ListAssets) Execute(ctx context.Context, actor identity.Actor, locale string, limit int) ([]domainmedia.Asset, error) {
-	if err := actor.Require(identity.PermAssetUploadImage); err != nil && actor.Require(identity.PermAssetUploadVideo) != nil {
+	if err := actor.Require(identity.PermArticleEditOwn); err != nil &&
+		actor.Require(identity.PermAssetUploadImage) != nil &&
+		actor.Require(identity.PermAssetUploadVideo) != nil {
 		return nil, err
 	}
 	return u.assets.List(ctx, locale, limit)

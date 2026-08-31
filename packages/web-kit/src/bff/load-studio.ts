@@ -12,6 +12,7 @@ import {
   type RevisionDto,
 } from './studio'
 import type { DraftView, RevisionView } from '../read-model/studio-view'
+import type { ArticleHeroView } from '../read-model/article-view'
 
 export interface StudioDraft {
   readonly id: string
@@ -22,6 +23,7 @@ export interface StudioDraft {
   readonly familyId: string
   readonly categoryId: string
   readonly revisions: readonly RevisionView[]
+  readonly hero: ArticleHeroView | null
 }
 
 function rethrow(error: unknown, articleId: string): never {
@@ -69,6 +71,7 @@ async function draftFromTypeScript(actor: Actor, articleId: string): Promise<Stu
     familyId: props.familyId,
     categoryId: props.categoryId,
     revisions: history.map(revisionToView),
+    hero: props.hero ?? null,
   }
 }
 
@@ -96,6 +99,7 @@ export async function loadStudioDraft(actor: Actor, articleId: string): Promise<
       familyId: article.familyId,
       categoryId: article.categoryId,
       revisions: history.map(revisionViewFrom),
+      hero: article.hero,
     }
   } catch (error) {
     rethrow(error, articleId)

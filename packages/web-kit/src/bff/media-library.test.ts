@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
 import { resetEnv } from '../composition/env'
-import { completeMediaUpload, createMediaUpload, loadMediaAssets } from './media-library'
+import { attachArticleHero, completeMediaUpload, createMediaUpload, loadMediaAssets } from './media-library'
 
 const actor = new Actor(userId('user_1'), ['video_editor'])
 function configure(): void {
@@ -40,9 +40,39 @@ describe('media library BFF', () => {
     await expect(loadMediaAssets(actor, 'en')).rejects.toThrow(/API_URL/u)
   })
 
+  it('attaches a verified image with its public attribution', async () => {
+    configure()
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
+      assetId: 'asset_1', secureUrl: 'https://cdn.test/market.jpg', altText: 'A market reporter',
+      caption: 'Reporting from Makola.', credit: 'Kurasikapa / Ama Mensah', width: 1600, height: 900,
+    }), { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const hero = await attachArticleHero(actor, 'article_1', { assetId: 'asset_1', credit: 'Newsroom' })
+
+    expect(hero).toMatchObject({ assetId: 'asset_1', credit: 'Kurasikapa / Ama Mensah', width: 1600 })
+    expect(fetchMock).toHaveBeenCalledWith('http://api.test/articles/article_1/hero', expect.objectContaining({ method: 'PUT' }))
+  })
+
   it('surfaces API problems', async () => {
     configure()
     vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({ type: 'not_permitted', title: 'Not permitted' }), { status: 403 })))
     await expect(loadMediaAssets(actor, 'en')).rejects.toThrow(/Not permitted/u)
+  })
+
+  it('returns an empty inventory when the API omits items', async () => {
+    configure()
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response('{}', { status: 200 })))
+    await expect(loadMediaAssets(actor, 'en')).resolves.toEqual([])
+  })
+
+  it('surfaces attribution errors while attaching an article image', async () => {
+    configure()
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify({
+      type: 'invalid_article_hero', title: 'Image credit is required',
+    }), { status: 422 })))
+    await expect(attachArticleHero(actor, 'article_1', {
+      assetId: 'asset_1', credit: '',
+    })).rejects.toThrow(/Image credit is required/u)
   })
 })

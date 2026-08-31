@@ -22,6 +22,7 @@ import (
 type Deps struct {
 	CreateDraft                appeditorial.CreateDraft
 	UpdateDraft                appeditorial.UpdateDraft
+	AttachArticleHero          appeditorial.AttachArticleHero
 	GetDraft                   appeditorial.GetDraft
 	ListAuthoredArticles       appeditorial.ListAuthoredArticles
 	ListAwaitingReview         appeditorial.ListAwaitingReview
@@ -89,6 +90,7 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /review", deps.handleListReview)
 	mux.HandleFunc("GET /articles/{id}", deps.handleGetDraft)
 	mux.HandleFunc("PATCH /articles/{id}", deps.handleUpdateDraft)
+	mux.HandleFunc("PUT /articles/{id}/hero", deps.handleAttachArticleHero)
 	mux.HandleFunc("GET /articles/{id}/revisions", deps.handleListRevisions)
 	mux.HandleFunc("POST /articles/{id}/revisions/{rid}/restore", deps.handleRestore)
 	mux.HandleFunc("POST /articles/{id}/submit", deps.handleSubmit)

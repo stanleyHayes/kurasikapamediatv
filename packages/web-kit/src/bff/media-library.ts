@@ -1,4 +1,5 @@
 import type { Actor } from '@kurasikapa/domain'
+import type { ArticleHeroView } from '../read-model/article-view'
 import { env } from '../composition/env'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
@@ -46,4 +47,12 @@ export async function createMediaUpload(actor: Actor, input: unknown): Promise<C
 }
 export async function completeMediaUpload(actor: Actor, id: string, input: unknown): Promise<MediaAssetView> {
   return asset(await api(actor, `/media/assets/${id}/complete`, { method: 'POST', body: JSON.stringify(input) }))
+}
+
+export async function attachArticleHero(actor: Actor, articleId: string, input: unknown): Promise<ArticleHeroView> {
+  const raw = record(await api(actor, `/articles/${articleId}/hero`, { method: 'PUT', body: JSON.stringify(input) }))
+  return {
+    assetId: text(raw['assetId']), secureUrl: text(raw['secureUrl']), altText: text(raw['altText']),
+    caption: text(raw['caption']), credit: text(raw['credit']), width: number(raw['width']), height: number(raw['height']),
+  }
 }

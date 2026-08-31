@@ -54,17 +54,17 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
-| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising now has tested campaign, activation, placement, budget, event and report APIs; Studio/public ad surfaces, products, classifieds and affiliates remain. |
+| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, classifieds, affiliates and advertiser self-service remain. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
 
 | Audit requirement | Current evidence | State |
 |---|---|---|
-| Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
+| Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast publishing is deployed. Photo/video galleries now have domain/app/API/Mongo, Studio builder and public presentation with full verification; Studio and API are live while the public route awaits Vercel quota reset. Article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
-| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising campaign inventory, activation, deterministic budget-aware placement, append-only events and reporting are implemented behind ports and HTTP APIs. Studio/public ad surfaces, provider credentials, production release, products, classifieds and affiliates remain. | **PARTIAL — ACTIVE R4** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment to articles now runs through Go domain/application/API/Mongo and renders across Studio, public cards, story pages and social metadata. VOD processing, article-to-audio and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
+| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
@@ -356,8 +356,9 @@ assets, chapters are validated against duration, Mongo indexes the public
 library, and the public site renders a native accessible player plus a
 Podcasting 2.0 RSS feed with transcript metadata. Production release remains.
 
-Still unbuilt: attaching assets to articles, VOD processing, article-to-audio
-(TTS) and voice-to-article. Photo and caption-gated video galleries are
+Article hero-image attachment is implemented with ready-image validation,
+required alternative text and visible credit. Still unbuilt: VOD processing,
+article-to-audio (TTS) and voice-to-article. Photo and caption-gated video galleries are
 implemented and CI-green; their public route awaits the Vercel quota reset.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
@@ -373,8 +374,9 @@ stubbed), the "Listen" button (not rendered), and the Live indicator in the head
 
 Membership tiers, domain-level entitlement, donations, Stripe EUR and Paystack
 GHS checkout, signed webhook confirmation, currency-separated KPIs and the
-subscriber ledger are implemented. Ad inventory/serving, products,
-classifieds, affiliate links and the advertiser portal remain.
+subscriber ledger are implemented. Ad inventory, delivery, Studio operations
+and public placements are implemented. Products, classifieds, affiliate links
+and the advertiser self-service portal remain.
 
 ### 5.5 R5 — Intelligence & Reach
 
@@ -1114,3 +1116,32 @@ are live. Custom-domain DNS remains an external registrar action.**
   tests cover validation, budget enforcement, placement, events and reporting.
   Full `pnpm verify` passes; web has 77 tests and 93.75% function coverage, and
   web-kit has 301 tests with 80.70% branch coverage.
+
+## 22. KUR-83 — credited article photography and production handoff (2026-08-31)
+
+**Status: VERIFIED; production release active.**
+
+- Added a Go-owned article hero snapshot tied to a verified media-library
+  asset. Attachment is allowed only while the story is editable and refuses
+  pending, failed, non-image or wrong-locale media.
+- Every lead image carries an HTTPS delivery URL, alternative text, caption,
+  visible credit and dimensions. Mongo and the transitional TypeScript mapper
+  preserve the same document shape so either runtime cannot erase the field.
+- Studio article editing now includes a verified-image chooser without granting
+  authors upload permissions. The chosen image remains visible with its caption
+  and credit before review.
+- Public Home, Latest and reusable story cards render real photography when
+  present; the article page renders an accessible figure and uses the same image
+  for Open Graph, Twitter and `NewsArticle` structured data. Existing branded
+  artwork remains the fallback when a story has no approved photograph.
+- Added [production deployment handoff](docs/production-deployment-handoff.md),
+  covering account ownership, credentials, editorial/legal inputs, environment
+  placement and current mid/high operating budgets. `.env.production` was
+  corrected locally for the independent Vercel-host shape and remains ignored.
+- Evidence: full `pnpm verify` passes, including lint, TypeScript, boundaries,
+  all package suites, Mongo integration tests, duplication limits and Go race
+  tests. Web-kit has 305 passing tests at 80.03% branch coverage; Mongo has 177
+  passing integration tests at 95.12% statement coverage; Go verification
+  reports 96.5% domain and 90.2% application/HTTP coverage. Production release
+  remains dependent on the required secrets and provider values documented in
+  the handoff.

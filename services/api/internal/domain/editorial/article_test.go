@@ -332,3 +332,33 @@ func TestReadableBy(t *testing.T) {
 		})
 	}
 }
+
+func TestArticleHeroRequiresAccessibleCreditedMedia(t *testing.T) {
+	t.Parallel()
+
+	article := anArticle()
+	if _, err := article.SetHero(editorial.ArticleHero{}, author()); !errors.Is(err, editorial.ErrInvalidArticleHero) {
+		t.Fatalf("empty hero error = %v, want ErrInvalidArticleHero", err)
+	}
+
+	hero := editorial.ArticleHero{
+		AssetID:   shared.AssetID("asset_1"),
+		SecureURL: "https://res.cloudinary.com/demo/image/upload/report.jpg",
+		AltText:   "A reporter interviewing traders at Makola Market",
+		Caption:   "Traders describe the effect of changing food prices.",
+		Credit:    "Kurasikapa / Ama Mensah", Width: 1600, Height: 900,
+	}
+	updated, err := article.SetHero(hero, author())
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, ok := updated.Hero()
+	if !ok || got != hero {
+		t.Fatalf("hero = %#v, %v", got, ok)
+	}
+
+	inReview := anArticle(func(s *editorial.ArticleState) { s.Status = editorial.StatusInReview })
+	if _, err := inReview.SetHero(hero, editor()); !errors.Is(err, editorial.ErrNotEditable) {
+		t.Fatalf("in-review hero error = %v, want ErrNotEditable", err)
+	}
+}

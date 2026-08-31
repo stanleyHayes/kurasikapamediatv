@@ -75,6 +75,34 @@ type updateDraftBody struct {
 	Body  string `json:"body"`
 }
 
+type attachArticleHeroBody struct {
+	AssetID string `json:"assetId"`
+	Caption string `json:"caption"`
+	Credit  string `json:"credit"`
+}
+
+func (d Deps) handleAttachArticleHero(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	var body attachArticleHeroBody
+	if err := decode(r, &body); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	view, err := d.AttachArticleHero.Execute(r.Context(), appeditorial.AttachArticleHeroInput{
+		Actor: actor, ArticleID: shared.ArticleID(r.PathValue("id")),
+		AssetID: shared.AssetID(body.AssetID), Caption: body.Caption, Credit: body.Credit,
+	})
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, view)
+}
+
 func (d Deps) handleUpdateDraft(w http.ResponseWriter, r *http.Request) {
 	actor, err := d.actorFrom(r)
 	if err != nil {

@@ -8,6 +8,7 @@ const article = {
   title: 'Fish & chips',
   categoryId: 'cat_1',
   publishedAt: '2026-08-11T09:00:00.000Z',
+  hero: null,
 }
 
 describe('rssXml', () => {

@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
 import { ArticleCard } from '@/components/article-card'
+import { StoryVisual } from '@/components/story/story-visual'
 import { EditorialEmptyState } from '@/components/editorial-empty-state'
 import { ArticleMeta } from '@/components/story/article-meta'
-import { StoryBanner } from '@/components/story/story-banner'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import type { CardArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { cachedLatest } from '@kurasikapa/web-kit/read-model/queries'
@@ -94,7 +94,7 @@ function NewsLead({ article }: { article: CardArticleView }): React.ReactElement
   return (
     <article className="editorial-card group overflow-hidden border border-outline-variant bg-inverse-surface text-white">
       <Link href={`/articles/${article.slug}`} className="grid lg:grid-cols-[.85fr_1.15fr]">
-        <StoryBanner categoryId={article.categoryId} large />
+        <StoryVisual article={article} large />
         <div className="flex flex-col p-7 md:p-10">
           <div className="eyebrow text-secondary mb-3">{article.categoryId.replace(/^cat_/u, '')}</div>
           <h2 className="font-display text-3xl font-semibold leading-[1.02] text-white transition-colors group-hover:text-secondary md:text-[length:var(--text-headline-md)]">{article.title}</h2>

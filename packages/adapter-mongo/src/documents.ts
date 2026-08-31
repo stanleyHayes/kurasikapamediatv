@@ -29,6 +29,15 @@ export interface ArticleDocument {
   authorId: string
   categoryId: string
   tagIds: string[]
+  hero?: {
+    assetId: string
+    secureUrl: string
+    altText: string
+    caption: string
+    credit: string
+    width: number
+    height: number
+  }
   status: ArticleStatus
   approvedRevisionId: string | null
   scheduledAt: Date | null

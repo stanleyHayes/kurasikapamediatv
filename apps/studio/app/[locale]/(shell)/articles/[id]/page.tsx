@@ -8,6 +8,9 @@ import { StatusBadge } from '@/components/status-badge'
 import { TransitionControls } from '@/components/transition-controls'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { ArticleNotFound } from '@kurasikapa/application'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { loadMediaAssets } from '@kurasikapa/web-kit/bff/media-library'
+import { ArticleHeroPicker } from '@/components/article-hero-picker'
 
 interface Params {
   params: Promise<{ locale: string; id: string }>
@@ -33,6 +36,7 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
     if (error instanceof ArticleNotFound) notFound()
     throw error
   })
+  const assets = env().API_URL === undefined ? [] : await loadMediaAssets(actor, draft.locale)
 
   return (
     <>
@@ -66,6 +70,10 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
         revisions={draft.revisions}
         uiLocale={locale}
       />
+
+      <div className="mt-7 lg:w-2/3 lg:pr-2">
+        <ArticleHeroPicker articleId={draft.id} assets={assets} initialHero={draft.hero} editable={EDITABLE.includes(draft.status)} />
+      </div>
 
       {draft.status === 'published' && <BreakingAlertButton articleId={draft.id} />}
     </>
