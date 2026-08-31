@@ -1230,7 +1230,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 26. KUR-87 — editor-approved article narration (2026-08-31)
 
-**Status: IMPLEMENTED; full release verification and provider activation remain.**
+**Status: DEPLOYED; provider activation remains.**
 
 - Added a Go-owned narration job aggregate and use cases for request, polling,
   private review and explicit attachment. Jobs are pinned to the exact approved
@@ -1246,9 +1246,13 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Public articles expose only attached narration, use native audio controls,
   identify the voice as synthetic and link directly to the approved article
   body as the transcript.
-- TypeScript type-check, lint and targeted Go domain/application/HTTP/adapter
-  tests pass. Full `pnpm verify`, production builds, CI and deployment smoke are
-  still required before this item can be marked deployed.
+- Commit `9534117` passed CI run `33444152054`: lint, type-check, boundaries,
+  all TypeScript coverage floors, production builds, 39 browser/accessibility
+  journeys, duplication, dependency audit, Lighthouse, secret scanning, Go
+  vet/race/coverage, real-Mongo integration tests and vulnerability scanning.
+  Render deploy `dep-daavj0u8bjmc739e94o0` is live on that exact commit. The
+  stable Web home, OG image, Studio sign-in and API health aliases each return
+  HTTP 200 in production.
 - Activation inputs: `AWS_POLLY_OUTPUT_BUCKET`, least-privilege AWS credentials
   with Polly/S3 access, and the existing Cloudinary credentials. See
   [ADR-0013](docs/decisions/adr-0013-article-narration.md).
