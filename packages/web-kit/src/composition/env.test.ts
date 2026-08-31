@@ -46,6 +46,18 @@ describe('env', () => {
     expect(parse(valid).API_URL).toBeUndefined()
   })
 
+  it('treats blank AWS credentials as disabled so live video fails closed', () => {
+    const env = parse({ ...valid, AWS_ACCESS_KEY_ID: '', AWS_SECRET_ACCESS_KEY: '' })
+    expect(env.AWS_ACCESS_KEY_ID).toBeUndefined()
+    expect(env.AWS_SECRET_ACCESS_KEY).toBeUndefined()
+  })
+
+  it('requires both AWS credentials and a deliberate region', () => {
+    expect(() => parse({ ...valid, AWS_ACCESS_KEY_ID: 'access' })).toThrow(/AWS_ACCESS_KEY_ID/u)
+    expect(() => parse({ ...valid, AWS_ACCESS_KEY_ID: 'access', AWS_SECRET_ACCESS_KEY: 'secret' })).toThrow(/AWS_REGION/u)
+    expect(parse({ ...valid, AWS_REGION: 'eu-west-3', AWS_ACCESS_KEY_ID: 'access', AWS_SECRET_ACCESS_KEY: 'secret' }).AWS_REGION).toBe('eu-west-3')
+  })
+
   it('accepts an API_URL when the Go service is reachable', () => {
     expect(parse({ ...valid, API_URL: 'http://localhost:8080' }).API_URL).toBe(
       'http://localhost:8080',

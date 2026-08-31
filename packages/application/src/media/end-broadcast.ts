@@ -1,4 +1,4 @@
-import type { Actor, BroadcastId } from '@kurasikapa/domain'
+import { type Actor, type BroadcastId, requirePermission } from '@kurasikapa/domain'
 import type { ClockPort } from '../ports/ambient'
 import type { BroadcastRepository } from '../ports/broadcast-repository'
 import type { LiveVideoPort } from '../ports/live-video'
@@ -36,23 +36,26 @@ export class EndBroadcast implements UseCase<EndBroadcastInput, EndBroadcastResu
     const broadcast = await this.deps.broadcasts.findById(input.broadcastId)
     if (broadcast === null) throw new BroadcastNotFound(input.broadcastId)
 
+    // Retry after a provider failure: the record was intentionally persisted
+    // as ended before teardown. Permission is still checked before revealing
+    // or touching its provider handle.
+    if (broadcast.state === 'ended') {
+      requirePermission(input.actor, 'stream:manage')
+      await this.deps.live.teardown(broadcast.channelArn)
+      const endedAt = broadcast.endedAt
+      if (endedAt === null) throw new Error(`Ended broadcast ${broadcast.id} has no end timestamp`)
+      return { broadcastId: broadcast.id, endedAt }
+    }
+
     const now = this.deps.clock.now()
     const ended = broadcast.end(input.actor, now)
 
-    // Record first, tear down second — never the other way round.
-    //
-    // Tearing down first and then failing to save leaves a record saying "live"
-    // against a channel that no longer exists: `currentLive` keeps serving it
-    // and every reader gets a player that spins forever. This order's worst
-    // case is a channel that outlives its record — still billing, but visible
-    // by its ARN and reapable by a retry, because teardown is idempotent.
-    await this.deps.broadcasts.save(ended)
-
-    // A teardown failure is not swallowed. The broadcast is off air either way,
-    // so the caller could be told "done" — but then a live channel bills on
-    // with nobody aware of it. An error an operator can retry is the cheaper
-    // outcome.
+    // Provider first, record second. If teardown fails the row stays live, so
+    // the control room retains its cleanup button and a new start remains
+    // blocked. If save fails after teardown, retry is safe because provider
+    // teardown is idempotent (a missing channel is success).
     await this.deps.live.teardown(ended.channelArn)
+    await this.deps.broadcasts.save(ended)
 
     return { broadcastId: ended.id, endedAt: now }
   }

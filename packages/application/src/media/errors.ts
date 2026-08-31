@@ -43,3 +43,15 @@ export class LiveVideoUnavailable extends Error {
     this.name = 'LiveVideoUnavailable'
   }
 }
+
+/** A provisioned, billable channel could not be recorded or torn down. */
+export class CleanupRequired extends Error {
+  constructor(
+    readonly channelArn: string,
+    readonly recordFailure: unknown,
+    readonly cleanupFailure: unknown,
+  ) {
+    super(`Live channel cleanup is required for ${channelArn}`)
+    this.name = 'CleanupRequired'
+  }
+}

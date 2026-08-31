@@ -732,12 +732,18 @@ decision.
   when the callback route is written, so the CSRF check stays impossible to
   skip.
 
-- **KUR-67 live broadcast has no surface.** `domain/media`, `application/media`
-  (`StartBroadcast`, `EndBroadcast`, `GetCurrentBroadcast`, `ListBroadcasts`),
-  the fail-closed IVS adapter and `media-graph.ts` are all built and tested.
-  Nothing in `apps/` references any of it — `media-graph.ts` is the only
-  consumer. This is R3 scope and blocked on the AWS IVS quota request and
-  sizing answers in §6.
+- **KUR-67 live broadcast surface — IMPLEMENTED, provider activation blocked.**
+  The shared container now wires Mongo broadcasts and the fail-closed Amazon
+  IVS provider. Studio has an authorised/rate-limited control room with one-time
+  OBS credentials and channel teardown; the public bilingual `/live` route
+  reads the current broadcast and plays HLS with native Safari support plus
+  `hls.js`. Public state is polled every 15 seconds through a CDN-shared status
+  projection (10-second freshness, 20-second stale window), not Mongo per
+  viewer. Broadcast operations await the correctness indexes before use, and
+  failed teardown remains live, start-blocking, visibly retryable and idempotent.
+  Production still needs AWS credentials and the IVS quota increase
+  in `docs/operations/live-broadcast.md`. Recording/VOD, call-in stages and chat
+  remain later R3 scope and are not claimed here.
 
 ### Still blocked, unchanged
 

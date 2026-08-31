@@ -17,7 +17,7 @@ export type {
   ProvisionedChannel,
 } from '../ports/live-video'
 
-export { AlreadyBroadcasting, BroadcastNotFound, LiveVideoUnavailable } from './errors'
+export { AlreadyBroadcasting, BroadcastNotFound, CleanupRequired, LiveVideoUnavailable } from './errors'
 export {
   StartBroadcast,
   type StartBroadcastDeps,

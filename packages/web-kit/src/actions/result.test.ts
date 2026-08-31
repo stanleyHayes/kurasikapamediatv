@@ -3,6 +3,7 @@ import {
   BreakingAlertAlreadySent,
   CaptionNeedsBody,
   CommentNotFound,
+  CleanupRequired,
   EmailDeliveryFailed,
   SlugTaken,
 } from '@kurasikapa/application'
@@ -19,7 +20,7 @@ import {
 import { describe, expect, it } from 'vitest'
 import { ApiProblem } from '../bff/problem'
 import { NotSignedIn } from '../composition/actor'
-import { attempt, toActionError } from './result'
+import { attempt, cleanupRequiredActionError, toActionError } from './result'
 import { InvalidInput } from './schemas'
 
 describe('toActionError', () => {
@@ -59,6 +60,15 @@ describe('toActionError', () => {
 
   it('rethrows a non-Error value rather than inventing a code', () => {
     expect(() => toActionError('something odd')).toThrow()
+  })
+
+  it('reports orphan cleanup with ARN and never a stream key', () => {
+    const lines: string[] = []
+    const error = new CleanupRequired('arn:channel/1', new Error('save failed'), new Error('delete failed'))
+    const result = cleanupRequiredActionError(error, (line) => { lines.push(line) })
+    expect(result).toEqual({ code: 'cleanup_required', message: error.message, channelArn: 'arn:channel/1' })
+    expect(lines.join('')).toContain('arn:channel/1')
+    expect(lines.join('')).not.toContain('streamKey')
   })
 })
 

@@ -8,7 +8,7 @@ import {
   InMemoryBroadcastRepository,
   STORE_UNAVAILABLE,
 } from '../testing/in-memory-broadcast-repository'
-import { AlreadyBroadcasting, LiveVideoUnavailable } from './errors'
+import { AlreadyBroadcasting, CleanupRequired, LiveVideoUnavailable } from './errors'
 import { StartBroadcast } from './start-broadcast'
 
 const NOW = new Date('2026-08-14T19:02:00Z')
@@ -117,13 +117,14 @@ describe('StartBroadcast', () => {
     expect(live.tornDown).toEqual([CHANNEL_1])
   })
 
-  it('lets the original failure win when the cleanup itself fails', async () => {
-    // The caller needs to know why the start failed. A teardown error thrown on
-    // top would replace that answer with a less useful one.
+  it('surfaces the non-secret channel ARN when compensating cleanup fails', async () => {
     const live = new FakeLiveVideo(true)
     const start = startWith(new ExplodingBroadcastRepository(), live)
 
-    await expect(start.execute(goLive)).rejects.toThrow(STORE_UNAVAILABLE)
+    const failure = await start.execute(goLive).catch((error: unknown) => error)
+    expect(failure).toBeInstanceOf(CleanupRequired)
+    expect((failure as CleanupRequired).channelArn).toBe(CHANNEL_1)
+    expect(JSON.stringify(failure)).not.toContain('sk_test_1')
     expect(live.tornDown).toEqual([CHANNEL_1])
   })
 

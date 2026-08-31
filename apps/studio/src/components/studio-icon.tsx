@@ -1,4 +1,4 @@
-export type StudioIconName = 'desk' | 'review' | 'social' | 'rss' | 'comments' | 'people' | 'audit' | 'search' | 'menu' | 'close' | 'language' | 'site' | 'collapse' | 'chevron'
+export type StudioIconName = 'desk' | 'review' | 'social' | 'rss' | 'comments' | 'people' | 'audit' | 'live' | 'search' | 'menu' | 'close' | 'language' | 'site' | 'collapse' | 'chevron'
 
 const PATHS: Record<StudioIconName, React.ReactNode> = {
   desk: <><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></>,
@@ -8,6 +8,7 @@ const PATHS: Record<StudioIconName, React.ReactNode> = {
   comments: <path d="M4 5h16v11H9l-5 4z"/>,
   people: <><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2"/><path d="M3 20c0-4 2-6 6-6s6 2 6 6M15 15c3 0 5 2 5 5"/></>,
   audit: <><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></>,
+  live: <><rect x="4" y="6" width="16" height="12"/><path d="M10 9l5 3-5 3zM2 3l2 2M22 3l-2 2"/></>,
   search: <><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></>,
   menu: <path d="M4 7h16M4 12h16M4 17h16"/>, close: <path d="M6 6l12 12M18 6L6 18"/>,
   language: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></>,

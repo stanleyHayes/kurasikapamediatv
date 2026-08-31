@@ -59,6 +59,13 @@ describe('contentSecurityPolicy', () => {
     expect(connect).toContain('https://challenges.cloudflare.com')
     expect(directives(false).get('script-src')).toContain('https://www.googletagmanager.com')
   })
+
+  it('allows only the Amazon IVS playback estate for live media', () => {
+    expect(directives(false).get('connect-src')).toContain('https://*.playback.live-video.net')
+    expect(directives(false).get('media-src')).toBe(
+      "'self' blob: https://*.playback.live-video.net",
+    )
+  })
 })
 
 describe('securityHeaders', () => {

@@ -9,7 +9,7 @@ import type { ClockPort, IdPort } from '../ports/ambient'
 import type { BroadcastRepository } from '../ports/broadcast-repository'
 import type { LiveVideoPort } from '../ports/live-video'
 import type { UseCase } from '../ports/use-case'
-import { AlreadyBroadcasting } from './errors'
+import { AlreadyBroadcasting, CleanupRequired } from './errors'
 
 export interface StartBroadcastDeps {
   readonly broadcasts: BroadcastRepository
@@ -93,10 +93,13 @@ export class StartBroadcast implements UseCase<StartBroadcastInput, StartBroadca
       // holds its ARN, so no EndBroadcast will ever tear it down and it bills
       // until somebody notices it in the AWS console. Undo the provision.
       //
-      // The teardown's own failure is swallowed deliberately — the caller needs
-      // to know why the start failed, and a cleanup error thrown on top of it
-      // would replace that answer with a less useful one.
-      await this.deps.live.teardown(channelArn).catch(() => undefined)
+      // If compensation also fails, surface a non-secret reconciliation handle
+      // so an operator can delete the billable channel explicitly.
+      try {
+        await this.deps.live.teardown(channelArn)
+      } catch (cleanupFailure) {
+        throw new CleanupRequired(channelArn, error, cleanupFailure)
+      }
       throw error
     }
   }

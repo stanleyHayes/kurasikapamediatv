@@ -1,4 +1,5 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
+import { failClosedIvs, IvsLiveVideo, ivsChannels } from '@kurasikapa/adapter-ivs'
 import { MongoAuditLog } from '@kurasikapa/adapter-mongo'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { buildContainer, type Container } from './build-container'
@@ -43,9 +44,22 @@ export function container(): Container {
      * which is behind authentication and 404s for a reader. ADR-0011.
      */
     siteUrl: siteUrl(env()),
+    live: liveVideo(env()),
   })
 
   return instance
+}
+
+function liveVideo(config: ReturnType<typeof env>): IvsLiveVideo {
+  if (config.AWS_ACCESS_KEY_ID === undefined || config.AWS_SECRET_ACCESS_KEY === undefined) {
+    return failClosedIvs()
+  }
+  if (config.AWS_REGION === undefined) return failClosedIvs()
+  return new IvsLiveVideo({
+    accessKeyId: config.AWS_ACCESS_KEY_ID,
+    secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
+    channels: ivsChannels(config.AWS_REGION),
+  })
 }
 
 /** Test seam. */

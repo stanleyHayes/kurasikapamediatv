@@ -19,6 +19,17 @@ const EDITOR = new Actor(userId('usr_editor'), ['editor'])
 
 const BCAST = broadcastId('bcast_1')
 
+class FailsOnceBroadcastRepository extends InMemoryBroadcastRepository {
+  private failed = false
+  override save(broadcast: Parameters<InMemoryBroadcastRepository['save']>[0]): Promise<void> {
+    if (!this.failed) {
+      this.failed = true
+      return Promise.reject(new Error(STORE_UNAVAILABLE))
+    }
+    return super.save(broadcast)
+  }
+}
+
 interface Wiring {
   readonly broadcasts: InMemoryBroadcastRepository
   readonly live: FakeLiveVideo
@@ -26,7 +37,9 @@ interface Wiring {
 }
 
 const wiring = (state: 'scheduled' | 'live' | 'ended' = 'live'): Wiring => {
-  const broadcasts = new InMemoryBroadcastRepository([aBroadcast({ state })])
+  const broadcasts = new InMemoryBroadcastRepository([
+    aBroadcast({ state, endedAt: state === 'ended' ? END : null }),
+  ])
   const live = new FakeLiveVideo()
 
   return { broadcasts, live, end: new EndBroadcast({ broadcasts, live, clock: new FakeClock(END) }) }
@@ -50,11 +63,7 @@ describe('EndBroadcast', () => {
     expect(live.tornDown).toEqual([CHANNEL])
   })
 
-  it('records the end before it releases the channel', async () => {
-    // The other order leaves a record saying "live" against a channel that no
-    // longer exists whenever the save fails: `currentLive` keeps serving it and
-    // every reader gets a player that spins forever. This way the worst case is
-    // a channel that outlives its record — billing, but visible and reapable.
+  it('releases the channel before recording the end', async () => {
     const live = new FakeLiveVideo()
     const end = new EndBroadcast({
       broadcasts: new ExplodingBroadcastRepository([aBroadcast()]),
@@ -65,7 +74,7 @@ describe('EndBroadcast', () => {
     await expect(end.execute({ actor: PRODUCER, broadcastId: BCAST })).rejects.toThrow(
       STORE_UNAVAILABLE,
     )
-    expect(live.tornDown).toHaveLength(0)
+    expect(live.tornDown).toEqual([CHANNEL])
   })
 
   it('stops answering as the current broadcast', async () => {
@@ -90,6 +99,20 @@ describe('EndBroadcast', () => {
     await expect(end.execute({ actor: PRODUCER, broadcastId: BCAST })).rejects.toThrow(
       'teardown refused',
     )
+    expect((await broadcasts.findById(BCAST))?.state).toBe('live')
+  })
+
+  it('retries safely when provider teardown succeeded but saving ended failed', async () => {
+    const broadcasts = new FailsOnceBroadcastRepository([aBroadcast()])
+    const live = new FakeLiveVideo()
+    const end = new EndBroadcast({ broadcasts, live, clock: new FakeClock(END) })
+
+    await expect(end.execute({ actor: PRODUCER, broadcastId: BCAST })).rejects.toThrow(
+      STORE_UNAVAILABLE,
+    )
+    expect((await broadcasts.findById(BCAST))?.state).toBe('live')
+    await expect(end.execute({ actor: PRODUCER, broadcastId: BCAST })).resolves.toBeDefined()
+    expect(live.tornDown).toEqual([CHANNEL, CHANNEL])
     expect((await broadcasts.findById(BCAST))?.state).toBe('ended')
   })
 
@@ -114,10 +137,19 @@ describe('EndBroadcast', () => {
     expect(live.tornDown).toHaveLength(0)
   })
 
-  it('refuses to end the same broadcast twice', async () => {
+  it('retries provider cleanup for an already-ended broadcast', async () => {
     const { end, live } = wiring('ended')
 
-    await expect(end.execute({ actor: PRODUCER, broadcastId: BCAST })).rejects.toThrow(NotLive)
+    await expect(end.execute({ actor: PRODUCER, broadcastId: BCAST })).resolves.toMatchObject({
+      broadcastId: BCAST,
+    })
+    expect(live.tornDown).toEqual([CHANNEL])
+  })
+
+  it('keeps cleanup retry permission-protected', async () => {
+    const { end, live } = wiring('ended')
+
+    await expect(end.execute({ actor: EDITOR, broadcastId: BCAST })).rejects.toThrow(NotPermitted)
     expect(live.tornDown).toHaveLength(0)
   })
 })

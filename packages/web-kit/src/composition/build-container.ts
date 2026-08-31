@@ -1,4 +1,5 @@
 import { MongoRateLimiter } from '@kurasikapa/adapter-mongo'
+import { failClosedIvs } from '@kurasikapa/adapter-ivs'
 import type { Container, Infrastructure } from './container-types'
 import {
   ApproveArticle,
@@ -27,6 +28,7 @@ import {
   rssFetcher,
 } from './outbound'
 import { rssCommands } from './rss-graph'
+import { mediaCommands } from './media-graph'
 
 export type { Container, Infrastructure } from './container-types'
 
@@ -67,6 +69,12 @@ export function buildContainer(infra: Infrastructure): Container {
     manageSitePages: new ManageSitePages({ pages: graph.sitePages, clock: infra.clock }),
     getSitePage: new GetSitePage(graph.sitePages),
     sitePages: graph.sitePages,
+    ...mediaCommands({
+      broadcasts: graph.broadcasts,
+      live: infra.live ?? failClosedIvs(),
+      clock: infra.clock,
+      ids: infra.ids,
+    }),
   }
 }
 

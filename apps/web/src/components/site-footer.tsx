@@ -1,4 +1,3 @@
-import { cacheLife } from 'next/cache'
 import Image from 'next/image'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { FooterNav } from './footer-nav'
@@ -33,9 +32,8 @@ export function SiteFooter(): React.ReactElement {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/require-await -- `use cache` requires async.
-async function CopyrightYear(): Promise<React.ReactElement> {
-  'use cache'
-  cacheLife('days')
-  return <>{new Date().getUTCFullYear()}</>
+function CopyrightYear(): React.ReactElement {
+  // Static by design: reading wall-clock time during a Cache Components
+  // prerender makes every standing page fail its production build.
+  return <>2026</>
 }

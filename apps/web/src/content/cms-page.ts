@@ -1,8 +1,13 @@
 import type { SitePageKey } from '@kurasikapa/domain'
+import { connection } from 'next/server'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { type StandingPage, pageFor } from './pages'
 
 export async function cmsPageFor(key: SitePageKey, locale: string): Promise<StandingPage> {
+  // Mongo's driver reads the clock while selecting a server. Mark CMS-backed
+  // standing pages request-time before that access so Cache Components does
+  // not attempt the database call during static prerender.
+  await connection()
   const found = await container().getSitePage.execute({ key, locale })
   if (found === null && locale !== 'en') {
     const english = await container().getSitePage.execute({ key, locale: 'en' })

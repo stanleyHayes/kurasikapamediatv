@@ -72,8 +72,13 @@ export function contentSecurityPolicy(isDev: boolean): string {
       'https://*.google-analytics.com',
       'https://www.googletagmanager.com',
       'https://challenges.cloudflare.com',
+      'https://*.playback.live-video.net',
       ...(isDev ? ['ws:'] : []),
     ],
+
+    // Amazon IVS playback manifests and segments. Ingest never reaches a
+    // browser; only the public playback estate is allowed here.
+    ['media-src', "'self'", 'blob:', 'https://*.playback.live-video.net'],
 
     // No plugins, no embedded frames, and nobody may frame us. Clickjacking a
     // publish button is a real attack on a newsroom.

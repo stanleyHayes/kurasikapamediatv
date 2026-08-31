@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+const optionalCredential = z.preprocess(
+  (value) => value === '' ? undefined : value,
+  z.string().min(1).optional(),
+)
+
 /**
  * Environment, validated once at the edge of the process.
  *
@@ -91,7 +96,16 @@ const schema = z.object({
    */
   API_URL: z.url().optional(),
 
+  AWS_REGION: optionalCredential,
+  AWS_ACCESS_KEY_ID: optionalCredential,
+  AWS_SECRET_ACCESS_KEY: optionalCredential,
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+}).superRefine((value, context) => {
+  const hasAccess = value.AWS_ACCESS_KEY_ID !== undefined
+  const hasSecret = value.AWS_SECRET_ACCESS_KEY !== undefined
+  if (hasAccess !== hasSecret) context.addIssue({ code: 'custom', path: ['AWS_ACCESS_KEY_ID'], message: 'Both AWS credentials are required' })
+  if ((hasAccess || hasSecret) && value.AWS_REGION === undefined) context.addIssue({ code: 'custom', path: ['AWS_REGION'], message: 'AWS_REGION is required with credentials' })
 })
 
 export type Env = z.infer<typeof schema>

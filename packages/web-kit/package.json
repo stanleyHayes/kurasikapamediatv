@@ -16,6 +16,7 @@
     "@kurasikapa/adapter-anthropic": "workspace:*",
     "@kurasikapa/adapter-auth": "workspace:*",
     "@kurasikapa/adapter-email": "workspace:*",
+    "@kurasikapa/adapter-ivs": "workspace:*",
     "@kurasikapa/adapter-mongo": "workspace:*",
     "@kurasikapa/adapter-push": "workspace:*",
     "@kurasikapa/adapter-rss": "workspace:*",

@@ -6,18 +6,20 @@ import { type MongoHarness, startMongo } from './testing/mongo-harness'
 
 let mongo: MongoHarness
 let repo: MongoBroadcastRepository
+let started = false
 
 beforeAll(async () => {
   mongo = await startMongo()
+  started = true
   repo = new MongoBroadcastRepository(mongo.db)
 })
 
 afterEach(async () => {
-  await mongo.reset()
+  if (started) await mongo.reset()
 })
 
 afterAll(async () => {
-  await mongo.stop()
+  if (started) await mongo.stop()
 })
 
 const EVENING = new Date('2026-08-13T19:00:00Z')
@@ -101,6 +103,16 @@ describe('currentLive', () => {
 })
 
 describe('one live broadcast per locale', () => {
+  it('guarantees the live uniqueness index before its first operation', async () => {
+    await mongo.db.collection(BROADCASTS).dropIndex('broadcast_live_per_locale_unique')
+    const guarded = new MongoBroadcastRepository(mongo.db)
+
+    await guarded.currentLive('en')
+
+    const indexes = await mongo.db.collection(BROADCASTS).indexes()
+    expect(indexes.map(({ name }) => name)).toContain('broadcast_live_per_locale_unique')
+  })
+
   it('refuses a second live broadcast in the same locale', async () => {
     // StartBroadcast reads `currentLive`, sees null, then writes. Two operators
     // pressing "go live" in the same second both read null, so the database is

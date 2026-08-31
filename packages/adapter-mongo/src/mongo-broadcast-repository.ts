@@ -2,15 +2,20 @@ import type { BroadcastRepository } from '@kurasikapa/application'
 import { Broadcast, type BroadcastId, broadcastId, userId } from '@kurasikapa/domain'
 import type { Collection, Db } from 'mongodb'
 import { BROADCASTS, type BroadcastDocument } from './documents'
+import { ensureBroadcastIndexes } from './indexes'
 
 export class MongoBroadcastRepository implements BroadcastRepository {
   private readonly rows: Collection<BroadcastDocument>
+  private readonly db: Db
+  private ready: Promise<void> | undefined
 
   constructor(db: Db) {
     this.rows = db.collection<BroadcastDocument>(BROADCASTS)
+    this.db = db
   }
 
   async findById(id: BroadcastId): Promise<Broadcast | null> {
+    await this.ensureReady()
     const doc = await this.rows.findOne({ _id: id })
     return doc === null ? null : toDomain(doc)
   }
@@ -26,6 +31,7 @@ export class MongoBroadcastRepository implements BroadcastRepository {
    * would work and would also drag the whole archive off disk every request.
    */
   async currentLive(locale: string): Promise<Broadcast | null> {
+    await this.ensureReady()
     const doc = await this.rows.findOne(
       { locale, state: 'live' },
       // At most one row can match — `broadcast_live_per_locale_unique` sees to
@@ -47,6 +53,7 @@ export class MongoBroadcastRepository implements BroadcastRepository {
    * at one end of the list regardless of when it is due.
    */
   async list(locale: string, limit: number): Promise<readonly Broadcast[]> {
+    await this.ensureReady()
     const docs = await this.rows
       .find({ locale })
       .sort({ scheduledFor: -1, _id: -1 })
@@ -66,9 +73,17 @@ export class MongoBroadcastRepository implements BroadcastRepository {
    * of that race leaves nothing behind.
    */
   async save(broadcast: Broadcast): Promise<void> {
+    await this.ensureReady()
     const { id, ...rest } = broadcast.snapshot()
 
     await this.rows.updateOne({ _id: id }, { $set: rest }, { upsert: true })
+  }
+
+  private ensureReady(): Promise<void> {
+    // Lazy keeps composition side-effect free; every real operation still
+    // waits for the correctness index before it can read or write.
+    this.ready ??= ensureBroadcastIndexes(this.db)
+    return this.ready
   }
 }
 

@@ -101,7 +101,7 @@ export async function ensureIndexes(db: Db): Promise<void> {
   ])
 
   await ensureAudienceIndexes(db)
-  await ensureMediaIndexes(db)
+  await ensureBroadcastIndexes(db)
 
   await revisions.createIndexes([
     // Append-only history, newest first. Unique so a torn write cannot duplicate a seq.
@@ -214,7 +214,7 @@ async function ensureAudienceIndexesPart2(db: Db): Promise<void> {
     )
 }
 
-async function ensureMediaIndexes(db: Db): Promise<void> {
+export async function ensureBroadcastIndexes(db: Db): Promise<void> {
   await db.collection<BroadcastDocument>(BROADCASTS).createIndexes([
     // "Is this locale on air?" — the homepage asks it on every request, for
     // everyone, so it is the one broadcast query a reader can trigger and the

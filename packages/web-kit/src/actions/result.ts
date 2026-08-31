@@ -32,6 +32,7 @@ import {
   CaptionNeedsBody,
   CommentNotFound,
   ContactMessageTooLong,
+  CleanupRequired,
   EmailDeliveryFailed,
   EmptyContactMessage,
   LiveVideoUnavailable,
@@ -49,6 +50,7 @@ export interface ActionError {
   /** Stable across locales — the UI maps it to a translated message. */
   readonly code: string
   readonly message: string
+  readonly channelArn?: string | undefined
 }
 
 /**
@@ -106,6 +108,7 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
 ]
 
 export function toActionError(error: unknown): ActionError {
+  if (error instanceof CleanupRequired) return cleanupRequiredActionError(error)
   if (error instanceof ApiProblem) {
     return { code: error.type, message: error.message }
   }
@@ -115,6 +118,23 @@ export function toActionError(error: unknown): ActionError {
   }
 
   throw error
+}
+
+export function cleanupRequiredActionError(
+  error: CleanupRequired,
+  sink: (line: string) => void = console.error,
+): ActionError {
+  sink(JSON.stringify({
+    event: 'live.cleanup_required',
+    channelArn: error.channelArn,
+    recordFailure: safeError(error.recordFailure),
+    cleanupFailure: safeError(error.cleanupFailure),
+  }))
+  return { code: 'cleanup_required', message: error.message, channelArn: error.channelArn }
+}
+
+function safeError(error: unknown): string {
+  return error instanceof Error ? `${error.name}: ${error.message}` : String(error)
 }
 
 export async function attempt<T>(run: () => Promise<T>): Promise<ActionResult<T>> {

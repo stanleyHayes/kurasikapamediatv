@@ -227,3 +227,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Treat the article as a sequence from arrival through orientation, reading, action, onward discovery and recovery; design the masthead, prose typography, reader tools, takeaways, related content, loading state and 404 as one editorial system.
 
 **Principle:** A complete news-detail redesign owns every state from first signal to the reader's next destination.
+
+### Observation 15: Cloud provisioning needs a durable compensation failure path
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** A live broadcast workflow provisioned a billable provider resource before persisting its local record.
+**Skill:** do
+**Type:** open-source
+**Phase/Area:** Production integration verification
+
+**Issue:** The happy path and ordinary rollback were tested, but a simultaneous persistence failure and provider-cleanup failure could silently orphan a billable resource with no local reconciliation handle.
+
+**Suggested improvement:** For every create-remote-then-save-local workflow, test the dual-failure branch explicitly and surface a non-secret provider handle through a typed incident, secure logging and an operator reconciliation path.
+
+**Principle:** Compensation is not complete until failure of the compensation itself remains visible and actionable.

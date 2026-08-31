@@ -17,6 +17,7 @@ import {
   MongoTextSearch,
   MongoUserDirectory,
   MongoSitePageRepository,
+  MongoBroadcastRepository,
 } from '@kurasikapa/adapter-mongo'
 import {
   ConfirmNewsletter,
@@ -64,6 +65,7 @@ import {
   type SocialPostRepository,
   type UserDirectory,
   type SitePageRepository,
+  type BroadcastRepository,
 } from '@kurasikapa/application'
 import type { Db } from 'mongodb'
 
@@ -86,6 +88,7 @@ export interface MongoGraph {
   readonly audit: AuditLog
   readonly categories: CategoryRepository
   readonly sitePages: SitePageRepository
+  readonly broadcasts: BroadcastRepository
 }
 
 /**
@@ -112,6 +115,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     audit: new MongoAuditLog(db),
     categories: new MongoCategoryRepository(db),
     sitePages: new MongoSitePageRepository(db),
+    broadcasts: new MongoBroadcastRepository(db),
   }
 }
 

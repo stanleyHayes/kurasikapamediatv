@@ -1,4 +1,4 @@
-import { FakeAi } from '@kurasikapa/application/testing'
+import { FakeAi, FakeLiveVideo } from '@kurasikapa/application/testing'
 import type { Db } from 'mongodb'
 import { afterEach, describe, expect, it } from 'vitest'
 import { InProcessEventBus } from './ambient'
@@ -26,6 +26,7 @@ const build = (): Container =>
     ids: { next: () => 'id_1' },
     events: new InProcessEventBus(),
     ai: new FakeAi(),
+    live: new FakeLiveVideo(),
   })
 
 describe('buildContainer', () => {
@@ -52,6 +53,8 @@ describe('buildContainer', () => {
     expect(c.sendNewsletterDigest).toBeDefined()
     expect(c.registerRssSource).toBeDefined()
     expect(c.proposeSocialCaption).toBeDefined()
+    expect(c.startBroadcast).toBeDefined()
+    expect(c.endBroadcast).toBeDefined()
   })
 
   it('wires the reader-facing queries', () => {
@@ -62,6 +65,8 @@ describe('buildContainer', () => {
     expect(c.listMostRead).toBeDefined()
     expect(c.listRelatedArticles).toBeDefined()
     expect(c.resolvePublicByline).toBeDefined()
+    expect(c.getCurrentBroadcast).toBeDefined()
+    expect(c.listBroadcasts).toBeDefined()
   })
 
   it('exposes the AI port for interactive editor streaming', () => {
@@ -85,6 +90,7 @@ describe('buildContainer', () => {
       ids: { next: () => 'id_1' },
       events,
       ai: new FakeAi(),
+      live: new FakeLiveVideo(),
     })
 
     expect(container.events).toBe(events)

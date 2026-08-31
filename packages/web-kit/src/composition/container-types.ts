@@ -28,6 +28,11 @@ import type {
   ListSections,
   ListUsers,
   ListVisibleComments,
+  ListBroadcasts,
+  GetCurrentBroadcast,
+  StartBroadcast,
+  EndBroadcast,
+  LiveVideoPort,
   ModerateComment,
   ManageSitePages,
   PostComment,
@@ -117,6 +122,10 @@ export interface Container {
   readonly rssSources: RssSourceRepository
   readonly manageSitePages: ManageSitePages
   readonly sitePages: SitePageRepository
+  readonly startBroadcast: StartBroadcast
+  readonly endBroadcast: EndBroadcast
+  readonly getCurrentBroadcast: GetCurrentBroadcast
+  readonly listBroadcasts: ListBroadcasts
 
   // Queries
   readonly getPublishedArticle: GetPublishedArticle
@@ -150,4 +159,5 @@ export interface Infrastructure {
   readonly push?: PushPort | undefined
   readonly feed?: RssFeedPort | undefined
   readonly siteUrl?: string | undefined
+  readonly live?: LiveVideoPort | undefined
 }

@@ -32,7 +32,7 @@ export {
   type RoleAssignmentDocument,
   type SitePageDocument,
 } from './documents'
-export { ensureIndexes } from './indexes'
+export { ensureIndexes, ensureBroadcastIndexes } from './indexes'
 export {
   articleToDocument,
   articleToDomain,
