@@ -84,15 +84,26 @@ func TestRevenueHandlersRejectMalformedAndMissingResources(t *testing.T) {
 		{http.MethodPost, "/public/donations", `{`, http.StatusBadRequest},
 		{http.MethodPost, "/public/donations", `{}`, http.StatusBadRequest},
 		{http.MethodPost, "/revenue/membership-plans/missing/activate", `{}`, http.StatusNotFound},
+		{http.MethodPost, "/revenue/ad-campaigns", `{`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/ad-campaigns", `{}`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/ad-campaigns/missing/activate", `{}`, http.StatusNotFound},
+		{http.MethodPost, "/public/ads/missing/events", `{`, http.StatusBadRequest},
+		{http.MethodPost, "/public/ads/missing/events", `{"kind":"click"}`, http.StatusNotFound},
 	}
 	for _, tc := range cases {
-		authorized := tc.path != "/public/donations"
+		authorized := tc.path != "/public/donations" && tc.path != "/public/ads/missing/events"
 		if response := request(handler, tc.method, tc.path, tc.body, authorized); response.Code != tc.want {
 			t.Errorf("%s: got %d, want %d: %s", tc.path, response.Code, tc.want, response.Body.String())
 		}
 	}
 	if response := request(handler, http.MethodGet, "/revenue/entitlement", "", false); response.Code != http.StatusForbidden {
 		t.Fatalf("unsigned entitlement: %d %s", response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodGet, "/revenue/ad-report", "", false); response.Code != http.StatusForbidden {
+		t.Fatalf("unsigned ad report: %d %s", response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodGet, "/public/en/ads/article_inline", "", false); response.Code != http.StatusOK || !bytes.Contains(response.Body.Bytes(), []byte(`"placement":null`)) {
+		t.Fatalf("empty placement: %d %s", response.Code, response.Body.String())
 	}
 }
 

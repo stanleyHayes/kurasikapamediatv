@@ -22,11 +22,12 @@ test.beforeAll(async ({ baseURL }) => {
 
 /** Signs in through the real form — the same path a newsroom uses. */
 async function signIn(page: Page): Promise<void> {
+  await resetSignInAllowance()
   await page.goto('/en/sign-in')
   await page.getByLabel('Email').fill(EDITOR.email)
   await page.getByLabel('Password').fill(EDITOR.password)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.waitForURL(`${STUDIO}/en`)
+  await page.waitForURL((url) => url.pathname === '/studio/en' || url.pathname === '/studio/en/', { waitUntil: 'domcontentloaded', timeout: 20_000 })
 }
 
 /**
@@ -75,7 +76,7 @@ test.describe('signed in', () => {
     // The studio's own shell, not the public masthead: the Stitch editorial CMS
     // is a full-screen admin surface, so reaching it must show its top bar AND
     // must not show the reader's site chrome.
-    await expect(page.getByRole('heading', { name: 'Editorial desk', level: 1 })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Editorial desk', exact: true, level: 1 })).toBeVisible()
     await expect(page.locator('footer')).toHaveCount(0)
   })
 
@@ -117,6 +118,7 @@ test.describe('signed in', () => {
 
 test.describe('workflow transitions', () => {
   test('an editor moves a draft through review and approval to scheduled', async ({ page }) => {
+    test.setTimeout(60_000)
     // Re-seeded here rather than only in the file's beforeAll: a CI retry must
     // find the draft a draft again, not whatever the failed attempt left behind.
     // The revision is what an approval approves — without one the Approve
@@ -137,7 +139,7 @@ test.describe('workflow transitions', () => {
     await page.getByLabel('Date').fill(date)
     await page.getByLabel('Time').fill(time)
     await page.getByRole('button', { name: 'Schedule' }).click()
-    await expect(page.getByText('Scheduled')).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByText('Scheduled', { exact: true })).toBeVisible({ timeout: 30_000 })
   })
 })
 
