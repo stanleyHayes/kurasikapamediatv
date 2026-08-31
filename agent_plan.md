@@ -62,7 +62,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Audit requirement | Current evidence | State |
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
-| Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
+| Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment to articles now runs through Go domain/application/API/Mongo and renders across Studio, public cards, story pages and social metadata. VOD processing, article-to-audio and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
@@ -1119,7 +1119,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 22. KUR-83 — credited article photography and production handoff (2026-08-31)
 
-**Status: VERIFIED; production release active.**
+**Status: DEPLOYED; client content and provider setup remain.**
 
 - Added a Go-owned article hero snapshot tied to a verified media-library
   asset. Attachment is allowed only while the story is editable and refuses
@@ -1138,10 +1138,14 @@ are live. Custom-domain DNS remains an external registrar action.**
   covering account ownership, credentials, editorial/legal inputs, environment
   placement and current mid/high operating budgets. `.env.production` was
   corrected locally for the independent Vercel-host shape and remains ignored.
-- Evidence: full `pnpm verify` passes, including lint, TypeScript, boundaries,
-  all package suites, Mongo integration tests, duplication limits and Go race
-  tests. Web-kit has 305 passing tests at 80.03% branch coverage; Mongo has 177
-  passing integration tests at 95.12% statement coverage; Go verification
-  reports 96.5% domain and 90.2% application/HTTP coverage. Production release
-  remains dependent on the required secrets and provider values documented in
-  the handoff.
+- Evidence: CI run `33429262483` passes lint, TypeScript, boundaries, package
+  coverage, builds, E2E/accessibility, duplication, dependency audit,
+  Lighthouse, secret scan, Go race tests and real-Mongo integration. Go reports
+  96.5% domain and 90.9% aggregate application/HTTP coverage locally after a
+  clean cache; the CI-pinned runtime also clears its 90% floor.
+- Production deployment `dpl_CreKjs4YCFhLkTDct1mTpFZCqNpt` is Ready. The stable
+  public alias returns `200 image/png` from `/og-image` without a locale
+  redirect; public Team and Studio sign-in return 200, and API `/healthz`
+  reports healthy. `kurasikapa.tv` is attached in Vercel but still requires
+  working DNS. Real editorial content and provider credentials remain governed
+  by the production handoff.

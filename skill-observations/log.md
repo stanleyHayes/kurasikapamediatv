@@ -331,3 +331,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** For framework applications, make the release candidate gate run the same production build command and environment shape as hosting after tests pass. Treat a verification script that omits the deployable build as necessary but incomplete evidence.
 
 **Principle:** A green code-quality gate does not prove deployability unless it executes the framework's production compiler.
+
+### Observation 22: Coverage floors need pinned-runtime headroom
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** A clean local Go verification narrowly cleared an aggregate coverage floor while the CI-pinned Go runtime reported the same suite below that floor.
+**Skill:** New skill candidate: release-verification
+**Type:** open-source
+**Phase/Area:** CI parity and coverage verification
+
+**Issue:** A newer local toolchain and the pinned CI toolchain produced materially different aggregate coverage percentages near a hard threshold, causing repeated release failures despite locally green evidence.
+
+**Suggested improvement:** Reproduce the pinned CI toolchain before release when practical, keep deliberate coverage margin above the configured floor, and add meaningful failure-path tests instead of lowering the threshold or relying on cached results.
+
+**Principle:** Coverage at the exact floor is unstable release evidence; pinned-toolchain parity and tested headroom make the gate trustworthy.

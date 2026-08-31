@@ -12,8 +12,8 @@ a growth budget, not an enterprise quote.
 - Owner/admin access to GitHub, both Vercel projects, Render, MongoDB Atlas,
   Cloudinary, AWS, Resend, Cloudflare, Google, Meta, Paystack and Stripe.
 - A billing card and billing contact for every paid provider.
-- The final public domain. Until then the public host is
-  `kurasikapa-web-hayfordstanleys-projects.vercel.app` and Studio is
+- The final public domain. Until its DNS resolves, the public host is
+  `kurasikapa-web.vercel.app` and Studio is
   `kurasikapa-studio.vercel.app/studio`.
 - DNS access when the domain is purchased. Preferred final shape:
   `www.<domain>` or `<domain>` for readers and `studio.<domain>/studio` for staff.
@@ -135,3 +135,17 @@ but the applicable rate and eligibility depend on the legal account country.
   rollback owner are documented and tested.
 - Real content and team profiles replace all launch/demo empty states before the
   URL is shared publicly.
+
+## Verified deployment state — 31 August 2026
+
+- Public Web deployment `dpl_CreKjs4YCFhLkTDct1mTpFZCqNpt` is Ready and the
+  stable Vercel alias serves `/og-image` as `200 image/png` without redirecting
+  through a locale.
+- Studio sign-in and the public Team route return HTTP 200; the Render API
+  `/healthz` endpoint reports healthy.
+- `kurasikapa.tv` is attached to the Web project but does not currently resolve
+  in DNS. Do not use it in launch announcements until DNS and TLS checks pass.
+- Vercel currently builds with Node 24.x while the repository requests Node
+  26+. The build succeeds, but the Web and Studio project settings should move
+  to Node 26 when Vercel offers it, or the repository engine should be aligned
+  deliberately after full verification.
