@@ -27,7 +27,7 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
 | Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
 | Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
-| AWS | IVS IAM pair and recording-configuration ARN; separate Polly/S3 IAM pair, London region and private output bucket | Recorded live channels and article narration |
+| AWS | IVS IAM pair/configuration/source bucket, EventBridge secret, MediaConvert role/template/output bucket; separate Polly/S3 IAM pair | Recorded live ingest and article narration |
 | Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
 | Cloudflare | Turnstile site key and secret | Production CAPTCHA |
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
@@ -60,7 +60,9 @@ they cannot accidentally be uploaded as blank production variables.
 - Cloudinary cloud name, API key and secret.
 - AWS account, least-privilege IVS IAM user, approved IVS quotas, billing
   alarms, private IVS recording bucket and
-  `AWS_IVS_RECORDING_CONFIGURATION_ARN`. Add a separate least-privilege Polly/S3 principal and private London
+  `AWS_IVS_RECORDING_CONFIGURATION_ARN`. Add the MediaConvert role/template and
+  private processing bucket, allowlist only that output bucket in Cloudinary,
+  and configure the EventBridge destination secret. Add a separate least-privilege Polly/S3 principal and private London
   staging bucket with a short lifecycle policy for article narration. Never
   provide the AWS root credentials.
 - Resend API key plus a verified sending domain and DNS records. The application
@@ -128,7 +130,7 @@ a ticket, source control or a screen recording.
 | Cloudinary | $99 | $249 | Plus vs Advanced media plan |
 | Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
 | Anthropic | $50 | $300 | Editorial-assistance spending cap; usage based |
-| AWS IVS/live + narration | $250 | $2,000 | Working allowance; live is driven by viewer-hours; narration is usage-based and comparatively small |
+| AWS IVS/live + MediaConvert + narration | $250 | $2,000 | Live is driven by viewer-hours; each replay adds MediaConvert output minutes and temporary S3 |
 | Monitoring/DNS/domain | $25 | $150 | DNS can be free; includes domain amortisation and observability allowance |
 | Contingency | $110 | $526 | About 20% for bandwidth, backups, tax and usage variance |
 | **Estimated total** | **$657/month** | **$4,029/month** | Excludes salaries, production gear, legal work and payment fees |

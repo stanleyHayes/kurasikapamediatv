@@ -82,3 +82,11 @@ export async function processNarrationsViaApi(input: { readonly baseUrl: string;
   if (!response.ok && response.status !== 207) throw await problemFromResponse(response)
   return response.json() as Promise<unknown>
 }
+
+export async function processRecordingsViaApi(input: { readonly baseUrl: string; readonly cronSecret: string }): Promise<unknown> {
+  const response = await fetch(joinUrl(input.baseUrl, '/internal/process-recordings'), {
+    method: 'POST', headers: { Authorization: `Bearer ${input.cronSecret}` },
+  })
+  if (!response.ok && response.status !== 207) throw await problemFromResponse(response)
+  return response.json() as Promise<unknown>
+}

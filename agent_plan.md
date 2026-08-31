@@ -1276,10 +1276,8 @@ are live. Custom-domain DNS remains an external registrar action.**
   poster and synchronized captions into the shared resilient VOD player.
 - Focused Go domain/application/HTTP suites, the IVS adapter suite, the Web-kit
   BFF suite, full lint, monorepo type-check, boundaries, duplication, both
-  production builds and the focused real-Mongo repository test pass. The local
-  all-package test run passed 12 of 13 packages before the overloaded Docker
-  daemon timed out starting another Testcontainers instance; clean CI and
-  deployment smoke remain required before this item is marked deployed.
+  production builds and the focused real-Mongo repository test pass. Clean CI
+  and production smoke evidence are recorded below.
 - Activation input: a private IVS recording destination and its recording
   configuration ARN. Automated S3 recording promotion into Cloudinary remains
   the next R3 slice; this release deliberately keeps capture separate from the
@@ -1292,3 +1290,34 @@ are live. Custom-domain DNS remains an external registrar action.**
   production deployment is Ready at `kurasikapa-studio.vercel.app`; public
   home, Live, OG image, Studio sign-in and API health return 200, while both
   unauthenticated replay endpoints correctly return 403.
+
+## 28. KUR-89 — automatic IVS recording promotion (2026-08-31)
+
+**Status: IMPLEMENTED; full release verification and provider activation remain.**
+
+- A signed, size-bounded EventBridge `Recording End` endpoint accepts only one
+  IVS channel ARN, the configured private source bucket, a safe `ivs/v1/`
+  prefix, a positive duration and an `en:`/`fr:` channel name. Missing or wrong
+  webhook credentials return 404 and never start paid provider work.
+- Go persists `recording_imports` before starting MediaConvert. The unique IVS
+  recording-session reference absorbs duplicate provider delivery, reserves
+  the eventual media asset id, and leaves a failed start retryable.
+- The provider reads IVS `recording-ended.json` instead of guessing rendition
+  paths, submits the discovered HLS master to a configured HLS-to-MP4 template,
+  polls asynchronously, promotes the deterministic private S3 output into
+  Cloudinary and deletes only that temporary MP4. Original IVS HLS remains
+  recoverable under the source-bucket lifecycle.
+- A successfully promoted MP4 becomes a ready private video in the existing
+  media library. It is not published automatically: Studio still requires an
+  ended schedule slot and a separately ready WebVTT caption before replay
+  publication.
+- The five-minute GitHub schedule now processes recording jobs through a
+  cron-authenticated Studio BFF. Domain, application, provider, HTTP and real
+  Mongo repository tests pass; the new provider adapter is at 85.0% coverage,
+  and `make verify` reports 95.4% domain and 90.2% application coverage.
+- Activation inputs are intentionally absent from `.env.production`:
+  `AWS_IVS_REGION`, `AWS_IVS_RECORDING_BUCKET`,
+  `AWS_MEDIACONVERT_OUTPUT_BUCKET`, `AWS_MEDIACONVERT_ROLE_ARN`,
+  `AWS_MEDIACONVERT_JOB_TEMPLATE`, `IVS_RECORDING_WEBHOOK_SECRET` and the
+  Cloudinary credential trio. The exact provider setup and recovery process is
+  in [recording-promotion.md](docs/operations/recording-promotion.md).

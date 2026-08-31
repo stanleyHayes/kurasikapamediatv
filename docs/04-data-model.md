@@ -61,6 +61,7 @@ erDiagram
 | `role_assignments` | our RBAC, keyed by the auth user id | `roles[]` |
 | `user` `session` `account` `verification` | Better Auth | managed by the library — **do not hand-edit**. Roles live in `role_assignments`, ours. |
 | `media_assets` | signed Cloudinary uploads for images, video, audio, captions, transcripts and documents | `kind`, `status`, `providerId`, `secureUrl`, `altText`, `caption`, `locale`, dimensions and duration |
+| `recording_imports` | idempotent private IVS-to-media promotion jobs | unique `sourceRef`, reserved `assetId`, bucket/prefix, MediaConvert task/output refs, status, failure reason and timestamps |
 | `podcasts` / `episodes` | publishable audio series and accessible episodes | locale, slug, artwork; `audioAssetId`, `transcriptAssetId`, `durationSeconds`, ordered chapters, `publishedAt` |
 | `galleries` | ordered photo stories and captioned video reports | kind, locale, slug, items with asset/caption ids, editorial captions, credits, `publishedAt` |
 | `live_streams` | Live TV | `providerStreamId`, `state`, `startedAt`, `viewerPeak` |

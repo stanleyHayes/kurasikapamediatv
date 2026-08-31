@@ -87,6 +87,10 @@ EmailPort      Resend: transactional now, bulk at R2
   editor separately verifies the Cloudinary asset and synchronized WebVTT file
   before Go can place it on the public replay shelf. Capture is never treated
   as editorial publication.
+- Foreign HLS manifests are not treated as Cloudinary delivery assets.
+  EventBridge starts a MediaConvert MP4 job from IVS metadata, then Cloudinary
+  ingests that result from an allowlisted private processing bucket. Only the
+  temporary MP4 is deleted immediately; source HLS keeps a recovery lifecycle.
 - GDPR: the company is France-registered. Chat messages are personal data and
   IVS Chat logging must target an EU region with a stated retention period.
   Audit and insight collections are already append-only (product rule 4); chat

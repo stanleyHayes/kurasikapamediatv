@@ -44,6 +44,8 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	revenueDeps.AdCampaigns = faketesting.NewAdCampaignStore()
 	revenueDeps.AdEvents = &faketesting.AdEventStore{}
 	staffDeps := appidentity.StaffProfileDeps{Profiles: faketesting.NewStaffProfileStore(), Assets: assets, IDs: &faketesting.SequentialIDs{}}
+	recordingImports := faketesting.NewRecordingImportStore()
+	recordingProvider := &faketesting.RecordingPromotionFake{StartResult: ports.RecordingTranscode{TaskID: "transcode_1", OutputRef: "processed/recording.mp4"}, CheckResult: ports.RecordingProviderResult{Status: ports.RecordingProviderProcessing}}
 	return kurahttp.Deps{
 		CreateDraft:                appeditorial.NewCreateDraft(app),
 		UpdateDraft:                appeditorial.NewUpdateDraft(app),
@@ -87,6 +89,8 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		CreateGallery:              appmedia.NewCreateGallery(mediaDeps),
 		PublishGallery:             appmedia.NewPublishGallery(mediaDeps),
 		ListGalleryLibrary:         appmedia.NewListGalleryLibrary(mediaDeps, faketesting.VideoDeliveryFake{Delivery: ports.VideoDelivery{PlaybackURL: "https://cdn.test/report.m3u8", PosterURL: "https://cdn.test/poster.jpg", MIMEType: "application/vnd.apple.mpegurl"}}),
+		ReceiveRecording:           appmedia.NewReceiveRecording(mediaDeps, recordingImports, recordingProvider),
+		ProcessRecordings:          appmedia.NewProcessRecordings(mediaDeps, recordingImports, recordingProvider),
 		CreateMembershipPlan:       apprevenue.NewCreateMembershipPlan(revenueDeps),
 		ActivateMembershipPlan:     apprevenue.NewActivateMembershipPlan(revenueDeps),
 		ListMembershipPlans:        apprevenue.NewListMembershipPlans(revenueDeps),
@@ -106,6 +110,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		Clock:                      faketesting.FixedClock{At: now},
 		Log:                        slog.New(slog.NewTextHandler(io.Discard, nil)),
 		CronSecret:                 "s3cret-value-of-known-length-0000",
+		IVSWebhookSecret:           "ivs-secret-value-of-known-length",
 	}
 }
 

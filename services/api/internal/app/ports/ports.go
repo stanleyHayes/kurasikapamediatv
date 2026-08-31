@@ -31,6 +31,7 @@ var (
 	ErrNotFound               = errors.New("not found")
 	ErrInvalidPaymentWebhook  = errors.New("invalid payment webhook")
 	ErrNarrationNotConfigured = errors.New("article narration is not configured")
+	ErrRecordingNotConfigured = errors.New("recording promotion is not configured")
 )
 
 // Clock supplies the current time.
@@ -201,6 +202,38 @@ type NarrationJobRepository interface {
 	FindLatestForArticle(context.Context, shared.ArticleID) (media.NarrationJob, error)
 	ListProcessing(context.Context, int) ([]media.NarrationJob, error)
 	Save(context.Context, media.NarrationJob) error
+}
+
+type RecordingImportRepository interface {
+	FindByID(context.Context, shared.RecordingImportID) (media.RecordingImport, error)
+	FindBySourceRef(context.Context, string) (media.RecordingImport, error)
+	ListProcessing(context.Context, int) ([]media.RecordingImport, error)
+	Save(context.Context, media.RecordingImport) error
+}
+
+type RecordingSource struct {
+	SourceRef, Bucket, Prefix, ChannelName, Locale string
+	DurationSeconds                                float64
+}
+
+type RecordingTranscode struct{ TaskID, OutputRef string }
+type RecordingProviderStatus string
+
+const (
+	RecordingProviderProcessing RecordingProviderStatus = "processing"
+	RecordingProviderReady      RecordingProviderStatus = "ready"
+	RecordingProviderFailed     RecordingProviderStatus = "failed"
+)
+
+type RecordingProviderResult struct {
+	Status        RecordingProviderStatus
+	FailureReason string
+	Delivery      media.AssetDelivery
+}
+
+type RecordingPromotionPort interface {
+	Start(context.Context, shared.RecordingImportID, RecordingSource) (RecordingTranscode, error)
+	Check(context.Context, shared.RecordingImportID, string, string) (RecordingProviderResult, error)
 }
 
 type NarrationRequest struct {

@@ -57,6 +57,13 @@ slots awaiting a replay and requires a ready Cloudinary video plus ready WebVTT
 captions before completing the slot. Public guide reads then project the video
 through `VideoDeliveryPort` into adaptive HLS, poster and caption URLs.
 
+Recording promotion is asynchronous and Go-owned. EventBridge sends a signed
+IVS `Recording End` event to the API; the application stores a source-session
+idempotency record before MediaConvert packages the discovered private HLS as
+MP4. A cron poll promotes completed output from an allowlisted private S3
+bucket into Cloudinary, persists a ready video asset, then removes only the
+temporary MP4. The original IVS capture remains under its recovery lifecycle.
+
 ---
 
 ## 2. Repository layout

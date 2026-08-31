@@ -5,6 +5,7 @@ import {
   attachGeneratedNarration,
   loadLatestArticleNarration,
   processNarrationsViaApi,
+  processRecordingsViaApi,
   requestArticleNarration,
 } from './article-narration'
 
@@ -88,6 +89,17 @@ describe('article narration BFF', () => {
     vi.stubGlobal('fetch', fetchMock)
     await expect(processNarrationsViaApi({ baseUrl: 'https://api.test/', cronSecret: 'secret' })).resolves.toMatchObject({ failed: ['nar_1'] })
     await expect(processNarrationsViaApi({ baseUrl: 'https://api.test', cronSecret: 'secret' })).rejects.toThrow(/down/u)
+    expect(fetchMock.mock.calls[0]?.[1]?.headers).toEqual({ Authorization: 'Bearer secret' })
+  })
+
+  it('processes recording jobs through the authenticated API cron', async () => {
+    const fetchMock = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ processing: 1, ready: 0, failed: [] })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ type: 'internal', title: 'down' }), { status: 500 }))
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(processRecordingsViaApi({ baseUrl: 'https://api.test/', cronSecret: 'secret' })).resolves.toMatchObject({ processing: 1 })
+    await expect(processRecordingsViaApi({ baseUrl: 'https://api.test', cronSecret: 'secret' })).rejects.toThrow(/down/u)
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://api.test/internal/process-recordings')
     expect(fetchMock.mock.calls[0]?.[1]?.headers).toEqual({ Authorization: 'Bearer secret' })
   })
 })

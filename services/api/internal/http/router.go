@@ -28,6 +28,8 @@ type Deps struct {
 	GetLatestNarration         appeditorial.GetLatestArticleNarration
 	AttachArticleNarration     appeditorial.AttachArticleNarration
 	ProcessNarrationJobs       appeditorial.ProcessNarrationJobs
+	ReceiveRecording           appmedia.ReceiveRecording
+	ProcessRecordings          appmedia.ProcessRecordings
 	GetDraft                   appeditorial.GetDraft
 	ListAuthoredArticles       appeditorial.ListAuthoredArticles
 	ListAwaitingReview         appeditorial.ListAwaitingReview
@@ -86,6 +88,7 @@ type Deps struct {
 	Clock                      ports.Clock
 	Log                        *slog.Logger
 	CronSecret                 string
+	IVSWebhookSecret           string
 }
 
 // NewRouter wires the HTTP surface.
@@ -115,6 +118,8 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /articles/{id}/unpublish", deps.handleUnpublish)
 	mux.HandleFunc("POST /internal/publish-due", deps.handlePublishDue)
 	mux.HandleFunc("POST /internal/process-narrations", deps.handleProcessNarrations)
+	mux.HandleFunc("POST /internal/process-recordings", deps.handleProcessRecordings)
+	mux.HandleFunc("POST /webhooks/ivs/recordings", deps.handleIVSRecording)
 	mux.HandleFunc("GET /public/{locale}/articles/{slug}", deps.handleGetPublished)
 	mux.HandleFunc("GET /public/{locale}/articles", deps.handleListPublished)
 	mux.HandleFunc("GET /public/{locale}/sections/{slug}", deps.handleBrowseCategory)

@@ -155,6 +155,12 @@ and refuses future, cancelled, prerecorded or already-completed slots. The
 public `ListTelevisionGuide` resolves completed replay assets through
 `VideoDeliveryPort`; provider transformation syntax stays in the adapter.
 
+`RecordingPromotionPort` starts and polls IVS HLS-to-MP4 packaging without
+leaking EventBridge, S3, MediaConvert or Cloudinary SDK types. A unique
+`RecordingImportRepository` source reference absorbs provider retries and
+reserves the final asset ID before paid work begins. Completion creates a
+private ready video; it does not publish a replay or bypass the WebVTT gate.
+
 The Go migration carries the same contracts in `internal/app/ports`: separate
 presenter, programme and schedule repositories feed `ListTelevisionGuide`.
 Production HTTP exposes `GET /public/{locale}/television` plus authenticated

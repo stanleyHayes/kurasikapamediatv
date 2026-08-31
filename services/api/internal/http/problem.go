@@ -33,6 +33,7 @@ type Problem struct {
 }
 
 var errMalformedRequest = errors.New("malformed request")
+var errInvalidWebhookEvent = errors.New("invalid webhook event")
 
 // problemFor maps a domain error to a status and a stable type.
 //
@@ -48,6 +49,9 @@ func problemFor(err error) Problem {
 	case errors.Is(err, errMalformedRequest):
 		return Problem{Type: "invalid_json", Title: "The request body is not valid JSON", Status: http.StatusBadRequest}
 
+	case errors.Is(err, errInvalidWebhookEvent):
+		return Problem{Type: "invalid_webhook", Title: "The recording event is invalid", Status: http.StatusBadRequest}
+
 	case errors.Is(err, ports.ErrNotFound):
 		return Problem{Type: "not_found", Title: "Not found", Status: http.StatusNotFound}
 
@@ -62,6 +66,9 @@ func problemFor(err error) Problem {
 
 	case errors.Is(err, ports.ErrNarrationNotConfigured):
 		return Problem{Type: "narration_unavailable", Title: "Article narration is not configured", Status: http.StatusServiceUnavailable}
+
+	case errors.Is(err, ports.ErrRecordingNotConfigured):
+		return Problem{Type: "recording_unavailable", Title: "Recording promotion is not configured", Status: http.StatusServiceUnavailable}
 
 	case errors.Is(err, editorial.ErrNotOwnArticle):
 		return Problem{
@@ -101,6 +108,7 @@ func problemFor(err error) Problem {
 		errors.Is(err, domainmedia.ErrInvalidEpisodeChapter),
 		errors.Is(err, domainmedia.ErrInvalidNarrationJob),
 		errors.Is(err, domainmedia.ErrUnsupportedNarrationLocale),
+		errors.Is(err, domainmedia.ErrInvalidRecordingImport),
 		errors.Is(err, appeditorial.ErrNarrationTextTooLong),
 		errors.Is(err, appeditorial.ErrNarrationTextEmpty):
 		// Fall through to the shared invalid-input response.

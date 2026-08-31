@@ -23,6 +23,7 @@ import (
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
 	adapternarration "github.com/kurasikapa/api/internal/adapter/narration"
 	adapterpayments "github.com/kurasikapa/api/internal/adapter/payments"
+	adapterrecording "github.com/kurasikapa/api/internal/adapter/recording"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appidentity "github.com/kurasikapa/api/internal/app/identity"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
@@ -75,6 +76,7 @@ func run(log *slog.Logger) error {
 	schedule := adaptermongo.NewScheduleRepository(televisionStore)
 	assets := adaptermongo.NewAssetRepository(db)
 	narrationJobs := adaptermongo.NewNarrationJobRepository(db)
+	recordingImports := adaptermongo.NewRecordingImportRepository(db)
 	podcasts := adaptermongo.NewPodcastRepository(db)
 	episodes := adaptermongo.NewEpisodeRepository(db)
 	galleries := adaptermongo.NewGalleryRepository(db)
@@ -99,6 +101,20 @@ func run(log *slog.Logger) error {
 			return providerErr
 		}
 		narrationProvider = provider
+	}
+	var recordingProvider ports.RecordingPromotionPort = adapterrecording.Unavailable{}
+	if cfg.IVSRecordingBucket != "" {
+		provider, providerErr := adapterrecording.New(ctx, adapterrecording.Config{
+			Region: cfg.IVSRegion, SourceBucket: cfg.IVSRecordingBucket,
+			OutputBucket: cfg.MediaConvertBucket, RoleARN: cfg.MediaConvertRoleARN,
+			JobTemplate: cfg.MediaConvertTemplate, OutputPrefix: "kurasikapa/recordings",
+			CloudName: cfg.CloudinaryCloudName, CloudinaryKey: cfg.CloudinaryAPIKey,
+			CloudinarySecret: cfg.CloudinaryAPISecret, Clock: clock,
+		})
+		if providerErr != nil {
+			return providerErr
+		}
+		recordingProvider = provider
 	}
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
@@ -133,6 +149,9 @@ func run(log *slog.Logger) error {
 		return err
 	}
 	if err := narrationJobs.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := recordingImports.EnsureIndexes(ctx); err != nil {
 		return err
 	}
 	if err := podcasts.EnsureIndexes(ctx); err != nil {
@@ -189,6 +208,8 @@ func run(log *slog.Logger) error {
 		GetLatestNarration:         appeditorial.NewGetLatestArticleNarration(deps, narrationJobs),
 		AttachArticleNarration:     appeditorial.NewAttachArticleNarration(deps, narrationJobs),
 		ProcessNarrationJobs:       appeditorial.NewProcessNarrationJobs(deps, narrationJobs, narrationProvider),
+		ReceiveRecording:           appmedia.NewReceiveRecording(mediaDeps, recordingImports, recordingProvider),
+		ProcessRecordings:          appmedia.NewProcessRecordings(mediaDeps, recordingImports, recordingProvider),
 		GetDraft:                   appeditorial.NewGetDraft(deps),
 		ListAuthoredArticles:       appeditorial.NewListAuthoredArticles(deps),
 		ListAwaitingReview:         appeditorial.NewListAwaitingReview(deps),
@@ -247,6 +268,7 @@ func run(log *slog.Logger) error {
 		Clock:                      clock,
 		Log:                        log,
 		CronSecret:                 cfg.CronSecret,
+		IVSWebhookSecret:           cfg.IVSWebhookSecret,
 	})
 
 	server := &http.Server{

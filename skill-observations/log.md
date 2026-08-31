@@ -360,3 +360,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Derive the handoff from runtime reads, keep generated or supplied values active, and leave unavailable optional provider keys commented with format-safe examples. Validate that no active assignment is empty before delivery.
 
 **Principle:** Production environment handoffs should encode absence explicitly and be validated against runtime consumption rather than copied mechanically from an example file.
+
+### Observation 24: Production builds must identify the highest-precedence environment source
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** Verifying two Next.js applications in a monorepo where ignored app-level production placeholders overrode the authoritative root production environment.
+**Skill:** New skill candidate: release-verification
+**Type:** open-source
+**Phase/Area:** Production build environment parity
+
+**Issue:** A production build loaded a nearer app-level environment file containing fake provider values before the valid root file, producing an apparent application failure even though the intended production configuration was correct.
+
+**Suggested improvement:** Before compiling a release candidate, enumerate the framework's environment-file precedence, identify ignored local overrides, validate the effective non-secret key sources, and run the build with the same authoritative environment shape used by hosting.
+
+**Principle:** Production build evidence is trustworthy only when the highest-precedence environment source is known and intentional.
