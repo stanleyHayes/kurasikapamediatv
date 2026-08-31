@@ -6,11 +6,39 @@ const (
 	CollMembershipPlans = "membership_plans"
 	CollSubscriptions   = "subscriptions"
 	CollDonations       = "donations"
+	CollAdCampaigns     = "ad_campaigns"
+	CollAdEvents        = "ad_events"
 )
 
 type moneyDoc struct {
 	Minor    int64  `bson:"minor"`
 	Currency string `bson:"currency"`
+}
+
+type adCampaignDoc struct {
+	ID          string     `bson:"_id"`
+	Name        string     `bson:"name"`
+	Advertiser  string     `bson:"advertiser"`
+	Locale      string     `bson:"locale"`
+	Slot        string     `bson:"slot"`
+	CreativeURL string     `bson:"creativeUrl"`
+	AltText     string     `bson:"altText"`
+	LandingURL  string     `bson:"landingUrl"`
+	Budget      moneyDoc   `bson:"budget"`
+	CPMMinor    int64      `bson:"cpmMinor"`
+	Priority    int        `bson:"priority"`
+	StartsAt    time.Time  `bson:"startsAt"`
+	EndsAt      time.Time  `bson:"endsAt"`
+	Active      bool       `bson:"active"`
+	ActivatedAt *time.Time `bson:"activatedAt"`
+	CreatedBy   string     `bson:"createdBy"`
+}
+
+type adEventDoc struct {
+	ID         string    `bson:"_id"`
+	CampaignID string    `bson:"campaignId"`
+	Kind       string    `bson:"kind"`
+	OccurredAt time.Time `bson:"occurredAt"`
 }
 
 type membershipPlanDoc struct {

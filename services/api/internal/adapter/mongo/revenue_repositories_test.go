@@ -69,7 +69,9 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 	plans := adapter.NewMembershipPlanRepository(h.DB)
 	subscriptions := adapter.NewSubscriptionRepository(h.DB)
 	donations := adapter.NewDonationRepository(h.DB)
-	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes} {
+	adCampaigns := adapter.NewAdCampaignRepository(h.DB)
+	adEvents := adapter.NewAdEventRepository(h.DB)
+	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes} {
 		if err := ensure(ctx); err != nil {
 			t.Fatal(err)
 		}
@@ -78,6 +80,8 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 		adapter.CollMembershipPlans: {"membership_slug_unique", "active_membership_plans"},
 		adapter.CollSubscriptions:   {"subscription_provider_ref_unique", "reader_entitlement", "revenue_subscribers_recent"},
 		adapter.CollDonations:       {"donation_provider_ref_unique", "donation_revenue_recent", "donation_checkout_recent"},
+		adapter.CollAdCampaigns:     {"eligible_ad_campaigns"},
+		adapter.CollAdEvents:        {"campaign_event_counts"},
 	}
 	for collection, expected := range checks {
 		names := indexNames(t, h, collection)
@@ -95,5 +99,30 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 	state.ID = "don_b"
 	if err := donations.Save(ctx, revenue.ReconstituteDonation(state)); err == nil {
 		t.Fatal("duplicate provider reference accepted")
+	}
+}
+
+func TestAdRepositoriesResolveEligibleCampaignsAndCountEvents(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	ctx := context.Background()
+	campaigns := adapter.NewAdCampaignRepository(h.DB)
+	events := adapter.NewAdEventRepository(h.DB)
+	activated := testNow.Add(-time.Hour)
+	campaign := revenue.ReconstituteAdCampaign(revenue.AdCampaignState{ID: "ad_1", Name: "Launch", Advertiser: "Acme", Locale: "*", Slot: revenue.SlotHomeLeaderboard, CreativeURL: "https://cdn.example/ad.jpg", AltText: "Solar panels", LandingURL: "https://example.com", Budget: revenue.Money{Minor: 10000, Currency: revenue.CurrencyGHS}, CPMMinor: 1000, Priority: 90, StartsAt: testNow.Add(-time.Hour), EndsAt: testNow.Add(time.Hour), Active: true, ActivatedAt: &activated, CreatedBy: "admin"})
+	if err := campaigns.Save(ctx, campaign); err != nil {
+		t.Fatal(err)
+	}
+	listed, err := campaigns.ListEligible(ctx, revenue.SlotHomeLeaderboard, "fr", testNow, 10)
+	if err != nil || len(listed) != 1 || listed[0].State().AltText != "Solar panels" {
+		t.Fatal(listed, err)
+	}
+	event, _ := revenue.NewAdEvent("event_1", campaign.ID(), revenue.AdImpression, testNow)
+	if err = events.Append(ctx, event); err != nil {
+		t.Fatal(err)
+	}
+	count, err := events.CountForCampaign(ctx, campaign.ID(), revenue.AdImpression)
+	if err != nil || count != 1 {
+		t.Fatal(count, err)
 	}
 }

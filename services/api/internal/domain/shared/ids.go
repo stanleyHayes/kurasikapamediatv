@@ -53,6 +53,10 @@ type (
 	SubscriptionID string
 	// DonationID identifies one supporter contribution.
 	DonationID string
+	// AdCampaignID identifies one advertiser-funded campaign.
+	AdCampaignID string
+	// AdEventID identifies one immutable impression or click event.
+	AdEventID string
 )
 
 func (id ArticleID) String() string        { return string(id) }
@@ -71,6 +75,8 @@ func (id GalleryID) String() string        { return string(id) }
 func (id MembershipPlanID) String() string { return string(id) }
 func (id SubscriptionID) String() string   { return string(id) }
 func (id DonationID) String() string       { return string(id) }
+func (id AdCampaignID) String() string     { return string(id) }
+func (id AdEventID) String() string        { return string(id) }
 
 // NewArticleID validates and wraps an article identifier.
 func NewArticleID(raw string) (ArticleID, error) {

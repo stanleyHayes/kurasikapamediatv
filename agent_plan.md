@@ -54,7 +54,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
-| Revenue | **IN PROGRESS** | Provider-neutral memberships, donations, entitlement, Paystack/Stripe checkout, signed webhook confirmation, multi-currency KPIs and the subscriber ledger are implemented; advertising, products, classifieds and affiliates remain. |
+| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising now has tested campaign, activation, placement, budget, event and report APIs; Studio/public ad surfaces, products, classifieds and affiliates remain. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
@@ -64,7 +64,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast publishing is deployed. Photo/video galleries now have domain/app/API/Mongo, Studio builder and public presentation with full verification; Studio and API are live while the public route awaits Vercel quota reset. Article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
-| Monetisation | Membership tiers, recurring subscriptions, one-time donations, domain entitlement, GHS Paystack/EUR Stripe checkout, signed idempotent webhooks, Studio tier management, public support, multi-currency KPIs and a subscriber ledger are implemented locally. Provider credentials, production release, products, advertising, classifieds and affiliates remain. | **PARTIAL — ACTIVE R4** |
+| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising campaign inventory, activation, deterministic budget-aware placement, append-only events and reporting are implemented behind ports and HTTP APIs. Studio/public ad surfaces, provider credentials, production release, products, classifieds and affiliates remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
@@ -1086,3 +1086,22 @@ are live. Custom-domain DNS remains an external registrar action.**
   the protected `/revenue/report` route (anonymous request correctly returns
   403). The public and Studio builds remain unpublished because Vercel again
   rejected the final deployment at its 100-deployments-per-24-hours limit.
+
+## 21. KUR-82 — advertising inventory and delivery foundation (2026-08-31)
+
+**Status: BACKEND COMPLETE; Studio/public surfaces remain active.**
+
+- Added accessible ad campaigns with explicit slot, locale, HTTPS creative and
+  destination, alt text, GHS/EUR budget, CPM, priority and bounded delivery
+  window. Activation is permission-gated and expired campaigns fail closed.
+- Placement selection is deterministic and checks active state, locale, slot,
+  delivery window and estimated CPM spend before serving. Impression and click
+  records are immutable and contain no reader identity, IP address or tracking
+  profile.
+- Added Mongo campaign/event repositories with named eligibility/count indexes,
+  public placement/event endpoints and permission-gated campaign reporting.
+  Public responses expose only the disclosure/rendering fields required by an
+  ad placement.
+- Evidence: `make -C services/api verify` passes with 96.6% domain and 90.0%
+  application/HTTP coverage; domain, application, Mongo and HTTP lifecycle
+  tests cover validation, budget enforcement, placement, events and reporting.

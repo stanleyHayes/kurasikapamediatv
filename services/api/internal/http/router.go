@@ -64,6 +64,11 @@ type Deps struct {
 	ConfirmSubscriptionPayment apprevenue.ConfirmSubscriptionPayment
 	ConfirmDonationPayment     apprevenue.ConfirmDonationPayment
 	BuildRevenueReport         apprevenue.BuildRevenueReport
+	CreateAdCampaign           apprevenue.CreateAdCampaign
+	ActivateAdCampaign         apprevenue.ActivateAdCampaign
+	ResolveAdPlacement         apprevenue.ResolveAdPlacement
+	RecordAdEvent              apprevenue.RecordAdEvent
+	BuildAdReport              apprevenue.BuildAdReport
 	PaymentWebhooks            ports.PaymentWebhookVerifier
 	Roles                      ports.RoleRepository
 	Clock                      ports.Clock
@@ -121,6 +126,11 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /public/donations", deps.handleRecordDonation)
 	mux.HandleFunc("GET /revenue/entitlement", deps.handleCheckEntitlement)
 	mux.HandleFunc("GET /revenue/report", deps.handleRevenueReport)
+	mux.HandleFunc("POST /revenue/ad-campaigns", deps.handleCreateAdCampaign)
+	mux.HandleFunc("POST /revenue/ad-campaigns/{id}/activate", deps.handleActivateAdCampaign)
+	mux.HandleFunc("GET /revenue/ad-report", deps.handleAdReport)
+	mux.HandleFunc("GET /public/{locale}/ads/{slot}", deps.handleResolveAdPlacement)
+	mux.HandleFunc("POST /public/ads/{id}/events", deps.handleRecordAdEvent)
 	mux.HandleFunc("POST /webhooks/payments/{provider}", deps.handlePaymentWebhook)
 
 	return withRequestLogging(deps.Log, mux)

@@ -18,6 +18,8 @@ type Deps struct {
 	Plans         ports.MembershipPlanRepository
 	Subscriptions ports.SubscriptionRepository
 	Donations     ports.DonationRepository
+	AdCampaigns   ports.AdCampaignRepository
+	AdEvents      ports.AdEventRepository
 	Payments      ports.PaymentGateway
 	Clock         ports.Clock
 	IDs           ports.IDs

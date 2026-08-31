@@ -35,6 +35,8 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 			Provider: "paystack", ProviderRef: "checkout_1", CheckoutURL: "https://pay.example/checkout",
 		}}, Clock: faketesting.FixedClock{At: now}, IDs: &faketesting.SequentialIDs{},
 	}
+	revenueDeps.AdCampaigns = faketesting.NewAdCampaignStore()
+	revenueDeps.AdEvents = &faketesting.AdEventStore{}
 	return kurahttp.Deps{
 		CreateDraft:                appeditorial.NewCreateDraft(app),
 		UpdateDraft:                appeditorial.NewUpdateDraft(app),
@@ -80,6 +82,11 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ConfirmSubscriptionPayment: apprevenue.NewConfirmSubscriptionPayment(revenueDeps),
 		ConfirmDonationPayment:     apprevenue.NewConfirmDonationPayment(revenueDeps),
 		BuildRevenueReport:         apprevenue.NewBuildRevenueReport(revenueDeps),
+		CreateAdCampaign:           apprevenue.NewCreateAdCampaign(revenueDeps),
+		ActivateAdCampaign:         apprevenue.NewActivateAdCampaign(revenueDeps),
+		ResolveAdPlacement:         apprevenue.NewResolveAdPlacement(revenueDeps),
+		RecordAdEvent:              apprevenue.NewRecordAdEvent(revenueDeps),
+		BuildAdReport:              apprevenue.NewBuildAdReport(revenueDeps),
 		PaymentWebhooks:            faketesting.PaymentWebhookFake{},
 		Roles:                      roles{granted: granted},
 		Clock:                      faketesting.FixedClock{At: now},

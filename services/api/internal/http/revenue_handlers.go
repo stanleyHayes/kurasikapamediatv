@@ -138,6 +138,80 @@ func (d Deps) handleRevenueReport(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, d.Log, http.StatusOK, report)
 }
 
+func (d Deps) handleCreateAdCampaign(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	var input revenue.AdCampaignState
+	if err = decode(r, &input); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	campaign, err := d.CreateAdCampaign.Execute(r.Context(), actor, input)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusCreated, campaign.State())
+}
+
+func (d Deps) handleActivateAdCampaign(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	campaign, err := d.ActivateAdCampaign.Execute(r.Context(), actor, shared.AdCampaignID(r.PathValue("id")))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+}
+
+func (d Deps) handleResolveAdPlacement(w http.ResponseWriter, r *http.Request) {
+	campaign, err := d.ResolveAdPlacement.Execute(r.Context(), revenue.AdSlot(r.PathValue("slot")), r.PathValue("locale"))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	if campaign == nil {
+		writeJSON(w, d.Log, http.StatusOK, map[string]any{"placement": nil})
+		return
+	}
+	s := campaign.State()
+	writeJSON(w, d.Log, http.StatusOK, map[string]any{"placement": map[string]any{"id": s.ID.String(), "advertiser": s.Advertiser, "creativeUrl": s.CreativeURL, "altText": s.AltText, "landingUrl": s.LandingURL}})
+}
+
+func (d Deps) handleRecordAdEvent(w http.ResponseWriter, r *http.Request) {
+	var input struct{ Kind revenue.AdEventKind }
+	if err := decode(r, &input); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	if _, err := d.RecordAdEvent.Execute(r.Context(), shared.AdCampaignID(r.PathValue("id")), input.Kind); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (d Deps) handleAdReport(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	report, err := d.BuildAdReport.Execute(r.Context(), actor)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, map[string]any{"campaigns": report})
+}
+
 func membershipPlanView(plan revenue.MembershipPlan) map[string]any {
 	s := plan.State()
 	return map[string]any{"id": s.ID.String(), "name": s.Name, "slug": s.Slug,

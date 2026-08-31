@@ -242,6 +242,18 @@ type DonationRepository interface {
 	Save(context.Context, revenue.Donation) error
 }
 
+type AdCampaignRepository interface {
+	FindByID(context.Context, shared.AdCampaignID) (revenue.AdCampaign, error)
+	ListEligible(context.Context, revenue.AdSlot, string, time.Time, int) ([]revenue.AdCampaign, error)
+	ListAll(context.Context, int) ([]revenue.AdCampaign, error)
+	Save(context.Context, revenue.AdCampaign) error
+}
+
+type AdEventRepository interface {
+	CountForCampaign(context.Context, shared.AdCampaignID, revenue.AdEventKind) (int64, error)
+	Append(context.Context, revenue.AdEvent) error
+}
+
 type CheckoutRequest struct {
 	Reference string
 	Purpose   string

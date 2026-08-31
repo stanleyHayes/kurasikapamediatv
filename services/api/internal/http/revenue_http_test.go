@@ -143,3 +143,28 @@ func TestRevenueReportIsRoleProtectedAndReturnsLedger(t *testing.T) {
 		t.Fatalf("report: %d %s", response.Code, response.Body.String())
 	}
 }
+
+func TestAdvertisingCampaignLifecyclePlacementEventsAndReport(t *testing.T) {
+	handler := revenueServer()
+	body := `{"name":"Launch","advertiser":"Acme Ghana","locale":"en","slot":"home_leaderboard","creativeURL":"https://cdn.example/ad.jpg","altText":"Acme solar systems","landingURL":"https://example.com","budget":{"minor":10000,"currency":"GHS"},"cpmMinor":1000,"priority":90,"startsAt":"2026-08-08T12:00:00Z","endsAt":"2026-08-10T12:00:00Z"}`
+	created := request(handler, http.MethodPost, "/revenue/ad-campaigns", body, true)
+	if created.Code != http.StatusCreated {
+		t.Fatal(created.Code, created.Body.String())
+	}
+	activated := request(handler, http.MethodPost, "/revenue/ad-campaigns/id_1/activate", `{}`, true)
+	if activated.Code != http.StatusOK {
+		t.Fatal(activated.Code, activated.Body.String())
+	}
+	placement := request(handler, http.MethodGet, "/public/en/ads/home_leaderboard", "", false)
+	if placement.Code != http.StatusOK || !bytes.Contains(placement.Body.Bytes(), []byte(`"advertiser":"Acme Ghana"`)) {
+		t.Fatal(placement.Code, placement.Body.String())
+	}
+	event := request(handler, http.MethodPost, "/public/ads/id_1/events", `{"kind":"impression"}`, false)
+	if event.Code != http.StatusNoContent {
+		t.Fatal(event.Code, event.Body.String())
+	}
+	report := request(handler, http.MethodGet, "/revenue/ad-report", "", true)
+	if report.Code != http.StatusOK || !bytes.Contains(report.Body.Bytes(), []byte(`"Impressions":1`)) {
+		t.Fatal(report.Code, report.Body.String())
+	}
+}

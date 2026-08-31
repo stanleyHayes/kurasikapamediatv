@@ -76,6 +76,8 @@ func run(log *slog.Logger) error {
 	plans := adaptermongo.NewMembershipPlanRepository(db)
 	subscriptions := adaptermongo.NewSubscriptionRepository(db)
 	donations := adaptermongo.NewDonationRepository(db)
+	adCampaigns := adaptermongo.NewAdCampaignRepository(db)
+	adEvents := adaptermongo.NewAdEventRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
 	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
 	paymentWebhooks := adapterpayments.NewWebhookVerifier(cfg.PaystackSecretKey, cfg.StripeWebhookSecret)
@@ -126,6 +128,12 @@ func run(log *slog.Logger) error {
 	if err := donations.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := adCampaigns.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := adEvents.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 
 	deps := appeditorial.Deps{
 		Articles:   articles,
@@ -142,6 +150,7 @@ func run(log *slog.Logger) error {
 	}
 	revenueDeps := apprevenue.Deps{
 		Plans: plans, Subscriptions: subscriptions, Donations: donations,
+		AdCampaigns: adCampaigns, AdEvents: adEvents,
 		Payments: payments, Clock: clock, IDs: uuidIDs{},
 	}
 
@@ -190,6 +199,11 @@ func run(log *slog.Logger) error {
 		ConfirmSubscriptionPayment: apprevenue.NewConfirmSubscriptionPayment(revenueDeps),
 		ConfirmDonationPayment:     apprevenue.NewConfirmDonationPayment(revenueDeps),
 		BuildRevenueReport:         apprevenue.NewBuildRevenueReport(revenueDeps),
+		CreateAdCampaign:           apprevenue.NewCreateAdCampaign(revenueDeps),
+		ActivateAdCampaign:         apprevenue.NewActivateAdCampaign(revenueDeps),
+		ResolveAdPlacement:         apprevenue.NewResolveAdPlacement(revenueDeps),
+		RecordAdEvent:              apprevenue.NewRecordAdEvent(revenueDeps),
+		BuildAdReport:              apprevenue.NewBuildAdReport(revenueDeps),
 		PaymentWebhooks:            paymentWebhooks,
 		Roles:                      roles,
 		Clock:                      clock,
