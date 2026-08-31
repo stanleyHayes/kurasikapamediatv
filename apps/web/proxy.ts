@@ -1,5 +1,9 @@
 import createMiddleware from 'next-intl/middleware'
+import { NextResponse, type NextRequest } from 'next/server'
 import { routing } from '@kurasikapa/web-kit/i18n/routing'
+import { isLocaleFreePath } from './src/i18n/locale-free-path'
+
+const localeMiddleware = createMiddleware(routing)
 
 /**
  * Next 16 renamed `middleware.ts` to `proxy.ts`. Having both is a build error.
@@ -7,7 +11,10 @@ import { routing } from '@kurasikapa/web-kit/i18n/routing'
  * Locale routing only. Security headers are NOT set here, deliberately — see
  * src/security/headers.ts for why they live in next.config.ts instead.
  */
-export default createMiddleware(routing)
+export default function proxy(request: NextRequest): NextResponse {
+  if (isLocaleFreePath(request.nextUrl.pathname)) return NextResponse.next()
+  return localeMiddleware(request)
+}
 
 export const config = {
   /*
