@@ -29,6 +29,8 @@ type Problem struct {
 	Status int    `json:"status"`
 }
 
+var errMalformedRequest = errors.New("malformed request")
+
 // problemFor maps a domain error to a status and a stable type.
 //
 // The mapping lives in ONE place. Scattered across handlers, the same error
@@ -40,6 +42,9 @@ type Problem struct {
 // message can hand a connection string to whoever made the request.
 func problemFor(err error) Problem {
 	switch {
+	case errors.Is(err, errMalformedRequest):
+		return Problem{Type: "invalid_json", Title: "The request body is not valid JSON", Status: http.StatusBadRequest}
+
 	case errors.Is(err, ports.ErrNotFound):
 		return Problem{Type: "not_found", Title: "Not found", Status: http.StatusNotFound}
 

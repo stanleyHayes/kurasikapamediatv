@@ -53,3 +53,31 @@ func TestAssetUseCasesFailClosed(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestAssetUseCasesPropagateRepositoryAndDeliveryFailures(t *testing.T) {
+	d, _, _, _ := deps()
+	storageFailure := errors.New("storage unavailable")
+	assets := fakes.NewAssetStore()
+	uploads := &fakes.MediaUploadFake{Ticket: ports.UploadTicket{Signature: "ok"}}
+
+	assets.Err = storageFailure
+	if _, err := appmedia.NewCreateAssetUpload(d, assets, uploads).Execute(context.Background(), actor(), domainmedia.AssetState{Kind: domainmedia.AssetVideo, Filename: "report.mp4"}); !errors.Is(err, storageFailure) {
+		t.Fatalf("create save: %v", err)
+	}
+	if _, err := appmedia.NewListAssets(assets).Execute(context.Background(), actor(), "en", 20); !errors.Is(err, storageFailure) {
+		t.Fatalf("list: %v", err)
+	}
+
+	assets.Err = nil
+	complete := appmedia.NewCompleteAssetUpload(assets, uploads)
+	if _, err := complete.Execute(context.Background(), actor(), "missing", ports.UploadReceipt{}); !errors.Is(err, ports.ErrNotFound) {
+		t.Fatalf("find: %v", err)
+	}
+	created, err := appmedia.NewCreateAssetUpload(d, assets, uploads).Execute(context.Background(), actor(), domainmedia.AssetState{Kind: domainmedia.AssetVideo, Filename: "report.mp4"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = complete.Execute(context.Background(), actor(), created.Asset.ID(), ports.UploadReceipt{PublicID: "provider", SecureURL: "https://example.test/report.mp4"}); !errors.Is(err, domainmedia.ErrInvalidAssetDelivery) {
+		t.Fatalf("delivery: %v", err)
+	}
+}

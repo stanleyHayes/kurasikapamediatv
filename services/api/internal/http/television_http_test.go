@@ -64,7 +64,7 @@ func TestTelevisionEndpointsRejectUnauthorisedAndInvalidInput(t *testing.T) {
 	if rec := request(handler, http.MethodPost, "/television/presenters", `{}`, false); rec.Code != http.StatusForbidden {
 		t.Fatalf("unauthorised = %d", rec.Code)
 	}
-	if rec := request(handler, http.MethodPost, "/television/presenters", `{`, true); rec.Code != http.StatusInternalServerError {
+	if rec := request(handler, http.MethodPost, "/television/presenters", `{`, true); rec.Code != http.StatusBadRequest {
 		t.Fatalf("invalid = %d", rec.Code)
 	}
 }

@@ -3,6 +3,7 @@ package http
 import (
 	"crypto/subtle"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -145,7 +146,10 @@ func decode(r *http.Request, into any) error {
 	decoder := json.NewDecoder(http.MaxBytesReader(nil, r.Body, 1<<20))
 	decoder.DisallowUnknownFields()
 
-	return decoder.Decode(into)
+	if err := decoder.Decode(into); err != nil {
+		return fmt.Errorf("%w: %v", errMalformedRequest, err)
+	}
+	return nil
 }
 
 type articleResponse struct {
