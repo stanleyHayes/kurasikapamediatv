@@ -70,3 +70,65 @@ func TestVerifiedWebhookConfirmsPendingDonation(t *testing.T) {
 		t.Fatalf("unknown event: %d %s", response.Code, response.Body.String())
 	}
 }
+
+func TestRevenueHandlersRejectMalformedAndMissingResources(t *testing.T) {
+	handler := revenueServer()
+	cases := []struct {
+		method, path, body string
+		want               int
+	}{
+		{http.MethodPost, "/revenue/membership-plans", `{`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/membership-plans", `{}`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/subscriptions", `{`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/subscriptions", `{}`, http.StatusNotFound},
+		{http.MethodPost, "/public/donations", `{`, http.StatusBadRequest},
+		{http.MethodPost, "/public/donations", `{}`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/membership-plans/missing/activate", `{}`, http.StatusNotFound},
+	}
+	for _, tc := range cases {
+		authorized := tc.path != "/public/donations"
+		if response := request(handler, tc.method, tc.path, tc.body, authorized); response.Code != tc.want {
+			t.Errorf("%s: got %d, want %d: %s", tc.path, response.Code, tc.want, response.Body.String())
+		}
+	}
+	if response := request(handler, http.MethodGet, "/revenue/entitlement", "", false); response.Code != http.StatusForbidden {
+		t.Fatalf("unsigned entitlement: %d %s", response.Code, response.Body.String())
+	}
+}
+
+func TestVerifiedWebhookRejectsMissingRevenueResources(t *testing.T) {
+	for _, purpose := range []string{"subscription", "donation"} {
+		deps := httpDeps(emptyEditorial(), nil)
+		deps.PaymentWebhooks = faketesting.PaymentWebhookFake{Event: ports.VerifiedPayment{
+			Purpose: purpose, ResourceID: "missing", PaymentRef: "payment_missing",
+		}}
+		response := request(kurahttp.NewRouter(deps), http.MethodPost, "/webhooks/payments/paystack", `{}`, false)
+		if response.Code != http.StatusNotFound {
+			t.Errorf("%s: got %d, want %d: %s", purpose, response.Code, http.StatusNotFound, response.Body.String())
+		}
+	}
+}
+
+func TestVerifiedSubscriptionWebhookIsIdempotent(t *testing.T) {
+	deps := httpDeps(emptyEditorial(), map[shared.UserID][]identity.Role{"manager": {identity.RoleAdministrator}})
+	handler := kurahttp.NewRouter(deps)
+	if response := request(handler, http.MethodPost, "/revenue/membership-plans", `{"name":"Supporter","slug":"supporter","interval":"monthly","price":{"minor":3500,"currency":"GHS"},"benefits":["Member briefings"]}`, true); response.Code != http.StatusCreated {
+		t.Fatalf("create: %d %s", response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodPost, "/revenue/membership-plans/id_1/activate", `{}`, true); response.Code != http.StatusOK {
+		t.Fatalf("activate: %d %s", response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodPost, "/revenue/subscriptions", `{"planID":"id_1","email":"reader@example.com","returnURL":"https://kurasikapa.tv/en/support"}`, true); response.Code != http.StatusCreated {
+		t.Fatalf("subscription: %d %s", response.Code, response.Body.String())
+	}
+	deps.PaymentWebhooks = faketesting.PaymentWebhookFake{Event: ports.VerifiedPayment{
+		Purpose: "subscription", ResourceID: "id_2", PaymentRef: "payment_2",
+	}}
+	handler = kurahttp.NewRouter(deps)
+	for attempt := 1; attempt <= 2; attempt++ {
+		response := request(handler, http.MethodPost, "/webhooks/payments/paystack", `{}`, false)
+		if response.Code != http.StatusNoContent {
+			t.Fatalf("webhook attempt %d: %d %s", attempt, response.Code, response.Body.String())
+		}
+	}
+}
