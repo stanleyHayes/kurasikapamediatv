@@ -58,7 +58,7 @@ function HomeLayout({ lead, briefing, trending }: HomeRails): React.ReactElement
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-x-[var(--space-md)] gap-y-10 md:grid-cols-2">
+            <div className="depth-grid grid grid-cols-1 gap-x-[var(--space-md)] gap-y-10 md:grid-cols-2">
               {briefing.map((article, index) => (
                 <BriefingCard key={article.id} article={article} index={index} />
               ))}

@@ -22,7 +22,7 @@ export function DashboardInsights({
           <p className="max-w-xl text-sm text-on-surface-variant">Live workflow signals from the editorial and moderation queues. Publication figures show the latest 50 items per language.</p>
         </div>
       </header>
-      <div className="grid lg:grid-cols-[1.35fr_.85fr_1fr]">
+      <div className="depth-grid grid gap-3 p-3 lg:grid-cols-[1.35fr_.85fr_1fr]">
         <BarPanel title="Your workflow" data={workflow} />
         <LanguagePanel data={published} />
         <BarPanel title="Decision queues" data={attention} />

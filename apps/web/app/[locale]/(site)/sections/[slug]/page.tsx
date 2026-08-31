@@ -72,7 +72,7 @@ async function SectionBody({ params }: Params): Promise<React.ReactElement> {
             <LeadStory article={lead} now={section.now} />
 
             {secondary.length > 0 && (
-              <div className="grid grid-cols-1 gap-[var(--space-md)] md:grid-cols-2">
+              <div className="depth-grid grid grid-cols-1 gap-[var(--space-md)] md:grid-cols-2">
                 {secondary.map((article) => (
                   <SectionCard key={article.id} article={article} />
                 ))}

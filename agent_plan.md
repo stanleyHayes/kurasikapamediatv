@@ -41,6 +41,7 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 | Dashboard KPIs and visualisations | **DONE** | Sourced workflow, review, moderation and language-publication KPIs plus workflow bars, queue bars and language chart; no invented totals. |
 | Full gates, production deploy and live workflow smoke tests | **DONE** | Lint, typecheck, boundaries, all TS suites, duplication and Go verification passed. Both Vercel projects reached Ready; live Studio sign-in/create-story and public Careers/invitation routes responded successfully. |
 | Client-demo presentation pass | **DONE** | Shared animated empty-state frame covers public collections, search, reader libraries, comments and Studio queues; Studio has a dedicated newsroom splash and the login logo no longer sits on a white plate. Production now contains 35 EN/FR stories, 11 sections, comments, FAQ, Help and Careers records, all ownership-tagged for a one-command selective clear. `pnpm verify` passed; both Vercel projects are Ready and the live FAQ and independent Studio login smokes return 200. |
+| Editorial authoring and spatial UI consistency | **IN REVIEW** | New-story intake now opens the canonical Markdown-backed rich editor immediately, the last native select has been replaced by the branded picker, route loading is a composed newsroom transition, and the shared signal/card grid language has isometric depth with reduced-motion fallback. Full gates passed; production deploy and rendered authenticated review remain. |
 
 ### Discovery completion programme
 

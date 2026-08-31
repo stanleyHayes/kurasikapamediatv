@@ -20,7 +20,7 @@ export interface Metric {
 
 export function MetricCards({ metrics }: { metrics: readonly Metric[] }): React.ReactElement {
   return (
-    <section className="grid grid-cols-1 border-y-2 border-on-surface bg-surface-container-lowest sm:grid-cols-2 xl:grid-cols-4">
+    <section className="depth-grid grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
         <div
           key={metric.label}

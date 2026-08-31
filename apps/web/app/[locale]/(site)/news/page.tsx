@@ -72,7 +72,7 @@ async function NewsBody({ params }: Params): Promise<React.ReactElement> {
           <NewsLead article={lead} />
 
           {rest.length > 0 && (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="depth-grid grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {rest.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}

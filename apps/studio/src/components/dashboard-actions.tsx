@@ -15,7 +15,7 @@ export function DashboardActions(): React.ReactElement {
         <div><p className="broadcast-kicker text-primary">Newsroom tools</p><h2 className="mt-2 font-display text-2xl font-semibold text-on-surface">Move the desk forward</h2></div>
         <span className="hidden text-[10px] font-bold tracking-[.14em] text-on-surface-variant uppercase sm:block">5 live workspaces</span>
       </header>
-      <div className="grid sm:grid-cols-2 xl:grid-cols-5">
+      <div className="depth-grid grid gap-3 p-3 sm:grid-cols-2 xl:grid-cols-5">
         {ACTIONS.map((action) => (
           <Link key={action.href} href={action.href} className="group relative min-h-40 border-b border-outline-variant p-5 transition-colors hover:bg-primary-container sm:border-r xl:border-b-0">
             <span aria-hidden className="grid h-9 w-9 place-items-center border border-primary text-primary transition-colors group-hover:bg-primary group-hover:text-white">{action.icon}</span>

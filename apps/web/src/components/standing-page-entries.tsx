@@ -24,7 +24,7 @@ export function StandingPageEntries({ pageKey, entries }: { pageKey: SitePageKey
 }
 
 function EntryGrid({ pageKey, entries }: { pageKey: SitePageKey; entries: readonly SitePageEntry[] }): React.ReactElement {
-  return <div className="border-t border-on-surface md:grid md:grid-cols-2">{entries.map((entry, index) => <article key={entry.id} className="border-b border-on-surface p-6 md:p-8 md:odd:border-r">
+  return <div className="depth-grid mt-8 grid gap-5 md:grid-cols-2">{entries.map((entry, index) => <article key={entry.id} className="border border-on-surface bg-surface-container-lowest p-6 md:p-8">
     <span className="font-mono text-sm text-secondary-ink">{String(index + 1).padStart(2, '0')}</span>
     <h3 className="mt-8 max-w-[20ch] font-display text-3xl font-semibold leading-tight">{entry.title}</h3>
     {entry.summary !== '' && <p className="mt-3 text-sm font-bold uppercase tracking-[.08em] text-primary">{entry.summary}</p>}

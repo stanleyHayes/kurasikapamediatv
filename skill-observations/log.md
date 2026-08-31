@@ -287,3 +287,17 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** For each core workflow, trace the primary action from navigation and dashboard through completion; label secondary ingestion tools by their editorial role and never let them visually replace original authoring.
 
 **Principle:** A workflow does not exist for users until its first action is visible and correctly prioritised.
+### Observation 19: CMS entry routes must share the canonical authoring primitive
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** Remediating an editorial CMS after the full editor had rich Markdown while the create-story entry path still used a native select and plain textarea.
+**Skill:** redesign-existing-projects
+**Type:** open-source
+**Phase/Area:** Scan and component consistency audit
+
+**Issue:** Auditing only the named full editor missed a separate creation route that collected the same content with lower-quality native controls. The inconsistency was visible before editors ever reached the canonical workspace.
+
+**Suggested improvement:** Add a workflow-entry inventory to the redesign scan: trace every route that creates or edits the same entity, identify the canonical input primitives, search for native controls and simplified duplicates, and verify that loading boundaries use the same visual system.
+
+**Principle:** A premium workflow is only as coherent as its earliest entry point; shared data must use shared authoring primitives from creation through final editing.
