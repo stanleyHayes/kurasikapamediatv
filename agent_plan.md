@@ -66,7 +66,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment to articles now runs through Go domain/application/API/Mongo and renders across Studio, public cards, story pages and social metadata. VOD processing, article-to-audio and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
-| Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
+| Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
 | Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
 
@@ -1149,3 +1149,33 @@ are live. Custom-domain DNS remains an external registrar action.**
   reports healthy. `kurasikapa.tv` is attached in Vercel but still requires
   working DNS. Real editorial content and provider credentials remain governed
   by the production handoff.
+
+## 23. KUR-84 — credible newsroom profiles and accountable bylines (2026-08-31)
+
+**Status: VERIFIED; production release active.**
+
+- Added a Go-owned `StaffProfile` identity aggregate and `profile:manage`
+  permission. Profiles are translated per user and locale; updates return a
+  published profile to draft, and publication requires a ready image from the
+  verified media library.
+- Added application ports/use cases, hand-written fakes, indexed Mongo
+  persistence and authenticated/public HTTP routes. Unique `(userId, locale)`
+  and `(locale, slug)` indexes protect identity and public URLs from races.
+- Studio People & access now includes a no-native-select profile publisher for
+  choosing a newsroom member, language and verified portrait, plus approved
+  biography and optional HTTPS public link.
+- The public Team page renders published profiles with useful empty-state copy;
+  each person has a canonical author page, Person structured data and verified
+  links. Articles retain the author id across the Go BFF and link their byline
+  and portrait to that profile. `NewsArticle.author` includes the profile URL
+  when one exists, while unpublished identities keep the honest newsroom
+  fallback.
+- Full `pnpm verify` is green: lint, type checks, dependency boundaries,
+  package coverage, duplication, Go vet/race tests and the 95% domain / 90%
+  application coverage floors all pass. Explicit Web and Studio production
+  builds also pass against the deployed Go API.
+- The build audit exposed one remaining TypeScript Mongo read in the homepage
+  popularity rail. API-backed deployments now omit that unavailable ranking
+  and use the existing recency fallback, keeping Vercel prerendering independent
+  of Mongo while preserving the local TypeScript fallback until audience
+  ranking is ported to Go.

@@ -49,6 +49,12 @@ plus Atlas Vector Search.
 article path cannot 500 because a seed used `usr_author`. The byline use case
 returns a display name only; emails never appear on the article page.
 
+`StaffProfileRepository` owns locale-specific public newsroom identities. One
+user may have one profile per locale; `(userId, locale)` and `(locale, slug)`
+are unique. Public queries return published profiles only, and `PublishStaffProfile`
+resolves the portrait through `AssetRepository` so a pending, missing or
+non-image asset cannot enter Team, an author page or an article byline.
+
 ### Ambient ports
 
 These exist so the domain stays pure and every test is deterministic.
@@ -129,7 +135,8 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 **editorial** — `CreateDraft` · `UpdateDraft` · `SubmitForReview` · `ApproveArticle` · `RejectArticle` ·
 `SchedulePublication` · `PublishArticle` · `UnpublishArticle` · `RestoreRevision` · `TranslateArticle`
 
-**identity** — `RegisterReader` · `SignInWithProvider` · `AssignRole` · `EnableTwoFactor` · `AuthorizeAction`
+**identity** — `RegisterReader` · `SignInWithProvider` · `AssignRole` · `EnableTwoFactor` · `AuthorizeAction` ·
+`UpsertStaffProfile` · `PublishStaffProfile` · `ListStaffProfiles` · `GetStaffProfile`
 
 **media** — `CreateAssetUpload` · `CompleteAssetUpload` · `ListAssets` · `StartLiveStream` · `EndLiveStream` · `CreatePresenter` ·
 `PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·

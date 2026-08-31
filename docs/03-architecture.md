@@ -105,7 +105,7 @@ Seven contexts, each a folder inside `packages/domain`. They share IDs, never in
 | Context | Owns | Key invariants |
 |---|---|---|
 | **editorial** | Article, Revision, Category, Tag, Byline | An Article cannot reach `Published` without an approved Revision and a locale-complete `Slug` |
-| **identity** | User, Role, Permission, Session | 11 roles resolve to a permission set; permission checks live in the domain, never in a route |
+| **identity** | User, Role, Permission, Session, StaffProfile | 11 roles resolve to a permission set; public newsroom identities require an approved biography and verified portrait |
 | **media** | Asset, LiveStream, Podcast, Episode | An Asset is immutable once referenced by a published Article |
 | **distribution** | SocialPost, Newsletter, PushAlert, RssSource | A SocialPost may only reference a `Published` Article |
 | **audience** | Reader, Bookmark, ReadingHistory, Comment | A Comment belongs to exactly one Article and one Reader |

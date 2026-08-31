@@ -4,6 +4,7 @@ import { joinUrl } from './url'
 
 export interface PublicArticleDto {
   readonly id: string
+  readonly authorId: string
   readonly slug: string
   readonly locale: string
   readonly title: string
@@ -60,6 +61,7 @@ export function publicArticleFrom(raw: unknown): PublicArticleDto {
   const body = asRecord(raw)
   return {
     id: text(body['id']),
+    authorId: text(body['authorId']),
     slug: text(body['slug']),
     locale: text(body['locale']),
     title: text(body['title']),

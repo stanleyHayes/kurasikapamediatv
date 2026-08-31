@@ -33,6 +33,8 @@ type (
 	// collection must convert; treating the two as interchangeable produced a
 	// silent, total failure of role lookup once already.
 	UserID string
+	// StaffProfileID identifies one public newsroom identity.
+	StaffProfileID string
 	// AssetID identifies a media asset.
 	AssetID string
 	// PresenterID identifies a public station presenter.
@@ -65,6 +67,7 @@ func (id RevisionID) String() string       { return string(id) }
 func (id CategoryID) String() string       { return string(id) }
 func (id TagID) String() string            { return string(id) }
 func (id UserID) String() string           { return string(id) }
+func (id StaffProfileID) String() string   { return string(id) }
 func (id AssetID) String() string          { return string(id) }
 func (id PresenterID) String() string      { return string(id) }
 func (id ProgrammeID) String() string      { return string(id) }

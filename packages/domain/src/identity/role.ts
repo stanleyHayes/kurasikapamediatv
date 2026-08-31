@@ -35,6 +35,7 @@ export const PERMISSIONS = [
   'social:publish',
   'campaign:view_own',
   'role:assign',
+  'profile:manage',
   'audit:read',
   'analytics:read',
   'comment:moderate',

@@ -23,6 +23,7 @@ import (
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
 	adapterpayments "github.com/kurasikapa/api/internal/adapter/payments"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appidentity "github.com/kurasikapa/api/internal/app/identity"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
 	kurahttp "github.com/kurasikapa/api/internal/http"
@@ -65,6 +66,7 @@ func run(log *slog.Logger) error {
 	revisions := adaptermongo.NewRevisionRepository(db)
 	categories := adaptermongo.NewCategoryRepository(db)
 	roles := adaptermongo.NewRoleRepository(db)
+	staffProfiles := adaptermongo.NewStaffProfileRepository(db)
 	televisionStore := adaptermongo.NewTelevisionRepositories(db)
 	presenters := adaptermongo.NewPresenterRepository(televisionStore)
 	programmes := adaptermongo.NewProgrammeRepository(televisionStore)
@@ -105,6 +107,9 @@ func run(log *slog.Logger) error {
 		return err
 	}
 	if err := televisionStore.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := staffProfiles.EnsureIndexes(ctx); err != nil {
 		return err
 	}
 	if err := assets.EnsureIndexes(ctx); err != nil {
@@ -149,6 +154,7 @@ func run(log *slog.Logger) error {
 		Podcasts: podcasts, Episodes: episodes, Galleries: galleries, Assets: assets,
 		Clock: clock, IDs: uuidIDs{},
 	}
+	staffDeps := appidentity.StaffProfileDeps{Profiles: staffProfiles, Assets: assets, IDs: uuidIDs{}}
 	revenueDeps := apprevenue.Deps{
 		Plans: plans, Subscriptions: subscriptions, Donations: donations,
 		AdCampaigns: adCampaigns, AdEvents: adEvents,
@@ -175,6 +181,10 @@ func run(log *slog.Logger) error {
 		ListPublishedArticles:      appeditorial.NewListPublishedArticles(deps),
 		BrowseCategory:             appeditorial.NewBrowseCategory(deps),
 		ListSections:               appeditorial.NewListSections(deps),
+		UpsertStaffProfile:         appidentity.NewUpsertStaffProfile(staffDeps),
+		PublishStaffProfile:        appidentity.NewPublishStaffProfile(staffDeps),
+		ListStaffProfiles:          appidentity.NewListStaffProfiles(staffDeps),
+		GetStaffProfile:            appidentity.NewGetStaffProfile(staffDeps),
 		CreatePresenter:            appmedia.NewCreatePresenter(mediaDeps),
 		PublishPresenter:           appmedia.NewPublishPresenter(mediaDeps),
 		CreateProgramme:            appmedia.NewCreateProgramme(mediaDeps),

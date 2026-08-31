@@ -5,6 +5,11 @@ export interface Publisher {
   readonly url: string
 }
 
+export interface ArticleIdentity {
+  readonly image?: string
+  readonly authorUrl?: string
+}
+
 /**
  * schema.org NewsArticle.
  *
@@ -21,7 +26,7 @@ export function newsArticleJsonLd(
   article: ArticleView & { readonly authorName?: string | null },
   publisher: Publisher,
   canonical: string,
-  image?: string,
+  identity?: ArticleIdentity,
 ): Record<string, unknown> {
   const json: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -38,7 +43,7 @@ export function newsArticleJsonLd(
     },
   }
 
-  if (image !== undefined && image !== '') json['image'] = [image]
+  if (identity?.image !== undefined && identity.image !== '') json['image'] = [identity.image]
 
   // Only present once the article is actually live. Emitting a publish date
   // for a draft would be a lie told to a crawler.
@@ -48,7 +53,7 @@ export function newsArticleJsonLd(
   }
 
   if (typeof article.authorName === 'string' && article.authorName !== '') {
-    json['author'] = { '@type': 'Person', name: article.authorName }
+    json['author'] = { '@type': 'Person', name: article.authorName, ...(identity?.authorUrl === undefined ? {} : { url: identity.authorUrl }) }
   }
 
   return json

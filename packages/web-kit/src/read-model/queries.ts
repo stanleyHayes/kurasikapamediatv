@@ -43,7 +43,7 @@ export async function cachedArticle(
     const authorName = await container().resolvePublicByline.execute({
       userId: loaded.article.authorId,
     })
-    return { ...toArticleView(loaded.article), body: loaded.body, authorName }
+    return { ...toArticleView(loaded.article), body: loaded.body, authorId: loaded.article.authorId, authorName }
   })
   if (found === null) return null
 
@@ -83,6 +83,12 @@ export async function cachedMostRead(locale: string, limit: number): Promise<rea
   'use cache'
   cacheLife('minutes')
   cacheTag(listTag(locale))
+
+  // Audience ranking has not moved to the Go API yet. In an API-backed
+  // deployment, returning no ranking lets `homeRails` fill Trending from the
+  // already-loaded recency rail without opening a second Mongo connection.
+  // This also keeps public-page prerendering independent of the database.
+  if (env().API_URL !== undefined) return []
 
   return (await container().listMostRead.execute({ locale, limit })).map(toArticleView)
 }

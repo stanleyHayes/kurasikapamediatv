@@ -161,6 +161,14 @@ type UserDirectory interface {
 	List(ctx context.Context, cursor Cursor) (Page[DirectoryUser], error)
 }
 
+type StaffProfileRepository interface {
+	FindByID(context.Context, shared.StaffProfileID) (identity.StaffProfile, error)
+	FindByUserID(context.Context, shared.UserID, string) (identity.StaffProfile, error)
+	FindPublishedBySlug(context.Context, string, string) (identity.StaffProfile, error)
+	ListPublished(context.Context, string) ([]identity.StaffProfile, error)
+	Save(context.Context, identity.StaffProfile) error
+}
+
 type PresenterRepository interface {
 	FindByID(context.Context, shared.PresenterID) (media.Presenter, error)
 	ListPublished(context.Context, string) ([]media.Presenter, error)

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appidentity "github.com/kurasikapa/api/internal/app/identity"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
@@ -39,6 +40,10 @@ type Deps struct {
 	ListPublishedArticles      appeditorial.ListPublishedArticles
 	BrowseCategory             appeditorial.BrowseCategory
 	ListSections               appeditorial.ListSections
+	UpsertStaffProfile         appidentity.UpsertStaffProfile
+	PublishStaffProfile        appidentity.PublishStaffProfile
+	ListStaffProfiles          appidentity.ListStaffProfiles
+	GetStaffProfile            appidentity.GetStaffProfile
 	CreatePresenter            appmedia.CreatePresenter
 	PublishPresenter           appmedia.PublishPresenter
 	CreateProgramme            appmedia.CreateProgramme
@@ -104,6 +109,11 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /public/{locale}/articles", deps.handleListPublished)
 	mux.HandleFunc("GET /public/{locale}/sections/{slug}", deps.handleBrowseCategory)
 	mux.HandleFunc("GET /public/{locale}/sections", deps.handleListSections)
+	mux.HandleFunc("PUT /staff/profiles/{userId}", deps.handleUpsertStaffProfile)
+	mux.HandleFunc("POST /staff/profiles/{id}/publish", deps.handlePublishStaffProfile)
+	mux.HandleFunc("GET /public/{locale}/team", deps.handleListStaffProfiles)
+	mux.HandleFunc("GET /public/{locale}/team/by-user/{userId}", deps.handleStaffProfileByUser)
+	mux.HandleFunc("GET /public/{locale}/team/{slug}", deps.handleStaffProfileBySlug)
 	mux.HandleFunc("GET /public/{locale}/television", deps.handleTelevisionGuide)
 	mux.HandleFunc("POST /television/presenters", deps.handleCreatePresenter)
 	mux.HandleFunc("POST /television/presenters/{id}/publish", deps.handlePublishPresenter)

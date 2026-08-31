@@ -29,6 +29,7 @@ export interface ArticleHeroView {
 
 export interface ReadableArticle extends ArticleView {
   readonly body: string | null
+  readonly authorId: string
   /** Directory display name, or null when we cannot source one honestly. */
   readonly authorName: string | null
 }

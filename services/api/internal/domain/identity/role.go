@@ -43,6 +43,7 @@ const (
 	PermRevenueManage    Permission = "revenue:manage"
 	PermRevenueRead      Permission = "revenue:read"
 	PermRoleAssign       Permission = "role:assign"
+	PermProfileManage    Permission = "profile:manage"
 	PermAuditRead        Permission = "audit:read"
 )
 
@@ -52,7 +53,7 @@ var allPermissions = []Permission{
 	PermArticleApprove, PermArticlePublish, PermArticleUnpublish,
 	PermAssetUploadImage, PermAssetUploadVideo, PermStreamManage,
 	PermSocialPublish, PermCampaignViewOwn, PermRevenueManage, PermRevenueRead,
-	PermRoleAssign, PermAuditRead,
+	PermRoleAssign, PermProfileManage, PermAuditRead,
 }
 
 // AllPermissions returns a copy of every permission.

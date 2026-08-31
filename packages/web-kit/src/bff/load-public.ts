@@ -53,6 +53,7 @@ export async function loadPublishedArticle(
     return {
       ...toArticleViewFromDto(publicArticleFrom(raw.article)),
       body: typeof raw.body === 'string' ? raw.body : null,
+      authorId: raw.article.authorId,
       authorName: publicBylineName(typeof raw.article.authorName === 'string' ? raw.article.authorName : ''),
     }
   })

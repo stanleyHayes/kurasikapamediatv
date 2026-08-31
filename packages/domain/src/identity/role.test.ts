@@ -17,6 +17,7 @@ describe('role permissions', () => {
   it('does not let an administrator assign roles', () => {
     // The one thing that separates the two. Otherwise an admin could self-promote.
     expect(permissionsOf(['administrator']).has('role:assign')).toBe(false)
+    expect(permissionsOf(['administrator']).has('profile:manage')).toBe(true)
   })
 
   it('never lets an author publish', () => {

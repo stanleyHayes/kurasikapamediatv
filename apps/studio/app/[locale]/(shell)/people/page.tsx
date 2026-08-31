@@ -9,6 +9,8 @@ import { CollectionView } from '@/components/collection-view'
 import { InvitationPanel } from '@/components/invitation-panel'
 import { StudioEmptyState } from '@/components/empty-state'
 import { invitationGraph } from '@kurasikapa/web-kit/composition/invitation-graph'
+import { loadMediaAssets } from '@kurasikapa/web-kit/bff/media-library'
+import { StaffProfileManager } from '@/components/staff-profile-manager'
 
 interface Person {
   readonly id: string
@@ -62,6 +64,8 @@ export default async function PeoplePage({
   }))
   const invitations = (await invitationGraph().invitations.list()).map((item) => ({ ...item, invitedBy: String(item.invitedBy), createdAt: item.createdAt.toISOString(), expiresAt: item.expiresAt.toISOString() }))
   const pendingInvitations = invitations.filter((item) => item.state === 'pending')
+  const media = (await Promise.all(['en', 'fr'].map((language) => loadMediaAssets(actor, language)))).flat()
+  const portraits = media.filter((asset) => asset.kind === 'image' && asset.status === 'ready' && asset.secureUrl !== '')
 
   return (
     <div className="space-y-8 pb-20">
@@ -79,6 +83,8 @@ export default async function PeoplePage({
       <MetricCards metrics={metricsFor(people, pendingInvitations.length)} />
 
       <InvitationPanel invitations={invitations} />
+
+      <StaffProfileManager people={people} assets={portraits} />
 
       <MembersTable people={people} selfId={actor.id} />
     </div>

@@ -1,16 +1,19 @@
 package http_test
 
 import (
+	"context"
 	"io"
 	"log/slog"
 	"net/http"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appidentity "github.com/kurasikapa/api/internal/app/identity"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
 	faketesting "github.com/kurasikapa/api/internal/app/testing"
 	"github.com/kurasikapa/api/internal/domain/identity"
+	domainmedia "github.com/kurasikapa/api/internal/domain/media"
 	"github.com/kurasikapa/api/internal/domain/shared"
 	kurahttp "github.com/kurasikapa/api/internal/http"
 )
@@ -24,6 +27,8 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		IDs:       &faketesting.SequentialIDs{},
 	}
 	assets := faketesting.NewAssetStore()
+	portrait := domainmedia.ReconstituteAsset(domainmedia.AssetState{ID: "portrait", Kind: domainmedia.AssetImage, Status: domainmedia.AssetReady, SecureURL: "https://cdn.test/portrait.jpg", AltText: "Newsroom journalist", Width: 800, Height: 1000})
+	_ = assets.Save(context.Background(), portrait)
 	app.Assets = assets
 	mediaDeps.Assets = assets
 	uploads := &faketesting.MediaUploadFake{Ticket: ports.UploadTicket{
@@ -38,6 +43,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	}
 	revenueDeps.AdCampaigns = faketesting.NewAdCampaignStore()
 	revenueDeps.AdEvents = &faketesting.AdEventStore{}
+	staffDeps := appidentity.StaffProfileDeps{Profiles: faketesting.NewStaffProfileStore(), Assets: assets, IDs: &faketesting.SequentialIDs{}}
 	return kurahttp.Deps{
 		CreateDraft:                appeditorial.NewCreateDraft(app),
 		UpdateDraft:                appeditorial.NewUpdateDraft(app),
@@ -58,6 +64,10 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ListPublishedArticles:      appeditorial.NewListPublishedArticles(app),
 		BrowseCategory:             appeditorial.NewBrowseCategory(app),
 		ListSections:               appeditorial.NewListSections(app),
+		UpsertStaffProfile:         appidentity.NewUpsertStaffProfile(staffDeps),
+		PublishStaffProfile:        appidentity.NewPublishStaffProfile(staffDeps),
+		ListStaffProfiles:          appidentity.NewListStaffProfiles(staffDeps),
+		GetStaffProfile:            appidentity.NewGetStaffProfile(staffDeps),
 		CreatePresenter:            appmedia.NewCreatePresenter(mediaDeps),
 		PublishPresenter:           appmedia.NewPublishPresenter(mediaDeps),
 		CreateProgramme:            appmedia.NewCreateProgramme(mediaDeps),

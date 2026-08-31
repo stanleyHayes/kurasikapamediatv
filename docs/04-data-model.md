@@ -187,6 +187,16 @@ from the article's locale (or a locale-neutral asset); the domain requires an
 HTTPS delivery URL, useful alternative text, a visible credit and positive
 dimensions.
 
+### Public newsroom profiles
+
+`staff_profiles` stores one translated profile per `(userId, locale)`: a stable
+public slug, display name, newsroom title, approved biography, verified portrait
+asset id, HTTPS social links and publication state. Unique indexes on
+`(userId, locale)` and `(locale, slug)` prevent duplicate identity and URL races;
+the public-team index orders published profiles by display name. Editing a live
+profile returns it to draft, and publication resolves a ready image through the
+media library before exposing its delivery metadata.
+
 ## 5. Consistency rules
 
 MongoDB gives us no foreign keys, so these are enforced in the domain and verified by integration tests:

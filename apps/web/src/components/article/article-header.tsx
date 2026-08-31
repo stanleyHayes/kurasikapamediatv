@@ -1,11 +1,14 @@
+import Image from 'next/image'
+import Link from 'next/link'
 import type { ReadableArticle } from '@kurasikapa/web-kit/read-model/article-view'
+import type { StaffProfileView } from '@kurasikapa/web-kit/bff/staff-profiles'
 import { isOpinionArticle, opinionDisclaimer } from './opinion-byline'
 
 const section = (categoryId: string): string => categoryId.replace(/^cat_/u, '')
 const readingMinutes = (body: string | null): number => body === null ? 1 : Math.max(1, Math.round(body.split(/\s+/u).length / 200))
 
 /** A front-page masthead for one story, with the reporting metadata on the record. */
-export function ArticleHeader({ article }: { article: ReadableArticle }): React.ReactElement {
+export function ArticleHeader({ article, author }: { article: ReadableArticle; author: StaffProfileView | null }): React.ReactElement {
   const opinion = isOpinionArticle(article.categoryId)
   return <header className="paper-noise relative overflow-hidden border-b-2 border-on-surface bg-surface-container-lowest">
     <div className="mx-auto max-w-[var(--container-page)] px-4 pt-8 md:px-8 md:pt-12">
@@ -18,14 +21,14 @@ export function ArticleHeader({ article }: { article: ReadableArticle }): React.
         <p className="relative mb-8 max-w-xl text-sm font-medium text-on-surface-variant">Independent reporting from Kurasikapa Media TV</p>
         <h1 className="relative max-w-[14ch] font-display text-[clamp(3.3rem,7.4vw,7.6rem)] font-semibold leading-[.86] tracking-[-.07em] text-on-surface">{article.title}</h1>
       </div>
-      <Byline article={article} opinion={opinion} />
+      <Byline article={article} opinion={opinion} author={author} />
     </div>
   </header>
 }
 
-function Byline({ article, opinion }: { article: ReadableArticle; opinion: boolean }): React.ReactElement {
+function Byline({ article, opinion, author }: { article: ReadableArticle; opinion: boolean; author: StaffProfileView | null }): React.ReactElement {
   return <div className="grid border-t-2 border-on-surface md:grid-cols-[1.2fr_.6fr_.8fr]">
-    <div className="py-6 md:border-r md:border-on-surface md:pr-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Reported by</p><p className="mt-2 font-display text-2xl font-semibold">{article.authorName ?? 'Kurasikapa Newsroom'}</p></div>
+    <div className="py-6 md:border-r md:border-on-surface md:pr-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Reported by</p>{author === null ? <p className="mt-2 font-display text-2xl font-semibold">{article.authorName ?? 'Kurasikapa Newsroom'}</p> : <Link href={`/${article.locale}/team/${author.slug}`} className="mt-3 inline-flex items-center gap-3"><Image src={author.portrait.url} alt="" width={48} height={48} className="size-12 rounded-full border border-on-surface object-cover" /><span><strong className="block font-display text-2xl font-semibold leading-none">{author.displayName}</strong><small className="mt-1 block text-xs font-bold uppercase tracking-[.12em] text-primary">{author.jobTitle} ↗</small></span></Link>}</div>
     <div className="border-t border-on-surface py-6 md:border-r md:border-t-0 md:px-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Reading time</p><p className="mt-2 font-mono text-lg font-semibold">{readingMinutes(article.body)} minutes</p></div>
     <div className="border-t border-on-surface py-6 md:border-t-0 md:pl-8"><p className="text-[.65rem] font-bold uppercase tracking-[.18em] text-on-surface-variant">Published</p><PublishedDate article={article} /></div>
     {opinion && <p className="border-t border-on-surface py-4 text-sm italic text-on-surface-variant md:col-span-3">{opinionDisclaimer(article.locale)}</p>}

@@ -73,7 +73,7 @@ describe('newsArticleJsonLd', () => {
 
   it('includes the same social image when one is supplied', () => {
     const image = 'https://kurasikapa.tv/og-image?title=Budget%202026'
-    expect(newsArticleJsonLd(article, publisher, canonical, image)['image']).toEqual([image])
+    expect(newsArticleJsonLd(article, publisher, canonical, { image })['image']).toEqual([image])
   })
 })
 

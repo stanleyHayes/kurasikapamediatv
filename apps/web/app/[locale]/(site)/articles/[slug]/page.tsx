@@ -19,6 +19,7 @@ import { AdPlacement } from '@/components/advertising/ad-placement'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
+import { loadStaffProfileByUser } from '@kurasikapa/web-kit/bff/staff-profiles'
 
 interface Params {
   params: Promise<{ locale: string; slug: string }>
@@ -106,13 +107,15 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
   // would confirm the article exists.
   if (article === null) notFound()
 
+  const authorProfile = await loadStaffProfileByUser(locale, article.authorId)
+
   const canonical = `${env().APP_URL}/${locale}/articles/${article.slug}`
   const socialImage = article.hero?.secureUrl ?? `${env().APP_URL}/og-image?title=${encodeURIComponent(article.title)}`
   const jsonLd = newsArticleJsonLd(
     article,
     { name: 'Kurasikapa Media TV', url: env().APP_URL },
     canonical,
-    socialImage,
+    { image: socialImage, ...(authorProfile === null ? {} : { authorUrl: `${env().APP_URL}/${locale}/team/${authorProfile.slug}` }) },
   )
 
   return (
@@ -125,7 +128,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
         dangerouslySetInnerHTML={{ __html: asScriptContent(jsonLd) }}
       />
 
-      <ArticleHeader article={article} />
+      <ArticleHeader article={article} author={authorProfile} />
       {article.hero !== null && <ArticleHero hero={article.hero} />}
       <div className="mx-auto max-w-[var(--container-page)] border-x-2 border-b-2 border-on-surface">
         <StoryBanner categoryId={article.categoryId} />

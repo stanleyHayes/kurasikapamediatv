@@ -19,6 +19,7 @@ const (
 // PublicArticle is the reader-facing card: no workflow fields.
 type PublicArticle struct {
 	ID          string           `json:"id"`
+	AuthorID    string           `json:"authorId"`
 	Slug        string           `json:"slug"`
 	Locale      string           `json:"locale"`
 	Title       string           `json:"title"`
@@ -29,7 +30,7 @@ type PublicArticle struct {
 
 func publicFrom(a editorial.Article) PublicArticle {
 	view := PublicArticle{
-		ID: a.ID().String(), Slug: a.Slug().String(), Locale: a.Locale(),
+		ID: a.ID().String(), AuthorID: a.AuthorID().String(), Slug: a.Slug().String(), Locale: a.Locale(),
 		Title: a.Title(), CategoryID: a.CategoryID().String(), Hero: heroViewOf(a),
 	}
 	if at, ok := a.PublishedAt(); ok {
