@@ -99,6 +99,78 @@ func TestAttachArticleHeroUsesOnlyReadyLocalisedImages(t *testing.T) {
 	}
 }
 
+func TestAttachArticleHeroSurfacesEveryRejectedDependency(t *testing.T) {
+	t.Parallel()
+
+	slug, _ := shared.NewSlug("market-report")
+	article := editorial.Reconstitute(editorial.ArticleState{
+		ID: "art_hero", FamilyID: "family_hero", Locale: "en", Slug: slug,
+		Title: "Market report", AuthorID: author().ID(), Status: editorial.StatusDraft,
+	})
+	ready := media.ReconstituteAsset(media.AssetState{
+		ID: "asset_ready", Kind: media.AssetImage, Locale: "en", Status: media.AssetReady,
+		SecureURL: "https://res.cloudinary.com/demo/image/upload/report.jpg",
+		AltText:   "A reporter interviewing traders", Width: 1600, Height: 900,
+	})
+	input := app.AttachArticleHeroInput{
+		Actor: author(), ArticleID: article.ID(), AssetID: ready.ID(), Credit: "Newsroom",
+	}
+
+	t.Run("missing article", func(t *testing.T) {
+		h := newHarness()
+		_, err := app.NewAttachArticleHero(h.deps).Execute(context.Background(), input)
+		if !errors.Is(err, ports.ErrNotFound) {
+			t.Fatalf("error = %v, want ErrNotFound", err)
+		}
+	})
+
+	t.Run("asset lookup failure", func(t *testing.T) {
+		h := newHarness(article)
+		boom := errors.New("asset store unavailable")
+		h.assets.Err = boom
+		_, err := app.NewAttachArticleHero(h.deps).Execute(context.Background(), input)
+		if !errors.Is(err, boom) {
+			t.Fatalf("error = %v, want storage failure", err)
+		}
+	})
+
+	for name, state := range map[string]media.AssetState{
+		"pending image": {ID: "asset_ready", Kind: media.AssetImage, Locale: "en", Status: media.AssetPending},
+		"wrong locale":  {ID: "asset_ready", Kind: media.AssetImage, Locale: "fr", Status: media.AssetReady},
+	} {
+		t.Run(name, func(t *testing.T) {
+			h := newHarness(article)
+			h.assets.Items[ready.ID()] = media.ReconstituteAsset(state)
+			_, err := app.NewAttachArticleHero(h.deps).Execute(context.Background(), input)
+			if !errors.Is(err, app.ErrHeroAssetNotUsable) {
+				t.Fatalf("error = %v, want ErrHeroAssetNotUsable", err)
+			}
+		})
+	}
+
+	t.Run("domain rejection", func(t *testing.T) {
+		h := newHarness(article)
+		h.assets.Items[ready.ID()] = ready
+		input.Actor = reader()
+		_, err := app.NewAttachArticleHero(h.deps).Execute(context.Background(), input)
+		if !errors.Is(err, identity.ErrNotPermitted) {
+			t.Fatalf("error = %v, want ErrNotPermitted", err)
+		}
+	})
+
+	t.Run("article save failure", func(t *testing.T) {
+		h := newHarness(article)
+		h.assets.Items[ready.ID()] = ready
+		boom := errors.New("article store unavailable")
+		h.articles.FailSave = boom
+		input.Actor = author()
+		_, err := app.NewAttachArticleHero(h.deps).Execute(context.Background(), input)
+		if !errors.Is(err, boom) {
+			t.Fatalf("error = %v, want storage failure", err)
+		}
+	})
+}
+
 func TestCreateDraft(t *testing.T) {
 	t.Parallel()
 
