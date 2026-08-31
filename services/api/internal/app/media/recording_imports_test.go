@@ -161,3 +161,74 @@ func TestRecordingImportPropagatesStorageAndProviderErrors(t *testing.T) {
 		t.Fatalf("asset error: %+v", result)
 	}
 }
+
+func TestRecordingImportCoversInvalidInputAndPersistenceFailures(t *testing.T) {
+	d, assets := recordingDeps()
+	down := errors.New("storage down")
+	provider := &fakes.RecordingPromotionFake{StartResult: ports.RecordingTranscode{TaskID: "task", OutputRef: "output"}}
+
+	invalid := recordingSource()
+	invalid.Locale = "de"
+	if _, err := appmedia.NewReceiveRecording(d, fakes.NewRecordingImportStore(), provider).Execute(context.Background(), actor(), invalid); !errors.Is(err, domainmedia.ErrInvalidRecordingImport) {
+		t.Fatalf("invalid source: %v", err)
+	}
+
+	imports := fakes.NewRecordingImportStore()
+	job, err := appmedia.NewReceiveRecording(d, imports, provider).Execute(context.Background(), actor(), recordingSource())
+	if err != nil {
+		t.Fatalf("seed import: %v", err)
+	}
+	requested, _ := domainmedia.NewRecordingImport(actor(), domainmedia.RecordingImportState{
+		ID: "requested", AssetID: "requested_asset", SourceRef: "requested_source", Bucket: "bucket",
+		Prefix: "prefix", ChannelName: "Requested News", Locale: "en", DurationSeconds: 30,
+	}, now)
+	imports = fakes.NewRecordingImportStore(requested)
+	imports.SaveErr = down
+	if _, err = appmedia.NewReceiveRecording(d, imports, provider).Execute(context.Background(), actor(), ports.RecordingSource{
+		SourceRef: "requested_source", Bucket: "bucket", Prefix: "prefix", ChannelName: "Requested News", Locale: "en", DurationSeconds: 30,
+	}); !errors.Is(err, down) {
+		t.Fatalf("processing transition save: %v", err)
+	}
+
+	imports = fakes.NewRecordingImportStore(job)
+	provider.CheckResult = ports.RecordingProviderResult{Status: ports.RecordingProviderReady, Delivery: domainmedia.AssetDelivery{}}
+	result, err := appmedia.NewProcessRecordings(d, imports, provider).Execute(context.Background(), actor())
+	if err != nil || len(result.Failed) != 1 {
+		t.Fatalf("invalid delivery: %+v %v", result, err)
+	}
+	provider.CheckResult = ports.RecordingProviderResult{Status: ports.RecordingProviderReady, Delivery: domainmedia.AssetDelivery{ProviderID: "new", SecureURL: "https://cdn.test/new.mp4", Bytes: 10}}
+	assets.SaveErr = down
+	result, err = appmedia.NewProcessRecordings(d, imports, provider).Execute(context.Background(), actor())
+	if err != nil || len(result.Failed) != 1 {
+		t.Fatalf("asset save: %+v %v", result, err)
+	}
+	assets.SaveErr = nil
+
+	delivery := domainmedia.AssetDelivery{ProviderID: "ready", SecureURL: "https://cdn.test/ready.mp4", Bytes: 10}
+	ready, _ := domainmedia.NewAsset(actor(), domainmedia.AssetState{ID: job.State().AssetID, Kind: domainmedia.AssetVideo, Filename: "ready.mp4", MIMEType: "video/mp4", Locale: "en"})
+	ready, _ = ready.MarkReady(actor(), delivery)
+	assets.Items[job.State().AssetID] = ready
+	imports.SaveErr = down
+	provider.CheckResult = ports.RecordingProviderResult{Status: ports.RecordingProviderReady, Delivery: delivery}
+	result, err = appmedia.NewProcessRecordings(d, imports, provider).Execute(context.Background(), actor())
+	if err != nil || len(result.Failed) != 1 {
+		t.Fatalf("completion save: %+v %v", result, err)
+	}
+
+	imports.SaveErr = nil
+	provider.CheckResult = ports.RecordingProviderResult{Status: ports.RecordingProviderFailed}
+	result, err = appmedia.NewProcessRecordings(d, imports, provider).Execute(context.Background(), actor())
+	if err != nil || len(result.Failed) != 1 || imports.Rows[job.ID()].State().FailureReason == "" {
+		t.Fatalf("default provider failure: %+v %#v %v", result, imports.Rows[job.ID()].State(), err)
+	}
+
+	processing, _ := domainmedia.NewRecordingImport(actor(), domainmedia.RecordingImportState{ID: "fail_save", AssetID: "fail_asset", SourceRef: "fail_source", Bucket: "bucket", Prefix: "prefix", ChannelName: "News", Locale: "en", DurationSeconds: 30}, now)
+	processing, _ = processing.Start(actor(), "task", "output", now)
+	imports = fakes.NewRecordingImportStore(processing)
+	imports.SaveErr = down
+	provider.CheckResult = ports.RecordingProviderResult{Status: ports.RecordingProviderFailed, FailureReason: "provider failed"}
+	result, err = appmedia.NewProcessRecordings(d, imports, provider).Execute(context.Background(), actor())
+	if err != nil || len(result.Failed) != 1 || imports.Rows[processing.ID()].State().Status != domainmedia.RecordingImportProcessing {
+		t.Fatalf("failure save: %+v %#v %v", result, imports.Rows[processing.ID()].State(), err)
+	}
+}

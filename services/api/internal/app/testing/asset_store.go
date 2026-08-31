@@ -10,8 +10,9 @@ import (
 )
 
 type AssetStore struct {
-	Items map[shared.AssetID]domainmedia.Asset
-	Err   error
+	Items   map[shared.AssetID]domainmedia.Asset
+	Err     error
+	SaveErr error
 }
 
 func NewAssetStore(seed ...domainmedia.Asset) *AssetStore {
@@ -48,6 +49,9 @@ func (s *AssetStore) List(_ context.Context, locale string, limit int) ([]domain
 	return out, nil
 }
 func (s *AssetStore) Save(_ context.Context, item domainmedia.Asset) error {
+	if s.SaveErr != nil {
+		return s.SaveErr
+	}
 	if s.Err != nil {
 		return s.Err
 	}
