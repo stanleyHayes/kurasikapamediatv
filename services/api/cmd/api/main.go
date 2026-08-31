@@ -21,6 +21,7 @@ import (
 
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appmedia "github.com/kurasikapa/api/internal/app/media"
 	kurahttp "github.com/kurasikapa/api/internal/http"
 )
 
@@ -61,6 +62,10 @@ func run(log *slog.Logger) error {
 	revisions := adaptermongo.NewRevisionRepository(db)
 	categories := adaptermongo.NewCategoryRepository(db)
 	roles := adaptermongo.NewRoleRepository(db)
+	televisionStore := adaptermongo.NewTelevisionRepositories(db)
+	presenters := adaptermongo.NewPresenterRepository(televisionStore)
+	programmes := adaptermongo.NewProgrammeRepository(televisionStore)
+	schedule := adaptermongo.NewScheduleRepository(televisionStore)
 
 	if err := revisions.EnsureIndexes(ctx); err != nil {
 		// Fatal, not a warning. The unique (articleId, seq) index is what makes
@@ -84,6 +89,9 @@ func run(log *slog.Logger) error {
 		// unlikely.
 		return err
 	}
+	if err := televisionStore.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 
 	deps := appeditorial.Deps{
 		Articles:   articles,
@@ -92,6 +100,10 @@ func run(log *slog.Logger) error {
 		Clock:      clock,
 		IDs:        uuidIDs{},
 		Events:     loggingBus{log: log},
+	}
+	mediaDeps := appmedia.Deps{
+		Presenters: presenters, Programmes: programmes, Schedule: schedule,
+		Clock: clock, IDs: uuidIDs{},
 	}
 
 	handler := kurahttp.NewRouter(kurahttp.Deps{
@@ -113,6 +125,12 @@ func run(log *slog.Logger) error {
 		ListPublishedArticles: appeditorial.NewListPublishedArticles(deps),
 		BrowseCategory:        appeditorial.NewBrowseCategory(deps),
 		ListSections:          appeditorial.NewListSections(deps),
+		CreatePresenter:       appmedia.NewCreatePresenter(mediaDeps),
+		PublishPresenter:      appmedia.NewPublishPresenter(mediaDeps),
+		CreateProgramme:       appmedia.NewCreateProgramme(mediaDeps),
+		PublishProgramme:      appmedia.NewPublishProgramme(mediaDeps),
+		ScheduleProgramme:     appmedia.NewScheduleProgramme(mediaDeps),
+		ListTelevisionGuide:   appmedia.NewListTelevisionGuide(mediaDeps),
 		Roles:                 roles,
 		Log:                   log,
 		CronSecret:            cfg.CronSecret,

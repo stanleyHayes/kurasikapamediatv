@@ -35,15 +35,24 @@ type (
 	UserID string
 	// AssetID identifies a media asset.
 	AssetID string
+	// PresenterID identifies a public station presenter.
+	PresenterID string
+	// ProgrammeID identifies a recurring television programme.
+	ProgrammeID string
+	// ScheduleSlotID identifies one airing of a programme.
+	ScheduleSlotID string
 )
 
-func (id ArticleID) String() string  { return string(id) }
-func (id FamilyID) String() string   { return string(id) }
-func (id RevisionID) String() string { return string(id) }
-func (id CategoryID) String() string { return string(id) }
-func (id TagID) String() string      { return string(id) }
-func (id UserID) String() string     { return string(id) }
-func (id AssetID) String() string    { return string(id) }
+func (id ArticleID) String() string      { return string(id) }
+func (id FamilyID) String() string       { return string(id) }
+func (id RevisionID) String() string     { return string(id) }
+func (id CategoryID) String() string     { return string(id) }
+func (id TagID) String() string          { return string(id) }
+func (id UserID) String() string         { return string(id) }
+func (id AssetID) String() string        { return string(id) }
+func (id PresenterID) String() string    { return string(id) }
+func (id ProgrammeID) String() string    { return string(id) }
+func (id ScheduleSlotID) String() string { return string(id) }
 
 // NewArticleID validates and wraps an article identifier.
 func NewArticleID(raw string) (ArticleID, error) {

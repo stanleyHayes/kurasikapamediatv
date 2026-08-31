@@ -62,7 +62,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Audit requirement | Current evidence | State |
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Production currently contains 35 records explicitly tagged and worded as client-preview data; these are not real reporting. Article media is not yet an editorial field. Client-approved copy, reporter identities and photography are required before this can close. | **BLOCKED ON CLIENT CONTENT + MEDIA WORKFLOW** |
-| Television identity | The Live page and broadcast control room now have a tested TypeScript foundation for presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. Domain/application coverage, real Mongo repositories, Studio management UI and public rendering pass `pnpm verify`. Production still reads through the Go API, so the Go media context and BFF endpoints must land before this slice can be released. | **FOUNDATION COMPLETE — GO API ACTIVE** |
+| Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata now exist. Asset upload, podcast, episode, gallery, transcript, caption-file and VOD processing contexts, Cloudinary adapter and shared Studio media library remain unbuilt. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
 | Newsroom intelligence | Operational workflow KPIs, moderation counts, language publication charts, GA consent/instrumentation and privacy-safe unique-reader ranking exist. Traffic, acquisition, author/category performance, newsletter growth, retention, search and revenue dashboards do not. | **PARTIAL — R5** |
@@ -337,11 +337,12 @@ failure; rate-limited; nothing is persisted.
 
 ### 5.3 R3 — Multimedia
 
-The TypeScript media context now includes live broadcast plus presenter,
+The TypeScript and Go media contexts now include live broadcast plus presenter,
 programme and schedule aggregates; tested Mongo adapters; a Studio television
 manager; public guide, reminders and replay presentation; and a domain rule that
-recorded replays require captions. Production persistence is owned by the Go API,
-so the equivalent Go context and HTTP/BFF seam are the active release blocker.
+recorded replays require captions. The Go API exposes authenticated programming
+commands and a public guide, and both Next.js applications prefer that BFF path
+when `API_URL` is set. Full verification and production promotion are active.
 
 Still unbuilt: the shared asset library and CDN workflow, VOD processing, video
 and image galleries, podcast library with chapters/transcripts, article-to-audio

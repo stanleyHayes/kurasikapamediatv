@@ -9,6 +9,7 @@ import (
 	"time"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
@@ -35,6 +36,12 @@ type Deps struct {
 	ListPublishedArticles appeditorial.ListPublishedArticles
 	BrowseCategory        appeditorial.BrowseCategory
 	ListSections          appeditorial.ListSections
+	CreatePresenter       appmedia.CreatePresenter
+	PublishPresenter      appmedia.PublishPresenter
+	CreateProgramme       appmedia.CreateProgramme
+	PublishProgramme      appmedia.PublishProgramme
+	ScheduleProgramme     appmedia.ScheduleProgramme
+	ListTelevisionGuide   appmedia.ListTelevisionGuide
 	Roles                 ports.RoleRepository
 	Log                   *slog.Logger
 	CronSecret            string
@@ -66,6 +73,12 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /public/{locale}/articles", deps.handleListPublished)
 	mux.HandleFunc("GET /public/{locale}/sections/{slug}", deps.handleBrowseCategory)
 	mux.HandleFunc("GET /public/{locale}/sections", deps.handleListSections)
+	mux.HandleFunc("GET /public/{locale}/television", deps.handleTelevisionGuide)
+	mux.HandleFunc("POST /television/presenters", deps.handleCreatePresenter)
+	mux.HandleFunc("POST /television/presenters/{id}/publish", deps.handlePublishPresenter)
+	mux.HandleFunc("POST /television/programmes", deps.handleCreateProgramme)
+	mux.HandleFunc("POST /television/programmes/{id}/publish", deps.handlePublishProgramme)
+	mux.HandleFunc("POST /television/schedule", deps.handleScheduleProgramme)
 
 	return withRequestLogging(deps.Log, mux)
 }

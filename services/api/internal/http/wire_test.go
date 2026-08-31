@@ -6,12 +6,19 @@ import (
 	"net/http"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appmedia "github.com/kurasikapa/api/internal/app/media"
+	faketesting "github.com/kurasikapa/api/internal/app/testing"
 	"github.com/kurasikapa/api/internal/domain/identity"
 	"github.com/kurasikapa/api/internal/domain/shared"
 	kurahttp "github.com/kurasikapa/api/internal/http"
 )
 
 func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) kurahttp.Deps {
+	mediaDeps := appmedia.Deps{
+		Presenters: faketesting.NewPresenterStore(), Programmes: faketesting.NewProgrammeStore(),
+		Schedule: faketesting.NewScheduleStore(), Clock: faketesting.FixedClock{At: now},
+		IDs: &faketesting.SequentialIDs{},
+	}
 	return kurahttp.Deps{
 		CreateDraft:           appeditorial.NewCreateDraft(app),
 		UpdateDraft:           appeditorial.NewUpdateDraft(app),
@@ -31,6 +38,12 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ListPublishedArticles: appeditorial.NewListPublishedArticles(app),
 		BrowseCategory:        appeditorial.NewBrowseCategory(app),
 		ListSections:          appeditorial.NewListSections(app),
+		CreatePresenter:       appmedia.NewCreatePresenter(mediaDeps),
+		PublishPresenter:      appmedia.NewPublishPresenter(mediaDeps),
+		CreateProgramme:       appmedia.NewCreateProgramme(mediaDeps),
+		PublishProgramme:      appmedia.NewPublishProgramme(mediaDeps),
+		ScheduleProgramme:     appmedia.NewScheduleProgramme(mediaDeps),
+		ListTelevisionGuide:   appmedia.NewListTelevisionGuide(mediaDeps),
 		Roles:                 roles{granted: granted},
 		Log:                   slog.New(slog.NewTextHandler(io.Discard, nil)),
 		CronSecret:            "s3cret-value-of-known-length-0000",

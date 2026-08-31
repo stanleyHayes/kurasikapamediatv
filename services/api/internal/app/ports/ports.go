@@ -17,6 +17,7 @@ import (
 
 	"github.com/kurasikapa/api/internal/domain/editorial"
 	"github.com/kurasikapa/api/internal/domain/identity"
+	"github.com/kurasikapa/api/internal/domain/media"
 	"github.com/kurasikapa/api/internal/domain/shared"
 )
 
@@ -154,4 +155,22 @@ type DirectoryUser struct {
 // UserDirectory reads the auth library's user collection, and only reads it.
 type UserDirectory interface {
 	List(ctx context.Context, cursor Cursor) (Page[DirectoryUser], error)
+}
+
+type PresenterRepository interface {
+	FindByID(context.Context, shared.PresenterID) (media.Presenter, error)
+	ListPublished(context.Context, string) ([]media.Presenter, error)
+	Save(context.Context, media.Presenter) error
+}
+
+type ProgrammeRepository interface {
+	FindByID(context.Context, shared.ProgrammeID) (media.Programme, error)
+	ListPublished(context.Context, string) ([]media.Programme, error)
+	Save(context.Context, media.Programme) error
+}
+
+type ScheduleRepository interface {
+	ListUpcoming(context.Context, string, time.Time, int) ([]media.ScheduleSlot, error)
+	ListReplays(context.Context, string, int) ([]media.ScheduleSlot, error)
+	Save(context.Context, media.ScheduleSlot) error
 }

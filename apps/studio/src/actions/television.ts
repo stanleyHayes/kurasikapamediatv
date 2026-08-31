@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { attempt, type ActionResult } from '@kurasikapa/web-kit/actions/result'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
+import { createAndPublishPresenter, createAndPublishProgramme, createSchedule } from '@kurasikapa/web-kit/bff/television'
 
 const locale = z.enum(['en', 'fr'])
 const presenterSchema = z.object({
@@ -25,9 +26,11 @@ export async function createPresenterAction(input: unknown): Promise<ActionResul
   return attempt(async () => {
     const parsed = presenterSchema.parse(input)
     const actor = await requireActor()
-    const draft = await container().createPresenter.execute({ actor, ...parsed, portraitAssetId: null })
-    const published = await container().publishPresenter.execute({ actor, presenterId: draft.id })
-    return { id: published.id }
+    return createAndPublishPresenter(actor, parsed, async () => {
+      const draft = await container().createPresenter.execute({ actor, ...parsed, portraitAssetId: null })
+      const published = await container().publishPresenter.execute({ actor, presenterId: draft.id })
+      return { id: published.id }
+    })
   })
 }
 
@@ -35,11 +38,13 @@ export async function createProgrammeAction(input: unknown): Promise<ActionResul
   return attempt(async () => {
     const parsed = programmeSchema.parse(input)
     const actor = await requireActor()
-    const draft = await container().createProgramme.execute({
-      actor, ...parsed, presenterIds: parsed.presenterIds.map(presenterId), artworkAssetId: null,
+    return createAndPublishProgramme(actor, parsed, async () => {
+      const draft = await container().createProgramme.execute({
+        actor, ...parsed, presenterIds: parsed.presenterIds.map(presenterId), artworkAssetId: null,
+      })
+      const published = await container().publishProgramme.execute({ actor, programmeId: draft.id })
+      return { id: published.id }
     })
-    const published = await container().publishProgramme.execute({ actor, programmeId: draft.id })
-    return { id: published.id }
   })
 }
 
@@ -47,9 +52,12 @@ export async function scheduleProgrammeAction(input: unknown): Promise<ActionRes
   return attempt(async () => {
     const parsed = scheduleSchema.parse(input)
     const actor = await requireActor()
-    const slot = await container().scheduleProgramme.execute({
-      actor, ...parsed, programmeId: programmeId(parsed.programmeId),
+    const payload = { ...parsed, startsAt: parsed.startsAt.toISOString(), endsAt: parsed.endsAt.toISOString() }
+    return createSchedule(actor, payload, async () => {
+      const slot = await container().scheduleProgramme.execute({
+        actor, ...parsed, programmeId: programmeId(parsed.programmeId),
+      })
+      return { id: slot.id }
     })
-    return { id: slot.id }
   })
 }

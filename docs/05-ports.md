@@ -139,6 +139,12 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 be published without a caption asset; this accessibility rule lives in the
 schedule aggregate, not in a form or route handler.
 
+The Go migration carries the same contracts in `internal/app/ports`: separate
+presenter, programme and schedule repositories feed `ListTelevisionGuide`.
+Production HTTP exposes `GET /public/{locale}/television` plus authenticated
+presenter, programme and schedule commands; Next.js reaches them through the
+shared `web-kit` BFF rather than importing a Go adapter or connecting to Mongo.
+
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 
 `SendBreakingAlert` is live in TypeScript: an editor with `article:publish` mails

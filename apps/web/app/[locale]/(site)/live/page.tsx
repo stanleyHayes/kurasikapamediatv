@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { LiveSignal } from '@/components/live/live-signal'
 import { TelevisionGuide, type GuideData } from '@/components/live/television-guide'
 import { container } from '@kurasikapa/web-kit/composition/container'
+import { loadTelevisionGuide } from '@kurasikapa/web-kit/bff/television'
 
 interface Params { params: Promise<{ locale: string }> }
 
@@ -16,18 +17,35 @@ export default async function LivePage({ params }: Params): Promise<React.ReactE
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations('livePage')
-  const guide = await container().listTelevisionGuide.execute({ locale, from: new Date() })
+  const guide = await loadTelevisionGuide(locale, async () => {
+    const loaded = await container().listTelevisionGuide.execute({ locale, from: new Date() })
+    return {
+      presenters: loaded.presenters.map((person) => ({ ...person.snapshot(), portraitAssetId: null })),
+      programmes: loaded.programmes.map(({ programme, presenters }) => ({
+        programme: { ...programme.snapshot(), artworkAssetId: null },
+        presenters: presenters.map((person) => ({ ...person.snapshot(), portraitAssetId: null })),
+      })),
+      upcoming: loaded.upcoming.map(({ slot, programme }) => ({
+        slot: { ...slot.snapshot(), startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() },
+        programme: { ...programme.snapshot(), artworkAssetId: null },
+      })),
+      replays: loaded.replays.map(({ slot, programme }) => ({
+        slot: { ...slot.snapshot(), startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() },
+        programme: { ...programme.snapshot(), artworkAssetId: null },
+      })),
+    }
+  })
   const view: GuideData = {
     programmes: guide.programmes.map(({ programme, presenters }) => ({
       id: programme.id, title: programme.title, slug: programme.slug, summary: programme.summary,
       category: programme.category, presenters: presenters.map((person) => ({ id: person.id, name: person.name, role: person.role })),
     })),
     upcoming: guide.upcoming.map(({ slot, programme }) => ({
-      id: slot.id, startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString(), isLive: slot.isLive,
+      id: slot.id, startsAt: slot.startsAt, endsAt: slot.endsAt, isLive: slot.isLive,
       programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
     })),
     replays: guide.replays.map(({ slot, programme }) => ({
-      id: slot.id, startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString(), isLive: slot.isLive,
+      id: slot.id, startsAt: slot.startsAt, endsAt: slot.endsAt, isLive: slot.isLive,
       programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
     })),
   }
