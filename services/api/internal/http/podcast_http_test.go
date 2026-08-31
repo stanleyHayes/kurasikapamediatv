@@ -35,14 +35,45 @@ func TestPodcastPublishingLifecycleAndPublicLibrary(t *testing.T) {
 
 func TestPodcastEndpointsRejectInvalidAndUnauthorisedRequests(t *testing.T) {
 	handler := televisionServer()
-	if response := request(handler, http.MethodPost, "/media/podcasts", `{}`, false); response.Code != http.StatusForbidden {
-		t.Fatalf("unauthorised: %d", response.Code)
+	for _, path := range []string{"/media/podcasts", "/media/podcasts/missing/publish", "/media/episodes", "/media/episodes/missing/publish"} {
+		if response := request(handler, http.MethodPost, path, `{}`, false); response.Code != http.StatusForbidden {
+			t.Fatalf("unauthorised %s: %d", path, response.Code)
+		}
+	}
+	for _, path := range []string{"/media/podcasts", "/media/episodes"} {
+		if response := request(handler, http.MethodPost, path, `{`, true); response.Code != http.StatusBadRequest {
+			t.Fatalf("malformed %s: %d %s", path, response.Code, response.Body.String())
+		}
 	}
 	if response := request(handler, http.MethodPost, "/media/podcasts", `{"title":"","summary":""}`, true); response.Code != http.StatusBadRequest {
 		t.Fatalf("invalid podcast: %d %s", response.Code, response.Body.String())
 	}
+	if response := request(handler, http.MethodPost, "/media/podcasts/missing/publish", `{}`, true); response.Code != http.StatusNotFound {
+		t.Fatalf("missing podcast publish: %d %s", response.Code, response.Body.String())
+	}
 	if response := request(handler, http.MethodPost, "/media/episodes", `{"podcastID":"missing","title":"Episode"}`, true); response.Code != http.StatusNotFound {
 		t.Fatalf("missing podcast: %d %s", response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodPost, "/media/episodes/missing/publish", `{}`, true); response.Code != http.StatusNotFound {
+		t.Fatalf("missing episode publish: %d %s", response.Code, response.Body.String())
+	}
+}
+
+func TestPodcastEpisodeCannotPublishWithoutAccessibleAssets(t *testing.T) {
+	handler := televisionServer()
+	created := request(handler, http.MethodPost, "/media/podcasts", `{"title":"The Brief","summary":"Daily context"}`, true)
+	if created.Code != http.StatusCreated {
+		t.Fatalf("create podcast: %d %s", created.Code, created.Body.String())
+	}
+	if published := request(handler, http.MethodPost, "/media/podcasts/id_1/publish", `{}`, true); published.Code != http.StatusOK {
+		t.Fatalf("publish podcast: %d %s", published.Code, published.Body.String())
+	}
+	episode := request(handler, http.MethodPost, "/media/episodes", `{"podcastID":"id_1","title":"Episode"}`, true)
+	if episode.Code != http.StatusCreated {
+		t.Fatalf("create episode: %d %s", episode.Code, episode.Body.String())
+	}
+	if published := request(handler, http.MethodPost, "/media/episodes/id_2/publish", `{}`, true); published.Code != http.StatusConflict {
+		t.Fatalf("publish inaccessible episode: %d %s", published.Code, published.Body.String())
 	}
 }
 
