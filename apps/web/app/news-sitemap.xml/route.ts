@@ -8,8 +8,6 @@ import { buildNewsSitemap, recentNewsItems, type NewsSitemapItem } from '@/seo/n
 const PAGE_SIZE = 50
 const MAX_ITEMS = 1_000
 
-export const revalidate = 900
-
 export async function GET(): Promise<Response> {
   const { APP_URL, API_URL } = env()
   const now = new Date()

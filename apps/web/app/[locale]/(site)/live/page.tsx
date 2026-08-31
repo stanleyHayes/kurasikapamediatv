@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { connection } from 'next/server'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { LiveSignal } from '@/components/live/live-signal'
 import { TelevisionGuide, type GuideData } from '@/components/live/television-guide'
@@ -17,6 +18,7 @@ export default async function LivePage({ params }: Params): Promise<React.ReactE
   const { locale } = await params
   setRequestLocale(locale)
   const t = await getTranslations('livePage')
+  await connection()
   const guide = await loadTelevisionGuide(locale, async () => {
     const loaded = await container().listTelevisionGuide.execute({ locale, from: new Date() })
     return {
