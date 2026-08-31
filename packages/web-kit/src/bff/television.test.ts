@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
 import { resetEnv } from '../composition/env'
-import { createAndPublishPresenter, createAndPublishProgramme, createSchedule, loadTelevisionGuide } from './television'
+import { createAndPublishPresenter, createAndPublishProgramme, createSchedule, loadReplayCandidates, loadTelevisionGuide, publishReplay } from './television'
 
 const required = {
   MONGODB_URI: 'mongodb://localhost:27017', MONGODB_DB: 'test',
@@ -35,13 +35,25 @@ describe('television BFF', () => {
       presenters: [{ id: 'p1', name: 'Ama', slug: 'ama', locale: 'en', role: 'Host', biography: 'Bio', published: true }],
       programmes: [{ programme: { id: 'g1', title: 'Morning', slug: 'morning', locale: 'en', summary: 'Summary', category: 'News', presenterIds: ['p1'], published: true }, presenters: [{ id: 'p1', name: 'Ama' }] }],
       upcoming: [{ slot: { id: 's1', programmeId: 'g1', locale: 'en', startsAt: '2026-09-01T08:00:00Z', endsAt: '2026-09-01T09:00:00Z', isLive: true, state: 'scheduled' }, programme: { id: 'g1', title: 'Morning' } }],
-      replays: [],
+      replays: [{ slot: { id: 's2', programmeId: 'g1', locale: 'en', startsAt: '2026-08-30T08:00:00Z', endsAt: '2026-08-30T09:00:00Z', isLive: true, state: 'completed', replayAssetId: 'v1', captionAssetId: 'c1' }, programme: { id: 'g1', title: 'Morning' }, replay: { playbackUrl: 'https://cdn.test/report.m3u8', posterUrl: 'https://cdn.test/poster.jpg', mimeType: 'application/vnd.apple.mpegurl', captionUrl: 'https://cdn.test/report.vtt', captionMimeType: 'text/vtt' } }],
     }), { status: 200 })))
     const guide = await loadTelevisionGuide('en', vi.fn())
     expect(guide.presenters[0]?.name).toBe('Ama')
     expect(guide.programmes[0]?.presenters[0]?.id).toBe('p1')
     expect(guide.upcoming[0]?.slot.isLive).toBe(true)
+		expect(guide.replays[0]?.replay?.captionUrl).toContain('report.vtt')
   })
+
+	it('loads candidates and publishes an accessible replay', async () => {
+		setEnv('http://api.test')
+		const fetchMock = vi.fn<typeof fetch>()
+			.mockResolvedValueOnce(new Response(JSON.stringify({ items: [{ slot: { id: 's1', state: 'scheduled' }, programme: { id: 'g1', title: 'Morning' } }] }), { status: 200 }))
+			.mockResolvedValueOnce(new Response(JSON.stringify({ id: 's1', state: 'completed' }), { status: 200 }))
+		vi.stubGlobal('fetch', fetchMock)
+		await expect(loadReplayCandidates(actor, 'en')).resolves.toHaveLength(1)
+		await expect(publishReplay(actor, 's1', { replayAssetId: 'v1', captionAssetId: 'c1' })).resolves.toEqual({ id: 's1' })
+		expect((fetchMock.mock.calls[0]?.[1]?.headers as Record<string, string>)['X-Kurasikapa-User']).toBe('user_1')
+	})
 
   it('creates, publishes and schedules through authenticated Go commands', async () => {
     setEnv('http://api.test')

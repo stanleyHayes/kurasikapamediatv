@@ -13,6 +13,7 @@ import { IvsLiveVideo } from './ivs-live-video'
 
 const STREAM_KEY = 'sk_live_do_not_log_me'
 const ARN = 'arn:aws:ivs:eu-west-1:000000000000:channel/ch_1'
+const RECORDING_ARN = 'arn:aws:ivs:eu-west-1:000000000000:recording-configuration/rc_1'
 
 /** A response shaped exactly as IVS sends one: bare ingest host, key alongside. */
 const CREATED: CreateChannelCommandOutput = {
@@ -59,6 +60,7 @@ function live(channels: IvsChannels): IvsLiveVideo {
   return new IvsLiveVideo({
     accessKeyId: 'AKIAEXAMPLE',
     secretAccessKey: 'secret',
+    recordingConfigurationArn: RECORDING_ARN,
     channels,
   })
 }
@@ -73,6 +75,7 @@ describe('IvsLiveVideo', () => {
     const ivs = new IvsLiveVideo({
       accessKeyId: undefined,
       secretAccessKey: 'secret',
+      recordingConfigurationArn: RECORDING_ARN,
       channels,
     })
 
@@ -86,6 +89,7 @@ describe('IvsLiveVideo', () => {
     const ivs = new IvsLiveVideo({
       accessKeyId: 'AKIAEXAMPLE',
       secretAccessKey: undefined,
+      recordingConfigurationArn: RECORDING_ARN,
       channels: new FakeIvsChannels(),
     })
 
@@ -96,11 +100,23 @@ describe('IvsLiveVideo', () => {
 
   it('fails closed on teardown too, rather than reporting a channel released', async () => {
     const channels = new FakeIvsChannels()
-    const ivs = new IvsLiveVideo({ accessKeyId: undefined, secretAccessKey: undefined, channels })
+    const ivs = new IvsLiveVideo({
+      accessKeyId: undefined,
+      secretAccessKey: undefined,
+      recordingConfigurationArn: undefined,
+      channels,
+    })
 
     await expect(ivs.teardown(ARN)).rejects.toThrow(/AWS_ACCESS_KEY_ID/u)
     expect(channels.deleted).toHaveLength(0)
-  })
+	})
+
+	it('fails closed before channel creation when automatic recording is unset', async () => {
+		const channels = new FakeIvsChannels()
+		const ivs = new IvsLiveVideo({ accessKeyId: 'AKIAEXAMPLE', secretAccessKey: 'secret', recordingConfigurationArn: undefined, channels })
+		await expect(ivs.provision({ name: 'en: Evening News' })).rejects.toThrow(/AWS_IVS_RECORDING_CONFIGURATION_ARN/u)
+		expect(channels.created).toHaveLength(0)
+	})
 
   it('provisions a channel and returns what the operator needs to go on air', async () => {
     const channels = new FakeIvsChannels()
@@ -131,7 +147,7 @@ describe('IvsLiveVideo', () => {
     await live(channels).provision({ name: 'en: Evening News' })
 
     expect(channels.created).toEqual([
-      { name: 'en: Evening News', type: 'STANDARD', latencyMode: 'LOW', authorized: false },
+		{ name: 'en: Evening News', type: 'STANDARD', latencyMode: 'LOW', authorized: false, recordingConfigurationArn: RECORDING_ARN },
     ])
   })
 

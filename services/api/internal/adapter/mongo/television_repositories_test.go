@@ -53,8 +53,18 @@ func TestTelevisionRepositoriesRoundTripAndFilterPublicGuide(t *testing.T) {
 	if err := schedule.Save(ctx, completed); err != nil {
 		t.Fatal(err)
 	}
+	if got, err := schedule.FindByID(ctx, completed.ID()); err != nil || got.State().State != domainmedia.ScheduleCompleted {
+		t.Fatalf("find schedule: %+v %v", got.State(), err)
+	}
 	if rows, err := schedule.ListUpcoming(ctx, "en", testNow, 20); err != nil || len(rows) != 1 {
 		t.Fatalf("upcoming %d %v", len(rows), err)
+	}
+	awaiting := domainmedia.ReconstituteScheduleSlot(domainmedia.ScheduleSlotState{ID: "awaiting", ProgrammeID: programme.ID(), Locale: "en", StartsAt: testNow.Add(-3 * time.Hour), EndsAt: testNow.Add(-2 * time.Hour), IsLive: true, State: domainmedia.ScheduleScheduled, CreatedBy: "manager"})
+	if err := schedule.Save(ctx, awaiting); err != nil {
+		t.Fatal(err)
+	}
+	if rows, err := schedule.ListAwaitingReplay(ctx, "en", testNow, 20); err != nil || len(rows) != 1 {
+		t.Fatalf("awaiting replay %d %v", len(rows), err)
 	}
 	if rows, err := schedule.ListReplays(ctx, "en", 12); err != nil || len(rows) != 1 {
 		t.Fatalf("replays %d %v", len(rows), err)
@@ -63,7 +73,7 @@ func TestTelevisionRepositoriesRoundTripAndFilterPublicGuide(t *testing.T) {
 	for collection, names := range map[string][]string{
 		adapter.CollPresenters:    {"locale_slug_unique", "public_directory"},
 		adapter.CollProgrammes:    {"locale_slug_unique", "public_directory"},
-		adapter.CollScheduleSlots: {"upcoming_schedule", "replay_schedule"},
+		adapter.CollScheduleSlots: {"upcoming_schedule", "awaiting_replay", "replay_schedule"},
 	} {
 		got := indexNames(t, h, collection)
 		for _, name := range names {

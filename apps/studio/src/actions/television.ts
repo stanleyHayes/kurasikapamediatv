@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { attempt, type ActionResult } from '@kurasikapa/web-kit/actions/result'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
-import { createAndPublishPresenter, createAndPublishProgramme, createSchedule } from '@kurasikapa/web-kit/bff/television'
+import { createAndPublishPresenter, createAndPublishProgramme, createSchedule, publishReplay } from '@kurasikapa/web-kit/bff/television'
 
 const locale = z.enum(['en', 'fr'])
 const presenterSchema = z.object({
@@ -20,6 +20,9 @@ const programmeSchema = z.object({
 const scheduleSchema = z.object({
   programmeId: z.string().min(1), locale, startsAt: z.coerce.date(), endsAt: z.coerce.date(),
   isLive: z.boolean(),
+})
+const replaySchema = z.object({
+	slotId: z.string().min(1), replayAssetId: z.string().min(1), captionAssetId: z.string().min(1),
 })
 
 export async function createPresenterAction(input: unknown): Promise<ActionResult<{ id: string }>> {
@@ -60,4 +63,12 @@ export async function scheduleProgrammeAction(input: unknown): Promise<ActionRes
       return { id: slot.id }
     })
   })
+}
+
+export async function publishReplayAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+	return attempt(async () => {
+		const parsed = replaySchema.parse(input)
+		const { slotId, ...assets } = parsed
+		return publishReplay(await requireActor(), slotId, assets)
+	})
 }

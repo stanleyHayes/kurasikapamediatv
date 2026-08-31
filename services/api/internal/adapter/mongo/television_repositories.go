@@ -34,6 +34,9 @@ func NewProgrammeRepository(store *TelevisionRepositories) *ProgrammeRepository 
 func NewScheduleRepository(store *TelevisionRepositories) *ScheduleRepository {
 	return &ScheduleRepository{store}
 }
+func (r *ScheduleRepository) FindByID(ctx context.Context, id shared.ScheduleSlotID) (domainmedia.ScheduleSlot, error) {
+	return r.store.FindScheduleByID(ctx, id)
+}
 func (r *PresenterRepository) FindByID(ctx context.Context, id shared.PresenterID) (domainmedia.Presenter, error) {
 	return r.store.FindPresenterByID(ctx, id)
 }
@@ -54,6 +57,9 @@ func (r *ProgrammeRepository) Save(ctx context.Context, value domainmedia.Progra
 }
 func (r *ScheduleRepository) ListUpcoming(ctx context.Context, locale string, from time.Time, limit int) ([]domainmedia.ScheduleSlot, error) {
 	return r.store.ListUpcoming(ctx, locale, from, limit)
+}
+func (r *ScheduleRepository) ListAwaitingReplay(ctx context.Context, locale string, now time.Time, limit int) ([]domainmedia.ScheduleSlot, error) {
+	return r.store.ListAwaitingReplay(ctx, locale, now, limit)
 }
 func (r *ScheduleRepository) ListReplays(ctx context.Context, locale string, limit int) ([]domainmedia.ScheduleSlot, error) {
 	return r.store.ListReplays(ctx, locale, limit)
@@ -123,9 +129,23 @@ func (r *TelevisionRepositories) SaveProgramme(ctx context.Context, programme do
 	_, err := r.programmes.ReplaceOne(ctx, bson.M{"_id": doc.ID}, doc, options.Replace().SetUpsert(true))
 	return wrapSave("programme", err)
 }
+func (r *TelevisionRepositories) FindScheduleByID(ctx context.Context, id shared.ScheduleSlotID) (domainmedia.ScheduleSlot, error) {
+	var doc scheduleSlotDoc
+	if err := r.schedule.FindOne(ctx, bson.M{"_id": id.String()}).Decode(&doc); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domainmedia.ScheduleSlot{}, ports.ErrNotFound
+		}
+		return domainmedia.ScheduleSlot{}, fmt.Errorf("finding schedule slot: %w", err)
+	}
+	return scheduleToDomain(doc), nil
+}
 func (r *TelevisionRepositories) ListUpcoming(ctx context.Context, locale string, from time.Time, limit int) ([]domainmedia.ScheduleSlot, error) {
 	filter := bson.M{"locale": locale, "state": string(domainmedia.ScheduleScheduled), "endsAt": bson.M{"$gt": from}}
 	return r.listSchedule(ctx, filter, bson.D{{Key: "startsAt", Value: 1}}, limit)
+}
+func (r *TelevisionRepositories) ListAwaitingReplay(ctx context.Context, locale string, now time.Time, limit int) ([]domainmedia.ScheduleSlot, error) {
+	filter := bson.M{"locale": locale, "state": string(domainmedia.ScheduleScheduled), "isLive": true, "endsAt": bson.M{"$lte": now}}
+	return r.listSchedule(ctx, filter, bson.D{{Key: "endsAt", Value: -1}}, limit)
 }
 func (r *TelevisionRepositories) ListReplays(ctx context.Context, locale string, limit int) ([]domainmedia.ScheduleSlot, error) {
 	filter := bson.M{"locale": locale, "state": string(domainmedia.ScheduleCompleted), "replayAssetId": bson.M{"$ne": nil}, "captionAssetId": bson.M{"$ne": nil}}

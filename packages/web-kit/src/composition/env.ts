@@ -98,7 +98,8 @@ const schema = z.object({
 
   AWS_REGION: optionalCredential,
   AWS_ACCESS_KEY_ID: optionalCredential,
-  AWS_SECRET_ACCESS_KEY: optionalCredential,
+	AWS_SECRET_ACCESS_KEY: optionalCredential,
+	AWS_IVS_RECORDING_CONFIGURATION_ARN: optionalCredential,
 
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 }).superRefine((value, context) => {

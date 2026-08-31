@@ -22,6 +22,7 @@ func (r *TelevisionRepositories) EnsureIndexes(ctx context.Context) error {
 	}
 	schedule := []mongo.IndexModel{
 		{Keys: bson.D{{Key: "locale", Value: 1}, {Key: "state", Value: 1}, {Key: "startsAt", Value: 1}}, Options: options.Index().SetName("upcoming_schedule")},
+		{Keys: bson.D{{Key: "locale", Value: 1}, {Key: "state", Value: 1}, {Key: "isLive", Value: 1}, {Key: "endsAt", Value: -1}}, Options: options.Index().SetName("awaiting_replay")},
 		{Keys: bson.D{{Key: "locale", Value: 1}, {Key: "state", Value: 1}, {Key: "endsAt", Value: -1}}, Options: options.Index().SetName("replay_schedule")},
 	}
 	if _, err := r.schedule.Indexes().CreateMany(ctx, schedule); err != nil {

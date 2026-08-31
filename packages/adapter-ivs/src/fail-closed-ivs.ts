@@ -16,9 +16,10 @@ import { IvsLiveVideo, unconfigured } from './ivs-live-video'
  * machine is carrying.
  */
 export function failClosedIvs(): IvsLiveVideo {
-  return new IvsLiveVideo({
-    accessKeyId: undefined,
-    secretAccessKey: undefined,
+	return new IvsLiveVideo({
+		accessKeyId: undefined,
+		secretAccessKey: undefined,
+		recordingConfigurationArn: undefined,
     channels: refusingChannels(),
   })
 }

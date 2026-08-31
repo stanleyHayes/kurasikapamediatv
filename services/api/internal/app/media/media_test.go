@@ -20,7 +20,7 @@ func actor() identity.Actor {
 }
 func deps() (appmedia.Deps, *fakes.PresenterStore, *fakes.ProgrammeStore, *fakes.ScheduleStore) {
 	p, g, s := fakes.NewPresenterStore(), fakes.NewProgrammeStore(), fakes.NewScheduleStore()
-	return appmedia.Deps{Presenters: p, Programmes: g, Schedule: s, Clock: fakes.FixedClock{At: now}, IDs: &fakes.SequentialIDs{}}, p, g, s
+	return appmedia.Deps{Presenters: p, Programmes: g, Schedule: s, Assets: fakes.NewAssetStore(), Clock: fakes.FixedClock{At: now}, IDs: &fakes.SequentialIDs{}}, p, g, s
 }
 
 func TestTelevisionWorkflow(t *testing.T) {
@@ -45,7 +45,7 @@ func TestTelevisionWorkflow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	guide, err := appmedia.NewListTelevisionGuide(d).Execute(context.Background(), "en")
+	guide, err := appmedia.NewListTelevisionGuide(d, fakes.VideoDeliveryFake{}).Execute(context.Background(), "en")
 	if err != nil || len(guide.Presenters) != 1 || len(guide.Programmes) != 1 || len(guide.Upcoming) != 1 {
 		t.Fatalf("%+v %v", guide, err)
 	}
@@ -71,12 +71,12 @@ func TestCommandsPropagateRulesAndStorageFailures(t *testing.T) {
 	}
 	presenters.Err = nil
 	programmes.Err = errors.New("programme store down")
-	if _, err := appmedia.NewListTelevisionGuide(d).Execute(context.Background(), "en"); err == nil {
+	if _, err := appmedia.NewListTelevisionGuide(d, fakes.VideoDeliveryFake{}).Execute(context.Background(), "en"); err == nil {
 		t.Fatal("expected list failure")
 	}
 	programmes.Err = nil
 	schedule.Err = errors.New("schedule store down")
-	if _, err := appmedia.NewListTelevisionGuide(d).Execute(context.Background(), "en"); err == nil {
+	if _, err := appmedia.NewListTelevisionGuide(d, fakes.VideoDeliveryFake{}).Execute(context.Background(), "en"); err == nil {
 		t.Fatal("expected schedule failure")
 	}
 }

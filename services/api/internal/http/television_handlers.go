@@ -19,6 +19,7 @@ type scheduleRequest struct {
 	StartsAt, EndsAt    time.Time
 	IsLive              bool
 }
+type replayRequest struct{ ReplayAssetID, CaptionAssetID string }
 
 func (d Deps) handleCreatePresenter(w http.ResponseWriter, r *http.Request) {
 	actor, err := d.actorFrom(r)
@@ -112,6 +113,44 @@ func (d Deps) handleScheduleProgramme(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, d.Log, http.StatusCreated, scheduleView(slot))
 }
+func (d Deps) handlePublishReplay(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	var input replayRequest
+	if err = decode(r, &input); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	slot, err := d.PublishReplay.Execute(r.Context(), actor, appmedia.PublishReplayInput{
+		SlotID: shared.ScheduleSlotID(r.PathValue("id")), ReplayAssetID: shared.AssetID(input.ReplayAssetID),
+		CaptionAssetID: shared.AssetID(input.CaptionAssetID),
+	})
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, scheduleView(slot))
+}
+func (d Deps) handleReplayCandidates(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	items, err := d.ListReplayCandidates.Execute(r.Context(), actor, r.URL.Query().Get("locale"))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	rows := make([]any, len(items))
+	for i, item := range items {
+		rows[i] = map[string]any{"slot": scheduleView(item.Slot), "programme": programmeView(item.Programme)}
+	}
+	writeJSON(w, d.Log, http.StatusOK, map[string]any{"items": rows})
+}
 func (d Deps) handleTelevisionGuide(w http.ResponseWriter, r *http.Request) {
 	guide, err := d.ListTelevisionGuide.Execute(r.Context(), r.PathValue("locale"))
 	if err != nil {
@@ -153,7 +192,7 @@ func guideView(guide appmedia.TelevisionGuide) map[string]any {
 	slots := func(items []appmedia.SlotView) []any {
 		out := make([]any, len(items))
 		for i, item := range items {
-			out[i] = map[string]any{"slot": scheduleView(item.Slot), "programme": programmeView(item.Programme)}
+			out[i] = map[string]any{"slot": scheduleView(item.Slot), "programme": programmeView(item.Programme), "replay": item.Replay}
 		}
 		return out
 	}

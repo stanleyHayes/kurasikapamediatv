@@ -1,4 +1,5 @@
 import { calendarDataUrl } from '@/live/schedule-calendar'
+import { VodPlayer } from '@/components/vod-player'
 
 export interface GuidePresenter { readonly id: string; readonly name: string; readonly role: string }
 export interface GuideProgramme {
@@ -6,8 +7,9 @@ export interface GuideProgramme {
   readonly category: string; readonly presenters: readonly GuidePresenter[]
 }
 export interface GuideSlot {
-  readonly id: string; readonly startsAt: string; readonly endsAt: string; readonly isLive: boolean
-  readonly programme: Pick<GuideProgramme, 'id' | 'title' | 'slug' | 'category'>
+	readonly id: string; readonly startsAt: string; readonly endsAt: string; readonly isLive: boolean
+	readonly programme: Pick<GuideProgramme, 'id' | 'title' | 'slug' | 'category'>
+	readonly replay: { readonly playbackUrl: string; readonly posterUrl: string; readonly captionUrl: string } | null
 }
 export interface GuideData {
   readonly programmes: readonly GuideProgramme[]
@@ -27,13 +29,14 @@ const COPY = {
 } as const
 
 export function TelevisionGuide({ locale, guide }: { locale: string; guide: GuideData }): React.ReactElement {
-  const copy = locale === 'fr' ? COPY.fr : COPY.en
+	const copy = locale === 'fr' ? COPY.fr : COPY.en
+	const replays = guide.replays.filter((item) => item.replay !== null)
   return <div className="mt-10 space-y-14"><GuideHeader eyebrow="Kurasikapa TV" title={copy.schedule} lead={copy.scheduleLead} />
     {guide.upcoming.length === 0 ? <Empty copy={copy.emptySchedule} /> : <div className="grid gap-4 lg:grid-cols-2">{guide.upcoming.map((item) => <ScheduleCard key={item.id} item={item} locale={locale} reminder={copy.reminder} liveLabel={copy.live} recordedLabel={copy.recorded} />)}</div>}
     <GuideHeader eyebrow="On screen" title={copy.programmes} lead={copy.programmesLead} />
     {guide.programmes.length === 0 ? <Empty copy={copy.emptyProgrammes} /> : <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{guide.programmes.map((item, index) => <ProgrammeCard key={item.id} item={item} index={index} />)}</div>}
     <GuideHeader eyebrow="Replay library" title={copy.replays} lead={copy.replaysLead} />
-    {guide.replays.length === 0 ? <Empty copy={copy.emptyReplays} /> : <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{guide.replays.map((item) => <ReplayCard key={item.id} item={item} locale={locale} />)}</div>}
+		{replays.length === 0 ? <Empty copy={copy.emptyReplays} /> : <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{replays.map((item) => <ReplayCard key={item.id} item={item} locale={locale} />)}</div>}
   </div>
 }
 
@@ -52,7 +55,8 @@ function ProgrammeCard({ item, index }: { item: GuideProgramme; index: number })
 }
 
 function ReplayCard({ item, locale }: { item: GuideSlot; locale: string }): React.ReactElement {
-  return <article className="border border-outline-variant bg-[#08150d] p-6 text-white shadow-[7px_8px_0_rgba(199,151,45,.2)]"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-secondary">Captioned replay</p><h3 className="mt-8 font-display text-3xl font-bold">{item.programme.title}</h3><p className="mt-4 text-sm text-white/55">{new Date(item.startsAt).toLocaleDateString(locale, { dateStyle: 'long' })}</p></article>
+	if (item.replay === null) return <></>
+	return <article className="overflow-hidden border border-outline-variant bg-[#08150d] text-white shadow-[7px_8px_0_rgba(199,151,45,.2)]"><VodPlayer source={item.replay.playbackUrl} poster={item.replay.posterUrl} captionSource={item.replay.captionUrl} locale={locale} title={`${item.programme.title} replay`} /><div className="p-6"><p className="text-[10px] font-bold uppercase tracking-[.16em] text-secondary">Captioned replay</p><h3 className="mt-3 font-display text-3xl font-bold">{item.programme.title}</h3><p className="mt-4 text-sm text-white/55">{new Date(item.startsAt).toLocaleDateString(locale, { dateStyle: 'long' })}</p></div></article>
 }
 
 function Empty({ copy }: { copy: string }): React.ReactElement {

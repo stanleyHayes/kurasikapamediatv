@@ -38,6 +38,10 @@ something we then own the seams of.
 
 - **Live TV and live interaction → Amazon IVS.** Low-Latency channels for the
   broadcast; Real-Time stages for call-in guests; IVS Chat for the audience.
+- **Every low-latency channel must use an IVS recording configuration.** IVS
+  writes completed broadcasts to a private S3 destination. Missing
+  `AWS_IVS_RECORDING_CONFIGURATION_ARN` refuses channel creation rather than
+  allowing an unrecorded programme to disappear when the channel ends.
 - **Images, VOD, podcasts, the whole media library → Cloudinary.** It is the
   client's stated choice, it is a genuinely strong asset pipeline, and live is
   not what it is for.
@@ -79,6 +83,10 @@ EmailPort      Resend: transactional now, bulk at R2
   CloudFront and S3. Budgeted as such rather than assumed away.
 - Two vendors now hold media instead of one. Accepted deliberately: the
   alternative is one vendor that does neither job as well.
+- Recording is a two-gate workflow: IVS capture protects the source; a video
+  editor separately verifies the Cloudinary asset and synchronized WebVTT file
+  before Go can place it on the public replay shelf. Capture is never treated
+  as editorial publication.
 - GDPR: the company is France-registered. Chat messages are personal data and
   IVS Chat logging must target an EU region with a stated retention period.
   Audit and insight collections are already append-only (product rule 4); chat

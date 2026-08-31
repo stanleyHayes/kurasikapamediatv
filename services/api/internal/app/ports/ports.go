@@ -183,7 +183,9 @@ type ProgrammeRepository interface {
 }
 
 type ScheduleRepository interface {
+	FindByID(context.Context, shared.ScheduleSlotID) (media.ScheduleSlot, error)
 	ListUpcoming(context.Context, string, time.Time, int) ([]media.ScheduleSlot, error)
+	ListAwaitingReplay(context.Context, string, time.Time, int) ([]media.ScheduleSlot, error)
 	ListReplays(context.Context, string, int) ([]media.ScheduleSlot, error)
 	Save(context.Context, media.ScheduleSlot) error
 }

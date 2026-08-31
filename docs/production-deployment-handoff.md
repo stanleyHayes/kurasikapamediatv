@@ -27,7 +27,7 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
 | Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
 | Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
-| AWS | IVS IAM pair; separate Polly/S3 IAM pair, London region and private output bucket | Live channels and article narration |
+| AWS | IVS IAM pair and recording-configuration ARN; separate Polly/S3 IAM pair, London region and private output bucket | Recorded live channels and article narration |
 | Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
 | Cloudflare | Turnstile site key and secret | Production CAPTCHA |
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
@@ -58,8 +58,9 @@ they cannot accidentally be uploaded as blank production variables.
 - MongoDB Atlas production cluster, database user and IP/network policy.
 - Render API service URL after `/healthz` passes.
 - Cloudinary cloud name, API key and secret.
-- AWS account, least-privilege IVS IAM user, approved IVS quotas and billing
-  alarms. Add a separate least-privilege Polly/S3 principal and private London
+- AWS account, least-privilege IVS IAM user, approved IVS quotas, billing
+  alarms, private IVS recording bucket and
+  `AWS_IVS_RECORDING_CONFIGURATION_ARN`. Add a separate least-privilege Polly/S3 principal and private London
   staging bucket with a short lifecycle policy for article narration. Never
   provide the AWS root credentials.
 - Resend API key plus a verified sending domain and DNS records. The application

@@ -49,6 +49,14 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 | Live TV, VOD, transcode orchestration | `services/api` | Long-lived, Amazon IVS + Cloudinary (R3) |
 | Article narration jobs | `services/api` | Async Polly/S3 generation, editor approval, Cloudinary delivery |
 
+Live channels are provisioned only when an Amazon IVS recording configuration
+is present, so every broadcast is captured to the station's private S3
+destination. Recording capture does not make a replay public. After the
+recording is verified in the media library, Go lists only ended live schedule
+slots awaiting a replay and requires a ready Cloudinary video plus ready WebVTT
+captions before completing the slot. Public guide reads then project the video
+through `VideoDeliveryPort` into adaptive HLS, poster and caption URLs.
+
 ---
 
 ## 2. Repository layout

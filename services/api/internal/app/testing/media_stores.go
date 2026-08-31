@@ -109,9 +109,24 @@ func NewScheduleStore(seed ...domainmedia.ScheduleSlot) *ScheduleStore {
 	}
 	return store
 }
+func (s *ScheduleStore) FindByID(_ context.Context, id shared.ScheduleSlotID) (domainmedia.ScheduleSlot, error) {
+	if s.Err != nil {
+		return domainmedia.ScheduleSlot{}, s.Err
+	}
+	item, ok := s.Items[id]
+	if !ok {
+		return domainmedia.ScheduleSlot{}, ports.ErrNotFound
+	}
+	return item, nil
+}
 func (s *ScheduleStore) ListUpcoming(_ context.Context, locale string, from time.Time, limit int) ([]domainmedia.ScheduleSlot, error) {
 	return s.list(locale, limit, func(state domainmedia.ScheduleSlotState) bool {
 		return state.State == domainmedia.ScheduleScheduled && state.EndsAt.After(from)
+	})
+}
+func (s *ScheduleStore) ListAwaitingReplay(_ context.Context, locale string, now time.Time, limit int) ([]domainmedia.ScheduleSlot, error) {
+	return s.list(locale, limit, func(state domainmedia.ScheduleSlotState) bool {
+		return state.State == domainmedia.ScheduleScheduled && state.IsLive && !state.EndsAt.After(now)
 	})
 }
 func (s *ScheduleStore) ListReplays(_ context.Context, locale string, limit int) ([]domainmedia.ScheduleSlot, error) {

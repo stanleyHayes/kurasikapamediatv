@@ -5,11 +5,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
+	appmedia "github.com/kurasikapa/api/internal/app/media"
+	"github.com/kurasikapa/api/internal/app/ports"
 	faketesting "github.com/kurasikapa/api/internal/app/testing"
 	"github.com/kurasikapa/api/internal/domain/identity"
+	domainmedia "github.com/kurasikapa/api/internal/domain/media"
 	"github.com/kurasikapa/api/internal/domain/shared"
+	kurahttp "github.com/kurasikapa/api/internal/http"
 )
 
 func emptyEditorial() appeditorial.Deps {
@@ -66,5 +71,39 @@ func TestTelevisionEndpointsRejectUnauthorisedAndInvalidInput(t *testing.T) {
 	}
 	if rec := request(handler, http.MethodPost, "/television/presenters", `{`, true); rec.Code != http.StatusBadRequest {
 		t.Fatalf("invalid = %d", rec.Code)
+	}
+}
+
+func TestReplayPublishingEndpoints(t *testing.T) {
+	grants := map[shared.UserID][]identity.Role{"manager": {identity.RoleVideoEditor}}
+	deps := httpDeps(emptyEditorial(), grants)
+	programme := domainmedia.ReconstituteProgramme(domainmedia.ProgrammeState{ID: "programme", Title: "Morning Desk", Locale: "en", Published: true})
+	slot := domainmedia.ReconstituteScheduleSlot(domainmedia.ScheduleSlotState{
+		ID: "slot", ProgrammeID: programme.ID(), Locale: "en", IsLive: true,
+		StartsAt: now.Add(-2 * time.Hour), EndsAt: now.Add(-time.Hour), State: domainmedia.ScheduleScheduled,
+	})
+	schedule := faketesting.NewScheduleStore(slot)
+	assets := faketesting.NewAssetStore(
+		domainmedia.ReconstituteAsset(domainmedia.AssetState{ID: "video", Kind: domainmedia.AssetVideo, Status: domainmedia.AssetReady, SecureURL: "https://cdn.test/report.mp4"}),
+		domainmedia.ReconstituteAsset(domainmedia.AssetState{ID: "captions", Kind: domainmedia.AssetCaption, MIMEType: "text/vtt", Status: domainmedia.AssetReady, SecureURL: "https://cdn.test/report.vtt"}),
+	)
+	mediaDeps := appmedia.Deps{Presenters: faketesting.NewPresenterStore(), Programmes: faketesting.NewProgrammeStore(programme), Schedule: schedule, Assets: assets, Clock: faketesting.FixedClock{At: now}}
+	deps.PublishReplay = appmedia.NewPublishReplay(mediaDeps)
+	deps.ListReplayCandidates = appmedia.NewListReplayCandidates(mediaDeps)
+	deps.ListTelevisionGuide = appmedia.NewListTelevisionGuide(mediaDeps, faketesting.VideoDeliveryFake{Delivery: ports.VideoDelivery{PlaybackURL: "https://cdn.test/report.m3u8", PosterURL: "https://cdn.test/poster.jpg", MIMEType: "application/vnd.apple.mpegurl"}})
+	handler := kurahttp.NewRouter(deps)
+	if rec := request(handler, http.MethodGet, "/television/replay-candidates?locale=en", "", true); rec.Code != http.StatusOK || !bytes.Contains(rec.Body.Bytes(), []byte("Morning Desk")) {
+		t.Fatalf("candidates: %d %s", rec.Code, rec.Body.String())
+	}
+	replay := request(handler, http.MethodPost, "/television/schedule/slot/replay", `{"replayAssetId":"video","captionAssetId":"captions"}`, true)
+	if replay.Code != http.StatusOK || !bytes.Contains(replay.Body.Bytes(), []byte("completed")) {
+		t.Fatalf("publish replay: %d %s", replay.Code, replay.Body.String())
+	}
+	guide := request(handler, http.MethodGet, "/public/en/television", "", false)
+	if guide.Code != http.StatusOK || !bytes.Contains(guide.Body.Bytes(), []byte(`"captionUrl":"https://cdn.test/report.vtt"`)) {
+		t.Fatalf("public replay: %d %s", guide.Code, guide.Body.String())
+	}
+	if rec := request(handler, http.MethodPost, "/television/schedule/slot/replay", `{}`, false); rec.Code != http.StatusForbidden {
+		t.Fatalf("unauthorised replay = %d", rec.Code)
 	}
 }

@@ -17,10 +17,13 @@ const (
 )
 
 var (
-	ErrScheduleInPast        = errors.New("schedule slot must start in the future")
-	ErrInvalidScheduleWindow = errors.New("schedule slot must end after it starts")
-	ErrSlotAlreadyCancelled  = errors.New("schedule slot already cancelled")
-	ErrReplayNeedsCaptions   = errors.New("recorded replay requires captions")
+	ErrScheduleInPast         = errors.New("schedule slot must start in the future")
+	ErrInvalidScheduleWindow  = errors.New("schedule slot must end after it starts")
+	ErrSlotAlreadyCancelled   = errors.New("schedule slot already cancelled")
+	ErrReplayNeedsCaptions    = errors.New("recorded replay requires captions")
+	ErrReplayBeforeSlotEnds   = errors.New("recorded replay cannot publish before the slot ends")
+	ErrReplayAlreadyPublished = errors.New("recorded replay is already published")
+	ErrReplayNotAwaiting      = errors.New("schedule slot is not awaiting a replay")
 )
 
 type ScheduleSlotState struct {
@@ -64,9 +67,18 @@ func (s ScheduleSlot) Cancel(actor identity.Actor) (ScheduleSlot, error) {
 	s.state.State = ScheduleCancelled
 	return s, nil
 }
-func (s ScheduleSlot) PublishReplay(actor identity.Actor, replay shared.AssetID, captions *shared.AssetID) (ScheduleSlot, error) {
+func (s ScheduleSlot) PublishReplay(actor identity.Actor, replay shared.AssetID, captions *shared.AssetID, now time.Time) (ScheduleSlot, error) {
 	if err := actor.Require(identity.PermStreamManage); err != nil {
 		return ScheduleSlot{}, err
+	}
+	if s.state.State == ScheduleCompleted {
+		return ScheduleSlot{}, ErrReplayAlreadyPublished
+	}
+	if s.state.State != ScheduleScheduled || !s.state.IsLive {
+		return ScheduleSlot{}, ErrReplayNotAwaiting
+	}
+	if now.Before(s.state.EndsAt) {
+		return ScheduleSlot{}, ErrReplayBeforeSlotEnds
 	}
 	if captions == nil {
 		return ScheduleSlot{}, ErrReplayNeedsCaptions

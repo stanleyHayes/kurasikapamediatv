@@ -53,6 +53,8 @@ type Deps struct {
 	CreateProgramme            appmedia.CreateProgramme
 	PublishProgramme           appmedia.PublishProgramme
 	ScheduleProgramme          appmedia.ScheduleProgramme
+	PublishReplay              appmedia.PublishReplay
+	ListReplayCandidates       appmedia.ListReplayCandidates
 	ListTelevisionGuide        appmedia.ListTelevisionGuide
 	CreateAssetUpload          appmedia.CreateAssetUpload
 	CompleteAssetUpload        appmedia.CompleteAssetUpload
@@ -128,6 +130,8 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /television/programmes", deps.handleCreateProgramme)
 	mux.HandleFunc("POST /television/programmes/{id}/publish", deps.handlePublishProgramme)
 	mux.HandleFunc("POST /television/schedule", deps.handleScheduleProgramme)
+	mux.HandleFunc("POST /television/schedule/{id}/replay", deps.handlePublishReplay)
+	mux.HandleFunc("GET /television/replay-candidates", deps.handleReplayCandidates)
 	mux.HandleFunc("POST /media/assets/uploads", deps.handleCreateAssetUpload)
 	mux.HandleFunc("POST /media/assets/{id}/complete", deps.handleCompleteAssetUpload)
 	mux.HandleFunc("GET /media/assets", deps.handleListAssets)

@@ -24,7 +24,7 @@
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
 | Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.22% · `next build` 0 · `go vet`/`gofmt`/`go test -race` 0 |
 | Deployables | **Three:** `apps/web` (public), `apps/studio` (CMS, basePath `/studio`), `services/api` (Go). See [ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md). |
-| Deployed | **Web + Studio on Vercel.** Studio is canonical at `kurasikapa-studio.vercel.app/studio`; the Go API still needs its independent production host. |
+| Deployed | **Web + Studio on Vercel; Go API on Render.** Studio is canonical at `kurasikapa-studio.vercel.app/studio`; the API is health-checked independently and reached through `API_URL`. |
 
 Run `pnpm verify` before claiming any task is done. It runs the gates in CI order.
 
@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. Live-recording ingestion and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded channels; ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automated S3-to-Cloudinary promotion and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
@@ -285,7 +285,7 @@ the wiring is missing.
 
 | Item | State |
 |---|---|
-| **Deployment to Vercel + Render** | Web and independent Studio are live on Vercel. The Go API remains the outstanding Render/independent-host deployment. `render.yaml` + [docs/operations/deploy-api.md](docs/operations/deploy-api.md) + `scripts/smoke-api.sh` are ready. |
+| ~~**Deployment to Vercel + Render**~~ | **DONE.** Web and independent Studio are live on Vercel; the Go API is live on Render and the stable `/healthz` route is monitored. |
 | **The Go backend itself** | Domain → HTTP serving done (KUR-29 … KUR-43). Editorial BFF cutover done (KUR-45) for CMS writes/reads and public-site reads when `API_URL` is set. Remaining: delete TS editorial packages once a deployed API is the only live path. |
 | ~~Audit logs~~ | **DONE — KUR-38.** Every domain event is recorded. Append-only enforced by the port having no update or delete, and tested against a real database. Screen at `/studio/audit`, gated on `audit:read`. |
 | ~~**Rich-text editor**~~ | **DONE.** Textarea + Markdown toolbar (bold/italic/heading/link). `ArticleBody` parses a safe subset into React children — still no HTML, still no sanitiser dependency. |
@@ -363,15 +363,17 @@ the public player shares the tested HLS recovery engine with Live TV and keeps
 caption tracks mandatory. Article-to-audio is implemented as an asynchronous,
 editor-approved English/French workflow using Polly, private S3 staging and
 Cloudinary delivery; Twi fails closed until a reviewed voice exists. Still
-unbuilt: ingestion of completed live recordings and voice-to-article.
+unbuilt: automated promotion of completed IVS recordings from private S3 into
+Cloudinary and voice-to-article. IVS capture itself and the caption-gated replay
+publication path are now implemented.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;
 **Cloudinary** for images, VOD and podcasts. Mux is superseded, unbuilt.
 
-Remaining public R3 placeholders are limited to live-recording inventory and
-voice-to-article; approved article audio now renders with native controls,
-synthetic-voice disclosure and a transcript link.
+Remaining public R3 placeholders are limited to automatic IVS recording
+promotion and voice-to-article; approved replay/video/article audio now render
+with the required player, caption or transcript affordance.
 
 ### 5.4 R4 — Revenue
 
@@ -466,13 +468,13 @@ Resend (R2), Stripe + Paystack (R4), Meta Graph API and app review (R2).
 
 Ordered by value per unit of risk, not by release number.
 
-1. **Delete TS editorial packages** once a deployed `API_URL` is the only
-   live path (public-site reads are now on Go when it is set).
-2. **Close R1 properly** — first deployment (Vercel + API hosting). Editor
-   Markdown, 2FA, Turnstile and consent-gated GA are in; they need live env
-   values and a production host.
-3. **Social send path** — adapter + cron are live and fail-closed. Flip on
-   when Meta app review and page tokens exist.
+1. **Automate IVS recording promotion** — consume the private S3 completion
+   event, promote the selected rendition to Cloudinary and keep publication
+   caption-gated in Studio.
+2. **Voice-to-article** — private transcription proposal with an editor-owned
+   draft boundary; never persist or publish raw AI output automatically.
+3. **Products and classifieds** — finish the remaining R4 transaction and
+   inventory surfaces before advertiser self-service.
 
 **Done since this file was first written:** category listing (KUR-26), editorial
 CMS (KUR-27), profile/roles/social queue (KUR-33), cron publish (KUR-34),
@@ -1256,3 +1258,29 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Activation inputs: `AWS_POLLY_OUTPUT_BUCKET`, least-privilege AWS credentials
   with Polly/S3 access, and the existing Cloudinary credentials. See
   [ADR-0013](docs/decisions/adr-0013-article-narration.md).
+
+## 27. KUR-88 — recorded live replay handoff (2026-08-31)
+
+**Status: IMPLEMENTED; full release verification and provider activation remain.**
+
+- Amazon IVS channel creation now fails closed unless
+  `AWS_IVS_RECORDING_CONFIGURATION_ARN` is present, so an operator cannot start
+  an ephemeral live channel that silently leaves no source recording.
+- Go owns the replay boundary. A private authenticated query lists ended live
+  slots still awaiting replay; publication refuses future, cancelled,
+  prerecorded and already-completed slots and requires a ready video plus a
+  ready `text/vtt` caption asset.
+- Mongo supplies the id lookup and indexed ended-live queue. Studio exposes
+  branded asset/slot selectors with disabled animated submission, and the
+  public guide projects the immutable Cloudinary video through adaptive HLS,
+  poster and synchronized captions into the shared resilient VOD player.
+- Focused Go domain/application/HTTP suites, the IVS adapter suite, the Web-kit
+  BFF suite, full lint, monorepo type-check, boundaries, duplication, both
+  production builds and the focused real-Mongo repository test pass. The local
+  all-package test run passed 12 of 13 packages before the overloaded Docker
+  daemon timed out starting another Testcontainers instance; clean CI and
+  deployment smoke remain required before this item is marked deployed.
+- Activation input: a private IVS recording destination and its recording
+  configuration ARN. Automated S3 recording promotion into Cloudinary remains
+  the next R3 slice; this release deliberately keeps capture separate from the
+  editor's accessibility and publication decision.

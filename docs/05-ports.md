@@ -148,6 +148,13 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 be published without a caption asset; this accessibility rule lives in the
 schedule aggregate, not in a form or route handler.
 
+`ListReplayCandidates` is an authenticated newsroom query over ended live slots
+that are still scheduled. `PublishReplay` resolves the selected assets through
+`AssetRepository`, accepts only a ready video and a ready `text/vtt` caption,
+and refuses future, cancelled, prerecorded or already-completed slots. The
+public `ListTelevisionGuide` resolves completed replay assets through
+`VideoDeliveryPort`; provider transformation syntax stays in the adapter.
+
 The Go migration carries the same contracts in `internal/app/ports`: separate
 presenter, programme and schedule repositories feed `ListTelevisionGuide`.
 Production HTTP exposes `GET /public/{locale}/television` plus authenticated

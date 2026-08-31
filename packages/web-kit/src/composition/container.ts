@@ -56,8 +56,9 @@ function liveVideo(config: ReturnType<typeof env>): IvsLiveVideo {
   }
   if (config.AWS_REGION === undefined) return failClosedIvs()
   return new IvsLiveVideo({
-    accessKeyId: config.AWS_ACCESS_KEY_ID,
-    secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
+		accessKeyId: config.AWS_ACCESS_KEY_ID,
+		secretAccessKey: config.AWS_SECRET_ACCESS_KEY,
+		recordingConfigurationArn: config.AWS_IVS_RECORDING_CONFIGURATION_ARN,
     channels: ivsChannels(config.AWS_REGION),
   })
 }

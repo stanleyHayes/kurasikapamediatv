@@ -64,6 +64,7 @@ erDiagram
 | `podcasts` / `episodes` | publishable audio series and accessible episodes | locale, slug, artwork; `audioAssetId`, `transcriptAssetId`, `durationSeconds`, ordered chapters, `publishedAt` |
 | `galleries` | ordered photo stories and captioned video reports | kind, locale, slug, items with asset/caption ids, editorial captions, credits, `publishedAt` |
 | `live_streams` | Live TV | `providerStreamId`, `state`, `startedAt`, `viewerPeak` |
+| `schedule_slots` | programme transmissions and replay publication | `programmeId`, locale, start/end window, `isLive`, state, immutable `replayAssetId` and required `captionAssetId` |
 | `social_posts` | outbound queue | `articleId`, `platform`, `caption`, `scheduledAt`, `state`, `attempts` |
 | `newsletter_subscribers` | digests | `email`, `locales[]`, `cadence`, `confirmedAt` |
 | `rss_sources` | syndication in | `url`, `lastFetchedAt`, `etag` |
@@ -111,6 +112,7 @@ db.audit_logs.createIndex({ entity: 1, entityId: 1, at: -1 })
 
 // Studio media library
 db.media_assets.createIndex({ locale: 1, status: 1, _id: -1 })
+db.schedule_slots.createIndex({ locale: 1, state: 1, isLive: 1, endsAt: -1 })
 db.podcasts.createIndex({ locale: 1, published: 1, _id: -1 })
 db.episodes.createIndex({ podcastId: 1, published: 1, publishedAt: -1, _id: -1 })
 db.galleries.createIndex({ locale: 1, published: 1, publishedAt: -1, _id: -1 })

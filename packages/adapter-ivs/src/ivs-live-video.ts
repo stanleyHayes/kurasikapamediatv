@@ -8,9 +8,10 @@ import {
 import type { IvsChannels } from './ivs-channels'
 
 export interface IvsConfig {
-  readonly accessKeyId: string | undefined
-  readonly secretAccessKey: string | undefined
-  readonly channels: IvsChannels
+	readonly accessKeyId: string | undefined
+	readonly secretAccessKey: string | undefined
+	readonly recordingConfigurationArn: string | undefined
+	readonly channels: IvsChannels
 }
 
 /**
@@ -34,8 +35,12 @@ export interface IvsConfig {
 export class IvsLiveVideo implements LiveVideoPort {
   constructor(private readonly config: IvsConfig) {}
 
-  async provision(input: ProvisionChannelInput): Promise<ProvisionedChannel> {
-    const channels = this.configured()
+	async provision(input: ProvisionChannelInput): Promise<ProvisionedChannel> {
+		const channels = this.configured()
+		const recordingConfigurationArn = requiredConfig(
+			this.config.recordingConfigurationArn,
+			'AWS_IVS_RECORDING_CONFIGURATION_ARN',
+		)
 
     const created = await channels.createChannel({
       name: input.name,
@@ -49,7 +54,8 @@ export class IvsLiveVideo implements LiveVideoPort {
       // what the player on the front page loads. Ingest is not, and is gated by
       // the stream key alone. Entitlement, when it arrives, is a decision for
       // the domain, not a flag set once at provision time.
-      authorized: false,
+			authorized: false,
+			recordingConfigurationArn,
     })
 
     return provisioned(created)
@@ -138,4 +144,9 @@ function rtmpsUrl(host: string): string {
 
 function present(value: string | undefined): value is string {
   return value !== undefined && value !== ''
+}
+
+function requiredConfig(value: string | undefined, key: string): string {
+	if (!present(value)) throw unconfigured(key)
+	return value
 }

@@ -28,13 +28,13 @@ export default async function LivePage({ params }: Params): Promise<React.ReactE
         programme: { ...programme.snapshot(), artworkAssetId: null },
         presenters: presenters.map((person) => ({ ...person.snapshot(), portraitAssetId: null })),
       })),
-      upcoming: loaded.upcoming.map(({ slot, programme }) => ({
-        slot: { ...slot.snapshot(), startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() },
-        programme: { ...programme.snapshot(), artworkAssetId: null },
-      })),
-      replays: loaded.replays.map(({ slot, programme }) => ({
-        slot: { ...slot.snapshot(), startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() },
-        programme: { ...programme.snapshot(), artworkAssetId: null },
+		upcoming: loaded.upcoming.map(({ slot, programme }) => ({
+			slot: { ...slot.snapshot(), startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() },
+			programme: { ...programme.snapshot(), artworkAssetId: null }, replay: null,
+		})),
+		replays: loaded.replays.map(({ slot, programme }) => ({
+			slot: { ...slot.snapshot(), startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() },
+			programme: { ...programme.snapshot(), artworkAssetId: null }, replay: null,
       })),
     }
   })
@@ -44,13 +44,15 @@ export default async function LivePage({ params }: Params): Promise<React.ReactE
       category: programme.category, presenters: presenters.map((person) => ({ id: person.id, name: person.name, role: person.role })),
     })),
     upcoming: guide.upcoming.map(({ slot, programme }) => ({
-      id: slot.id, startsAt: slot.startsAt, endsAt: slot.endsAt, isLive: slot.isLive,
-      programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
-    })),
-    replays: guide.replays.map(({ slot, programme }) => ({
-      id: slot.id, startsAt: slot.startsAt, endsAt: slot.endsAt, isLive: slot.isLive,
-      programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
-    })),
+		id: slot.id, startsAt: slot.startsAt, endsAt: slot.endsAt, isLive: slot.isLive,
+		programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
+		replay: null,
+	})),
+	replays: guide.replays.map(({ slot, programme, replay }) => ({
+		id: slot.id, startsAt: slot.startsAt, endsAt: slot.endsAt, isLive: slot.isLive,
+		programme: { id: programme.id, title: programme.title, slug: programme.slug, category: programme.category },
+		replay,
+	})),
   }
   return <main className="mx-auto w-full max-w-[var(--container-page)] px-4 py-8 md:px-8 md:py-12"><LiveSignal locale={locale} copy={{ title: t('title'), description: t('description'), status: t('status'), onAir: t('onAir'), nowPlaying: t('nowPlaying'), emptyTitle: t('emptyTitle'), emptyDescription: t('emptyDescription') }} /><AdPlacement locale={locale} slot="live_companion" /><TelevisionGuide locale={locale} guide={view} /></main>
 }

@@ -2,14 +2,27 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
-import { createPresenterAction, createProgrammeAction, scheduleProgrammeAction } from '@/actions/television'
+import { createPresenterAction, createProgrammeAction, publishReplayAction, scheduleProgrammeAction } from '@/actions/television'
 
 interface PresenterItem { readonly id: string; readonly name: string; readonly role: string }
 interface ProgrammeItem { readonly id: string; readonly title: string; readonly category: string; readonly presenters: readonly PresenterItem[] }
 interface SlotItem { readonly id: string; readonly title: string; readonly startsAt: string; readonly isLive: boolean }
+interface ReplayCandidate { readonly id: string; readonly title: string; readonly endedAt: string }
+interface AssetOption { readonly id: string; readonly filename: string }
 
-export function TelevisionManager(props: { locale: string; presenters: readonly PresenterItem[]; programmes: readonly ProgrammeItem[]; upcoming: readonly SlotItem[] }): React.ReactElement {
-  return <div className="grid gap-7 xl:grid-cols-2"><PresenterForm locale={props.locale} /><ProgrammeForm locale={props.locale} presenters={props.presenters} /><ScheduleForm locale={props.locale} programmes={props.programmes} /><ScheduleLedger locale={props.locale} rows={props.upcoming} /></div>
+export function TelevisionManager(props: { locale: string; presenters: readonly PresenterItem[]; programmes: readonly ProgrammeItem[]; upcoming: readonly SlotItem[]; replayCandidates: readonly ReplayCandidate[]; videos: readonly AssetOption[]; captions: readonly AssetOption[] }): React.ReactElement {
+	return <div className="grid gap-7 xl:grid-cols-2"><PresenterForm locale={props.locale} /><ProgrammeForm locale={props.locale} presenters={props.presenters} /><ScheduleForm locale={props.locale} programmes={props.programmes} /><ScheduleLedger locale={props.locale} rows={props.upcoming} /><ReplayForm locale={props.locale} candidates={props.replayCandidates} videos={props.videos} captions={props.captions} /></div>
+}
+
+function ReplayForm({ locale, candidates, videos, captions }: { locale: string; candidates: readonly ReplayCandidate[]; videos: readonly AssetOption[]; captions: readonly AssetOption[] }): React.ReactElement {
+	const run = useAction(publishReplayAction)
+	const [slotId, setSlotId] = useState(''); const [replayAssetId, setReplayAssetId] = useState(''); const [captionAssetId, setCaptionAssetId] = useState('')
+	const ready = slotId !== '' && replayAssetId !== '' && captionAssetId !== ''
+	return <Panel eyebrow="Recording desk" title="Publish a completed live recording" description="Pair an ended live transmission with its verified video and synchronized caption file. It stays off the public replay shelf until both are ready."><div className="space-y-5"><ChoiceGroup title="Ended live transmission" values={candidates.map((item) => ({ id: item.id, label: item.title, detail: new Date(item.endedAt).toLocaleString(locale) }))} selected={slotId} onSelect={setSlotId} empty="Ended live transmissions awaiting replay will appear here." /><ChoiceGroup title="Recording" values={videos.map((item) => ({ id: item.id, label: item.filename, detail: 'Ready video' }))} selected={replayAssetId} onSelect={setReplayAssetId} empty="Upload and verify the completed recording in Media library first." /><ChoiceGroup title="Synchronized captions" values={captions.map((item) => ({ id: item.id, label: item.filename, detail: 'Ready caption file' }))} selected={captionAssetId} onSelect={setCaptionAssetId} empty="Upload the WebVTT caption file before publishing the replay." /><Submit pending={run.pending} disabled={!ready} label="Publish captioned replay" />{run.message !== null && <Status message={run.message} />}</div></Panel>
+}
+
+function ChoiceGroup({ title, values, selected, onSelect, empty }: { title: string; values: readonly { id: string; label: string; detail: string }[]; selected: string; onSelect: (id: string) => void; empty: string }): React.ReactElement {
+	return <fieldset><legend className="mb-2 text-xs font-bold uppercase tracking-[.12em] text-on-surface-variant">{title}</legend>{values.length === 0 ? <p className="border-l-4 border-secondary bg-secondary-container/30 p-3 text-sm">{empty}</p> : <div className="grid gap-2">{values.map((item) => <button key={item.id} type="button" aria-pressed={selected === item.id} onClick={() => { onSelect(item.id) }} className={`border p-3 text-left ${selected === item.id ? 'border-primary bg-primary-container' : 'border-outline-variant'}`}><strong className="block text-sm">{item.label}</strong><span className="text-xs text-on-surface-variant">{item.detail}</span></button>)}</div>}</fieldset>
 }
 
 function PresenterForm({ locale }: { locale: string }): React.ReactElement {

@@ -90,7 +90,7 @@ func TestScheduleAndAccessibleReplay(t *testing.T) {
 	if _, err := media.NewScheduleSlot(manager(), input, now); !errors.Is(err, media.ErrInvalidScheduleWindow) {
 		t.Fatal(err)
 	}
-	input.EndsAt = now.Add(2 * time.Hour)
+	input.EndsAt, input.IsLive = now.Add(2*time.Hour), true
 	if _, err := media.NewScheduleSlot(guest(), input, now); !errors.Is(err, identity.ErrNotPermitted) {
 		t.Fatal(err)
 	}
@@ -98,15 +98,25 @@ func TestScheduleAndAccessibleReplay(t *testing.T) {
 	if err != nil || slot.ID() != "slot" || slot.State().State != media.ScheduleScheduled {
 		t.Fatal(err)
 	}
-	if _, err = slot.PublishReplay(manager(), "replay", nil); !errors.Is(err, media.ErrReplayNeedsCaptions) {
+	if _, err = slot.PublishReplay(manager(), "replay", nil, input.EndsAt); !errors.Is(err, media.ErrReplayNeedsCaptions) {
 		t.Fatal(err)
 	}
 	caption := shared.AssetID("captions")
-	if _, err = slot.PublishReplay(guest(), "replay", &caption); !errors.Is(err, identity.ErrNotPermitted) {
+	if _, err = slot.PublishReplay(guest(), "replay", &caption, now); !errors.Is(err, identity.ErrNotPermitted) {
 		t.Fatal(err)
 	}
-	slot, err = slot.PublishReplay(manager(), "replay", &caption)
+	if _, err = slot.PublishReplay(manager(), "replay", &caption, input.EndsAt.Add(-time.Second)); !errors.Is(err, media.ErrReplayBeforeSlotEnds) {
+		t.Fatal(err)
+	}
+	slot, err = slot.PublishReplay(manager(), "replay", &caption, input.EndsAt)
 	if err != nil || slot.State().State != media.ScheduleCompleted {
+		t.Fatal(err)
+	}
+	if _, err = slot.PublishReplay(manager(), "other", &caption, input.EndsAt); !errors.Is(err, media.ErrReplayAlreadyPublished) {
+		t.Fatal(err)
+	}
+	prerecorded := media.ReconstituteScheduleSlot(media.ScheduleSlotState{State: media.ScheduleScheduled, EndsAt: now})
+	if _, err = prerecorded.PublishReplay(manager(), "replay", &caption, now); !errors.Is(err, media.ErrReplayNotAwaiting) {
 		t.Fatal(err)
 	}
 	if _, err = slot.Cancel(guest()); !errors.Is(err, identity.ErrNotPermitted) {
