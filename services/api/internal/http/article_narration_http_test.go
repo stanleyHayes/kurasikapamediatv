@@ -85,3 +85,30 @@ func TestArticleNarrationHTTPWorkflowRequiresExplicitAttachment(t *testing.T) {
 		t.Fatalf("public after approval: %d %s", after.Code, after.Body.String())
 	}
 }
+
+func TestArticleNarrationHTTPFailsClosed(t *testing.T) {
+	t.Parallel()
+	handler := narrationHTTPServer(t)
+	for _, path := range []string{
+		"/articles/article_1/narrations",
+		"/articles/article_1/narrations/latest",
+		"/articles/article_1/narrations/job_1/attach",
+	} {
+		method := http.MethodPost
+		if path == "/articles/article_1/narrations/latest" {
+			method = http.MethodGet
+		}
+		response := request(handler, method, path, "", false)
+		if response.Code != http.StatusForbidden {
+			t.Fatalf("unauthorised %s: %d %s", path, response.Code, response.Body.String())
+		}
+	}
+	missing := request(handler, http.MethodPost, "/articles/missing/narrations", "", true)
+	if missing.Code != http.StatusNotFound {
+		t.Fatalf("missing article: %d %s", missing.Code, missing.Body.String())
+	}
+	cron := request(handler, http.MethodPost, "/internal/process-narrations", "", false)
+	if cron.Code != http.StatusNotFound {
+		t.Fatalf("unauthorised cron: %d %s", cron.Code, cron.Body.String())
+	}
+}
