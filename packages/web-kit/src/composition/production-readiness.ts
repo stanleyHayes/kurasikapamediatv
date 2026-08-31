@@ -1,5 +1,4 @@
 import type { Env } from './env'
-import { siteUrl, studioUrl } from './origins'
 
 /**
  * The gap between "the process starts" and "the platform actually works".
@@ -47,21 +46,6 @@ const isLoopback = (url: string): boolean => {
 }
 
 /**
- * Hostname, NOT `host`. Cookies are scoped by host and ignore the port, so
- * `localhost:3000` and `localhost:3001` share a cookie jar — which is exactly
- * why `pnpm dev` signs you into both apps with no COOKIE_DOMAIN set. Comparing
- * `host` here would demand one for every local run and teach people that this
- * check cries wolf.
- */
-const hostnameOf = (url: string): string | undefined => {
-  try {
-    return new URL(url).hostname
-  } catch {
-    return undefined
-  }
-}
-
-/**
  * Secrets whose absence the code handles correctly and invisibly.
  *
  * A table rather than a run of `if`s: each entry is one deployment key and the
@@ -81,28 +65,6 @@ const SILENT_SECRETS: readonly {
     why: 'publishing cannot refresh the public site, so breaking news stays invisible until the cache expires on its own',
   },
 ]
-
-/**
- * The sign-in loop from ADR-0011 § 4, caught before it ships.
- *
- * Split-origin only. In the same-origin shape a host cookie already reaches
- * both deployables, and widening it is the stricter setting given away for
- * nothing — so this asks for COOKIE_DOMAIN when, and only when, the site and
- * the studio sit on different hostnames.
- */
-function cookieDomainGap(env: Env): ReadinessGap | null {
-  if (env.COOKIE_DOMAIN !== undefined) return null
-
-  const site = hostnameOf(siteUrl(env))
-  const studio = hostnameOf(studioUrl(env))
-
-  if (site === undefined || studio === undefined || site === studio) return null
-
-  return {
-    key: 'COOKIE_DOMAIN',
-    why: `the session cookie issued on ${site} is never sent to ${studio}, so an editor signs in and the studio bounces them straight back`,
-  }
-}
 
 export interface ReadinessContext {
   /** Next's build phase, so prerendering never trips a deployment check. */
@@ -147,13 +109,9 @@ export function productionGaps(env: Env, context: ReadinessContext = {}): Readin
   // check is noise, and a check people route around protects nothing.
   if (isLoopback(rawAppUrl)) return []
 
-  const gaps: ReadinessGap[] = SILENT_SECRETS.filter(({ key }) => env[key] === undefined).map(
+  return SILENT_SECRETS.filter(({ key }) => env[key] === undefined).map(
     ({ key, why }) => ({ key, why }),
   )
-
-  const cookies = cookieDomainGap(env)
-
-  return cookies === null ? gaps : [...gaps, cookies]
 }
 
 /**

@@ -74,16 +74,15 @@ describe('productionGaps', () => {
     expect(productionGaps(underTest, { rawAppUrl: 'http://127.0.0.1:31742' })).toEqual([])
   })
 
-  it('requires COOKIE_DOMAIN once the site and studio are on different hosts', () => {
-    // The sign-in loop from ADR-0011 § 4: a host-scoped cookie set on
-    // kurasikapa.tv is never sent to studio.kurasikapa.tv, so the editor signs
-    // in successfully and the studio bounces them straight back.
+  it('supports independent hosts because each deployment owns its sign-in session', () => {
+    // Vercel project domains have different registrable parents and cannot
+    // share a cookie. Studio therefore signs in on its own host and issues the
+    // same signed token into a host-scoped cookie backed by the shared store.
     const split = production({
       SITE_URL: 'https://kurasikapa.tv',
-      STUDIO_URL: 'https://studio.kurasikapa.tv',
+      STUDIO_URL: 'https://kurasikapa-studio.vercel.app/studio',
     })
-    expect(productionGaps(split, PUBLIC).map((g) => g.key)).toContain('COOKIE_DOMAIN')
-    expect(productionGaps({ ...split, COOKIE_DOMAIN: '.kurasikapa.tv' }, PUBLIC)).toEqual([])
+    expect(productionGaps(split, PUBLIC)).toEqual([])
   })
 
   it('does not ask for COOKIE_DOMAIN when only the PORT differs', () => {
