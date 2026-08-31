@@ -1261,7 +1261,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 27. KUR-88 — recorded live replay handoff (2026-08-31)
 
-**Status: IMPLEMENTED; full release verification and provider activation remain.**
+**Status: DEPLOYED; provider activation remains.**
 
 - Amazon IVS channel creation now fails closed unless
   `AWS_IVS_RECORDING_CONFIGURATION_ARN` is present, so an operator cannot start
@@ -1284,3 +1284,11 @@ are live. Custom-domain DNS remains an external registrar action.**
   configuration ARN. Automated S3 recording promotion into Cloudinary remains
   the next R3 slice; this release deliberately keeps capture separate from the
   editor's accessibility and publication decision.
+- Release evidence: implementation commit `f617b28`; CI run `33448531924`
+  passed on its clean rerun, including all 39 browser/accessibility journeys,
+  full coverage, real-Mongo integration, Go race/coverage/vulnerability gates,
+  Lighthouse, duplication and dependency audit. Render deploy
+  `dep-dab0dc15efls73fn442g` is live from the exact commit. The Studio
+  production deployment is Ready at `kurasikapa-studio.vercel.app`; public
+  home, Live, OG image, Studio sign-in and API health return 200, while both
+  unauthenticated replay endpoints correctly return 403.
