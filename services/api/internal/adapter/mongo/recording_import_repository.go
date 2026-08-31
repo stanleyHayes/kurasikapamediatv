@@ -18,21 +18,21 @@ import (
 const CollRecordingImports = "recording_imports"
 
 type recordingImportDoc struct {
-	ID                   string                      `bson:"_id"`
-	AssetID              string                      `bson:"assetId"`
-	SourceRef            string                      `bson:"sourceRef"`
-	Bucket               string                      `bson:"bucket"`
-	Prefix               string                      `bson:"prefix"`
-	ChannelName          string                      `bson:"channelName"`
-	Locale               string                      `bson:"locale"`
-	ProviderTaskID       string                      `bson:"providerTaskId,omitempty"`
-	OutputRef            string                      `bson:"outputRef,omitempty"`
-	FailureReason        string                      `bson:"failureReason,omitempty"`
-	DurationSeconds      float64                     `bson:"durationSeconds"`
-	Status               media.RecordingImportStatus `bson:"status"`
-	RequestedBy          string                      `bson:"requestedBy"`
-	CreatedAt            time.Time                   `bson:"createdAt"`
-	UpdatedAt            time.Time                   `bson:"updatedAt"`
+	ID              string                      `bson:"_id"`
+	AssetID         string                      `bson:"assetId"`
+	SourceRef       string                      `bson:"sourceRef"`
+	Bucket          string                      `bson:"bucket"`
+	Prefix          string                      `bson:"prefix"`
+	ChannelName     string                      `bson:"channelName"`
+	Locale          string                      `bson:"locale"`
+	ProviderTaskID  string                      `bson:"providerTaskId,omitempty"`
+	OutputRef       string                      `bson:"outputRef,omitempty"`
+	FailureReason   string                      `bson:"failureReason,omitempty"`
+	DurationSeconds float64                     `bson:"durationSeconds"`
+	Status          media.RecordingImportStatus `bson:"status"`
+	RequestedBy     string                      `bson:"requestedBy"`
+	CreatedAt       time.Time                   `bson:"createdAt"`
+	UpdatedAt       time.Time                   `bson:"updatedAt"`
 }
 
 type RecordingImportRepository struct{ rows *mongo.Collection }
