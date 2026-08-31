@@ -78,3 +78,42 @@ func TestNarrationJobRefusesInvalidOrOutOfOrderChanges(t *testing.T) {
 		t.Fatalf("restart error = %v, want ErrNarrationJobTransition", err)
 	}
 }
+
+func TestNarrationJobCoversEveryGuardAndReconstitution(t *testing.T) {
+	t.Parallel()
+	invalid := narrationState()
+	invalid.Voice = " "
+	if _, err := media.NewNarrationJob(narrationEditor(), invalid, narrationNow); !errors.Is(err, media.ErrInvalidNarrationJob) {
+		t.Fatalf("incomplete job error = %v", err)
+	}
+	job, err := media.NewNarrationJob(narrationEditor(), narrationState(), narrationNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = job.Start(narrationReader(), "task", narrationNow); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("start permission error = %v", err)
+	}
+	if _, err = job.Start(narrationEditor(), " ", narrationNow); !errors.Is(err, media.ErrNarrationJobTransition) {
+		t.Fatalf("empty task error = %v", err)
+	}
+	job, err = job.Start(narrationEditor(), " task ", narrationNow)
+	if err != nil || job.State().ProviderTaskID != "task" {
+		t.Fatalf("trimmed task state = %#v error = %v", job.State(), err)
+	}
+	if _, err = job.Complete(narrationReader(), "audio", narrationNow); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("complete permission error = %v", err)
+	}
+	if _, err = job.Complete(narrationEditor(), "", narrationNow); !errors.Is(err, media.ErrNarrationJobTransition) {
+		t.Fatalf("empty asset error = %v", err)
+	}
+	if _, err = job.Fail(narrationReader(), "failed", narrationNow); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("fail permission error = %v", err)
+	}
+	if _, err = job.Fail(narrationEditor(), " ", narrationNow); !errors.Is(err, media.ErrNarrationJobTransition) {
+		t.Fatalf("empty failure error = %v", err)
+	}
+	restored := media.ReconstituteNarrationJob(job.State())
+	if restored.ID() != job.ID() {
+		t.Fatalf("restored id = %s", restored.ID())
+	}
+}
