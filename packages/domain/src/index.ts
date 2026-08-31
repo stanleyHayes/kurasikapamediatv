@@ -220,3 +220,4 @@ export {
 } from './media/schedule-slot'
 
 export { AuditEntry, type AuditEntryProps } from './insight/audit-entry'
+export { PageView, ACQUISITION_CHANNELS, type AcquisitionChannel, type PageViewProps } from './insight/page-view'

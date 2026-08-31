@@ -1,6 +1,6 @@
 'use client'
 
-import { writeConsent, type AnalyticsConsent } from './consent'
+import { CONSENT_EVENT, writeConsent, type AnalyticsConsent } from './consent'
 
 /**
  * GDPR: analytics is off until a named choice. Essential cookies (session)
@@ -13,6 +13,7 @@ export function ConsentBanner({
 }): React.ReactElement {
   const choose = (value: AnalyticsConsent): void => {
     writeConsent(window.localStorage, value)
+    window.dispatchEvent(new Event(CONSENT_EVENT))
     onChoose(value)
   }
 
@@ -23,8 +24,9 @@ export function ConsentBanner({
       className="border-outline-variant bg-surface-container-high fixed right-4 bottom-4 left-4 z-50 mx-auto max-w-lg rounded-xl border p-4 shadow-lg md:left-auto"
     >
       <p className="text-on-surface text-sm">
-        We use Google Analytics only if you agree. Essential sign-in cookies are
-        always on. You can refuse — the site still works.
+        We measure readership with privacy-safe first-party analytics and Google
+        Analytics only if you agree. Essential sign-in cookies are always on.
+        You can refuse — the site still works.
       </p>
       <div className="mt-3 flex gap-2">
         <button

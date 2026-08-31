@@ -24,7 +24,7 @@ export function SignOutButton(): React.ReactElement {
       onClick={() => {
         start(() => void signOutAction())
       }}
-      className="text-label-bold text-on-surface-variant hover:text-primary uppercase transition-colors disabled:opacity-60"
+      className="text-label-bold text-white/75 hover:text-secondary uppercase transition-colors disabled:opacity-60"
     >
       {pending ? 'Signing out…' : 'Sign out'}
     </button>

@@ -87,6 +87,15 @@ export interface ReadingDocument {
   readAt: Date
 }
 
+export interface PageViewDocument {
+  _id: string
+  articleId: string
+  locale: string
+  visitorHash: string
+  channel: string
+  occurredAt: Date
+}
+
 export interface LikeDocument {
   /** `${readerId}:${articleId}` — a reader cannot like the same article twice. */
   _id: string
@@ -201,6 +210,7 @@ export const CATEGORIES = 'categories'
 export const BOOKMARKS = 'bookmarks'
 export const LIKES = 'likes'
 export const READINGS = 'readings'
+export const PAGE_VIEWS = 'page_views'
 export const COMMENTS = 'comments'
 export const NEWSLETTER_SUBSCRIBERS = 'newsletter_subscribers'
 export const BREAKING_ALERTS = 'breaking_alerts'

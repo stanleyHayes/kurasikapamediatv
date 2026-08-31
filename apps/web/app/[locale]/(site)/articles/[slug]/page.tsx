@@ -13,6 +13,7 @@ import { ReadingBeacon } from '@/components/article/reading-beacon'
 import { SaveControl } from '@/components/article/save-control'
 import { StoryBanner } from '@/components/story/story-banner'
 import { ArticleSplash } from '@/components/article/article-splash'
+import { ArticleViewBeacon } from '@/analytics/article-view-beacon'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { cachedArticle, type ReadableArticle } from '@kurasikapa/web-kit/read-model/queries'
 import { asScriptContent, newsArticleJsonLd } from '@/seo/json-ld'
@@ -101,6 +102,7 @@ async function Story({ params }: Params): Promise<React.ReactElement> {
 
   return (
     <article className="pb-20">
+      <ArticleViewBeacon articleId={article.id} locale={locale} />
       {/* Structured data for Google News and Discover. Escaped so a headline
           cannot close the script block — see seo/json-ld.ts. */}
       <script

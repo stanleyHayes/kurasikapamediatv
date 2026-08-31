@@ -69,7 +69,8 @@ erDiagram
 | `bookmarks` `reading_history` `comments` | reader activity | `readerId`, `articleId` |
 | `ad_campaigns` `placements` | ad serving | `advertiserId`, `slot`, `targeting`, `budget`, `impressions` |
 | `subscriptions` `donations` | revenue | `provider`, `providerRef`, `currency`, `status` |
-| `page_views` `seo_reports` `revenue_snapshots` | insight, append-only | time-series collections |
+| `page_views` | insight, append-only | `articleId`, `locale`, hashed `visitorHash`, acquisition `channel`, `occurredAt`; TTL after 400 days |
+| `seo_reports` `revenue_snapshots` | insight, append-only | future time-series collections |
 | `audit_logs` | who did what | `actorId`, `action`, `entity`, `before`, `after`, `at` |
 
 ---
@@ -109,9 +110,11 @@ db.galleries.createIndex({ locale: 1, published: 1, publishedAt: -1, _id: -1 })
 db.bookmarks.createIndex({ readerId: 1, articleId: 1 }, { unique: true })
 db.reading_history.createIndex({ readerId: 1, at: -1 })
 db.comments.createIndex({ articleId: 1, at: -1 })
+db.page_views.createIndex({ articleId: 1, occurredAt: -1 })
+db.page_views.createIndex({ visitorHash: 1, occurredAt: -1 })
 
 // TTL — GDPR retention
-db.page_views.createIndex({ at: 1 }, { expireAfterSeconds: 34560000 })   // 400 days
+db.page_views.createIndex({ occurredAt: 1 }, { expireAfterSeconds: 34560000 }) // 400 days
 db.sessions.createIndex({ expires: 1 }, { expireAfterSeconds: 0 })
 ```
 

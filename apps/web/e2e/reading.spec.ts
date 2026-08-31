@@ -24,6 +24,13 @@ test.describe('reading', () => {
     await expect(page.getByRole('heading', { name: PUBLISHED.title, level: 1 })).toBeVisible()
   })
 
+  test('a consenting reader records one privacy-safe article view', async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem('kurasikapa-analytics-consent', 'granted'))
+    const recorded = page.waitForResponse((response) => response.url().endsWith('/api/analytics/page-view'))
+    await page.goto(`/en/articles/${PUBLISHED.slug}`)
+    expect((await recorded).status()).toBe(204)
+  })
+
   test('the article carries NewsArticle structured data', async ({ page }) => {
     await page.goto(`/en/articles/${PUBLISHED.slug}`)
 

@@ -189,7 +189,15 @@ cadence+locale+period so a second tick does not double-mail.
 
 **revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `ServePlacement`
 
-**insight** — `RecordPageView` · `BuildSeoReport` · `BuildRevenueSnapshot`
+**insight** — `RecordPageView` · `BuildNewsroomReport` · `BuildSeoReport` · `BuildRevenueSnapshot`
+
+`RecordPageView` accepts only a SHA-256 visitor token produced at the web
+composition edge after analytics consent; neither an IP address nor a raw
+browser identifier crosses the port. `BuildNewsroomReport` requires
+`analytics:read` and derives bounded 7/30/90-day traffic, unique and returning
+readers, acquisition/search share, top story/category/author performance and
+newsletter growth from append-only production data. Page views expire after
+400 days under the documented GDPR retention policy.
 
 ### Shape of a use case
 

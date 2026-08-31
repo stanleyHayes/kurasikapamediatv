@@ -1,4 +1,5 @@
 export const CONSENT_KEY = 'kurasikapa-analytics-consent'
+export const CONSENT_EVENT = 'kurasikapa:analytics-consent'
 
 export type AnalyticsConsent = 'granted' | 'denied'
 

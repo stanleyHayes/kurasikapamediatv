@@ -11,6 +11,7 @@ import {
   MongoPushSubscriptionRepository,
   MongoRssSourceRepository,
   MongoReadingRepository,
+  MongoInsightRepository,
   MongoRevisionRepository,
   MongoRoleRepository,
   MongoSocialPostRepository,
@@ -61,6 +62,7 @@ import {
   type PushSubscriptionRepository,
   type RssSourceRepository,
   type ReadingRepository,
+  type InsightRepository,
   type IdPort,
   type RevisionRepository,
   type RoleRepository,
@@ -85,6 +87,7 @@ export interface MongoGraph {
   readonly comments: CommentRepository
   readonly likes: LikeRepository
   readonly readings: ReadingRepository
+  readonly insights: InsightRepository
   readonly subscriptions: NewsletterRepository
   readonly alerts: BreakingAlertRepository
   readonly digests: NewsletterDigestRepository
@@ -115,6 +118,7 @@ export function mongoGraph(db: Db, clock: ClockPort): MongoGraph {
     comments: new MongoCommentRepository(db),
     likes: new MongoLikeRepository(db),
     readings: new MongoReadingRepository(db),
+    insights: new MongoInsightRepository(db),
     subscriptions: new MongoNewsletterRepository(db),
     alerts: new MongoBreakingAlertRepository(db),
     digests: new MongoNewsletterDigestRepository(db),

@@ -7,6 +7,7 @@ import {
   BROADCASTS,
   LIKES,
   READINGS,
+  PAGE_VIEWS,
   COMMENTS,
   NEWSLETTER_SUBSCRIBERS,
   BREAKING_ALERTS,
@@ -24,6 +25,7 @@ import {
   type BroadcastDocument,
   type LikeDocument,
   type ReadingDocument,
+  type PageViewDocument,
   type CommentDocument,
   type NewsletterDocument,
   type BreakingAlertDocument,
@@ -135,6 +137,12 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
     // Unique-reader ranking for the public most-read rail. One row per
     // (reader, article), so grouping on articleId is unique readers, not hits.
     { key: { articleId: 1 }, name: 'article_read_rank' },
+  ])
+  await db.collection<PageViewDocument>(PAGE_VIEWS).createIndexes([
+    { key: { occurredAt: -1 }, name: 'insight_recent_views' },
+    { key: { occurredAt: 1 }, name: 'insight_view_retention', expireAfterSeconds: 34_560_000 },
+    { key: { articleId: 1, occurredAt: -1 }, name: 'insight_story_views' },
+    { key: { visitorHash: 1, occurredAt: -1 }, name: 'insight_reader_retention' },
   ])
   await db.collection<CommentDocument>(COMMENTS).createIndexes([
     { key: { articleId: 1, state: 1, createdAt: -1, _id: -1 }, name: 'article_visible_recent' },

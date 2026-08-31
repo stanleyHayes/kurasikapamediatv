@@ -36,6 +36,7 @@ export const PERMISSIONS = [
   'campaign:view_own',
   'role:assign',
   'audit:read',
+  'analytics:read',
   'comment:moderate',
 ] as const
 
@@ -50,6 +51,7 @@ const EDITOR_PERMISSIONS: readonly Permission[] = [
   'article:publish',
   'article:unpublish',
   'asset:upload_image',
+  'analytics:read',
   'comment:moderate',
 ]
 

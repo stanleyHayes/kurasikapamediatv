@@ -153,6 +153,7 @@ export async function seed(): Promise<void> {
 
   await db.collection<SeedArticle>('articles').deleteMany({})
   await db.collection<SeedCategory>('categories').deleteMany({})
+  await db.collection('page_views').deleteMany({})
   await db.collection<SeedArticle>('articles').insertMany([PUBLISHED, DRAFT])
   await db.collection<SeedCategory>('categories').insertOne(SECTION)
   await db.collection<SeedArticle>('articles').createIndex(

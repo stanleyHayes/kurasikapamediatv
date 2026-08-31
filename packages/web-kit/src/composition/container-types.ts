@@ -3,6 +3,7 @@ import type {
   ApproveArticle,
   AssignRoles,
   BrowseCategory,
+  BuildNewsroomReport,
   ClockPort,
   ConfirmNewsletter,
   CountLikes,
@@ -51,6 +52,7 @@ import type {
   RateLimiter,
   ReadAuditLog,
   RecordReading,
+  RecordPageView,
   RegisterRssSource,
   RejectArticle,
   RemoveSavedArticle,
@@ -113,6 +115,8 @@ export interface Container {
   readonly unlikeArticle: UnlikeArticle
   readonly countLikes: CountLikes
   readonly recordReading: RecordReading
+  readonly recordPageView: RecordPageView
+  readonly buildNewsroomReport: BuildNewsroomReport
   readonly listReadingHistory: ListReadingHistory
   readonly countReadings: CountReadings
   readonly subscribeNewsletter: SubscribeNewsletter
