@@ -76,4 +76,28 @@ func TestIDsStringify(t *testing.T) {
 	if shared.GalleryID("gal_1").String() != "gal_1" {
 		t.Error("GalleryID")
 	}
+	if shared.StaffProfileID("staff_1").String() != "staff_1" {
+		t.Error("StaffProfileID")
+	}
+	if shared.NarrationJobID("narration_1").String() != "narration_1" {
+		t.Error("NarrationJobID")
+	}
+	if shared.RecordingImportID("recording_1").String() != "recording_1" {
+		t.Error("RecordingImportID")
+	}
+	if shared.MembershipPlanID("plan_1").String() != "plan_1" {
+		t.Error("MembershipPlanID")
+	}
+	if shared.SubscriptionID("subscription_1").String() != "subscription_1" {
+		t.Error("SubscriptionID")
+	}
+	if shared.DonationID("donation_1").String() != "donation_1" {
+		t.Error("DonationID")
+	}
+	if shared.AdCampaignID("campaign_1").String() != "campaign_1" {
+		t.Error("AdCampaignID")
+	}
+	if shared.AdEventID("event_1").String() != "event_1" {
+		t.Error("AdEventID")
+	}
 }

@@ -64,3 +64,28 @@ func TestRecordingImportGuards(t *testing.T) {
 		t.Fatalf("failed twice: %v", err)
 	}
 }
+
+func TestRecordingImportReconstitutionAndTransitionPermissions(t *testing.T) {
+	state := recordingState()
+	state.Status = media.RecordingImportProcessing
+	state.ProviderTaskID = "mediaconvert_1"
+	job := media.ReconstituteRecordingImport(state)
+	if job.ID() != state.ID || job.State().ProviderTaskID != state.ProviderTaskID {
+		t.Fatalf("reconstituted import lost state: %#v", job.State())
+	}
+
+	reader := identity.NewActor("reader", []identity.Role{identity.RoleGuest})
+	if _, err := job.Complete(reader, recordingNow); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("reader completed import: %v", err)
+	}
+	if _, err := job.Fail(reader, "failed", recordingNow); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("reader failed import: %v", err)
+	}
+	requested, _ := media.NewRecordingImport(recordingManager(), recordingState(), recordingNow)
+	if _, err := requested.Start(reader, "task", "output", recordingNow); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("reader started import: %v", err)
+	}
+	if _, err := requested.Fail(recordingManager(), "   ", recordingNow); !errors.Is(err, media.ErrRecordingImportTransition) {
+		t.Fatalf("blank failure reason accepted: %v", err)
+	}
+}
