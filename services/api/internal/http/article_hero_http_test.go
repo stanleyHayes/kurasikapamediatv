@@ -30,4 +30,32 @@ func TestArticleHeroAttachmentUsesVerifiedMedia(t *testing.T) {
 	if attached.Code != http.StatusOK || !bytes.Contains(attached.Body.Bytes(), []byte(`"credit":"Kurasikapa / Ama Mensah"`)) {
 		t.Fatalf("attach: %d %s", attached.Code, attached.Body.String())
 	}
+	draft := request(handler, http.MethodGet, "/articles/id_1", "", true)
+	if draft.Code != http.StatusOK || !bytes.Contains(draft.Body.Bytes(), []byte(`"secureUrl":"https://res.cloudinary.test/market.jpg"`)) {
+		t.Fatalf("draft hero: %d %s", draft.Code, draft.Body.String())
+	}
+}
+
+func TestArticleHeroAttachmentRejectsInvalidRequests(t *testing.T) {
+	t.Parallel()
+	handler := routed(emptyEditorial(), map[shared.UserID][]identity.Role{
+		"manager": {identity.RoleAdministrator},
+	})
+
+	for name, tc := range map[string]struct {
+		body       string
+		identified bool
+		want       int
+	}{
+		"anonymous":      {body: `{}`, identified: false, want: http.StatusForbidden},
+		"malformed json": {body: `{`, identified: true, want: http.StatusBadRequest},
+		"missing story":  {body: `{"assetId":"missing","credit":"Newsroom"}`, identified: true, want: http.StatusNotFound},
+	} {
+		t.Run(name, func(t *testing.T) {
+			rec := request(handler, http.MethodPut, "/articles/missing/hero", tc.body, tc.identified)
+			if rec.Code != tc.want {
+				t.Fatalf("status = %d, want %d: %s", rec.Code, tc.want, rec.Body.String())
+			}
+		})
+	}
 }
