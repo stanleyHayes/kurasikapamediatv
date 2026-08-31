@@ -149,8 +149,8 @@ async function seedStories(
   // showing "no text yet" on every story.
   await db.collection('article_revisions').insertMany(
     STORIES.map((s) => ({
-      _id: `rev_${s.id}`,
-      articleId: s.id,
+      _id: `demo_rev_${s.id}`,
+      articleId: `demo_${s.id}`,
       seq: 1,
       title: s.title,
       body: bodyFor(s),
@@ -170,8 +170,8 @@ async function seedStories(
 async function seedComments(db: Db): Promise<void> {
   await db.collection('comments').insertMany(
     COMMENTS.map((c) => ({
-      _id: c._id,
-      articleId: c.articleId,
+      _id: `demo_${c._id}`,
+      articleId: `demo_${c.articleId}`,
       readerId: c.readerId,
       body: c.body,
       state: c.state,
@@ -213,6 +213,19 @@ async function seedSitePages(db: Db): Promise<void> {
   }
 }
 
+async function seedSections(db: Db): Promise<void> {
+  const categories = db.collection<Record<string, unknown> & { _id: string }>('categories')
+  for (const section of SECTIONS) {
+    const existing = await categories.findOne({ _id: section._id })
+    if (existing !== null && existing['demoSeed'] !== DEMO_SEED) continue
+    await categories.replaceOne(
+      { _id: section._id },
+      { ...section, demoSeed: DEMO_SEED },
+      { upsert: true },
+    )
+  }
+}
+
 async function main(): Promise<void> {
   const client = new MongoClient(URI)
   await client.connect()
@@ -222,11 +235,11 @@ async function main(): Promise<void> {
     await db.collection(name).deleteMany({ demoSeed: DEMO_SEED })
   }
 
-  await db.collection('categories').insertMany(SECTIONS.map((section) => ({ ...section, demoSeed: DEMO_SEED })) as never[])
+  await seedSections(db)
 
   const articles = STORIES.map((s) => ({
-    _id: s.id,
-    familyId: `fam_${s.id}`,
+    _id: `demo_${s.id}`,
+    familyId: `demo_fam_${s.id}`,
     locale: s.locale,
     slug: s.slug,
     title: s.title,
@@ -234,7 +247,7 @@ async function main(): Promise<void> {
     categoryId: s.category,
     tagIds: [],
     status: s.status ?? 'published',
-    approvedRevisionId: `rev_${s.id}`,
+    approvedRevisionId: `demo_rev_${s.id}`,
     scheduledAt: s.status === 'scheduled' ? inDays(s.inDays ?? 1) : null,
     publishedAt: s.status === undefined ? at(s.daysAgo) : null,
     updatedAt: at(s.daysAgo),
