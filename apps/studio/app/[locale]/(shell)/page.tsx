@@ -89,7 +89,7 @@ export default async function StudioPage({
           </div>
 
           {drafts.length === 0 ? (
-            <StudioEmptyState eyebrow="Pipeline clear" icon="✎" title="No stories on your desk." description="Your drafts, submissions and scheduled reports will appear here as a live production ledger. While the desk is clear, check the review queue or monitor incoming sources." action={{ href: '/review', label: 'Open review desk' }} secondaryAction={{ href: '/rss', label: 'Check sources' }} />
+            <StudioEmptyState eyebrow="Pipeline clear" icon="desk" title="No stories on your desk." description="Your drafts, submissions and scheduled reports will appear here as a live production ledger. While the desk is clear, check the review queue or monitor incoming sources." action={{ href: '/review', label: 'Open review desk' }} secondaryAction={{ href: '/rss', label: 'Check sources' }} />
           ) : (
             <CollectionView noun="stories" filters={[...new Set(drafts.map((draft) => draft.status))]} entries={drafts.map((draft) => ({ id: draft.id, search: `${draft.title} ${draft.excerpt ?? ''} ${draft.locale} ${draft.status}`, filter: draft.status, content: <PipelineItem draft={draft} now={now} /> }))} />
           )}

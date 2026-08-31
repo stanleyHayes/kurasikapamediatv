@@ -9,7 +9,7 @@ import { CollectionView } from './collection-view'
 
 export function CommentQueue({ items }: { items: readonly CommentView[] }): React.ReactElement {
   if (items.length === 0) {
-    return <StudioEmptyState eyebrow="All caught up" icon="¶" title="No comments need a decision." description="Reader submissions will collect here before publication. The empty queue means every current conversation has been reviewed." action={{ href: '/', label: 'Back to editorial' }} compact />
+    return <StudioEmptyState eyebrow="All caught up" icon="comments" title="No comments need a decision." description="Reader submissions will collect here before publication. The empty queue means every current conversation has been reviewed." action={{ href: '/', label: 'Back to editorial' }} compact />
   }
 
   return <CollectionView noun="comments" entries={items.map((item) => ({ id: item.id, search: `${item.body} ${item.articleId}`, filter: 'pending', content: <QueueRow item={item} /> }))} />

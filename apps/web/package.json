@@ -12,7 +12,8 @@
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "seed:demo": "node e2e/demo-seed.ts"
+    "seed:demo": "node e2e/demo-seed.ts",
+    "clear:demo": "node e2e/demo-clear.ts"
   },
   "dependencies": {
     "@kurasikapa/adapter-anthropic": "workspace:*",

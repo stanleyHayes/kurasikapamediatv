@@ -5,6 +5,7 @@ import type { SitePageKey } from '@kurasikapa/domain'
 import { callAction } from '@kurasikapa/web-kit/actions/call'
 import type { SitePageEntry } from '@kurasikapa/web-kit/read-model/site-page-entries'
 import { saveSitePageEntriesAction } from '../actions/pages'
+import { StudioEmptyState } from './empty-state'
 
 export interface EditableSitePage {
   readonly key: SitePageKey
@@ -76,7 +77,9 @@ function EntryList(props: { entries: readonly SitePageEntry[]; pending: boolean;
   return <div className="border-t-2 border-on-surface">{props.entries.map((entry, index) => <article key={entry.id} className="grid gap-5 border-b border-outline-variant bg-surface-container-lowest p-5 md:grid-cols-[3rem_minmax(0,1fr)_auto] md:p-6"><span className="font-mono text-sm text-secondary-ink">{String(index + 1).padStart(2, '0')}</span><div><h3 className="font-display text-xl font-semibold">{entry.title}</h3>{entry.summary !== '' && <p className="mt-1 text-sm font-semibold text-primary">{entry.summary}</p>}<p className="mt-3 line-clamp-2 text-sm leading-relaxed text-on-surface-variant">{entry.body}</p></div><div className="flex items-start gap-2"><button type="button" disabled={props.pending} onClick={() => { props.onEdit(entry) }} className="border border-on-surface px-3 py-2 text-xs font-bold">Edit</button><button type="button" disabled={props.pending} onClick={() => { props.onRemove(entry.id) }} className="border border-error px-3 py-2 text-xs font-bold text-error">Remove</button></div></article>)}</div>
 }
 
-function EmptyCollection({ pageKey }: { pageKey: SitePageKey }): React.ReactElement { return <div className="border-y border-outline-variant bg-surface-container-lowest px-6 py-12 text-center"><p className="font-display text-2xl font-semibold">No {LABELS[pageKey].toLowerCase()} published.</p><p className="mt-2 text-sm text-on-surface-variant">The static page remains complete while this collection is empty.</p></div> }
+function EmptyCollection({ pageKey }: { pageKey: SitePageKey }): React.ReactElement {
+  return <StudioEmptyState eyebrow="Public collection" icon="site" title={`No ${LABELS[pageKey].toLowerCase()} published.`} description="The public page keeps its permanent introduction while this collection is clear. Create the first useful entry when the newsroom is ready." compact />
+}
 function Field({ label, children }: { label: string; children: React.ReactNode }): React.ReactElement { return <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-[.1em] text-on-surface-variant">{label}</span>{children}</label> }
 function singular(key: SitePageKey): string { return key === 'careers' ? 'role' : key === 'faq' ? 'question' : 'help article' }
 function titlePlaceholder(key: SitePageKey): string { return key === 'careers' ? 'Senior news producer' : key === 'faq' ? 'How do I update my email address?' : 'Manage your saved stories' }

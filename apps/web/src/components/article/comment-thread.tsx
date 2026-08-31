@@ -1,3 +1,5 @@
+import Image from 'next/image'
+import { EmptyState } from '@kurasikapa/ui/empty-state'
 import { articleId as asArticleId } from '@kurasikapa/domain'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { toCommentView } from '@kurasikapa/web-kit/read-model/comment-view'
@@ -21,7 +23,7 @@ export async function CommentThread({
       </header>
       <div className="p-6 md:p-9">
       {comments.length === 0 ? (
-        <div className="my-6 border border-dashed border-outline-variant bg-surface-container-low p-6"><p className="font-display text-xl font-semibold text-on-surface">Start a thoughtful conversation.</p><p className="mt-2 text-sm text-on-surface-variant">There are no published responses yet. Your perspective can open the discussion.</p></div>
+        <EmptyState className="my-6" eyebrow="Reader discussion" title="Start a thoughtful conversation." description="No responses have been published. Add a clear, respectful perspective and the moderation desk will review it before it appears." visual={<Image src="/brand-logo-transparent.png" alt="" width={1536} height={1024} className="h-8 w-auto object-contain" />} compact />
       ) : (
         <ul className="my-7 divide-y divide-outline-variant border-y border-outline-variant">
           {comments.map((comment, index) => (

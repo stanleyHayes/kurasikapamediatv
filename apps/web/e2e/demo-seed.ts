@@ -10,6 +10,7 @@ import { MongoClient, type Db } from 'mongodb'
  */
 const URI = process.env['MONGODB_URI'] ?? 'mongodb://127.0.0.1:37017/kurasikapa?directConnection=true'
 const DB = process.env['MONGODB_DB'] ?? 'kurasikapa'
+const DEMO_SEED = 'kurasikapa-client-preview-v1'
 
 const SECTIONS = [
   // Descriptions are per-locale and do NOT fall back — cat_education has only
@@ -122,18 +123,18 @@ const inDays = (days: number): Date => new Date(Date.now() + days * 86_400_000)
 function bodyFor(story: Story): string {
   const lead =
     story.locale === 'fr'
-      ? `Contenu de démonstration pour « ${story.title} ». Ce texte occupe la place de l'article réel afin de valider la mise en page.`
-      : `Demonstration copy for "${story.title}". This text stands in for the real article so the layout can be reviewed.`
+      ? `Cette édition de présentation montre comment Kurasikapa introduit « ${story.title} » avec une information claire, un contexte utile et une structure adaptée à la lecture sur mobile.`
+      : `This client-preview edition shows how Kurasikapa would introduce “${story.title}” with a clear lead, useful context and a structure made for reading on mobile.`
 
   const paragraph =
     story.locale === 'fr'
-      ? "Chaque paragraphe provient de la révision approuvée de l'article, et non d'un champ de l'article lui-même. Une correction en cours de rédaction reste donc invisible pour le lecteur jusqu'à son approbation."
-      : 'Each paragraph comes from the article\'s approved revision rather than a field on the article itself. A correction still being drafted therefore stays invisible to readers until it is approved.'
+      ? "Le reportage présenterait d'abord les faits confirmés, puis expliquerait les personnes concernées, les décisions à suivre et les questions qui restent ouvertes. Les chiffres et citations seraient reliés à des sources vérifiées par la rédaction."
+      : 'The report would lead with confirmed facts, then explain who is affected, which decisions matter next and what questions remain open. Figures and quotations would be tied to sources checked by the editorial desk.'
 
   const close =
     story.locale === 'fr'
-      ? "Remplacez ce contenu par la copie éditoriale réelle avant toute démonstration publique."
-      : 'Replace this content with real editorial copy before any public demonstration.'
+      ? "Note de présentation : ce scénario éditorial illustre le produit et ne constitue pas un reportage d'actualité. Il peut être supprimé avec la commande de nettoyage des données de démonstration."
+      : 'Preview note: this editorial scenario demonstrates the product and is not presented as current reporting. It can be removed with the demo-data clear command.'
 
   return [lead, paragraph, paragraph, close].join('\n\n')
 }
@@ -155,6 +156,7 @@ async function seedStories(
       body: bodyFor(s),
       authorId: 'usr_demo_author',
       createdAt: at(s.daysAgo),
+      demoSeed: DEMO_SEED,
     })) as never[],
   )
 
@@ -174,8 +176,41 @@ async function seedComments(db: Db): Promise<void> {
       body: c.body,
       state: c.state,
       createdAt: hoursAgo(c.hoursAgo),
+      demoSeed: DEMO_SEED,
     })) as never[],
   )
+}
+
+const pageBody = (entries: readonly Record<string, string>[]): string => JSON.stringify({ version: 1, entries })
+
+const SITE_PAGES = [
+  { _id: 'faq:en', key: 'faq', locale: 'en', title: 'Frequently asked questions', lead: '', body: pageBody([
+    { id: 'editorial-independence', title: 'How does Kurasikapa protect editorial independence?', summary: 'The newsroom separates editorial judgement from commercial influence.', body: 'Editors decide what is reported and how it is presented. Advertising and sponsored work are labelled clearly, and commercial partners do not approve newsroom coverage.' },
+    { id: 'corrections', title: 'How can I request a correction?', summary: 'Send the article link and the specific fact you believe needs review.', body: 'Use the contact page to reach the editorial desk. The team reviews supporting evidence, updates confirmed errors transparently and records material corrections on the article.' },
+    { id: 'languages', title: 'Which languages does Kurasikapa publish in?', summary: 'English and French editions are available at launch.', body: 'Each edition is edited independently rather than translated automatically. Additional Ghanaian-language editions can be introduced when the newsroom has the editors required to maintain them.' },
+  ]) },
+  { _id: 'help:en', key: 'help', locale: 'en', title: 'Help centre', lead: '', body: pageBody([
+    { id: 'save-story', title: 'Save a story for later', summary: 'Keep important reporting in your private reading list.', body: 'Sign in, open any published article and use Save. You can return to saved reporting from your profile and remove an item whenever it is no longer useful.' },
+    { id: 'newsletter', title: 'Manage newsletter updates', summary: 'Choose the language and cadence that suit you.', body: 'Join the reader dispatch from the newsletter page. Every message includes an unsubscribe link, and breaking alerts are sent separately from scheduled briefings.' },
+    { id: 'account-access', title: 'Recover access to your account', summary: 'Use the secure password recovery flow from the sign-in page.', body: 'Request a recovery link using the email attached to your account. Links expire and can only be used once. Contact support if you no longer control that inbox.' },
+  ]) },
+  { _id: 'careers:en', key: 'careers', locale: 'en', title: 'Careers', lead: '', body: pageBody([
+    { id: 'multimedia-producer', title: 'Multimedia producer', summary: 'Accra · Full time · Editorial production', body: 'Shape field reporting into clear video, audio and digital packages. The role needs strong news judgement, confident editing skills and a portfolio that shows how you tell complex stories simply.' },
+    { id: 'audience-editor', title: 'Audience editor', summary: 'Accra or remote in Ghana · Full time', body: 'Help the newsroom understand how readers find, use and respond to its journalism. You will work across newsletters, social distribution, analytics and community feedback without chasing empty reach.' },
+  ]) },
+] as const
+
+async function seedSitePages(db: Db): Promise<void> {
+  const pages = db.collection<Record<string, unknown> & { _id: string }>('site_pages')
+  for (const page of SITE_PAGES) {
+    const existing = await pages.findOne({ _id: page._id })
+    if (existing !== null && existing['demoSeed'] !== DEMO_SEED) continue
+    await pages.replaceOne(
+      { _id: page._id },
+      { ...page, updatedAt: at(0), demoSeed: DEMO_SEED },
+      { upsert: true },
+    )
+  }
 }
 
 async function main(): Promise<void> {
@@ -183,12 +218,11 @@ async function main(): Promise<void> {
   await client.connect()
   const db = client.db(DB)
 
-  await db.collection('articles').deleteMany({})
-  await db.collection('article_revisions').deleteMany({})
-  await db.collection('categories').deleteMany({})
-  await db.collection('comments').deleteMany({})
+  for (const name of ['articles', 'article_revisions', 'categories', 'comments']) {
+    await db.collection(name).deleteMany({ demoSeed: DEMO_SEED })
+  }
 
-  await db.collection('categories').insertMany(SECTIONS as never[])
+  await db.collection('categories').insertMany(SECTIONS.map((section) => ({ ...section, demoSeed: DEMO_SEED })) as never[])
 
   const articles = STORIES.map((s) => ({
     _id: s.id,
@@ -204,15 +238,17 @@ async function main(): Promise<void> {
     scheduledAt: s.status === 'scheduled' ? inDays(s.inDays ?? 1) : null,
     publishedAt: s.status === undefined ? at(s.daysAgo) : null,
     updatedAt: at(s.daysAgo),
+    demoSeed: DEMO_SEED,
   }))
 
   await seedStories(db, articles)
   await seedComments(db)
+  await seedSitePages(db)
 
   const published = articles.filter((a) => a.status === 'published').length
   console.error(
     `seeded ${String(published)} published, 1 draft, 1 in review, 1 scheduled, ` +
-      `${String(SECTIONS.length)} sections, ${String(COMMENTS.length)} comments`,
+      `${String(SECTIONS.length)} sections, ${String(COMMENTS.length)} comments and ${String(SITE_PAGES.length)} managed pages`,
   )
 
   await client.close()

@@ -33,7 +33,7 @@ export default async function RssPage({
         approves it — the same integrity rule as everything else we print.
       </p>
       <RssSourceForm locale={locale} categories={categories} />
-      {sources.length === 0 ? <StudioEmptyState eyebrow="Source intake" icon="◎" title="No feeds are connected." description="Add a trusted RSS source above. New items arrive as drafts and still require editorial review before publication." compact /> : <ul className="space-y-2">
+      {sources.length === 0 ? <StudioEmptyState eyebrow="Source intake" icon="rss" title="No feeds are connected." description="Add a trusted RSS source above. New items arrive as drafts and still require editorial review before publication." compact /> : <ul className="space-y-2">
         {sources.map((source) => (
           <li key={source.id} className="text-on-surface text-sm">
             {source.url}

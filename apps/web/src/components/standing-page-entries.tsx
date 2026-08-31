@@ -1,5 +1,8 @@
+import Image from 'next/image'
 import type { SitePageKey } from '@kurasikapa/domain'
+import { EmptyState as EmptyStateFrame } from '@kurasikapa/ui/empty-state'
 import type { SitePageEntry } from '@kurasikapa/web-kit/read-model/site-page-entries'
+import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 
 const TITLES = {
   careers: ['Open roles', 'Roles published by the newsroom appear here.'],
@@ -31,8 +34,19 @@ function EntryGrid({ pageKey, entries }: { pageKey: SitePageKey; entries: readon
 }
 
 function EmptyState({ pageKey }: { pageKey: SitePageKey }): React.ReactElement {
-  const message = pageKey === 'careers'
-    ? 'There are no open roles today. General expressions of interest are still welcome through our contact page.'
-    : `No ${pageKey === 'faq' ? 'questions' : 'help articles'} have been published yet.`
-  return <p className="max-w-2xl py-14 font-display text-2xl leading-snug text-on-surface-variant">{message}</p>
+  const copy = pageKey === 'careers'
+    ? { eyebrow: 'Recruitment desk', title: 'No roles are open today.', description: 'The newsroom is not hiring for a specific position right now. You can still introduce yourself and share your strongest work.', action: 'Contact the newsroom', href: '/contact' }
+    : pageKey === 'faq'
+      ? { eyebrow: 'Reader questions', title: 'The question desk is being prepared.', description: 'Editors are collecting the questions readers ask most. For an answer today, the newsroom and help desk are still available.', action: 'Visit the help centre', href: '/help' }
+      : { eyebrow: 'Support desk', title: 'No help guides are needed yet.', description: 'Practical guides will appear here as new reader tools launch. The newsroom can help directly in the meantime.', action: 'Contact support', href: '/contact' }
+
+  return <EmptyStateFrame
+    className="mt-8"
+    eyebrow={copy.eyebrow}
+    title={copy.title}
+    description={copy.description}
+    visual={<Image src="/brand-logo-transparent.png" alt="" width={1536} height={1024} className="h-8 w-auto object-contain" />}
+    actions={<Link href={copy.href} className="bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-inverse-surface">{copy.action} <span aria-hidden>↗</span></Link>}
+    compact
+  />
 }

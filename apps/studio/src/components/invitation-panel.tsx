@@ -5,6 +5,7 @@ import { callAction } from '@kurasikapa/web-kit/actions/call'
 import { useState, useTransition } from 'react'
 import { invitePersonAction, resendInvitationAction, revokeInvitationAction } from '../actions/invitations'
 import { RoleCheckboxes } from './role-checkboxes'
+import { StudioEmptyState } from './empty-state'
 
 export interface InvitationView { readonly id: string; readonly email: string; readonly name: string; readonly roles: readonly string[]; readonly state: string; readonly expiresAt: string }
 
@@ -35,7 +36,7 @@ function InviteForm({ onInvited }: { onInvited: (row: InvitationView) => void })
 function PendingList({ rows, onChange }: { rows: readonly InvitationView[]; onChange: (rows: readonly InvitationView[]) => void }): React.ReactElement {
   const [pending, startTransition] = useTransition()
   const active = rows.filter((row) => row.state === 'pending')
-  if (active.length === 0) return <p className="p-6 text-sm text-on-surface-variant">No pending invitations.</p>
+  if (active.length === 0) return <StudioEmptyState eyebrow="Access queue" icon="people" title="No invitations are waiting." description="New role-specific invitations will remain here until they are accepted, revoked or expire after seven days." compact />
   const act = (kind: 'revoke' | 'resend', row: InvitationView): void => { startTransition(async () => {
     if (kind === 'resend') { await callAction(() => resendInvitationAction(row.id)); return }
     const result = await callAction(() => revokeInvitationAction(row.id))

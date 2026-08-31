@@ -179,6 +179,7 @@
   .ticker-track:hover { animation-play-state: paused; }
   .splash-mark { animation: splash-mark 1.8s var(--ease-out) infinite; }
   .splash-progress { animation: splash-progress 1.4s var(--ease-in-out) infinite; }
+  .empty-state-mark { animation: empty-state-mark 2.8s var(--ease-out) infinite; }
   .editorial-link { position: relative; }
   .editorial-link::after {
     position: absolute; right: 0; bottom: -0.3rem; left: 0; height: 2px;
@@ -198,7 +199,7 @@
     .reveal, .reveal-delay-1, .reveal-delay-2, .reveal-delay-3 { animation: editorial-fade 180ms ease both; }
     .editorial-card, .image-band, .editorial-link::after, button { transition-property: color, background-color, border-color, opacity; }
     .ticker-track { animation: none; }
-    .splash-mark, .splash-progress { animation: none; }
+    .splash-mark, .splash-progress, .empty-state-mark { animation: none; }
     .editorial-card:hover, .editorial-card:hover .image-band { transform: none; }
   }
 }
@@ -211,5 +212,6 @@
 @keyframes editorial-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ticker { to { transform: translateX(-50%); } }
 @keyframes empty-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-.35rem); } }
+@keyframes empty-state-mark { 0%, 100% { transform: translateY(0); box-shadow: 0 0 0 0 rgb(7 133 42 / 0); } 50% { transform: translateY(-.3rem); box-shadow: .35rem .35rem 0 rgb(7 133 42 / 12%); } }
 @keyframes splash-mark { 0%, 100% { opacity: .72; transform: translateY(0) scale(.985); } 50% { opacity: 1; transform: translateY(-.35rem) scale(1); } }
 @keyframes splash-progress { 0% { transform: translateX(-120%); } 100% { transform: translateX(400%); } }

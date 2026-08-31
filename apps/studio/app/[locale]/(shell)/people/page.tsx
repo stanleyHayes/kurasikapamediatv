@@ -7,6 +7,7 @@ import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { CollectionView } from '@/components/collection-view'
 import { InvitationPanel } from '@/components/invitation-panel'
+import { StudioEmptyState } from '@/components/empty-state'
 import { invitationGraph } from '@kurasikapa/web-kit/composition/invitation-graph'
 
 interface Person {
@@ -99,7 +100,7 @@ function MembersTable({
       </div>
 
       {people.length === 0 ? (
-        <p className="text-on-surface-variant p-6">Nobody has signed up yet.</p>
+        <StudioEmptyState eyebrow="Team directory" icon="people" title="The newsroom directory is ready." description="Invite the first editor, reporter or producer and assign only the roles they need. New members will appear here after accepting their secure invitation." compact />
       ) : (
         <CollectionView noun="people" filters={['super_admin', 'editor', 'journalist', 'unassigned']} entries={people.map((person) => ({ id: person.id, search: `${person.name} ${person.email} ${person.roles.join(' ')}`, filter: person.roles[0] ?? 'unassigned', content: <MemberRow person={person} isSelf={person.id === selfId} /> }))} />
       )}

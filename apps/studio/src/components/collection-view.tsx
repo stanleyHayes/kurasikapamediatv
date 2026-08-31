@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { StudioIcon } from './studio-icon'
 import { BrandedSelect } from './branded-select'
+import { StudioEmptyState } from './empty-state'
 
 export interface CollectionEntry { readonly id: string; readonly search: string; readonly filter: string; readonly content: React.ReactNode }
 
@@ -20,7 +21,7 @@ export function CollectionView({ entries, filters, noun = 'items', pageSize = 8 
       <label className="relative min-w-0 flex-1"><span className="sr-only">Search {noun}</span><StudioIcon name="search" className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-on-surface-variant" /><input value={query} onChange={(event) => { updateQuery(event.target.value); }} placeholder={`Search ${noun}…`} className="h-11 w-full border border-outline-variant bg-surface-container-lowest pl-10 pr-3 text-sm text-on-surface outline-none focus:border-primary" /></label>
       {filters && filters.length > 0 && <div className="min-w-44"><BrandedSelect label={`Filter ${noun}`} value={filter} onChange={(value) => { setFilter(value); setPage(1) }} options={[{ value: 'all', label: `All ${noun}` }, ...filters.map((value) => ({ value, label: value.replaceAll('_', ' ') }))]}/></div>}
     </div>
-    {visible.length === 0 ? <div className="p-10 text-center"><p className="font-display text-xl font-semibold text-on-surface">No matching {noun}</p><p className="mt-2 text-sm text-on-surface-variant">Try a broader search or clear the current filter.</p></div> : <div>{visible.map((entry) => <div key={entry.id}>{entry.content}</div>)}</div>}
+    {visible.length === 0 ? <StudioEmptyState eyebrow="Filtered view" icon="search" title={`No matching ${noun}.`} description="Try a broader search term or return the filter to all items." compact /> : <div>{visible.map((entry) => <div key={entry.id}>{entry.content}</div>)}</div>}
     <footer className="flex items-center justify-between gap-4 border-t border-outline-variant px-4 py-3 text-sm text-on-surface-variant"><span>{matching.length} {noun} · Page {current} of {pages}</span><div className="flex gap-2"><PageButton label="Previous" disabled={current === 1} onClick={() => { setPage(current - 1); }} /><PageButton label="Next" disabled={current === pages} onClick={() => { setPage(current + 1); }} /></div></footer>
   </section>
 }

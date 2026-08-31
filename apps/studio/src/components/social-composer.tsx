@@ -11,6 +11,7 @@ import {
   ScheduleField,
 } from './social-compose-fields'
 import { PlatformCaptionFields } from './social-platform-captions'
+import { StudioEmptyState } from './empty-state'
 
 const text = (form: FormData, field: string): string => {
   const value = form.get(field)
@@ -52,11 +53,7 @@ export function SocialComposer({
   articles: readonly PublishableArticle[]
 }): React.ReactElement {
   if (articles.length === 0) {
-    return (
-      <p className="text-on-surface-variant">
-        Nothing is published yet. Social posts can only reference a live article.
-      </p>
-    )
+    return <StudioEmptyState eyebrow="Social composer" icon="social" title="Publish a story before distributing it." description="Only live, editor-approved reporting can be prepared for Facebook or Instagram. Publish the first article, then return here to write platform-specific captions." action={{ href: '/', label: 'Open editorial desk' }} compact />
   }
 
   return <ComposerForm articles={articles} />

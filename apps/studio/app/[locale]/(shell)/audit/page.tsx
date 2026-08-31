@@ -40,7 +40,7 @@ export default async function AuditPage({
       </p>
 
       {page.items.length === 0 ? (
-        <StudioEmptyState eyebrow="Clean record" icon="◫" title="No audit events yet." description="Editorial actions, role changes and scheduled publications will appear here as an immutable record once newsroom activity begins." action={{ href: '/', label: 'Return to editorial' }} compact />
+        <StudioEmptyState eyebrow="Clean record" icon="audit" title="No audit events yet." description="Editorial actions, role changes and scheduled publications will appear here as an immutable record once newsroom activity begins." action={{ href: '/', label: 'Return to editorial' }} compact />
       ) : (
         <CollectionView noun="events" filters={[...new Set(page.items.map((entry) => entry.action))]} entries={page.items.map((entry) => ({ id: entry.id, search: `${entry.action} ${entry.actorId} ${entry.subjectId} ${Object.values(entry.detail).join(' ')}`, filter: entry.action, content: <AuditRow entry={entry} locale={locale} /> }))} />
       )}

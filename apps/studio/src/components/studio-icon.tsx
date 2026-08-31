@@ -1,4 +1,4 @@
-export type StudioIconName = 'desk' | 'review' | 'social' | 'rss' | 'comments' | 'people' | 'audit' | 'live' | 'search' | 'menu' | 'close' | 'language' | 'site' | 'collapse' | 'chevron'
+export type StudioIconName = 'desk' | 'review' | 'social' | 'rss' | 'comments' | 'people' | 'audit' | 'live' | 'search' | 'menu' | 'close' | 'language' | 'site' | 'collapse' | 'chevron' | 'check'
 
 const PATHS: Record<StudioIconName, React.ReactNode> = {
   desk: <><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></>,
@@ -14,6 +14,7 @@ const PATHS: Record<StudioIconName, React.ReactNode> = {
   language: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></>,
   site: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18"/></>,
   collapse: <><path d="M4 4h16v16H4zM9 4v16M15 9l-3 3 3 3"/></>, chevron: <path d="M8 10l4 4 4-4"/>,
+  check: <><path d="M5 12l4 4L19 6"/><path d="M4 4h16v16H4z"/></>,
 }
 
 export function StudioIcon({ name, className = 'size-5' }: { name: StudioIconName; className?: string }): React.ReactElement {

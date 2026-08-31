@@ -1,3 +1,5 @@
+import Image from 'next/image'
+import { EmptyState } from '@kurasikapa/ui/empty-state'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { RelativeTime } from '@kurasikapa/ui/relative-time'
 
@@ -30,9 +32,7 @@ export function ReadingHistory({
       </h2>
 
       {articles.length === 0 ? (
-        <p className="text-on-surface-variant mt-4">
-          Open an article while signed in and it will show up here.
-        </p>
+        <EmptyState className="mt-4" eyebrow="Reading trail" title="Your recent history starts here." description="Open an article while signed in and this space will keep a private trail back to the reporting you read." visual={<Image src="/brand-logo-transparent.png" alt="" width={1536} height={1024} className="h-8 w-auto object-contain" />} compact />
       ) : (
         <ul className="mt-4">
           {articles.map((article) => (

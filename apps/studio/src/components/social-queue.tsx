@@ -32,7 +32,7 @@ export function SocialQueue({
   locale: string
 }): React.ReactElement {
   if (posts.length === 0) {
-    return <StudioEmptyState eyebrow="Distribution clear" icon="↗" title="Nothing is scheduled." description="Choose a published article in the composer to prepare its next Facebook or Instagram post. Every caption stays a proposal until you queue it." compact />
+    return <StudioEmptyState eyebrow="Distribution clear" icon="social" title="Nothing is scheduled." description="Choose a published article in the composer to prepare its next Facebook or Instagram post. Every caption stays a proposal until you queue it." compact />
   }
 
   return <CollectionView noun="posts" filters={[...new Set(posts.map((post) => post.state))]} entries={posts.map((post) => ({ id: post.id, search: `${post.caption} ${post.platform} ${post.state}`, filter: post.state, content: <QueueRow post={post} locale={locale} /> }))} />

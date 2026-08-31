@@ -14,8 +14,8 @@ export function StudioAuthShell(props: Props): React.ReactElement {
         <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border border-white/15" />
         <div className="absolute -bottom-32 left-20 h-96 w-96 rounded-full border border-secondary/30" />
         <div className="relative flex items-center gap-4">
-          <span className="grid h-16 w-24 place-items-center border border-white/20 bg-white/95 px-2">
-            <Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media TV" width={1536} height={1024} className="h-12 w-auto object-contain" priority />
+          <span className="grid h-20 w-28 place-items-center">
+            <Image src="/studio/brand-logo-transparent.png" alt="Kurasikapa Media TV" width={1536} height={1024} className="h-16 w-auto object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,.2)]" priority />
           </span>
           <span><strong className="block font-display text-xl">Kurasikapa</strong><small className="mt-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Newsroom studio</small></span>
         </div>

@@ -1,5 +1,7 @@
+import Image from 'next/image'
 import { setRequestLocale } from 'next-intl/server'
 import { Suspense } from 'react'
+import { EmptyState } from '@kurasikapa/ui/empty-state'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { currentActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
@@ -85,7 +87,7 @@ async function Results({
   const page = await container().searchArticles.execute({ terms, locale })
 
   if (page.items.length === 0) {
-    return <p className="text-on-surface-variant">Nothing matched “{terms}”.</p>
+    return <EmptyState eyebrow="Archive search" title={`No reporting matched “${terms}”.`} description="Try a broader topic, check the spelling, or browse the latest reporting while the archive continues to grow." visual={<Image src="/brand-logo-transparent.png" alt="" width={1536} height={1024} className="h-8 w-auto object-contain" />} actions={<Link href="/news" className="bg-primary px-5 py-3 text-sm font-bold text-white">Browse latest reporting ↗</Link>} compact />
   }
 
   return (

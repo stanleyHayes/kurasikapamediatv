@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { StudioEmptyState } from './empty-state'
 import { type Suggestion, SuggestionList } from './suggestion-list'
 import { ASSISTS, LABEL, type Assist } from './assists'
 
@@ -88,7 +89,7 @@ function AssistResults(props: {
     if (props.items.length > 0) {
       return <SuggestionList items={props.items} onApply={props.onApply} />
     }
-    if (props.ran) return <p className="text-on-surface-variant text-sm">No suggestions came back.</p>
+    if (props.ran) return <StudioEmptyState eyebrow="Assistant response" icon="review" title="No suggestions returned." description="The draft was left unchanged. Try a more specific instruction or add more reporting context before running the assistant again." compact />
 
     return null
   }

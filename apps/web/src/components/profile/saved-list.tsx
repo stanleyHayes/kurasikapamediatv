@@ -1,3 +1,5 @@
+import Image from 'next/image'
+import { EmptyState } from '@kurasikapa/ui/empty-state'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { RelativeTime } from '@kurasikapa/ui/relative-time'
 
@@ -44,9 +46,7 @@ export function SavedList({
       </div>
 
       {articles.length === 0 ? (
-        <p className="text-on-surface-variant">
-          Nothing saved yet. Use the Save button on any article.
-        </p>
+        <EmptyState eyebrow="Reading list" title="Your saved desk is clear." description="Save useful reporting from any article and it will stay collected here for your next visit." visual={<Image src="/brand-logo-transparent.png" alt="" width={1536} height={1024} className="h-8 w-auto object-contain" />} actions={<Link href="/news" className="bg-primary px-4 py-2.5 text-sm font-bold text-white">Browse latest reporting ↗</Link>} compact />
       ) : (
         <ul className="-mr-2 flex-1 overflow-y-auto pr-2">
           {articles.map((article) => (

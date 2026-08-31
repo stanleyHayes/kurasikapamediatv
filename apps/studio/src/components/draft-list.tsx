@@ -17,7 +17,7 @@ export function DraftList({
   caption?: string
 }): React.ReactElement {
   if (drafts.length === 0) {
-    return <StudioEmptyState eyebrow="Queue clear" icon="✓" title={empty} description="The editorial desk is caught up. New submissions will appear here in oldest-first order when a journalist sends work for review." action={{ href: '/', label: 'Return to editorial' }} />
+    return <StudioEmptyState eyebrow="Queue clear" icon="check" title={empty} description="The editorial desk is caught up. New submissions will appear here in oldest-first order when a journalist sends work for review." action={{ href: '/', label: 'Return to editorial' }} />
   }
 
   return (
