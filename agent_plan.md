@@ -1067,7 +1067,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 20. KUR-81 — revenue intelligence, subscriber ledger and social cards (2026-08-31)
 
-**Status: VERIFIED LOCALLY — CI and production release active.**
+**Status: CI GREEN; API DEPLOYED — Vercel release quota-blocked.**
 
 - Added a permission-gated revenue report over confirmed provider state with
   active/pending/canceled subscriber counts, successful gifts, gross revenue,
@@ -1080,6 +1080,9 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Added `/og-image`, a dynamic 1200x630 branded social-card endpoint. Global
   Open Graph/Twitter metadata uses it; article metadata renders the headline
   into the card and `NewsArticle` JSON-LD references the same absolute image.
-- Evidence: full `pnpm verify` is green. Go verification passes at 96.7%
-  domain and 90.9% application/HTTP coverage; web-kit has 298 passing tests
-  with 80.76% branch coverage. CI and production URL smoke tests remain.
+- Evidence: full `pnpm verify` and CI run `33420210277` are green. Go
+  verification passes at 96.7% domain and 90.9% application/HTTP coverage;
+  web-kit has 298 passing tests with 80.76% branch coverage. Render now exposes
+  the protected `/revenue/report` route (anonymous request correctly returns
+  403). The public and Studio builds remain unpublished because Vercel again
+  rejected the final deployment at its 100-deployments-per-24-hours limit.

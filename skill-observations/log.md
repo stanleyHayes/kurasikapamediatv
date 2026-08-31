@@ -316,3 +316,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Before a long production-remediation loop, inspect provider deployment caps, batch tightly related fixes behind local and CI gates, and reserve at least one deployment for the final smoke-tested candidate. Record quota exhaustion as an external release blocker rather than representing code-complete work as live.
 
 **Principle:** Deployment capacity is a finite release dependency and should be budgeted like CI minutes, credentials, and maintenance windows.
+
+### Observation 21: Framework production builds belong in the local release gate
+
+**Status:** OPEN
+**Date:** 2026-08-31
+**Session context:** A full lint, typecheck, boundaries, test, duplication and backend verification command passed, but the hosted Next.js build rejected a route-level configuration that those gates never compiled.
+**Skill:** New skill candidate: release-verification
+**Type:** open-source
+**Phase/Area:** Pre-deployment verification
+
+**Issue:** Static typechecking proved the route was valid TypeScript but did not exercise framework build-time invariants. The first production deployment consumed scarce release capacity only to reveal a configuration incompatibility.
+
+**Suggested improvement:** For framework applications, make the release candidate gate run the same production build command and environment shape as hosting after tests pass. Treat a verification script that omits the deployable build as necessary but incomplete evidence.
+
+**Principle:** A green code-quality gate does not prove deployability unless it executes the framework's production compiler.
