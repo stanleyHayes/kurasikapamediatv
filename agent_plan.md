@@ -53,7 +53,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
-| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are implemented locally; Search Console operations, semantic search and personalised recommendations remain. |
+| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
 | Revenue | **QUEUED** | Advertising inventory, memberships, subscriptions, donations, products and revenue reporting behind payment ports. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
@@ -65,9 +65,9 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Go domain/app/HTTP gates and TypeScript BFF tests pass. Full repository verification and production release remain. | **CODE COMPLETE — VERIFY/RELEASE ACTIVE** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast publishing is deployed. Photo/video galleries now have domain/app/API/Mongo, Studio builder and public presentation with full verification; Studio and API are live while the public route awaits Vercel quota reset. Article attachment and VOD processing remain. | **PARTIAL — ACTIVE R3** |
 | Monetisation | Advertise copy exists, but revenue domain/application/adapters and all memberships, donations, entitlement, product, advertising, classified, affiliate and reporting workflows are absent. | **NOT BUILT — R4** |
-| Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth locally. Revenue/campaign reporting waits on R4; full verification and release remain. | **PARTIAL — ACTIVE R5** |
+| Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, visible byline resolution, publisher/contact pages and `NewsArticle` structure exist. Team remains provisional static copy with no verified names, biographies, portraits or author profile routes. | **BLOCKED ON CLIENT IDENTITIES + IMPLEMENTATION** |
-| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. A rolling two-day `/news-sitemap.xml` is implemented, fully verified locally and pushed in `f3dc8b3`. Production promotion is blocked until Vercel's free-plan daily deployment quota resets (`api-deployments-free-per-day`, more than 100 deployments); Search Console ownership/submission and indexing monitoring require access to the publisher account. | **CODE COMPLETE / RELEASE BLOCKED** |
+| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
 | Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
 
 Implementation rule for this delivery: original reporting is the primary content
@@ -247,14 +247,14 @@ brand variants. All **21 base desktop screens** are extracted into
 | `social_media_publishing_kurasikapa_admin` | `/studio/social` | ✅ KUR-33 — queue + compose (calendar design not copied; send path needs Meta) |
 | `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |
 | `kurasikapa_media_podcast_library` | `/podcasts` | ✅ accessible series/episode library, chapters, transcripts and RSS feed (KUR-76; deployed) |
-| `kurasikapa_media_live_tv_gallery` | `/live` + `/galleries` | ◑ live/schedule/replay deployed; photo and caption-gated video gallery is CI-green with Studio/API live, but the public route awaits Vercel quota reset (KUR-77) |
+| `kurasikapa_media_live_tv_gallery` | `/live` + `/galleries` | ✅ live/schedule/replay plus photo and caption-gated video galleries deployed (KUR-77) |
 | `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
 | `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
 | `kurasikapa_media_membership_donations` | — | ❌ no route (R4) |
 | `support_membership_kurasikapa_media_tv` | — | ❌ no route (R4) |
 | `monetization_dashboard_kurasikapa_admin` | — | ❌ no route (R4) |
 | `kurasikapa_admin_subscriptions_revenue` | — | ❌ no route (R4) |
-| `kurasikapa_admin_analytics_hub` | `/studio/analytics` | ◑ first-party audience KPIs, traffic/acquisition/retention and content/newsletter visualisations implemented locally; revenue and campaign data wait on R4 |
+| `kurasikapa_admin_analytics_hub` | `/studio/analytics` | ✅ first-party audience KPIs, traffic/acquisition/retention and content/newsletter visualisations deployed; revenue and campaign data move with R4 |
 | `seo_center_kurasikapa_admin` | — | ❌ no route (R5) |
 
 The full 50MB `stitch_kurasikapa_ai_media_platform.zip` is at the repo root and
@@ -994,7 +994,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 17. KUR-77 — photo and video gallery publishing (2026-08-31)
 
-**Status: PARTIALLY DEPLOYED — public web blocked by Vercel quota.**
+**Status: DEPLOYED — CI and all production routes verified.**
 
 - Added a Go gallery aggregate with photo/video permissions, explicit
   publication, required editorial captions and immutable publication time.
@@ -1011,13 +1011,12 @@ are live. Custom-domain DNS remains an external registrar action.**
   domain 96.6% and application/HTTP 91.5%; the real-Mongo adapter integration
   suite passes; and `/en/galleries` has no axe WCAG 2.2 AA violations. CI run
   `33407743601` is green. Studio and Render gallery endpoints return HTTP 200.
-  A direct public-web promotion was rejected by Vercel's free-tier daily limit
-  (`api-deployments-free-per-day`, more than 100 deployments); retry and the
-  public-route smoke remain after the quota resets.
+  After the Vercel quota reset, the public deployment promoted successfully;
+  `/en/galleries` now returns HTTP 200 alongside the Studio and Render routes.
 
 ## 18. KUR-78 — first-party newsroom intelligence (2026-08-31)
 
-**Status: VERIFIED LOCALLY — release active.**
+**Status: DEPLOYED — CI and production routes verified.**
 
 - Added an append-only page-view aggregate and repository port. The browser
   records only after analytics consent, the web edge hashes its random visitor
@@ -1033,4 +1032,6 @@ are live. Custom-domain DNS remains an external registrar action.**
   the focused browser journey records a consented article view with HTTP 204;
   and authenticated `/studio/en/analytics` has no axe WCAG 2.2 AA violations.
   That accessibility audit also exposed and fixed pre-existing Studio sidebar
-  contrast failures. CI and production smoke remain.
+  contrast failures. CI run `33411985796` is green; the production Studio
+  analytics route returns HTTP 200, and the same public deployment promoted
+  the analytics beacon, gallery route and two-day news sitemap.
