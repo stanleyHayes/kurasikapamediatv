@@ -1812,7 +1812,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 43. KUR-105 — reversible client-preview inventory (2026-09-01)
 
-**Status: LOCALLY VERIFIED — production seed execution pending a Render-safe path.**
+**Status: RELEASE VERIFIED — production seed execution pending a Render-safe path.**
 
 - Extracted managed FAQ/help/careers pages and television preview inventory
   from the 294-line demo seeder into a bounded module. The executable seed is
@@ -1830,6 +1830,12 @@ are live. Custom-domain DNS remains an external registrar action.**
   tagged and zero `demo_`-prefixed records in every covered collection.
 - `pnpm lint`, `pnpm typecheck`, `pnpm boundaries` and `pnpm dup` pass. The only
   boundary finding is the existing Studio loading-route orphan warning.
+- Commit `8d3ee66` is on `main`; CI run `33491096648` is green across
+  Lighthouse, quality gates, all coverage floors, both production builds, the
+  40 browser/WCAG journeys, dependency audit, Go verification/integration/
+  vulnerability checks and secret scanning. Vercel correctly skipped a new
+  runtime deployment because this release changes only executable demo tooling
+  and the evidence ledger; both existing production deployments remain Ready.
 - Production seeding remains deliberately unclaimed. The valid Atlas URI is
   held by Render and direct workstation access does not complete; the public
   API rejects the available preview identities with HTTP 403, as required.
