@@ -240,6 +240,10 @@ func (d Deps) handlePaymentWebhook(w http.ResponseWriter, r *http.Request) {
 		_, err = d.ConfirmSubscriptionPayment.Execute(r.Context(), shared.SubscriptionID(event.ResourceID), event.PaymentRef)
 	case "donation":
 		_, err = d.ConfirmDonationPayment.Execute(r.Context(), shared.DonationID(event.ResourceID), event.PaymentRef)
+	case "product":
+		_, err = d.ConfirmProductOrder.Execute(r.Context(), shared.ProductOrderID(event.ResourceID), event.PaymentRef)
+	case "classified":
+		_, err = d.ConfirmClassified.Execute(r.Context(), shared.ClassifiedID(event.ResourceID), event.PaymentRef)
 	default:
 		err = ports.ErrInvalidPaymentWebhook
 	}

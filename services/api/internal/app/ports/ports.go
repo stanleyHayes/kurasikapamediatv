@@ -341,6 +341,25 @@ type AdEventRepository interface {
 	Append(context.Context, revenue.AdEvent) error
 }
 
+type ProductRepository interface {
+	FindByID(context.Context, shared.ProductID) (revenue.Product, error)
+	ListActive(context.Context, int) ([]revenue.Product, error)
+	ListAll(context.Context, int) ([]revenue.Product, error)
+	Save(context.Context, revenue.Product) error
+}
+
+type ProductOrderRepository interface {
+	FindByID(context.Context, shared.ProductOrderID) (revenue.ProductOrder, error)
+	Save(context.Context, revenue.ProductOrder) error
+}
+
+type ClassifiedRepository interface {
+	FindByID(context.Context, shared.ClassifiedID) (revenue.Classified, error)
+	ListPublished(context.Context, time.Time, int) ([]revenue.Classified, error)
+	ListAll(context.Context, int) ([]revenue.Classified, error)
+	Save(context.Context, revenue.Classified) error
+}
+
 type CheckoutRequest struct {
 	Reference string
 	Purpose   string

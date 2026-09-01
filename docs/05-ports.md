@@ -226,7 +226,7 @@ cadence+locale+period so a second tick does not double-mail.
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
 
-**revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `BuildRevenueReport` · `ServePlacement`
+**revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `BuildRevenueReport` · `ServePlacement` · `CreateProduct` · `StartProductOrder` · `SubmitClassified` · `PublishClassified`
 
 `StartSubscription` and `RecordDonation` now create provider checkout sessions
 through `PaymentGateway` and persist pending records only after the provider
@@ -240,6 +240,12 @@ payment. Entitlement is granted only by a confirmed subscription whose
 keeps GHS and EUR totals separate, derives confirmed gross revenue and MRR, and
 returns a recent subscriber ledger. It never treats a pending checkout as
 revenue and never invents an exchange rate.
+
+`ProductRepository`, `ProductOrderRepository` and `ClassifiedRepository` keep
+commerce behind application-owned ports. Checkout totals and classified
+placement fees are calculated before the payment adapter is called. A paid
+classified moves to review, not publication; only `revenue:manage` may start
+its bounded 30-day public placement.
 
 **insight** — `RecordPageView` · `BuildNewsroomReport` · `BuildSeoReport` · `BuildRevenueSnapshot`
 

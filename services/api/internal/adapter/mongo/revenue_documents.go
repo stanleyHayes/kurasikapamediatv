@@ -8,11 +8,40 @@ const (
 	CollDonations       = "donations"
 	CollAdCampaigns     = "ad_campaigns"
 	CollAdEvents        = "ad_events"
+	CollProducts        = "products"
+	CollProductOrders   = "product_orders"
+	CollClassifieds     = "classifieds"
 )
 
 type moneyDoc struct {
 	Minor    int64  `bson:"minor"`
 	Currency string `bson:"currency"`
+}
+
+type productDoc struct {
+	ID, Name, Slug, SKU, Description, ImageURL, ImageAlt string
+	Price                                                moneyDoc   `bson:"price"`
+	Stock                                                int        `bson:"stock"`
+	Active                                               bool       `bson:"active"`
+	ActivatedAt                                          *time.Time `bson:"activatedAt"`
+	CreatedBy                                            string     `bson:"createdBy"`
+}
+
+type productOrderDoc struct {
+	ID, ProductID                                                                   string
+	Quantity                                                                        int      `bson:"quantity"`
+	Total                                                                           moneyDoc `bson:"total"`
+	Email, DeliveryName, DeliveryAddress, Provider, ProviderRef, PaymentRef, Status string
+	StartedAt                                                                       time.Time  `bson:"startedAt"`
+	PaidAt                                                                          *time.Time `bson:"paidAt"`
+}
+
+type classifiedDoc struct {
+	ID, Title, Category, Description, Location, ContactName, ContactEmail, ContactPhone, ImageURL string
+	AskingPrice, PlacementFee                                                                     moneyDoc
+	Provider, ProviderRef, PaymentRef, Status                                                     string
+	SubmittedAt                                                                                   time.Time
+	PaidAt, PublishedAt, ExpiresAt                                                                *time.Time
 }
 
 type adCampaignDoc struct {

@@ -71,7 +71,10 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 	donations := adapter.NewDonationRepository(h.DB)
 	adCampaigns := adapter.NewAdCampaignRepository(h.DB)
 	adEvents := adapter.NewAdEventRepository(h.DB)
-	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes} {
+	products := adapter.NewProductRepository(h.DB)
+	orders := adapter.NewProductOrderRepository(h.DB)
+	classifieds := adapter.NewClassifiedRepository(h.DB)
+	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes, products.EnsureIndexes, orders.EnsureIndexes, classifieds.EnsureIndexes} {
 		if err := ensure(ctx); err != nil {
 			t.Fatal(err)
 		}
@@ -82,6 +85,9 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 		adapter.CollDonations:       {"donation_provider_ref_unique", "donation_revenue_recent", "donation_checkout_recent"},
 		adapter.CollAdCampaigns:     {"eligible_ad_campaigns"},
 		adapter.CollAdEvents:        {"campaign_event_counts"},
+		adapter.CollProducts:        {"product_slug_unique", "product_sku_unique", "active_product_inventory"},
+		adapter.CollProductOrders:   {"product_order_provider_ref_unique", "product_orders_recent"},
+		adapter.CollClassifieds:     {"published_classified_expiry", "classified_provider_ref_unique"},
 	}
 	for collection, expected := range checks {
 		names := indexNames(t, h, collection)
@@ -124,5 +130,48 @@ func TestAdRepositoriesResolveEligibleCampaignsAndCountEvents(t *testing.T) {
 	count, err := events.CountForCampaign(ctx, campaign.ID(), revenue.AdImpression)
 	if err != nil || count != 1 {
 		t.Fatal(count, err)
+	}
+}
+
+func TestCommerceRepositoriesRoundTripPublicInventory(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	ctx := context.Background()
+	products := adapter.NewProductRepository(h.DB)
+	orders := adapter.NewProductOrderRepository(h.DB)
+	classifieds := adapter.NewClassifiedRepository(h.DB)
+	activeAt, expires := testNow.Add(-time.Hour), testNow.Add(24*time.Hour)
+	product := revenue.ReconstituteProduct(revenue.ProductState{ID: "product_1", Name: "Annual", Slug: "annual", SKU: "ANN-01", Description: "Year in review", ImageURL: "https://cdn.test/annual.jpg", ImageAlt: "Annual cover", Price: revenue.Money{Minor: 2000, Currency: revenue.CurrencyEUR}, Stock: 8, Active: true, ActivatedAt: &activeAt, CreatedBy: "admin"})
+	if err := products.Save(ctx, product); err != nil {
+		t.Fatal(err)
+	}
+	if rows, err := products.ListActive(ctx, 10); err != nil || len(rows) != 1 || rows[0].ID() != product.ID() {
+		t.Fatal(rows, err)
+	}
+	if rows, err := products.ListAll(ctx, 10); err != nil || len(rows) != 1 {
+		t.Fatal(rows, err)
+	}
+	if got, err := products.FindByID(ctx, product.ID()); err != nil || got.State().SKU != "ANN-01" {
+		t.Fatal(got, err)
+	}
+	order := revenue.ReconstituteProductOrder(revenue.ProductOrderState{ID: "order_1", ProductID: product.ID(), Quantity: 2, Total: revenue.Money{Minor: 4000, Currency: revenue.CurrencyEUR}, Email: "buyer@example.com", DeliveryName: "Buyer", DeliveryAddress: "France", Provider: revenue.ProviderStripe, ProviderRef: "checkout_order", Status: revenue.PaymentPending, StartedAt: testNow})
+	if err := orders.Save(ctx, order); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := orders.FindByID(ctx, order.ID()); err != nil || got.State().Quantity != 2 {
+		t.Fatal(got, err)
+	}
+	listing := revenue.ReconstituteClassified(revenue.ClassifiedState{ID: "classified_1", Title: "Camera", Category: "Equipment", Description: "Broadcast camera", Location: "Accra", ContactName: "Ama", ContactEmail: "ama@example.com", AskingPrice: revenue.Money{Minor: 50000, Currency: revenue.CurrencyGHS}, PlacementFee: revenue.Money{Minor: 5000, Currency: revenue.CurrencyGHS}, Provider: revenue.ProviderPaystack, ProviderRef: "checkout_listing", PaymentRef: "paid", Status: revenue.ClassifiedPublished, SubmittedAt: activeAt, PaidAt: &activeAt, PublishedAt: &activeAt, ExpiresAt: &expires})
+	if err := classifieds.Save(ctx, listing); err != nil {
+		t.Fatal(err)
+	}
+	if rows, err := classifieds.ListPublished(ctx, testNow, 10); err != nil || len(rows) != 1 {
+		t.Fatal(rows, err)
+	}
+	if rows, err := classifieds.ListAll(ctx, 10); err != nil || len(rows) != 1 {
+		t.Fatal(rows, err)
+	}
+	if got, err := classifieds.FindByID(ctx, listing.ID()); err != nil || got.State().Status != revenue.ClassifiedPublished {
+		t.Fatal(got, err)
 	}
 }

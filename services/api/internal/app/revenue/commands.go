@@ -20,6 +20,9 @@ type Deps struct {
 	Donations     ports.DonationRepository
 	AdCampaigns   ports.AdCampaignRepository
 	AdEvents      ports.AdEventRepository
+	Products      ports.ProductRepository
+	ProductOrders ports.ProductOrderRepository
+	Classifieds   ports.ClassifiedRepository
 	Payments      ports.PaymentGateway
 	Clock         ports.Clock
 	IDs           ports.IDs

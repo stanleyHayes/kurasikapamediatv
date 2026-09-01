@@ -179,3 +179,75 @@ func TestAdvertisingCampaignLifecyclePlacementEventsAndReport(t *testing.T) {
 		t.Fatal(report.Code, report.Body.String())
 	}
 }
+
+func TestProductAndClassifiedCommerceLifecycle(t *testing.T) {
+	deps := httpDeps(emptyEditorial(), map[shared.UserID][]identity.Role{"manager": {identity.RoleAdministrator}})
+	handler := kurahttp.NewRouter(deps)
+	product := `{"name":"Annual","slug":"annual","sku":"ANN-01","description":"The Kurasikapa year in review.","imageURL":"https://cdn.test/annual.jpg","imageAlt":"Annual publication cover","price":{"minor":2000,"currency":"EUR"},"stock":8}`
+	if response := request(handler, http.MethodPost, "/revenue/products", product, true); response.Code != http.StatusCreated {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodPost, "/revenue/products/id_1/activate", `{}`, true); response.Code != http.StatusOK {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	for _, path := range []string{"/public/products", "/revenue/products"} {
+		response := request(handler, http.MethodGet, path, "", path == "/revenue/products")
+		if response.Code != http.StatusOK || !bytes.Contains(response.Body.Bytes(), []byte("Annual")) {
+			t.Fatal(path, response.Code, response.Body.String())
+		}
+	}
+	order := `{"productID":"id_1","quantity":2,"email":"buyer@example.com","deliveryName":"Ada Buyer","deliveryAddress":"4 Rue des Lys, France","returnURL":"https://site.test/shop"}`
+	if response := request(handler, http.MethodPost, "/public/product-orders", order, false); response.Code != http.StatusCreated {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	deps.PaymentWebhooks = faketesting.PaymentWebhookFake{Event: ports.VerifiedPayment{Purpose: "product", ResourceID: "id_2", PaymentRef: "paid_2"}}
+	handler = kurahttp.NewRouter(deps)
+	if response := request(handler, http.MethodPost, "/webhooks/payments/stripe", `{}`, false); response.Code != http.StatusNoContent {
+		t.Fatal(response.Code, response.Body.String())
+	}
+
+	listing := `{"title":"Broadcast camera","category":"Equipment","description":"Professionally maintained broadcast camera.","location":"Accra","contactName":"Ama","contactEmail":"ama@example.com","askingPrice":{"minor":450000,"currency":"GHS"},"returnURL":"https://site.test/classifieds"}`
+	if response := request(handler, http.MethodPost, "/public/classifieds", listing, false); response.Code != http.StatusCreated {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	deps.PaymentWebhooks = faketesting.PaymentWebhookFake{Event: ports.VerifiedPayment{Purpose: "classified", ResourceID: "id_3", PaymentRef: "paid_3"}}
+	handler = kurahttp.NewRouter(deps)
+	if response := request(handler, http.MethodPost, "/webhooks/payments/paystack", `{}`, false); response.Code != http.StatusNoContent {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	if response := request(handler, http.MethodPost, "/revenue/classifieds/id_3/publish", `{}`, true); response.Code != http.StatusOK {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	for _, path := range []string{"/public/classifieds", "/revenue/classifieds"} {
+		response := request(handler, http.MethodGet, path, "", path == "/revenue/classifieds")
+		if response.Code != http.StatusOK || !bytes.Contains(response.Body.Bytes(), []byte("Broadcast camera")) {
+			t.Fatal(path, response.Code, response.Body.String())
+		}
+	}
+}
+
+func TestCommerceHandlersRejectMalformedUnauthorizedAndMissingResources(t *testing.T) {
+	handler := revenueServer()
+	cases := []struct {
+		method, path, body string
+		auth               bool
+		want               int
+	}{
+		{http.MethodPost, "/revenue/products", `{`, true, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/products", `{}`, false, http.StatusForbidden},
+		{http.MethodPost, "/revenue/products/missing/activate", `{}`, true, http.StatusNotFound},
+		{http.MethodGet, "/revenue/products", "", false, http.StatusForbidden},
+		{http.MethodPost, "/public/product-orders", `{`, false, http.StatusBadRequest},
+		{http.MethodPost, "/public/product-orders", `{}`, false, http.StatusNotFound},
+		{http.MethodPost, "/public/classifieds", `{`, false, http.StatusBadRequest},
+		{http.MethodPost, "/public/classifieds", `{}`, false, http.StatusBadRequest},
+		{http.MethodGet, "/revenue/classifieds", "", false, http.StatusForbidden},
+		{http.MethodPost, "/revenue/classifieds/missing/publish", `{}`, true, http.StatusNotFound},
+	}
+	for _, tc := range cases {
+		response := request(handler, tc.method, tc.path, tc.body, tc.auth)
+		if response.Code != tc.want {
+			t.Errorf("%s: got %d want %d: %s", tc.path, response.Code, tc.want, response.Body.String())
+		}
+	}
+}

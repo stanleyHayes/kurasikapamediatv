@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { createAndActivateAdCampaign, createAndActivateMembershipPlan, loadAdPlacement, loadAdReport, loadMembershipPlans, loadRevenueReport, recordAdEvent, startDonationCheckout, startMembershipCheckout } from './revenue'
+import { createAndActivateAdCampaign, createAndActivateMembershipPlan, createAndActivateProduct, loadAdPlacement, loadAdReport, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -107,5 +107,34 @@ describe('revenue BFF', () => {
     await expect(loadAdReport(actor)).resolves.toEqual([])
     await expect(loadAdPlacement('en', 'article_inline')).resolves.toBeNull()
     await expect(recordAdEvent('ad_1', 'click')).resolves.toBeUndefined()
+  })
+
+  it('runs product and classified public and Studio flows', async () => {
+    configure()
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ items: [{ ID: 'product_1', Name: 'Annual', SKU: 'ANN-01', Price: { Minor: 2000, Currency: 'EUR' }, Stock: 4, Active: true }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ items: [{ ID: 'classified_1', Title: 'Camera', AskingPrice: { Minor: 50000, Currency: 'GHS' }, Status: 'published', ExpiresAt: null }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'order_1', Provider: 'stripe', CheckoutURL: 'https://pay.test/order' }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'classified_2', Provider: 'paystack', CheckoutURL: 'https://pay.test/listing' }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'product_2' }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'product_2', Active: true }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ID: 'classified_1', Status: 'published' }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    const actor = new Actor(userId('admin'), ['administrator'])
+    await expect(loadProducts()).resolves.toEqual([expect.objectContaining({ id: 'product_1', price: { minor: 2000, currency: 'EUR' }, stock: 4 })])
+    await expect(loadClassifieds()).resolves.toEqual([expect.objectContaining({ id: 'classified_1', status: 'published', expiresAt: null })])
+    await expect(startProductCheckout({ productID: 'product_1', quantity: 1, email: 'buyer@test.com', deliveryName: 'Buyer', deliveryAddress: 'Address', returnURL: 'https://site.test' })).resolves.toMatchObject({ id: 'order_1', provider: 'stripe' })
+    await expect(startClassifiedCheckout({ title: 'Camera', category: 'Equipment', description: 'Details', location: 'Accra', contactName: 'Ama', contactEmail: 'ama@test.com', contactPhone: '', imageURL: '', askingPrice: { minor: 50000, currency: 'GHS' }, returnURL: 'https://site.test' })).resolves.toMatchObject({ id: 'classified_2' })
+    await expect(createAndActivateProduct(actor, { name: 'Annual' })).resolves.toEqual({ id: 'product_2' })
+    await expect(publishClassified(actor, 'classified_1')).resolves.toBeUndefined()
+  })
+
+  it('keeps commerce empty until its API seam is configured', async () => {
+    configure(); vi.stubEnv('API_URL', undefined); resetEnv()
+    const actor = new Actor(userId('admin'), ['administrator'])
+    await expect(loadProducts()).resolves.toEqual([])
+    await expect(loadProducts(actor)).resolves.toEqual([])
+    await expect(loadClassifieds()).resolves.toEqual([])
+    await expect(loadClassifieds(actor)).resolves.toEqual([])
   })
 })

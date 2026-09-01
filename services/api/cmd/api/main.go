@@ -85,6 +85,9 @@ func run(log *slog.Logger) error {
 	donations := adaptermongo.NewDonationRepository(db)
 	adCampaigns := adaptermongo.NewAdCampaignRepository(db)
 	adEvents := adaptermongo.NewAdEventRepository(db)
+	products := adaptermongo.NewProductRepository(db)
+	productOrders := adaptermongo.NewProductOrderRepository(db)
+	classifieds := adaptermongo.NewClassifiedRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
 	videoDelivery := adaptercloudinary.NewDelivery()
 	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
@@ -178,6 +181,15 @@ func run(log *slog.Logger) error {
 	if err := adEvents.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := products.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := productOrders.EnsureIndexes(ctx); err != nil {
+		return err
+	}
+	if err := classifieds.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 
 	deps := appeditorial.Deps{
 		Articles:   articles,
@@ -197,6 +209,7 @@ func run(log *slog.Logger) error {
 	revenueDeps := apprevenue.Deps{
 		Plans: plans, Subscriptions: subscriptions, Donations: donations,
 		AdCampaigns: adCampaigns, AdEvents: adEvents,
+		Products: products, ProductOrders: productOrders, Classifieds: classifieds,
 		Payments: payments, Clock: clock, IDs: uuidIDs{},
 	}
 
@@ -263,6 +276,15 @@ func run(log *slog.Logger) error {
 		ResolveAdPlacement:         apprevenue.NewResolveAdPlacement(revenueDeps),
 		RecordAdEvent:              apprevenue.NewRecordAdEvent(revenueDeps),
 		BuildAdReport:              apprevenue.NewBuildAdReport(revenueDeps),
+		CreateProduct:              apprevenue.NewCreateProduct(revenueDeps),
+		ActivateProduct:            apprevenue.NewActivateProduct(revenueDeps),
+		ListProducts:               apprevenue.NewListProducts(revenueDeps),
+		StartProductOrder:          apprevenue.NewStartProductOrder(revenueDeps),
+		ConfirmProductOrder:        apprevenue.NewConfirmProductOrder(revenueDeps),
+		SubmitClassified:           apprevenue.NewSubmitClassified(revenueDeps),
+		ConfirmClassified:          apprevenue.NewConfirmClassified(revenueDeps),
+		PublishClassified:          apprevenue.NewPublishClassified(revenueDeps),
+		ListClassifieds:            apprevenue.NewListClassifieds(revenueDeps),
 		PaymentWebhooks:            paymentWebhooks,
 		Roles:                      roles,
 		Clock:                      clock,

@@ -63,6 +63,12 @@ type (
 	AdCampaignID string
 	// AdEventID identifies one immutable impression or click event.
 	AdEventID string
+	// ProductID identifies one item sold by the publisher.
+	ProductID string
+	// ProductOrderID identifies one product checkout lifecycle.
+	ProductOrderID string
+	// ClassifiedID identifies one paid community listing.
+	ClassifiedID string
 )
 
 func (id ArticleID) String() string         { return string(id) }
@@ -86,6 +92,9 @@ func (id SubscriptionID) String() string    { return string(id) }
 func (id DonationID) String() string        { return string(id) }
 func (id AdCampaignID) String() string      { return string(id) }
 func (id AdEventID) String() string         { return string(id) }
+func (id ProductID) String() string         { return string(id) }
+func (id ProductOrderID) String() string    { return string(id) }
+func (id ClassifiedID) String() string      { return string(id) }
 
 // NewArticleID validates and wraps an article identifier.
 func NewArticleID(raw string) (ArticleID, error) {

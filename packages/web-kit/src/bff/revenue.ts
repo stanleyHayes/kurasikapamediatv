@@ -17,6 +17,8 @@ export interface RevenueReportView { readonly days: number; readonly generatedAt
 export type AdSlotView = 'home_leaderboard' | 'article_inline' | 'live_companion'
 export interface AdPlacementView { readonly id: string; readonly advertiser: string; readonly creativeUrl: string; readonly altText: string; readonly landingUrl: string }
 export interface AdCampaignView { readonly id: string; readonly name: string; readonly advertiser: string; readonly slot: AdSlotView; readonly active: boolean; readonly budget: MoneyView; readonly impressions: number; readonly clicks: number; readonly estimatedSpendMinor: number; readonly ctr: number; readonly startsAt: string; readonly endsAt: string }
+export interface ProductView { readonly id: string; readonly name: string; readonly slug: string; readonly sku: string; readonly description: string; readonly imageURL: string; readonly imageAlt: string; readonly price: MoneyView; readonly stock: number; readonly active: boolean }
+export interface ClassifiedView { readonly id: string; readonly title: string; readonly category: string; readonly description: string; readonly location: string; readonly contactName: string; readonly contactEmail: string; readonly contactPhone: string; readonly imageURL: string; readonly askingPrice: MoneyView; readonly placementFee: MoneyView; readonly status: string; readonly submittedAt: string; readonly expiresAt: string | null }
 
 function record(value: unknown): Record<string, unknown> {
   return typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
@@ -55,6 +57,8 @@ function adCampaign(value: unknown): AdCampaignView {
   return { id: text(prefer(row, 'id', 'ID')), name: text(prefer(row, 'name', 'Name')), advertiser: text(prefer(row, 'advertiser', 'Advertiser')), slot: adSlot(prefer(row, 'slot', 'Slot')), active: prefer(row, 'active', 'Active') === true, budget: money(prefer(row, 'budget', 'Budget')), impressions: number(prefer(row, 'impressions', 'Impressions')), clicks: number(prefer(row, 'clicks', 'Clicks')), estimatedSpendMinor: number(prefer(row, 'estimatedSpendMinor', 'EstimatedSpendMinor')), ctr: number(prefer(row, 'ctr', 'CTR')), startsAt: text(prefer(row, 'startsAt', 'StartsAt')), endsAt: text(prefer(row, 'endsAt', 'EndsAt')) }
 }
 function prefer(row: Record<string, unknown>, current: string, legacy: string): unknown { return row[current] ?? row[legacy] }
+function product(value: unknown): ProductView { const row = record(value); return { id: text(prefer(row, 'id', 'ID')), name: text(prefer(row, 'name', 'Name')), slug: text(prefer(row, 'slug', 'Slug')), sku: text(prefer(row, 'sku', 'SKU')), description: text(prefer(row, 'description', 'Description')), imageURL: text(prefer(row, 'imageURL', 'ImageURL')), imageAlt: text(prefer(row, 'imageAlt', 'ImageAlt')), price: money(prefer(row, 'price', 'Price')), stock: number(prefer(row, 'stock', 'Stock')), active: prefer(row, 'active', 'Active') === true } }
+function classified(value: unknown): ClassifiedView { const row = record(value); const expires = prefer(row, 'expiresAt', 'ExpiresAt'); return { id: text(prefer(row, 'id', 'ID')), title: text(prefer(row, 'title', 'Title')), category: text(prefer(row, 'category', 'Category')), description: text(prefer(row, 'description', 'Description')), location: text(prefer(row, 'location', 'Location')), contactName: text(prefer(row, 'contactName', 'ContactName')), contactEmail: text(prefer(row, 'contactEmail', 'ContactEmail')), contactPhone: text(prefer(row, 'contactPhone', 'ContactPhone')), imageURL: text(prefer(row, 'imageURL', 'ImageURL')), askingPrice: money(prefer(row, 'askingPrice', 'AskingPrice')), placementFee: money(prefer(row, 'placementFee', 'PlacementFee')), status: text(prefer(row, 'status', 'Status')), submittedAt: text(prefer(row, 'submittedAt', 'SubmittedAt')), expiresAt: expires === null || expires === undefined ? null : text(expires) } }
 
 export async function loadMembershipPlans(locale: string): Promise<readonly MembershipPlanView[]> {
   const apiUrl = env().API_URL
@@ -137,3 +141,18 @@ export async function startMembershipCheckout(actor: Actor, input: { readonly pl
 export async function startDonationCheckout(input: { readonly amount: MoneyView; readonly email: string; readonly message: string; readonly anonymous: boolean; readonly returnURL: string }): Promise<CheckoutView> {
   return post('/public/donations', input)
 }
+
+async function loadCollection<T>(path: string, project: (value: unknown) => T, actor?: Actor): Promise<readonly T[]> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return []
+  const response = actor === undefined ? await fetch(joinUrl(apiUrl, path), { cache: 'no-store' }) : await fetch(joinUrl(apiUrl, path), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
+  if (!response.ok) throw await problemFromResponse(response)
+  const body = record(await response.json())
+  return Array.isArray(body['items']) ? body['items'].map(project) : []
+}
+export async function loadProducts(actor?: Actor): Promise<readonly ProductView[]> { return loadCollection(actor === undefined ? '/public/products' : '/revenue/products', product, actor) }
+export async function loadClassifieds(actor?: Actor): Promise<readonly ClassifiedView[]> { return loadCollection(actor === undefined ? '/public/classifieds' : '/revenue/classifieds', classified, actor) }
+export async function createAndActivateProduct(actor: Actor, input: unknown): Promise<{ readonly id: string }> { const created = await adminPost(actor, '/revenue/products', input); const id = text(prefer(created, 'id', 'ID')); await adminPost(actor, `/revenue/products/${id}/activate`); return { id } }
+export async function publishClassified(actor: Actor, id: string): Promise<void> { await adminPost(actor, `/revenue/classifieds/${encodeURIComponent(id)}/publish`) }
+export async function startProductCheckout(input: { readonly productID: string; readonly quantity: number; readonly email: string; readonly deliveryName: string; readonly deliveryAddress: string; readonly returnURL: string }): Promise<CheckoutView> { return post('/public/product-orders', input) }
+export async function startClassifiedCheckout(input: { readonly title: string; readonly category: string; readonly description: string; readonly location: string; readonly contactName: string; readonly contactEmail: string; readonly contactPhone: string; readonly imageURL: string; readonly askingPrice: MoneyView; readonly returnURL: string }): Promise<CheckoutView> { return post('/public/classifieds', input) }

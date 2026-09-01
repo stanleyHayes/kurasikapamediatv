@@ -83,6 +83,15 @@ type Deps struct {
 	ResolveAdPlacement         apprevenue.ResolveAdPlacement
 	RecordAdEvent              apprevenue.RecordAdEvent
 	BuildAdReport              apprevenue.BuildAdReport
+	CreateProduct              apprevenue.CreateProduct
+	ActivateProduct            apprevenue.ActivateProduct
+	ListProducts               apprevenue.ListProducts
+	StartProductOrder          apprevenue.StartProductOrder
+	ConfirmProductOrder        apprevenue.ConfirmProductOrder
+	SubmitClassified           apprevenue.SubmitClassified
+	ConfirmClassified          apprevenue.ConfirmClassified
+	PublishClassified          apprevenue.PublishClassified
+	ListClassifieds            apprevenue.ListClassifieds
 	PaymentWebhooks            ports.PaymentWebhookVerifier
 	Roles                      ports.RoleRepository
 	Clock                      ports.Clock
@@ -160,6 +169,15 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /revenue/ad-report", deps.handleAdReport)
 	mux.HandleFunc("GET /public/{locale}/ads/{slot}", deps.handleResolveAdPlacement)
 	mux.HandleFunc("POST /public/ads/{id}/events", deps.handleRecordAdEvent)
+	mux.HandleFunc("POST /revenue/products", deps.handleCreateProduct)
+	mux.HandleFunc("POST /revenue/products/{id}/activate", deps.handleActivateProduct)
+	mux.HandleFunc("GET /revenue/products", deps.handleManageProducts)
+	mux.HandleFunc("GET /public/products", deps.handleListProducts)
+	mux.HandleFunc("POST /public/product-orders", deps.handleStartProductOrder)
+	mux.HandleFunc("POST /public/classifieds", deps.handleSubmitClassified)
+	mux.HandleFunc("GET /public/classifieds", deps.handleListClassifieds)
+	mux.HandleFunc("GET /revenue/classifieds", deps.handleManageClassifieds)
+	mux.HandleFunc("POST /revenue/classifieds/{id}/publish", deps.handlePublishClassified)
 	mux.HandleFunc("POST /webhooks/payments/{provider}", deps.handlePaymentWebhook)
 
 	return withRequestLogging(deps.Log, mux)

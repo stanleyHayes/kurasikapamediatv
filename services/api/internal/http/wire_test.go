@@ -43,6 +43,9 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	}
 	revenueDeps.AdCampaigns = faketesting.NewAdCampaignStore()
 	revenueDeps.AdEvents = &faketesting.AdEventStore{}
+	revenueDeps.Products = faketesting.NewProductStore()
+	revenueDeps.ProductOrders = faketesting.NewProductOrderStore()
+	revenueDeps.Classifieds = faketesting.NewClassifiedStore()
 	staffDeps := appidentity.StaffProfileDeps{Profiles: faketesting.NewStaffProfileStore(), Assets: assets, IDs: &faketesting.SequentialIDs{}}
 	recordingImports := faketesting.NewRecordingImportStore()
 	recordingProvider := &faketesting.RecordingPromotionFake{StartResult: ports.RecordingTranscode{TaskID: "transcode_1", OutputRef: "processed/recording.mp4"}, CheckResult: ports.RecordingProviderResult{Status: ports.RecordingProviderProcessing}}
@@ -105,6 +108,15 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ResolveAdPlacement:         apprevenue.NewResolveAdPlacement(revenueDeps),
 		RecordAdEvent:              apprevenue.NewRecordAdEvent(revenueDeps),
 		BuildAdReport:              apprevenue.NewBuildAdReport(revenueDeps),
+		CreateProduct:              apprevenue.NewCreateProduct(revenueDeps),
+		ActivateProduct:            apprevenue.NewActivateProduct(revenueDeps),
+		ListProducts:               apprevenue.NewListProducts(revenueDeps),
+		StartProductOrder:          apprevenue.NewStartProductOrder(revenueDeps),
+		ConfirmProductOrder:        apprevenue.NewConfirmProductOrder(revenueDeps),
+		SubmitClassified:           apprevenue.NewSubmitClassified(revenueDeps),
+		ConfirmClassified:          apprevenue.NewConfirmClassified(revenueDeps),
+		PublishClassified:          apprevenue.NewPublishClassified(revenueDeps),
+		ListClassifieds:            apprevenue.NewListClassifieds(revenueDeps),
 		PaymentWebhooks:            faketesting.PaymentWebhookFake{},
 		Roles:                      roles{granted: granted},
 		Clock:                      faketesting.FixedClock{At: now},

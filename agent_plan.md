@@ -54,7 +54,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
-| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, classifieds, affiliates and advertiser self-service remain. |
+| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products and paid, review-gated classifieds now have end-to-end Go persistence, provider checkout, webhooks, Studio operations and public inventory. Affiliates and advertiser self-service remain. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
@@ -469,11 +469,9 @@ Resend (R2), Stripe + Paystack (R4), Meta Graph API and app review (R2).
 
 Ordered by value per unit of risk, not by release number.
 
-1. **Products and classifieds** — finish the remaining R4 transaction and
-   inventory surfaces before advertiser self-service.
-2. **Affiliate inventory** — add disclosed tracked placements with campaign
+1. **Affiliate inventory** — add disclosed tracked placements with campaign
    ownership and reporting.
-3. **Advertiser self-service** — expose only the campaign capabilities already
+2. **Advertiser self-service** — expose only the campaign capabilities already
    enforced by the revenue domain.
 
 **Done since this file was first written:** category listing (KUR-26), editorial
@@ -1365,3 +1363,24 @@ are live. Custom-domain DNS remains an external registrar action.**
 - A live microphone permission check still requires an operator-controlled
   supported browser. The current Chrome extension connection was unavailable;
   no permission prompt was accepted or microphone data captured automatically.
+
+## 30. KUR-91 — products and paid classifieds (2026-09-01)
+
+**Status: CODE COMPLETE; release verification active.**
+
+- Added revenue-domain product, product-order and classified lifecycles. A
+  product requires accessible HTTPS imagery, valid GHS/EUR pricing and stock
+  before activation. A classified must be paid, reviewed by a revenue manager
+  and is then published for a bounded 30-day period.
+- Added application ports/use cases, Mongo repositories and mandatory indexes.
+  Stripe/Paystack checkout remains provider-neutral; signed webhooks confirm
+  product orders or move classified submissions into the private review queue.
+- Studio Revenue now manages shop inventory and approves paid classifieds.
+  Public Shop and Classifieds pages provide inventory, accessible empty states,
+  disabled loading controls and secure checkout redirects. The footer exposes
+  both destinations.
+- Domain tests now cover 99.1% of the revenue package; total Go domain coverage
+  is 96.8%. Application/HTTP coverage meets the 90.0% floor, and the Web Kit
+  suite passes 323 tests at 80.07% branch coverage.
+- Production deployment and live payment-provider smoke evidence are still
+  required before this item can move to deployed.
