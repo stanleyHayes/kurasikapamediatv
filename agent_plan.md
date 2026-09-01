@@ -53,7 +53,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
-| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed. A Go-owned SEO readiness report and Studio SEO Center are code-complete; production release evidence remains. Search Console operations, semantic search and personalised recommendations remain. |
+| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed. The Go-owned SEO readiness report and Studio SEO Center are deployed; the public `dateModified` correction awaits a fresh Web release after the Vercel quota window. Search Console operations, semantic search and personalised recommendations remain. |
 | Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
@@ -67,7 +67,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds and disclosed affiliate inventory are code-complete across Studio and public surfaces. Provider credentials, the quota-delayed public release and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
-| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. The new SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data now uses the approved public revision for `dateModified`. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **SEO CENTER CODE COMPLETE / RELEASE ACTIVE / SEARCH CONSOLE ACCESS BLOCKED** |
+| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. The deployed SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data now uses the approved public revision for `dateModified`, pending a fresh Web release after the Vercel quota window. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **SEO CENTER DEPLOYED / WEB RELEASE QUOTA BLOCKED / SEARCH CONSOLE ACCESS BLOCKED** |
 | Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
 
 Implementation rule for this delivery: original reporting is the primary content
@@ -1474,7 +1474,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 33. KUR-94 — published-inventory SEO Center (2026-09-01)
 
-**Status: CODE COMPLETE; full gates and production release active.**
+**Status: STUDIO + API DEPLOYED; Web release quota-blocked.**
 
 - Added Go `BuildSEOReport` behind existing article, revision and staff-profile
   ports. It requires the now cross-language-consistent `analytics:read`
@@ -1500,5 +1500,12 @@ are live. Custom-domain DNS remains an external registrar action.**
   gates. Both independent Next.js production builds pass; Web was deliberately
   verified through the configured remote `API_URL` so prerendering matched the
   production composition rather than the stopped local Mongo development
-  fallback. CI and live route evidence remain required before this section may
-  be marked deployed.
+  fallback. GitHub CI run `33466192725` is green, including the full quality,
+  Go, secret-scan and Lighthouse jobs. The production API exposes the new route
+  (HTTP 403 without authentication, as required), and
+  `kurasikapa-studio.vercel.app/studio/en/seo` returns HTTP 200 from Ready
+  deployment `dpl_4zV43VKeoZuW5KVN7hiVA6MFusE9`. The public working alias still
+  returns HTTP 200 for `/og-image` and `/news-sitemap.xml`, but Vercel rejected
+  the fresh Web deployment with `api-deployments-free-per-day` (>100). Retry the
+  Web deployment after the 24-hour account quota window before calling the
+  `dateModified` correction live.
