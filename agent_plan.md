@@ -1651,7 +1651,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 38. KUR-100 — versioned public news API (2026-09-01)
 
-**Status: IMPLEMENTED; full verification and production release active.**
+**Status: DONE — API deployed, live contract smoked and every release gate green.**
 
 - Added a Go-owned, read-only `/v1` API that reuses the existing published
   article use cases, so drafts, scheduled stories and unapproved revisions
@@ -1664,5 +1664,13 @@ are live. Custom-domain DNS remains an external registrar action.**
   a served OpenAPI 3.1 contract. Unknown and unpublished stories retain the
   shared safe problem response.
 - Added the consumer and compatibility guide at `docs/api/public-v1.md` and
-  updated architecture, product and roadmap ownership. Do not mark deployed
-  until full Go/repository gates, Render deployment and live API smokes pass.
+  updated architecture, product and roadmap ownership.
+- Commit `58dc039` deployed to Render. Live checks passed for `/v1`, the
+  cursor-paginated English listing, article detail, `/v1/openapi.json`, safe
+  `404` handling and `OPTIONS` with CORS/cache/`nosniff` headers.
+- `make -C services/api verify`, `pnpm verify`, both Next.js production builds,
+  the 40-test browser/WCAG suite, secret scanning, Lighthouse and the Go lane
+  are green. Six consecutive local production-mode workflow journeys passed.
+  The hosted Server Action journey needed a realistic streamed-refresh budget;
+  commit `cfb6be0` carries that release-gate correction and CI run
+  `33479515249` is fully green across all four jobs.
