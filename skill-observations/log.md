@@ -512,3 +512,24 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Keep committed optimistic state local while the streamed refresh catches up, but key the stateful workflow boundary by stable entity identity rather than mutable server status. Preserve non-workflow display fields inside that boundary so the refactor does not silently remove context.
 
 **Principle:** Key stateful optimistic interfaces by what the state belongs to, not by each value the state can take.
+
+### Observation 34: Direct TypeScript scripts need runtime module verification
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Extracting Kurasikapa's executable demo inventory seeder into a bounded local module.
+**Skill:** New skill candidate: executable-typescript-release-gate
+**Type:** open-source
+**Phase/Area:** Tooling and release verification
+
+**Issue:** TypeScript accepted an extensionless relative import, but Node 26's
+direct `.ts` execution rejected it with `ERR_MODULE_NOT_FOUND`. Typechecking
+alone therefore proved the source graph while missing the actual operator path.
+
+**Suggested improvement:** Run every maintenance script through its documented
+package command after modularisation. For Node-native TypeScript scripts, use
+the explicit `.ts` extension where the runtime requires it and keep a small
+isolated data fixture that proves both the write and cleanup commands.
+
+**Principle:** An executable script is verified by its runtime entrypoint, not
+only by the compiler that understands its source.
