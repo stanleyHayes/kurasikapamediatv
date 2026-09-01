@@ -81,6 +81,7 @@ func run(log *slog.Logger) error {
 	podcasts := adaptermongo.NewPodcastRepository(db)
 	episodes := adaptermongo.NewEpisodeRepository(db)
 	galleries := adaptermongo.NewGalleryRepository(db)
+	events := adaptermongo.NewEventRepository(db)
 	plans := adaptermongo.NewMembershipPlanRepository(db)
 	subscriptions := adaptermongo.NewSubscriptionRepository(db)
 	donations := adaptermongo.NewDonationRepository(db)
@@ -169,6 +170,9 @@ func run(log *slog.Logger) error {
 	if err := galleries.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := events.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 	if err := plans.EnsureIndexes(ctx); err != nil {
 		return err
 	}
@@ -211,7 +215,7 @@ func run(log *slog.Logger) error {
 	}
 	mediaDeps := appmedia.Deps{
 		Presenters: presenters, Programmes: programmes, Schedule: schedule,
-		Podcasts: podcasts, Episodes: episodes, Galleries: galleries, Assets: assets,
+		Podcasts: podcasts, Episodes: episodes, Galleries: galleries, Events: events, Assets: assets,
 		Clock: clock, IDs: uuidIDs{},
 	}
 	staffDeps := appidentity.StaffProfileDeps{Profiles: staffProfiles, Assets: assets, IDs: uuidIDs{}}
@@ -273,6 +277,9 @@ func run(log *slog.Logger) error {
 		CreateGallery:               appmedia.NewCreateGallery(mediaDeps),
 		PublishGallery:              appmedia.NewPublishGallery(mediaDeps),
 		ListGalleryLibrary:          appmedia.NewListGalleryLibrary(mediaDeps, videoDelivery),
+		CreateEvent:                 appmedia.NewCreateEvent(mediaDeps),
+		PublishEvent:                appmedia.NewPublishEvent(mediaDeps),
+		ListUpcomingEvents:          appmedia.NewListUpcomingEvents(mediaDeps),
 		CreateMembershipPlan:        apprevenue.NewCreateMembershipPlan(revenueDeps),
 		ActivateMembershipPlan:      apprevenue.NewActivateMembershipPlan(revenueDeps),
 		ListMembershipPlans:         apprevenue.NewListMembershipPlans(revenueDeps),

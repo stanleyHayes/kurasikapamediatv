@@ -185,3 +185,34 @@ func TestGalleryRepositoryRoundTripAndIndexes(t *testing.T) {
 		t.Error("missing public_gallery_library")
 	}
 }
+
+func TestEventRepositoryRoundTripUpcomingAndIndexes(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	repo := adapter.NewEventRepository(h.DB)
+	ctx := context.Background()
+	if err := repo.EnsureIndexes(ctx); err != nil {
+		t.Fatal(err)
+	}
+	image := shared.AssetID("image")
+	publishedAt := testNow.Add(-time.Hour)
+	event := domainmedia.ReconstituteEvent(domainmedia.EventState{ID: "event", Type: domainmedia.EventSummit, Mode: domainmedia.EventHybrid, Title: "Media Futures", Slug: "media-futures", Locale: "en", Summary: "A forum for the future of trusted journalism.", StartsAt: testNow.Add(time.Hour), EndsAt: testNow.Add(4 * time.Hour), Timezone: "Africa/Accra", Venue: "National Theatre", City: "Accra", RegistrationURL: "https://events.example.org", ImageAssetID: &image, Speakers: []string{"Ama Mensah"}, Featured: true, Published: true, PublishedAt: &publishedAt, CreatedBy: "editor"})
+	if err := repo.Save(ctx, event); err != nil {
+		t.Fatal(err)
+	}
+	got, err := repo.FindByID(ctx, event.ID())
+	if err != nil || got.State().Speakers[0] != "Ama Mensah" || !got.State().Featured {
+		t.Fatalf("%+v %v", got.State(), err)
+	}
+	listed, err := repo.ListUpcoming(ctx, "en", testNow, 20)
+	if err != nil || len(listed) != 1 {
+		t.Fatalf("%d %v", len(listed), err)
+	}
+	if listed, err = repo.ListUpcoming(ctx, "fr", testNow, 20); err != nil || len(listed) != 0 {
+		t.Fatalf("fr = %d %v", len(listed), err)
+	}
+	indexes := indexNames(t, h, adapter.CollEvents)
+	if !indexes["event_locale_slug"] || !indexes["upcoming_events"] {
+		t.Fatalf("missing event indexes: %v", indexes)
+	}
+}

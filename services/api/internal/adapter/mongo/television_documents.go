@@ -10,6 +10,7 @@ const (
 	CollPodcasts      = "podcasts"
 	CollEpisodes      = "episodes"
 	CollGalleries     = "galleries"
+	CollEvents        = "events"
 )
 
 type presenterDoc struct {
@@ -118,4 +119,26 @@ type galleryDoc struct {
 	Published   bool             `bson:"published"`
 	PublishedAt *time.Time       `bson:"publishedAt"`
 	CreatedBy   string           `bson:"createdBy"`
+}
+
+type eventDoc struct {
+	ID              string     `bson:"_id"`
+	Type            string     `bson:"type"`
+	Mode            string     `bson:"mode"`
+	Title           string     `bson:"title"`
+	Slug            string     `bson:"slug"`
+	Locale          string     `bson:"locale"`
+	Summary         string     `bson:"summary"`
+	Timezone        string     `bson:"timezone"`
+	Venue           string     `bson:"venue"`
+	City            string     `bson:"city"`
+	RegistrationURL string     `bson:"registrationUrl"`
+	StartsAt        time.Time  `bson:"startsAt"`
+	EndsAt          time.Time  `bson:"endsAt"`
+	ImageAssetID    *string    `bson:"imageAssetId,omitempty"`
+	Speakers        []string   `bson:"speakers"`
+	Featured        bool       `bson:"featured"`
+	Published       bool       `bson:"published"`
+	PublishedAt     *time.Time `bson:"publishedAt"`
+	CreatedBy       string     `bson:"createdBy"`
 }

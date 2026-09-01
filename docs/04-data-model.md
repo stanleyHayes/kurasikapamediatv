@@ -64,6 +64,7 @@ erDiagram
 | `recording_imports` | idempotent private IVS-to-media promotion jobs | unique `sourceRef`, reserved `assetId`, bucket/prefix, MediaConvert task/output refs, status, failure reason and timestamps |
 | `podcasts` / `episodes` | publishable audio series and accessible episodes | locale, slug, artwork; `audioAssetId`, `transcriptAssetId`, `durationSeconds`, ordered chapters, `publishedAt` |
 | `galleries` | ordered photo stories and captioned video reports | kind, locale, slug, items with asset/caption ids, editorial captions, credits, `publishedAt` |
+| `events` | newsroom webinars, conferences and summits | locale/slug, attendance mode, start/end window, timezone, venue, speakers, verified image, registration URL, feature/publication state |
 | `broadcasts` | one billable live channel lifecycle per transmission | locale, private `channelArn`, public `playbackUrl`, `captionMode` (`in_band` or legacy `unverified`), state and start/end timestamps; never a stream key |
 | `schedule_slots` | programme transmissions and replay publication | `programmeId`, locale, start/end window, `isLive`, state, immutable `replayAssetId` and required `captionAssetId` |
 | `social_posts` | outbound queue | `articleId`, `platform`, `caption`, `scheduledAt`, `state`, `attempts` |
@@ -128,6 +129,8 @@ db.schedule_slots.createIndex({ locale: 1, state: 1, isLive: 1, endsAt: -1 })
 db.podcasts.createIndex({ locale: 1, published: 1, _id: -1 })
 db.episodes.createIndex({ podcastId: 1, published: 1, publishedAt: -1, _id: -1 })
 db.galleries.createIndex({ locale: 1, published: 1, publishedAt: -1, _id: -1 })
+db.events.createIndex({ locale: 1, slug: 1 }, { unique: true })
+db.events.createIndex({ locale: 1, published: 1, endsAt: 1, startsAt: 1 })
 
 // reader activity
 db.bookmarks.createIndex({ readerId: 1, articleId: 1 }, { unique: true })

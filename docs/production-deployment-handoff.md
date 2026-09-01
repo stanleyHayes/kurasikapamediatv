@@ -8,10 +8,13 @@ a growth budget, not an enterprise quote.
 
 The gitignored `.env.production` is the single updated local handoff file. It
 contains the deployed Render `API_URL`, the correct independent Vercel hosts,
-and explicit replacement markers for every provider credential or generated
-secret. It intentionally contains no usable secret. Generate or retrieve each
-value directly in the relevant provider/password manager, then upload it to
-the deployment dashboard without putting it in source control or chat.
+and every currently known variable consumed by the Web, Studio, Go API and
+enabled provider integrations, including variables intentionally left commented
+until their provider is activated. It contains explicit replacement markers for
+every generated secret and intentionally contains no usable secret. Generate or
+retrieve each value directly in the relevant provider/password manager, then
+upload it to the deployment dashboard without putting it in source control or
+chat.
 
 The ignored `apps/web/.env.production` and `apps/studio/.env.production` files
 are older developer placeholders and must not be used as deployment inputs.
@@ -203,13 +206,18 @@ but the applicable rate and eligibility depend on the legal account country.
 - Real content and team profiles replace all launch/demo empty states before the
   URL is shared publicly.
 
-## Verified deployment state — 31 August 2026
+## Verified deployment state — 1 September 2026
 
 - Public Web deployment `dpl_CreKjs4YCFhLkTDct1mTpFZCqNpt` is Ready and the
   stable Vercel alias serves `/og-image` as `200 image/png` without redirecting
   through a locale.
 - Studio sign-in and the public Team route return HTTP 200; the Render API
   `/healthz` endpoint reports healthy.
+- A fresh unauthenticated check on 1 September returned HTTP 307 from the Web
+  bare host (the expected locale redirect), HTTP 200 from Studio sign-in and
+  HTTP 200 from the Render API health check. The Studio Vercel project has all
+  12 core launch variables configured; optional provider variables remain
+  intentionally absent until their accounts and approvals are supplied.
 - The API's public newsroom-profile endpoint is deployed and returns HTTP 200.
   The empty profile list is expected until approved journalist identities and
   portraits are supplied and published from Studio.

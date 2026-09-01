@@ -142,7 +142,7 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 `PublishPresenter` · `CreateProgramme` · `PublishProgramme` · `ScheduleProgramme` ·
 `ListTelevisionGuide` · `CreatePodcast` · `PublishPodcast` · `CreateEpisode` ·
 `PublishEpisode` · `ListPodcastLibrary` · `CreateGallery` · `PublishGallery` ·
-`ListGalleryLibrary`
+`ListGalleryLibrary` · `CreateEvent` · `PublishEvent` · `ListUpcomingEvents`
 
 `ScheduleProgramme` accepts only published programmes. A recorded replay cannot
 be published without a caption asset; this accessibility rule lives in the
@@ -195,6 +195,13 @@ ready provider-neutral video into an adaptive playback URL, poster URL and MIME
 type. The Cloudinary adapter derives an `sp_auto` HLS manifest and first-frame
 poster lazily; the application and HTTP layers know nothing about Cloudinary
 transformation syntax.
+
+`EventRepository` persists newsroom webinars, conferences and summits. The
+domain owns attendance mode, timing, HTTPS registration and venue rules;
+`PublishEvent` rejects ended events and resolves an optional image through the
+existing media library before publication. `ListUpcomingEvents` projects only
+published, not-yet-ended records in chronological order, so an expired event
+cannot remain on the public calendar because a page forgot to filter it.
 
 `NarrationProvider` starts and polls long-form synthesis without leaking Polly,
 S3 or Cloudinary types. `RequestArticleNarration` accepts only the current

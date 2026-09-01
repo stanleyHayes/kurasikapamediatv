@@ -248,7 +248,7 @@ brand variants. All **21 base desktop screens** are extracted into
 | `user_management_kurasikapa_admin` | `/studio/people` | ✅ — **duplicate design**: same user list, role badges and status as `kurasikapa_admin_roles_permissions`. Not built twice. |
 | `kurasikapa_media_podcast_library` | `/podcasts` | ✅ accessible series/episode library, chapters, transcripts and RSS feed (KUR-76; deployed) |
 | `kurasikapa_media_live_tv_gallery` | `/live` + `/galleries` | ✅ live/schedule/replay plus photo and caption-gated video galleries deployed (KUR-77) |
-| `kurasikapa_media_events_summits` | — | ❌ no route (R3) |
+| `kurasikapa_media_events_summits` | `/events` + `/studio/events` | ✅ KUR-96 — editor-published webinars, conferences and summits with verified imagery, speakers, registration, calendar actions and Event structured data. |
 | `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
 | `kurasikapa_media_membership_donations` | `/support` | ◑ memberships and one-time contributions implemented; provider credentials and release remain (KUR-80) |
 | `support_membership_kurasikapa_media_tv` | `/support` | ◑ public GHS/EUR support journey implemented with honest empty state and provider handoff (KUR-80) |
@@ -374,7 +374,8 @@ Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md)
 
 The remaining R3 work is provider activation and production verification of
 voice dictation; approved replay/video/article audio render with the required
-player, caption or transcript affordance.
+player, caption or transcript affordance. Events and summits now have their own
+Go-owned publication workflow, Studio desk and public calendar (KUR-96).
 
 ### 5.4 R4 — Revenue
 
@@ -1512,7 +1513,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 34. KUR-95 — live synchronized-caption release contract (2026-09-01)
 
-**Status: LOCALLY VERIFIED; production release and real encoder smoke active.**
+**Status: CI GREEN; Studio deployed, public Web release and real encoder smoke active.**
 
 - `StartBroadcast` now refuses before Amazon IVS provisioning unless the
   operator confirms an active in-band caption source. The domain independently
@@ -1531,5 +1532,35 @@ are live. Custom-domain DNS remains an external registrar action.**
   TypeScript suites and coverage floors, 177 real-Mongo adapter tests, 1.65%
   duplication, Go race/vulnerability checks, 96.8% Go domain coverage and 90.8%
   application/HTTP coverage. Web now passes 86 tests at 85.07% branch coverage.
-  Both independent production builds pass. CI, Vercel release evidence and a
-  real encoder caption smoke remain before this section can be marked deployed.
+  Both independent production builds pass. CI run `33468262842` is green across
+  quality gates, Go, secret scan and Lighthouse. Studio deployment
+  `dpl_BU4aJ4kN3KYVox5y1utx2tQq6oKn` is Ready and `/studio/en/live-control`
+  returns HTTP 200. The corresponding public Web release remains delayed by the
+  Vercel free daily deployment quota; a real encoder caption smoke also remains
+  operator-assisted before this section can be marked fully deployed.
+
+## 35. KUR-96 — newsroom events and summits (2026-09-01)
+
+**Status: LOCAL IMPLEMENTATION COMPLETE; full release verification active.**
+
+- Added a Go event aggregate for webinars, conferences and summits. It owns
+  editor authorization, attendance mode, venue, timezone, start/end windows,
+  HTTPS registration, speaker copy, featured state and explicit publication;
+  an event whose end has passed cannot be published.
+- Added `EventRepository`, create/publish/list-upcoming use cases, a tested
+  in-memory fake, Mongo persistence and named unique/upcoming indexes. Optional
+  event photography must resolve to a ready image in the existing media library
+  before publication. The public query excludes drafts and ended events.
+- Added authenticated API commands and a public locale-scoped event feed, then
+  wired the shared BFF. Studio now has a branded Events desk with button-based
+  format/attendance choices, accessible image selection, speaker, location and
+  registration fields, disabled animated submission and a useful empty state.
+- Added the responsive public `/events` experience from the supplied events
+  design: featured event, upcoming session cards, registration, Google Calendar
+  actions, accessible image alternatives and `Event` JSON-LD. Events are linked
+  from public and Studio navigation and included in the standard sitemap.
+- Focused Go domain/application/HTTP suites pass, full `make verify` passes at
+  96.8% domain and 90.7% application/HTTP coverage, all TypeScript suites pass,
+  lint/typecheck/boundaries pass, and the event repository passed against an
+  isolated real MongoDB replica set. Both independent production builds pass
+  with 76 Studio and 123 public pages; release evidence remains the active gate.

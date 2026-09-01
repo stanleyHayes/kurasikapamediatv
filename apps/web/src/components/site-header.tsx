@@ -10,6 +10,7 @@ const PRIMARY = [
   { paths: { en: '/live', fr: '/live' }, key: 'live' },
   { paths: { en: '/podcasts', fr: '/podcasts' }, key: 'podcasts' },
   { paths: { en: '/galleries', fr: '/galleries' }, key: 'galleries' },
+  { paths: { en: '/events', fr: '/events' }, key: 'events' },
   { paths: { en: '/news', fr: '/news' }, key: 'latest' },
   { paths: { en: '/sections/ghana', fr: '/sections/ghana' }, key: 'ghana' },
   { paths: { en: '/sections/africa', fr: '/sections/afrique' }, key: 'africa' },
@@ -159,7 +160,7 @@ function MobileNav({ pathname }: { pathname: string }): React.ReactElement {
   const t = useTranslations('nav')
 
   return (
-    <details className="relative lg:hidden">
+    <details className="relative 2xl:hidden">
       <summary className="grid h-10 w-10 list-none place-items-center border border-white/20 text-xl text-white">≡<span className="sr-only">{t('openMenu')}</span></summary>
       <div className="broadcast-shadow border-outline-variant bg-surface-container-lowest absolute right-0 top-14 max-h-[70dvh] w-72 overflow-y-auto border p-3">
         <p className="eyebrow border-outline-variant mb-2 border-b px-4 py-3 text-primary-ink">{t('sections')}</p>
@@ -184,7 +185,7 @@ export function SiteHeader(): React.ReactElement {
       </div>
       <nav aria-label={t('primary')} className="mx-auto flex h-[5rem] max-w-[var(--container-page)] items-center justify-between gap-4 px-4 md:px-8">
         <Brand />
-        <div className="hidden border-x border-white/10 px-3 lg:block"><NavLinks pathname={pathname} /></div>
+        <div className="hidden border-x border-white/10 px-3 2xl:block"><NavLinks pathname={pathname} /></div>
         <div className="flex items-center gap-2"><ReaderActions pathname={pathname} /><MobileNav pathname={pathname} /></div>
       </nav>
     </header>

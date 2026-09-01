@@ -280,6 +280,12 @@ type GalleryRepository interface {
 	Save(context.Context, media.Gallery) error
 }
 
+type EventRepository interface {
+	FindByID(context.Context, shared.EventID) (media.Event, error)
+	ListUpcoming(context.Context, string, time.Time, int) ([]media.Event, error)
+	Save(context.Context, media.Event) error
+}
+
 type UploadRequest struct {
 	AssetID   shared.AssetID
 	Kind      media.AssetKind

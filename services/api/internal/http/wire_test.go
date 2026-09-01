@@ -25,6 +25,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		Schedule: faketesting.NewScheduleStore(), Clock: faketesting.FixedClock{At: now},
 		Podcasts: faketesting.NewPodcastStore(), Episodes: faketesting.NewEpisodeStore(),
 		Galleries: faketesting.NewGalleryStore(),
+		Events:    faketesting.NewEventStore(),
 		IDs:       &faketesting.SequentialIDs{},
 	}
 	assets := faketesting.NewAssetStore()
@@ -97,6 +98,9 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		CreateGallery:               appmedia.NewCreateGallery(mediaDeps),
 		PublishGallery:              appmedia.NewPublishGallery(mediaDeps),
 		ListGalleryLibrary:          appmedia.NewListGalleryLibrary(mediaDeps, faketesting.VideoDeliveryFake{Delivery: ports.VideoDelivery{PlaybackURL: "https://cdn.test/report.m3u8", PosterURL: "https://cdn.test/poster.jpg", MIMEType: "application/vnd.apple.mpegurl"}}),
+		CreateEvent:                 appmedia.NewCreateEvent(mediaDeps),
+		PublishEvent:                appmedia.NewPublishEvent(mediaDeps),
+		ListUpcomingEvents:          appmedia.NewListUpcomingEvents(mediaDeps),
 		ReceiveRecording:            appmedia.NewReceiveRecording(mediaDeps, recordingImports, recordingProvider),
 		ProcessRecordings:           appmedia.NewProcessRecordings(mediaDeps, recordingImports, recordingProvider),
 		CreateMembershipPlan:        apprevenue.NewCreateMembershipPlan(revenueDeps),

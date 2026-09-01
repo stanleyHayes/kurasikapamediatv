@@ -21,6 +21,7 @@ type Deps struct {
 	Podcasts   ports.PodcastRepository
 	Episodes   ports.EpisodeRepository
 	Galleries  ports.GalleryRepository
+	Events     ports.EventRepository
 	Assets     ports.AssetRepository
 	Clock      ports.Clock
 	IDs        ports.IDs

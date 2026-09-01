@@ -10,6 +10,7 @@ const TITLES = [
   { href: '/media', title: 'Media library', description: 'Manage verified images, video, audio and accessibility files.' },
   { href: '/podcasts', title: 'Podcasts', description: 'Publish original audio series, episodes, chapters and transcripts.' },
   { href: '/galleries', title: 'Visual galleries', description: 'Curate photo stories and captioned video reports.' },
+  { href: '/events', title: 'Events & summits', description: 'Publish webinars, public conversations and conferences.' },
   { href: '/review', title: 'Review queue', description: 'Make confident publishing decisions.' }, { href: '/social', title: 'Social publishing', description: 'Plan and monitor story distribution.' },
   { href: '/rss', title: 'News sources', description: 'Turn trusted feeds into newsroom drafts.' }, { href: '/comments', title: 'Comment moderation', description: 'Keep reader conversations constructive.' },
   { href: '/pages', title: 'Public pages', description: 'Publish organisation and legal information.' },

@@ -49,6 +49,8 @@ type (
 	EpisodeID string
 	// GalleryID identifies one curated photo or video collection.
 	GalleryID string
+	// EventID identifies one newsroom event, webinar or summit.
+	EventID string
 	// NarrationJobID identifies one article-to-audio generation attempt.
 	NarrationJobID string
 	// RecordingImportID identifies one IVS recording promotion attempt.
@@ -89,6 +91,7 @@ func (id ScheduleSlotID) String() string       { return string(id) }
 func (id PodcastID) String() string            { return string(id) }
 func (id EpisodeID) String() string            { return string(id) }
 func (id GalleryID) String() string            { return string(id) }
+func (id EventID) String() string              { return string(id) }
 func (id NarrationJobID) String() string       { return string(id) }
 func (id RecordingImportID) String() string    { return string(id) }
 func (id MembershipPlanID) String() string     { return string(id) }

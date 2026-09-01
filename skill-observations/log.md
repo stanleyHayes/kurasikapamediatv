@@ -407,3 +407,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Treat live-caption readiness as a cross-layer release contract: fail before billable provisioning when captions are not confirmed, preserve legacy records as unverified, surface actual in-band tracks in the player, and include an operator smoke test that confirms the caption control becomes available on the live signal.
 
 **Principle:** Live-media accessibility is only credible when ingest intent, stored state, delivered tracks and viewer controls form one verifiable chain.
+
+### Observation 27: Time-bounded public content should expire at the repository boundary
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Implementing editor-published events and summits with public upcoming-event delivery.
+**Skill:** New skill candidate: content-lifecycle-delivery
+**Type:** open-source
+**Phase/Area:** Domain and query design
+
+**Issue:** Events and other time-bounded records can remain visibly stale when expiry filtering exists only in page components. The implementation instead needed both a domain guard against publishing an already-ended record and a repository query that excludes records whose end time has passed.
+
+**Suggested improvement:** Use a reusable delivery checklist for time-bounded public content: domain publication guard, injected clock, storage-level expiry filtering and index, expired/empty UI, calendar or structured-data projection, and release evidence.
+
+**Principle:** Content lifecycle boundaries belong at the domain and repository seam, not in page rendering alone.

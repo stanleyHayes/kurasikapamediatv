@@ -71,6 +71,9 @@ type Deps struct {
 	CreateGallery               appmedia.CreateGallery
 	PublishGallery              appmedia.PublishGallery
 	ListGalleryLibrary          appmedia.ListGalleryLibrary
+	CreateEvent                 appmedia.CreateEvent
+	PublishEvent                appmedia.PublishEvent
+	ListUpcomingEvents          appmedia.ListUpcomingEvents
 	CreateMembershipPlan        apprevenue.CreateMembershipPlan
 	ActivateMembershipPlan      apprevenue.ActivateMembershipPlan
 	ListMembershipPlans         apprevenue.ListMembershipPlans
@@ -169,6 +172,9 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /media/galleries", deps.handleCreateGallery)
 	mux.HandleFunc("POST /media/galleries/{id}/publish", deps.handlePublishGallery)
 	mux.HandleFunc("GET /public/{locale}/galleries", deps.handleGalleryLibrary)
+	mux.HandleFunc("POST /media/events", deps.handleCreateEvent)
+	mux.HandleFunc("POST /media/events/{id}/publish", deps.handlePublishEvent)
+	mux.HandleFunc("GET /public/{locale}/events", deps.handleUpcomingEvents)
 	mux.HandleFunc("POST /revenue/membership-plans", deps.handleCreateMembershipPlan)
 	mux.HandleFunc("POST /revenue/membership-plans/{id}/activate", deps.handleActivateMembershipPlan)
 	mux.HandleFunc("GET /public/{locale}/membership-plans", deps.handleListMembershipPlans)

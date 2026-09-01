@@ -49,6 +49,7 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 | RSS ingest, sitemap generation, digests | `services/api` | Cron-driven |
 | Live TV, VOD, transcode orchestration | `services/api` | Long-lived, Amazon IVS + Cloudinary (R3) |
 | Article narration jobs | `services/api` | Async Polly/S3 generation, editor approval, Cloudinary delivery |
+| Events and summits | `services/api` | Publish windows, imagery, registration and upcoming-event projection stay provider-neutral |
 
 Live channels are provisioned only when an Amazon IVS recording configuration
 is present, so every broadcast is captured to the station's private S3
