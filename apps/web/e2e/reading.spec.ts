@@ -29,6 +29,8 @@ test.describe('reading', () => {
     const recorded = page.waitForResponse((response) => response.url().endsWith('/api/analytics/page-view'))
     const engaged = page.waitForResponse((response) => response.url().endsWith('/api/analytics/engagement'))
     await page.goto(`/en/articles/${PUBLISHED.slug}`)
+    await page.locator('#article-transcript').scrollIntoViewIfNeeded()
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
     expect((await recorded).status()).toBe(204)
     expect((await engaged).status()).toBe(204)
   })
