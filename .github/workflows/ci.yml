@@ -166,22 +166,21 @@ jobs:
   go:
     name: Go service
     runs-on: ubuntu-latest
-    services:
-      # The adapter suite runs against a real MongoDB (make integration), the
-      # same way the TS adapters use Testcontainers. Standalone is enough:
-      # nothing here opens a transaction.
-      mongo:
-        image: mongo:8
-        ports: ['27017:27017']
-        options: >-
-          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'"
-          --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version: '1.26'
           cache-dependency-path: services/api/go.sum
+      - name: Start transactional MongoDB
+        run: |
+          docker run -d --name kura-ci-mongo -p 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+          for attempt in {1..30}; do
+            docker exec kura-ci-mongo mongosh --quiet --eval 'db.adminCommand({ping:1})' && break
+            if [ "$attempt" = 30 ]; then exit 1; fi
+            sleep 1
+          done
+          docker exec kura-ci-mongo mongosh --quiet --eval 'rs.initiate({_id:"rs0",members:[{_id:0,host:"localhost:27017"}]})'
       - name: Verify
         run: make verify
         working-directory: services/api
@@ -191,9 +190,12 @@ jobs:
         env:
           # KURA_REQUIRE_MONGO (set by the target) makes a missing service a
           # failure, never a silent skip.
-          KURA_TEST_MONGO_URI: mongodb://127.0.0.1:27017/?directConnection=true
+          KURA_TEST_MONGO_URI: mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true
       - name: Vulnerabilities
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
           govulncheck ./...
         working-directory: services/api
+      - name: Stop transactional MongoDB
+        if: always()
+        run: docker rm -f kura-ci-mongo
