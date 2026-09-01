@@ -1809,3 +1809,31 @@ are live. Custom-domain DNS remains an external registrar action.**
   launch gate, not an implementation gap: approved identities, journalism,
   schedules, licensed media, pricing and commercial inventory must replace the
   preview edition before public launch.
+
+## 43. KUR-105 — reversible client-preview inventory (2026-09-01)
+
+**Status: LOCALLY VERIFIED — production seed execution pending a Render-safe path.**
+
+- Extracted managed FAQ/help/careers pages and television preview inventory
+  from the 294-line demo seeder into a bounded module. The executable seed is
+  now at the repository's 250-line ceiling, and the extracted module is 78
+  lines. Node 26 runtime execution is covered by the explicit `.ts` import,
+  rather than relying on TypeScript-only module resolution.
+- Presenters, programmes and schedule slots now carry the same
+  `kurasikapa-client-preview-v1` tag as articles, revisions, categories,
+  comments and managed pages. The existing `demo_` identifier fallback remains
+  available for cleanup, but tagged deletion no longer depends on naming.
+- A fresh isolated MongoDB 8 replica-set rehearsal created exactly 102 tagged
+  records: 38 articles, 38 revisions, 11 categories, three comments, three
+  managed pages, three presenters, three programmes and three schedule slots.
+  The guarded clear command removed all 102; a follow-up query found zero
+  tagged and zero `demo_`-prefixed records in every covered collection.
+- `pnpm lint`, `pnpm typecheck`, `pnpm boundaries` and `pnpm dup` pass. The only
+  boundary finding is the existing Studio loading-route orphan warning.
+- Production seeding remains deliberately unclaimed. The valid Atlas URI is
+  held by Render and direct workstation access does not complete; the public
+  API rejects the available preview identities with HTTP 403, as required.
+  Use a reviewed Render-side one-off seed command or a real privileged Studio
+  operator rather than weakening Atlas network policy or the API trust
+  boundary. Real journalists, launch reporting, licensed media and commercial
+  terms remain client-owned inputs and must not be fabricated by this seed.
