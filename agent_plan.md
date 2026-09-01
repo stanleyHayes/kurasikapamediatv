@@ -252,10 +252,10 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
 | `kurasikapa_media_membership_donations` | `/support` | ◑ memberships and one-time contributions implemented; provider credentials and release remain (KUR-80) |
 | `support_membership_kurasikapa_media_tv` | `/support` | ◑ public GHS/EUR support journey implemented with honest empty state and provider handoff (KUR-80) |
-| `monetization_dashboard_kurasikapa_admin` | — | ❌ no route (R4) |
+| `monetization_dashboard_kurasikapa_admin` | `/studio/revenue` | ✅ KUR-80–KUR-93 — memberships, donations, subscribers, commerce, affiliates, advertiser proposals, campaigns and currency-separated reporting share one commercial operations desk. |
 | `kurasikapa_admin_subscriptions_revenue` | `/studio/revenue` | ✅ tier management, confirmed-payment KPIs, currency-separated visualisations and subscriber ledger implemented (KUR-80/KUR-81); provider credentials/release remain |
 | `kurasikapa_admin_analytics_hub` | `/studio/analytics` | ✅ first-party audience KPIs, traffic/acquisition/retention and content/newsletter visualisations deployed; revenue intelligence is now available in `/studio/revenue` |
-| `seo_center_kurasikapa_admin` | — | ❌ no route (R5) |
+| `seo_center_kurasikapa_admin` | `/studio/seo` | ✅ KUR-94 — evidence-backed inventory, metadata and indexing readiness center. |
 
 The full 50MB `stitch_kurasikapa_ai_media_platform.zip` is at the repo root and
 is **not** in Git LFS. Design-system docs are in `design/systems/`; the chosen
@@ -383,7 +383,10 @@ Membership tiers, domain-level entitlement, donations, Stripe EUR and Paystack
 GHS checkout, signed webhook confirmation, currency-separated KPIs and the
 subscriber ledger are implemented. Ad inventory, delivery, Studio operations
 and public placements are implemented. Products, paid classifieds and disclosed
-affiliate links are code-complete; the advertiser self-service portal remains.
+affiliate links are implemented. The invitation-only advertiser self-service
+portal, MFA sign-in, proposal workflow, Studio approval queue and campaign
+handoff are implemented in KUR-93. Live settlement and campaign delivery still
+require provider credentials and real commercial inventory.
 
 ### 5.5 R5 — Intelligence & Reach
 
@@ -1541,7 +1544,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 35. KUR-96 — newsroom events and summits (2026-09-01)
 
-**Status: LOCAL IMPLEMENTATION COMPLETE; full release verification active.**
+**Status: DEPLOYED — CI and production routes verified.**
 
 - Added a Go event aggregate for webinars, conferences and summits. It owns
   editor authorization, attendance mode, venue, timezone, start/end windows,
@@ -1563,4 +1566,14 @@ are live. Custom-domain DNS remains an external registrar action.**
   96.8% domain and 90.7% application/HTTP coverage, all TypeScript suites pass,
   lint/typecheck/boundaries pass, and the event repository passed against an
   isolated real MongoDB replica set. Both independent production builds pass
-  with 76 Studio and 123 public pages; release evidence remains the active gate.
+  with 76 Studio and 123 public pages.
+- Commit `c2b1016` is on `main` at exact origin parity. Web deployment
+  `dpl_AmUd5mkMhaBVcrJGzYbpmhwhVdVV` and Studio deployment
+  `dpl_FA1Wvsn42U9MUfwzPSnXsSXJQ2Vh` reached Ready. The stable public and Studio
+  Events routes return HTTP 200, the Render API public feed returns HTTP 200,
+  and the sitemap includes both locale event routes. CI run `33470135791` is
+  green across quality gates, Go, secret scan and Lighthouse.
+- The production `APP_URL`, `SITE_URL` and `STUDIO_URL` values were corrected on
+  both Vercel projects to the working `kurasikapa-web.vercel.app` and
+  `kurasikapa-studio.vercel.app/studio` aliases. This removes unreachable
+  `kurasikapa.tv` canonicals until the client configures that domain's DNS.
