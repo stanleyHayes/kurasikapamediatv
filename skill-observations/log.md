@@ -548,3 +548,18 @@ only by the compiler that understands its source.
 **Suggested improvement:** Boot the exact pinned container image, assert its stable initialized state, exercise at least one authenticated control-plane lifecycle and remove the disposable resources before treating infrastructure configuration as verified.
 
 **Principle:** Provider configuration is verified by the pinned runtime accepting and exercising it, not by syntax alone.
+
+### Observation 36: Separate optional future products from release defects
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Closing the Kurasikapa discovery programme against its source questionnaire and implemented Web, Studio and API boundary.
+**Skill:** New skill candidate: discovery-scope-reconciliation
+**Type:** open-source
+**Phase/Area:** Product audit and delivery ledger
+
+**Issue:** Optional future ideas such as native apps and AI-generated media remained grouped under one active delivery status even after the current Web platform requirements were complete. This made finished engineering look unfinished and encouraged unsupported claims that products without approved acceptance criteria had shipped.
+
+**Suggested improvement:** Classify every discovery item as current acceptance scope, external activation input or optional future product before updating a programme status. Close the current boundary on evidence, keep external inputs visible and require a separate approved brief before opening future-product implementation.
+
+**Principle:** A delivery ledger should report the boundary that was accepted, not turn every future idea into an eternal release defect.

@@ -152,6 +152,7 @@ const SWEPT_PATHS = [
   '/en/sections/business',
   '/fr/sections/economie',
   '/en/search',
+  '/en/ask',
   '/en/contact',
   '/en/about',
   '/en/newsletter',

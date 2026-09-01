@@ -52,10 +52,10 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Programme | State | Exit evidence |
 |---|---|---|
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
-| Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
-| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention, newsletter and privacy-safe story-attention analytics are implemented. The Go-owned SEO readiness report and Studio SEO Center are deployed. KUR-98 adds semantic search, related reporting and reader-profile recommendations with safe fallbacks; production activation awaits a READY Atlas vector index and Voyage key. Search Console registration remains operator-owned. |
-| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
-| Remaining discovery scope | **IN PROGRESS** | Public news API v1 is implemented in KUR-100. Additional languages, integrations, security/DR evidence, other future surfaces and final launch verification remain. |
+| Television and multimedia | **ENGINEERING COMPLETE** | Programme schedule, presenters, live control, reminders, replay/video, podcasts, galleries, media library, CDN delivery, captions and transcripts are implemented. KUR-108 replaces the default managed live origin with OvenMediaEngine; host, DNS, Bunny activation and licensed programming are deployment inputs, not unfinished product code. |
+| Growth and intelligence | **ENGINEERING COMPLETE** | News sitemap, SEO Center, first-party traffic/acquisition/retention/newsletter/attention analytics, semantic search, related reporting and reader recommendations are implemented with safe fallbacks. Search Console ownership, a READY Atlas vector index, Voyage credentials and real traffic are operator inputs. |
+| Revenue | **ENGINEERING COMPLETE** | Memberships, donations, subscriptions, entitlement, checkout confirmation, advertising, products, paid classifieds, affiliates, advertiser self-service, KPIs and subscriber/revenue reporting are implemented. Provider credentials, approved pricing and commercial inventory are launch inputs. |
+| Remaining discovery scope | **WEB PLATFORM COMPLETE** | The versioned public API, PWA/offline reading, DR verifier, WAF guidance and grounded Ask Kurasikapa archive assistant are implemented. The questionnaire labels native apps, AI anchor/generators, reporter app and offline publishing as optional future products; they require their own approved product brief and are not misreported as unfinished Web defects. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
 
@@ -1959,3 +1959,45 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Studio and Web both deployed successfully with the provider variables. The
   stable production aliases serve `/studio/en/sign-in` and `/en/sign-up`
   respectively with HTTP 200.
+
+## 48. KUR-110 — concise public footer directory (2026-09-01)
+
+**Status: IMPLEMENTED AND LOCALLY VERIFIED.**
+
+- Replaced the overloaded Reporting/Kurasikapa/Information columns with five
+  purpose-based groups: Newsroom, Watch & listen, About, Marketplace, and Help
+  & legal. No group contains more than five destinations.
+- Gave the station identity its own full-width row so the directory no longer
+  competes with the logo and mission copy. The directory resolves from two
+  mobile columns through three tablet columns to five desktop columns.
+- Added regression coverage for group length, duplicate destinations and key
+  live/legal/assistant routes. Focused tests, lint and Web typecheck pass.
+
+## 49. KUR-111 — grounded Ask Kurasikapa assistant (2026-09-01)
+
+**Status: IMPLEMENTED AND LOCALLY VERIFIED.**
+
+- Added bilingual `/ask`, a source-first newsroom assistant that accepts plain
+  language questions, uses semantic discovery when configured and retains the
+  existing lexical fallback when embeddings or the Atlas index are unavailable.
+- The assistant never fabricates a prose answer: it explains what it found and
+  links every response to published Kurasikapa reporting. Empty results provide
+  a useful recovery path instead of inventing coverage.
+- The form uses the shared disabled pending control with animated dots, and the
+  assistant is reachable from the newly grouped footer.
+
+## 50. Discovery programme status reconciliation (2026-09-01)
+
+**Status: COMPLETE FOR THE CURRENT WEB, STUDIO AND API PRODUCT BOUNDARY.**
+
+- Re-audited the four programme summaries against the source discovery
+  questionnaire and the implemented runtime paths. Television/multimedia,
+  growth/intelligence and revenue have no remaining repository-owned product
+  gaps; their outstanding work is provider activation or client inventory.
+- Corrected the programme rows from ambiguous `IN PROGRESS` labels to
+  `ENGINEERING COMPLETE`, preserving each external activation requirement.
+- Section 21 of the questionnaire describes native mobile apps, AI anchor and
+  media generators, a reporter app and offline publishing as future products
+  the client *may* want. They are now separated from the completed Web release
+  instead of being silently counted as unfinished defects or falsely claimed as
+  shipped applications without an approved product brief.

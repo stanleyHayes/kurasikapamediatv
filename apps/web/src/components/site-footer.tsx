@@ -13,10 +13,10 @@ export function SiteFooter(): React.ReactElement {
       </div>
 
       <div className="mx-auto max-w-[var(--container-page)] px-5 py-14 md:px-8 md:py-20">
-        <div className="grid gap-14 lg:grid-cols-[1.15fr_1.85fr]">
-          <div>
+        <div className="space-y-14">
+          <div className="grid gap-7 border-b border-white/10 pb-10 md:grid-cols-[auto_1fr] md:items-end">
             <Image src="/brand-logo-transparent.png" alt="Kurasikapa Media" width={1536} height={1024} className="h-28 w-auto object-contain object-left" />
-            <p className="mt-5 max-w-sm border-l-2 border-secondary pl-5 text-base leading-relaxed text-white/58">Independent television and digital journalism from Ghana. Reporting that informs, educates and keeps power in view.</p>
+            <p className="max-w-xl border-l-2 border-secondary pl-5 text-base leading-relaxed text-white/58">Independent television and digital journalism from Ghana. Reporting that informs, educates and keeps power in view.</p>
           </div>
           <FooterNav />
         </div>
