@@ -27,7 +27,7 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Provider / owner | Values still to provide | What remains disabled |
 |---|---|---|
 | Google Cloud | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google sign-in |
-| Meta | Facebook OAuth pair plus `META_APP_ID`, `META_APP_SECRET`, Page token, Page ID and Instagram user ID | Facebook/Instagram sign-in and publishing |
+| Meta | Facebook OAuth pair plus Page token, Page ID and Instagram user ID; keep the app ID/secret in Meta's dashboard | Facebook/Instagram sign-in and publishing |
 | Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
 | Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
 | Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
@@ -129,8 +129,8 @@ a ticket, source control or a screen recording.
 
 | Target | Required production variables | Add when the provider is activated |
 |---|---|---|
-| Vercel Web | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Web `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `CONTACT_TO_EMAIL`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Google/Facebook/Apple OAuth, Resend, Turnstile, GA4 |
-| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` and recording configuration; Meta publishing |
+| Vercel Web | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Web `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `CONTACT_TO_EMAIL`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Google/Facebook/Apple OAuth, Resend, Turnstile, GA4 |
+| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` and recording configuration; Meta Page token/IDs |
 | Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` credentials |
 | GitHub Actions | `CRON_SECRET` | `ENABLE_SOCIAL_CRON=true` only after Meta approval |
 
@@ -153,6 +153,8 @@ For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
 | AWS IVS/live + MediaConvert + narration | $250 | $2,000 | Live is driven by viewer-hours; each replay adds MediaConvert output minutes and temporary S3 |
 | Domain and DNS | $2 | $10 | Annual domain renewal amortised monthly; DNS hosting can remain free |
 | Monitoring and incident alerts | $23 | $140 | Launch logging/uptime allowance vs expanded retention, alerting and paging |
+| OAuth, Turnstile, GA4, Search Console | $0 | $0 | Standard launch usage; provider limits and terms still apply |
+| GitHub Actions and SonarCloud | $0 | $0 | Existing CI allowance and optional free analysis; paid team/analysis plans are outside this estimate |
 | Contingency | $110 | $526 | About 20% for bandwidth, backups, tax and usage variance |
 | **Estimated total** | **$657/month** | **$4,029/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
 

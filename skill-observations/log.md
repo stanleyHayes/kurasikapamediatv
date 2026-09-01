@@ -422,3 +422,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Use a reusable delivery checklist for time-bounded public content: domain publication guard, injected clock, storage-level expiry filtering and index, expired/empty UI, calendar or structured-data projection, and release evidence.
 
 **Principle:** Content lifecycle boundaries belong at the domain and repository seam, not in page rendering alone.
+
+### Observation 28: Environment handoffs should contain runtime inputs, not provider metadata
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Reconciling one production dotenv checklist against two Vercel applications, a Go API and third-party provider setup.
+**Skill:** New skill candidate: production-environment-handoff
+**Type:** open-source
+**Phase/Area:** Deployment configuration ownership
+
+**Issue:** Provider dashboards expose identifiers and secrets that operators may assume all belong in the application environment, even when the runtime never reads them. This makes handoffs noisy and increases the chance of copying unnecessary secrets into multiple hosts.
+
+**Suggested improvement:** Generate the deployment map from actual runtime access, separate provider-console prerequisites from environment variables, and name the exact host scope for every key. Keep one authoritative local checklist and treat hosting dashboards as the secret store.
+
+**Principle:** A production environment file should be the smallest complete runtime contract, not a transcription of every provider dashboard.
