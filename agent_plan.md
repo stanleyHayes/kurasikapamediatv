@@ -1620,7 +1620,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 37. KUR-99 — consented story-attention heatmap (2026-09-01)
 
-**Status: IMPLEMENTED; full gates and production release verification active.**
+**Status: DEPLOYED — CI, both Vercel apps and production routes verified.**
 
 - Added a domain-validated, append-only article-attention event with only four
   reading-depth milestones and bounded active seconds. The browser supplies a
@@ -1636,6 +1636,15 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Corrected the analytics consent root so first-party consent is still offered
   when GA4 is not configured; only Google's script depends on a valid
   measurement ID. Updated the public cookies disclosure and data-model record.
-- Domain/application tests and the real-Mongo adapter aggregation test are
-  present. Do not mark deployed until the full repository gates, production
-  builds, public engagement endpoint and Studio analytics surface pass.
+- Domain/application tests and the real-Mongo adapter aggregation test pass.
+  Full `pnpm verify` is green, both independent Next.js production builds pass,
+  and the complete 40-test browser/accessibility suite passes locally. CI run
+  `33475473748` is green after a clean failed-job rerun; that run covers quality
+  gates, production builds, real-Mongo tests, all browser journeys, WCAG checks,
+  dependency audit, Go verification, secret scanning and Lighthouse.
+- Commits `c419b8e` and `5a7aece` are on `main` at exact origin parity. Web
+  deployment `dpl_7a49z15eUpwJDw3Eitotf7SGM8Cf` and Studio deployment
+  `dpl_AQRvXVUpbAkPYpkaZ6C3skqfip5B` are Ready. The stable Web homepage returns
+  HTTP 200, `/og-image` returns HTTP 200 as `image/png`, malformed engagement
+  input is rejected with HTTP 400, and the stable Studio sign-in returns HTTP
+  200. The test-only follow-up commit did not require a new Vercel build.
