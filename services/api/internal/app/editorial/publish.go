@@ -138,6 +138,11 @@ func publishAndAnnounce(
 		return editorial.Article{}, fmt.Errorf("saving published article: %w", err)
 	}
 
+	// Vector indexing is asynchronous and never changes publication truth. The
+	// durable queue is best-effort here for the same reason as cache events: a
+	// story already saved as published must not be reported as unpublished.
+	_ = queueSemanticArticle(ctx, deps, published)
+
 	// After the save, never before. An event announcing a publication that did
 	// not persist would invalidate caches for an article still sitting in its
 	// old state — the reader would see the story vanish and come back.

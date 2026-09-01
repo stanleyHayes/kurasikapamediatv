@@ -36,6 +36,7 @@ type harness struct {
 	categories *faketesting.CategoryStore
 	assets     *faketesting.AssetStore
 	events     *faketesting.RecordingEventBus
+	semantic   *faketesting.SemanticStore
 }
 
 func newHarness(seed ...editorial.Article) harness {
@@ -44,6 +45,7 @@ func newHarness(seed ...editorial.Article) harness {
 	categories := faketesting.NewCategoryStore()
 	events := &faketesting.RecordingEventBus{}
 	assets := faketesting.NewAssetStore()
+	semantic := faketesting.NewSemanticStore()
 
 	return harness{
 		deps: app.Deps{
@@ -54,8 +56,10 @@ func newHarness(seed ...editorial.Article) harness {
 			Clock:      faketesting.FixedClock{At: now},
 			IDs:        &faketesting.SequentialIDs{},
 			Events:     events,
+			Semantic:   semantic,
 		},
 		articles: articles, revisions: revisions, categories: categories, assets: assets, events: events,
+		semantic: semantic,
 	}
 }
 

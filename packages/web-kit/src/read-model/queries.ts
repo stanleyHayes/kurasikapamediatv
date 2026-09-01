@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from 'next/cache'
 import { articleId } from '@kurasikapa/domain'
 import { loadPublishedArticle, loadPublishedList, loadSectionPage } from '../bff/load-public'
+import { loadSemanticRelated, loadSemanticSearch } from '../bff/semantic'
 import { container } from '../composition/container'
 import { env } from '../composition/env'
 import {
@@ -93,23 +94,54 @@ export async function cachedMostRead(locale: string, limit: number): Promise<rea
   return (await container().listMostRead.execute({ locale, limit })).map(toArticleView)
 }
 
-/**
- * Same-section siblings for the article page. Category co-occurrence only —
- * EmbeddingPort has no adapter yet, so this is not semantic relatedness.
- */
+/** Semantic neighbours when ready, with same-section siblings as fallback. */
+export interface RelatedArticleView {
+  readonly items: readonly ArticleView[]
+  readonly mode: 'semantic' | 'section'
+}
+
 export async function cachedRelated(
   id: string,
   locale: string,
   limit: number,
-): Promise<readonly ArticleView[]> {
+): Promise<RelatedArticleView> {
   'use cache'
   cacheLife('minutes')
   cacheTag(listTag(locale))
   cacheTag(articleTag(id))
 
-  return (
-    await container().listRelatedArticles.execute({ articleId: articleId(id), limit })
-  ).map(toArticleView)
+  const apiUrl = env().API_URL
+  if (apiUrl !== undefined) {
+    try {
+      const semantic = await loadSemanticRelated(apiUrl, locale, id, limit)
+      if (semantic.length > 0) return { items: semantic, mode: 'semantic' }
+    } catch {
+      // Discovery is an enhancement. Same-section reporting remains useful
+      // while the embedding provider or Atlas vector index is unavailable.
+    }
+  }
+  const section = await container().listRelatedArticles.execute({ articleId: articleId(id), limit })
+  return { items: section.map(toArticleView), mode: 'section' }
+}
+
+export interface SearchResultView {
+  readonly id: string
+  readonly slug: string
+  readonly title: string
+}
+
+export async function searchReporting(terms: string, locale: string): Promise<readonly SearchResultView[]> {
+  const apiUrl = env().API_URL
+  if (apiUrl !== undefined) {
+    try {
+      const semantic = await loadSemanticSearch(apiUrl, locale, terms, 20)
+      if (semantic.length > 0) return semantic.map(({ id, slug, title }) => ({ id, slug, title }))
+    } catch {
+      // Lexical search is the production fallback, not an error page.
+    }
+  }
+  const lexical = await container().searchArticles.execute({ terms, locale })
+  return lexical.items.map(({ articleId: id, slug, title }) => ({ id, slug, title }))
 }
 
 export interface SectionView {

@@ -6,6 +6,7 @@ import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { currentActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { callerKey, limit } from '@kurasikapa/web-kit/security/rate-limit'
+import { searchReporting } from '@kurasikapa/web-kit/read-model/queries'
 
 interface Props {
   params: Promise<{ locale: string }>
@@ -84,16 +85,16 @@ async function Results({
     )
   }
 
-  const page = await container().searchArticles.execute({ terms, locale })
+  const items = await searchReporting(terms, locale)
 
-  if (page.items.length === 0) {
+  if (items.length === 0) {
     return <EmptyState eyebrow="Archive search" title={`No reporting matched “${terms}”.`} description="Try a broader topic, check the spelling, or browse the latest reporting while the archive continues to grow." visual={<Image src="/brand-logo-transparent.png" alt="" width={1536} height={1024} className="h-8 w-auto object-contain" />} actions={<Link href="/news" className="bg-primary px-5 py-3 text-sm font-bold text-white">Browse latest reporting ↗</Link>} compact />
   }
 
   return (
     <ul>
-      {page.items.map((hit) => (
-        <li key={hit.articleId} className="border-outline-variant border-b py-4">
+      {items.map((hit) => (
+        <li key={hit.id} className="border-outline-variant border-b py-4">
           <Link href={`/articles/${hit.slug}`} className="text-on-surface hover:text-primary">
             {hit.title}
           </Link>

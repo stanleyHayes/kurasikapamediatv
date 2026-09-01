@@ -8,9 +8,11 @@ import {
   type ReadArticleView,
 } from '@/components/profile/reading-history'
 import { SavedList, type SavedArticleView } from '@/components/profile/saved-list'
+import { Recommendations, type RecommendationView } from '@/components/profile/recommendations'
 import { currentActor } from '@kurasikapa/web-kit/composition/actor'
 import { container } from '@kurasikapa/web-kit/composition/container'
 import { authGraph } from '@kurasikapa/web-kit/composition/auth-graph'
+import { cachedRelated } from '@kurasikapa/web-kit/read-model/queries'
 
 interface Params {
   params: Promise<{ locale: string }>
@@ -41,6 +43,7 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
   if (actor === null) redirect(`/${locale}/sign-in`)
 
   const library = await loadLibrary(actor)
+  const recommendations = await recommendedFrom(library.history, locale)
   const [user, credential] = await Promise.all([
     authGraph().users.findById(actor.id),
     authGraph().credentials.findByUserId(actor.id),
@@ -72,9 +75,19 @@ async function Account({ params }: Params): Promise<React.ReactElement> {
 
       <ReadingHistory articles={library.history} now={now} />
 
+      <Recommendations items={recommendations} basis={library.history[0]?.title ?? null} />
+
       <AccountSettings name={user?.name ?? 'Kurasikapa reader'} email={user?.email ?? credential?.email.value ?? ''} locale={locale} />
     </>
   )
+}
+
+async function recommendedFrom(history: readonly ReadArticleView[], locale: string): Promise<RecommendationView[]> {
+  const latest = history[0]
+  if (latest === undefined) return []
+  const read = new Set(history.map(({ id }) => id))
+  const related = await cachedRelated(latest.id, locale, 8)
+  return related.items.filter(({ id }) => !read.has(id)).slice(0, 4).map(({ id, slug, title }) => ({ id, slug, title }))
 }
 
 async function loadLibrary(actor: Actor): Promise<{

@@ -15,12 +15,26 @@ unset `API_URL` keeps the TypeScript path.
    - `MONGODB_DB` — `kurasikapa` (default; only override for a different DB).
    - `CRON_SECRET` — a random bearer token for the cron guard. Leave unset to
      refuse every scheduled request.
+   - `VOYAGE_API_KEY` — Voyage embedding key, enabled only after the Atlas
+     vector index below reports `READY`.
+   - `VOYAGE_MODEL` — optional; defaults to `voyage-4`.
+   - `VOYAGE_DIMENSIONS` — optional; defaults to `1024` and must match Atlas.
    - `PORT` — do not set this manually. Render injects the port that its edge
      proxy routes to, and the API reads it at startup.
 4. Deploy. Wait for the health check to pass. At startup the API creates the
    Mongo indexes it depends on (`articles`, `categories`, `article_revisions`)
    and refuses to serve if the unique ones cannot be built — a first deploy
-   against an empty Atlas database is self-provisioning.
+    against an empty Atlas database is self-provisioning.
+
+### Create the semantic vector index
+
+Create an Atlas Vector Search index named `article_semantic_vector` on the
+`article_semantic_documents` collection with a 1,024-dimension cosine vector
+field at `embedding`, plus filter fields for `locale` and `active`. The exact
+definition is recorded in [ADR-0015](../decisions/adr-0015-manual-semantic-embeddings.md).
+Wait for Atlas to report `READY`, then add `VOYAGE_API_KEY` and redeploy. Until
+both are ready, public search and recommendations continue through their
+lexical and same-section fallbacks.
 
 ## 2. Point the web app at it
 
@@ -58,6 +72,9 @@ Actions repository secret with the same value configured in Studio and Render.
 The workflow also supports a manual run for deployment verification. Social
 delivery remains skipped until Meta credentials are approved and the GitHub
 repository variable `ENABLE_SOCIAL_CRON` is set to `true`.
+The five-minute publication job also calls `process-semantic-index`; this
+backfills any missed published revision and processes the pending embedding
+queue with bounded retries.
 
 ## 5. Delete the TypeScript editorial packages
 

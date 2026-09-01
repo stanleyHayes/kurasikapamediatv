@@ -53,7 +53,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
-| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed. The Go-owned SEO readiness report and Studio SEO Center are deployed; the public `dateModified` correction awaits a fresh Web release after the Vercel quota window. Search Console operations, semantic search and personalised recommendations remain. |
+| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed. The Go-owned SEO readiness report and Studio SEO Center are deployed. KUR-98 adds semantic search, related reporting and reader-profile recommendations with safe fallbacks; production activation awaits a READY Atlas vector index and Voyage key. Search Console registration remains operator-owned. |
 | Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
@@ -1580,3 +1580,28 @@ are live. Custom-domain DNS remains an external registrar action.**
   so the currently served sitemap still carries `kurasikapa.tv` until the next
   allowed deployment applies the staged environment. Do not treat the canonical
   correction as live before that deployment and a fresh sitemap check pass.
+
+## 36. KUR-98 — semantic discovery and recommendations (2026-09-01)
+
+**Status: IMPLEMENTED; full gates and production provider activation pending.**
+
+- Added a provider-neutral Go embedding port and semantic repository, a Voyage
+  `voyage-4` adapter, durable `article_semantic_documents` jobs and Atlas Vector
+  Search retrieval. Publishing queues the exact approved revision; unpublishing
+  deactivates it; the protected five-minute Studio job paginates the complete
+  EN/FR published inventory and repairs missed jobs before bounded processing.
+- Added locale-scoped semantic search and related-reporting endpoints. Every
+  vector hit is reloaded through the article repository and rechecked for
+  published visibility and locale, so delayed index updates cannot expose an
+  unpublished revision. Voyage or Atlas failures fall back to existing lexical
+  search and same-section related reporting.
+- Public Search now uses the semantic-first BFF, article pages distinguish
+  semantically related reporting from desk fallbacks, and the signed-in profile
+  recommends stories from the reader's latest history while excluding already
+  read article IDs.
+- Added unit, HTTP, provider and Mongo adapter coverage, the Atlas index
+  contract in ADR-0015, deployment/environment instructions and a usage-based
+  Voyage budget. Do not call the feature production-active until the Atlas
+  `article_semantic_vector` index reports `READY`, `VOYAGE_API_KEY` is present on
+  Render, the backfill succeeds and the public fallback/semantic paths are both
+  smoke-tested.

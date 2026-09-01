@@ -37,10 +37,11 @@ into the route or UI.
 
 `ReadingRepository` has no `findById` — a reader's history is not id-addressable.
 It does expose `rankByReaders(limit)`: unique readers per article, no identities.
-That powers the public most-read rail. Category-based related articles are live
-(`ListRelatedArticles` — same section, same locale). Semantic related /
-recommended still need `EmbeddingPort`, which is declared and has no adapter,
-plus Atlas Vector Search.
+That powers the public most-read rail. Category-based related articles remain
+the fail-soft fallback (`ListRelatedArticles` — same section, same locale).
+Go now owns semantic search, related reporting and reader-profile
+recommendations through `EmbeddingPort` and `SemanticRepository`; Voyage and
+Atlas types remain confined to their adapters.
 
 `Page<T>` is cursor-based, never offset — offset pagination on a growing news archive degrades.
 
@@ -103,6 +104,13 @@ export interface VectorSearchPort {
   similar(embedding: number[], limit: number): Promise<ArticleId[]>
 }
 ```
+
+The current Go contract separates embedding generation from durable indexing:
+`EmbeddingPort.Embed` receives provider-neutral document/query intent, while
+`SemanticRepository` queues approved revisions, tracks bounded retries,
+deactivates unpublished articles and retrieves ranked identities. The search
+use case reloads those identities from `ArticleRepository`, so an eventually
+consistent vector index cannot expose stale or unpublished content.
 
 ### Media, distribution, revenue
 

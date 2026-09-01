@@ -53,7 +53,8 @@ erDiagram
 
 | Collection | Purpose | Notable fields |
 |---|---|---|
-| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `hero`, approved `narration`, `seo`, `embedding[]`, `publishedAt`, `updatedAt` |
+| `articles` | one per locale | `familyId`, `locale`, `slug`, `status`, `hero`, approved `narration`, `seo`, `publishedAt`, `updatedAt` |
+| `article_semantic_documents` | one per published article | approved `revisionId`, retrieval text, locale, active state, retry metadata, model and `embedding[]` |
 | `article_revisions` | immutable history | `articleId`, `seq`, `body`, `authorId`, `createdAt` |
 | `narration_jobs` | private asynchronous article-to-audio work | `articleId`, exact `revisionId`, locale, voice, status, provider task id, ready `assetId`, failure reason and timestamps |
 | `categories` | hierarchy | `parentId`, `slugs{locale}`, `names{locale}`, `order` |
@@ -186,7 +187,13 @@ Atlas Search is a **second implementation of the same `SearchPort`** and one wir
 }
 ```
 
-Embeddings are written by `media-svc` on publish, not on save — drafts change too often to be worth embedding.
+The index is named `article_semantic_vector` on
+`article_semantic_documents`. Go queues the exact approved revision on publish,
+and a protected cron writes a manual Voyage `voyage-4` document embedding.
+Reader queries use the matching query input type. Search results are reloaded
+from `articles` and checked for public visibility before delivery, so an
+unpublished article cannot leak from a stale vector document. Drafts are never
+embedded; lexical search and category siblings remain fail-soft fallbacks.
 
 ---
 

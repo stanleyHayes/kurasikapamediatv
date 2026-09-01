@@ -38,6 +38,7 @@ type Deps struct {
 	Clock      ports.Clock
 	IDs        ports.IDs
 	Events     ports.EventBus
+	Semantic   ports.SemanticRepository
 }
 
 // CreateDraftInput is a request to start a new article.

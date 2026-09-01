@@ -32,6 +32,7 @@ var (
 	ErrInvalidPaymentWebhook  = errors.New("invalid payment webhook")
 	ErrNarrationNotConfigured = errors.New("article narration is not configured")
 	ErrRecordingNotConfigured = errors.New("recording promotion is not configured")
+	ErrSemanticNotConfigured  = errors.New("semantic discovery is not configured")
 )
 
 // Clock supplies the current time.

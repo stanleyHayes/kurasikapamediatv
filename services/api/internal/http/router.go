@@ -47,6 +47,10 @@ type Deps struct {
 	ListPublishedArticles       appeditorial.ListPublishedArticles
 	BrowseCategory              appeditorial.BrowseCategory
 	ListSections                appeditorial.ListSections
+	ProcessSemanticIndex        appeditorial.ProcessSemanticIndex
+	QueueSemanticInventory      appeditorial.QueueSemanticInventory
+	SemanticSearch              appeditorial.SemanticSearch
+	SemanticRelated             appeditorial.SemanticRelated
 	UpsertStaffProfile          appidentity.UpsertStaffProfile
 	PublishStaffProfile         appidentity.PublishStaffProfile
 	ListStaffProfiles           appidentity.ListStaffProfiles
@@ -142,11 +146,14 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("POST /internal/publish-due", deps.handlePublishDue)
 	mux.HandleFunc("POST /internal/process-narrations", deps.handleProcessNarrations)
 	mux.HandleFunc("POST /internal/process-recordings", deps.handleProcessRecordings)
+	mux.HandleFunc("POST /internal/process-semantic-index", deps.handleProcessSemanticIndex)
 	mux.HandleFunc("POST /webhooks/ivs/recordings", deps.handleIVSRecording)
 	mux.HandleFunc("GET /public/{locale}/articles/{slug}", deps.handleGetPublished)
 	mux.HandleFunc("GET /public/{locale}/articles", deps.handleListPublished)
 	mux.HandleFunc("GET /public/{locale}/sections/{slug}", deps.handleBrowseCategory)
 	mux.HandleFunc("GET /public/{locale}/sections", deps.handleListSections)
+	mux.HandleFunc("GET /public/{locale}/search", deps.handleSemanticSearch)
+	mux.HandleFunc("GET /public/{locale}/articles/{id}/related", deps.handleSemanticRelated)
 	mux.HandleFunc("PUT /staff/profiles/{userId}", deps.handleUpsertStaffProfile)
 	mux.HandleFunc("POST /staff/profiles/{id}/publish", deps.handlePublishStaffProfile)
 	mux.HandleFunc("GET /public/{locale}/team", deps.handleListStaffProfiles)

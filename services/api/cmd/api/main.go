@@ -20,6 +20,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 
 	adaptercloudinary "github.com/kurasikapa/api/internal/adapter/cloudinary"
+	adapterembedding "github.com/kurasikapa/api/internal/adapter/embedding"
 	adaptermongo "github.com/kurasikapa/api/internal/adapter/mongo"
 	adapternarration "github.com/kurasikapa/api/internal/adapter/narration"
 	adapterpayments "github.com/kurasikapa/api/internal/adapter/payments"
@@ -82,6 +83,7 @@ func run(log *slog.Logger) error {
 	episodes := adaptermongo.NewEpisodeRepository(db)
 	galleries := adaptermongo.NewGalleryRepository(db)
 	events := adaptermongo.NewEventRepository(db)
+	semantic := adaptermongo.NewSemanticRepository(db)
 	plans := adaptermongo.NewMembershipPlanRepository(db)
 	subscriptions := adaptermongo.NewSubscriptionRepository(db)
 	donations := adaptermongo.NewDonationRepository(db)
@@ -94,6 +96,7 @@ func run(log *slog.Logger) error {
 	affiliateLinks := adaptermongo.NewAffiliateLinkRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
 	videoDelivery := adaptercloudinary.NewDelivery()
+	embeddings := adapterembedding.NewVoyage(http.DefaultClient, cfg.VoyageAPIKey, cfg.VoyageModel, cfg.VoyageDimensions)
 	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
 	paymentWebhooks := adapterpayments.NewWebhookVerifier(cfg.PaystackSecretKey, cfg.StripeWebhookSecret)
 	var narrationProvider ports.NarrationProvider = adapternarration.Unavailable{}
@@ -173,6 +176,9 @@ func run(log *slog.Logger) error {
 	if err := events.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := semantic.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 	if err := plans.EnsureIndexes(ctx); err != nil {
 		return err
 	}
@@ -212,6 +218,7 @@ func run(log *slog.Logger) error {
 		Clock:      clock,
 		IDs:        uuidIDs{},
 		Events:     loggingBus{log: log},
+		Semantic:   semantic,
 	}
 	mediaDeps := appmedia.Deps{
 		Presenters: presenters, Programmes: programmes, Schedule: schedule,
@@ -253,6 +260,10 @@ func run(log *slog.Logger) error {
 		ListPublishedArticles:       appeditorial.NewListPublishedArticles(deps),
 		BrowseCategory:              appeditorial.NewBrowseCategory(deps),
 		ListSections:                appeditorial.NewListSections(deps),
+		ProcessSemanticIndex:        appeditorial.NewProcessSemanticIndex(semantic, embeddings, cfg.VoyageModel),
+		QueueSemanticInventory:      appeditorial.NewQueueSemanticInventory(deps),
+		SemanticSearch:              appeditorial.NewSemanticSearch(deps, embeddings, semantic),
+		SemanticRelated:             appeditorial.NewSemanticRelated(deps, semantic),
 		UpsertStaffProfile:          appidentity.NewUpsertStaffProfile(staffDeps),
 		PublishStaffProfile:         appidentity.NewPublishStaffProfile(staffDeps),
 		ListStaffProfiles:           appidentity.NewListStaffProfiles(staffDeps),

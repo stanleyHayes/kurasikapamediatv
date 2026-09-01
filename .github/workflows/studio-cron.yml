@@ -42,6 +42,13 @@ jobs:
           --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
           "$STUDIO_ORIGIN/studio/api/cron/process-recordings"
 
+      - name: Refresh semantic discovery index
+        run: >-
+          curl --fail-with-body --silent --show-error --retry 3
+          --request POST
+          --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          "$STUDIO_ORIGIN/studio/api/cron/process-semantic-index"
+
       - name: Publish due social posts
         if: vars.ENABLE_SOCIAL_CRON == 'true'
         run: >-

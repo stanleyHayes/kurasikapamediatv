@@ -35,6 +35,7 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
 | Cloudflare | Turnstile site key and secret | Production CAPTCHA |
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
+| Voyage AI / MongoDB Atlas | `VOYAGE_API_KEY` plus a READY 1,024-dimension `article_semantic_vector` index | Semantic search and related reporting; lexical/category fallbacks remain live |
 | SonarCloud | organization token, if private analysis is wanted | Hosted code-quality reporting only |
 
 The previously stored Atlas, authentication, revalidation, cron, Anthropic and
@@ -50,7 +51,7 @@ uploaded as blank production variables.
 
 - A company-owned email address and password-manager vault.
 - Owner/admin access to GitHub, both Vercel projects, Render, MongoDB Atlas,
-  Cloudinary, AWS, Resend, Cloudflare, Google, Meta, Paystack and Stripe.
+  Cloudinary, AWS, Resend, Cloudflare, Google, Meta, Paystack, Stripe and Voyage.
 - A billing card and billing contact for every paid provider.
 - The final public domain. Until its DNS resolves, the public host is
   `kurasikapa-web.vercel.app` and Studio is
@@ -131,7 +132,7 @@ a ticket, source control or a screen recording.
 |---|---|---|
 | Vercel Web | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Web `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `CONTACT_TO_EMAIL`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Google/Facebook/Apple OAuth, Resend, Turnstile, GA4 |
 | Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` and recording configuration; Meta Page token/IDs |
-| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` credentials |
+| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`; Voyage key/model/dimensions after the Atlas vector index is READY |
 | GitHub Actions | `CRON_SECRET` | `ENABLE_SOCIAL_CRON=true` only after Meta approval |
 
 For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
@@ -150,13 +151,14 @@ For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
 | Cloudinary | $99 | $249 | Plus vs Advanced media plan |
 | Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
 | Anthropic | $50 | $300 | Editorial-assistance spending cap; usage based |
+| Voyage embeddings | $5 | $40 | Multilingual semantic indexing and reader queries; usage based with a conservative launch allowance |
 | AWS IVS/live + MediaConvert + narration | $250 | $2,000 | Live is driven by viewer-hours; each replay adds MediaConvert output minutes and temporary S3 |
 | Domain and DNS | $2 | $10 | Annual domain renewal amortised monthly; DNS hosting can remain free |
 | Monitoring and incident alerts | $23 | $140 | Launch logging/uptime allowance vs expanded retention, alerting and paging |
 | OAuth, Turnstile, GA4, Search Console | $0 | $0 | Standard launch usage; provider limits and terms still apply |
 | GitHub Actions and SonarCloud | $0 | $0 | Existing CI allowance and optional free analysis; paid team/analysis plans are outside this estimate |
-| Contingency | $110 | $526 | About 20% for bandwidth, backups, tax and usage variance |
-| **Estimated total** | **$657/month** | **$4,029/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
+| Contingency | $111 | $709 | About 20% for bandwidth, backups, tax and usage variance |
+| **Estimated total** | **$663/month** | **$4,252/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
 
 These figures were rechecked against official price pages on 1 September 2026.
 The high Atlas figure uses the published M30 base rate of $0.54/hour (about
@@ -168,6 +170,9 @@ delivery region. Set an AWS Budget alert before the first public broadcast.
 Polly narration is billed per synthesized character and S3 holds only temporary
 private output before Cloudinary promotion; set a lifecycle rule even though a
 successful promotion deletes its staging object immediately.
+Voyage currently includes the first 200 million `voyage-4` tokens per account;
+the planning allowance covers later usage at $0.06 per million tokens and
+provider-policy changes rather than assuming the launch remains free forever.
 
 Paystack is not included in the fixed total. Ghana pricing is 1.95% per local
 or international transaction, with no integration or maintenance fee; transfers
@@ -185,6 +190,7 @@ but the applicable rate and eligibility depend on the legal account country.
 - [Amazon IVS pricing](https://aws.amazon.com/ivs/pricing/)
 - [Amazon Polly pricing](https://aws.amazon.com/polly/pricing/)
 - [Anthropic API pricing](https://platform.claude.com/docs/en/about-claude/pricing)
+- [Voyage AI pricing](https://docs.voyageai.com/docs/pricing)
 - [Paystack Ghana pricing](https://paystack.com/gh/pricing)
 - [Stripe pricing](https://stripe.com/pricing)
 

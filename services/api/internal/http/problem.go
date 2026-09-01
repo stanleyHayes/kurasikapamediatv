@@ -70,6 +70,9 @@ func problemFor(err error) Problem {
 	case errors.Is(err, ports.ErrRecordingNotConfigured):
 		return Problem{Type: "recording_unavailable", Title: "Recording promotion is not configured", Status: http.StatusServiceUnavailable}
 
+	case errors.Is(err, ports.ErrSemanticNotConfigured):
+		return Problem{Type: "semantic_unavailable", Title: "Semantic discovery is not configured", Status: http.StatusServiceUnavailable}
+
 	case errors.Is(err, editorial.ErrNotOwnArticle):
 		return Problem{
 			Type:   "not_own_article",

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // config is the process's environment, validated once at boot.
@@ -29,6 +30,9 @@ type config struct {
 	PaystackSecretKey    string
 	StripeSecretKey      string
 	StripeWebhookSecret  string
+	VoyageAPIKey         string
+	VoyageModel          string
+	VoyageDimensions     int
 }
 
 var errMissingEnv = errors.New("missing required environment")
@@ -53,16 +57,30 @@ func loadConfig() (config, error) {
 		PaystackSecretKey:    os.Getenv("PAYSTACK_SECRET_KEY"),
 		StripeSecretKey:      os.Getenv("STRIPE_SECRET_KEY"),
 		StripeWebhookSecret:  os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		VoyageAPIKey:         os.Getenv("VOYAGE_API_KEY"),
+		VoyageModel:          envOr("VOYAGE_MODEL", "voyage-4"),
+		VoyageDimensions:     1024,
 	}
 
 	if cfg.MongoURI == "" {
 		return config{}, fmt.Errorf("%w: MONGODB_URI", errMissingEnv)
+	}
+	if raw := os.Getenv("VOYAGE_DIMENSIONS"); raw != "" {
+		dimensions, err := strconv.Atoi(raw)
+		if err != nil || !supportedDimensions(dimensions) {
+			return config{}, fmt.Errorf("invalid VOYAGE_DIMENSIONS: %q", raw)
+		}
+		cfg.VoyageDimensions = dimensions
 	}
 
 	// CRON_SECRET is deliberately NOT required. Absent, the scheduled endpoint
 	// refuses every request — which is the safe state. Requiring it would stop
 	// the service booting for a developer who has no reason to run the cron.
 	return cfg, nil
+}
+
+func supportedDimensions(value int) bool {
+	return value == 256 || value == 512 || value == 1024 || value == 2048
 }
 
 func envOr(name, fallback string) string {

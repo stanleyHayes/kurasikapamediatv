@@ -201,6 +201,9 @@ func (uc UnpublishArticle) Execute(ctx context.Context, in UnpublishInput) (Tran
 	if err := uc.deps.Articles.Save(ctx, next); err != nil {
 		return TransitionResult{}, fmt.Errorf("saving: %w", err)
 	}
+	if uc.deps.Semantic != nil {
+		_ = uc.deps.Semantic.Deactivate(ctx, next.ID())
+	}
 
 	announce(ctx, uc.deps, "article.unpublished", next, map[string]string{"reason": in.Reason})
 

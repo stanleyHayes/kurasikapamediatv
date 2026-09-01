@@ -47,6 +47,7 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 | CMS writes, publish, schedule, transitions | `services/api` | Authorisation lives in the domain |
 | Social fan-out, scheduled publishing | `services/api` | Retryable queue work, not request-scoped |
 | RSS ingest, sitemap generation, digests | `services/api` | Cron-driven |
+| Semantic indexing, search and recommendations | `services/api` | Voyage embeddings and Atlas Vector Search stay behind application ports; public reads fail soft to lexical/category results |
 | Live TV, VOD, transcode orchestration | `services/api` | Long-lived, Amazon IVS + Cloudinary (R3) |
 | Article narration jobs | `services/api` | Async Polly/S3 generation, editor approval, Cloudinary delivery |
 | Events and summits | `services/api` | Publish windows, imagery, registration and upcoming-event projection stay provider-neutral |
@@ -69,6 +70,14 @@ idempotency record before MediaConvert packages the discovered private HLS as
 MP4. A cron poll promotes completed output from an allowlisted private S3
 bucket into Cloudinary, persists a ready video asset, then removes only the
 temporary MP4. The original IVS capture remains under its recovery lifecycle.
+
+Semantic indexing follows the same asynchronous boundary. Publishing queues
+the exact approved revision in `article_semantic_documents`; the protected
+Studio schedule embeds pending documents through Voyage and stores their
+vectors. Public semantic hits are never trusted as visibility records: Go
+reloads each article aggregate and rechecks its locale and published state
+before returning it. Search falls back to lexical Atlas Search, while related
+and reader-profile recommendations fall back to same-section reporting.
 
 ---
 

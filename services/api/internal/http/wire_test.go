@@ -20,6 +20,12 @@ import (
 )
 
 func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) kurahttp.Deps {
+	semantic, ok := app.Semantic.(*faketesting.SemanticStore)
+	if !ok {
+		semantic = faketesting.NewSemanticStore()
+		app.Semantic = semantic
+	}
+	embeddings := &faketesting.EmbeddingFake{Vector: []float32{0.1, 0.2}}
 	mediaDeps := appmedia.Deps{
 		Presenters: faketesting.NewPresenterStore(), Programmes: faketesting.NewProgrammeStore(),
 		Schedule: faketesting.NewScheduleStore(), Clock: faketesting.FixedClock{At: now},
@@ -74,6 +80,10 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ListPublishedArticles:       appeditorial.NewListPublishedArticles(app),
 		BrowseCategory:              appeditorial.NewBrowseCategory(app),
 		ListSections:                appeditorial.NewListSections(app),
+		ProcessSemanticIndex:        appeditorial.NewProcessSemanticIndex(semantic, embeddings, "voyage-4"),
+		QueueSemanticInventory:      appeditorial.NewQueueSemanticInventory(app),
+		SemanticSearch:              appeditorial.NewSemanticSearch(app, embeddings, semantic),
+		SemanticRelated:             appeditorial.NewSemanticRelated(app, semantic),
 		UpsertStaffProfile:          appidentity.NewUpsertStaffProfile(staffDeps),
 		PublishStaffProfile:         appidentity.NewPublishStaffProfile(staffDeps),
 		ListStaffProfiles:           appidentity.NewListStaffProfiles(staffDeps),
