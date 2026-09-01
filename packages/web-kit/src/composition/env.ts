@@ -101,6 +101,15 @@ const schema = z.object({
 	AWS_SECRET_ACCESS_KEY: optionalCredential,
 	AWS_IVS_RECORDING_CONFIGURATION_ARN: optionalCredential,
 
+  LIVE_VIDEO_PROVIDER: z.enum(['ovenmedia', 'ivs', 'disabled']).default('ovenmedia'),
+  OVENMEDIA_API_URL: z.url().optional(),
+  OVENMEDIA_API_TOKEN: optionalCredential,
+  OVENMEDIA_INGEST_URL: z.url().optional(),
+  OVENMEDIA_PLAYBACK_URL: z.url().optional(),
+  OVENMEDIA_SIGNING_SECRET: z.string().min(32).optional(),
+  OVENMEDIA_KEY_LIFETIME_SECONDS: z.coerce.number().int().positive().default(900),
+  OVENMEDIA_MAX_BROADCAST_SECONDS: z.coerce.number().int().positive().default(14_400),
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 }).superRefine((value, context) => {
   const hasAccess = value.AWS_ACCESS_KEY_ID !== undefined

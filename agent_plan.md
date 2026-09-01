@@ -1915,3 +1915,48 @@ are live. Custom-domain DNS remains an external registrar action.**
   Source CI run `33495714417` is fully green across Lighthouse, Go, secret
   scanning and the combined build, coverage, browser/WCAG, duplication and
   dependency quality gates.
+
+## 46. KUR-108 — self-hosted live origin (2026-09-01)
+
+**Status: IMPLEMENTED AND LOCALLY VERIFIED — host, DNS and Bunny activation required.**
+
+- Accepted OvenMediaEngine as the owned live origin in ADR-0017. Amazon IVS is
+  retained as an explicit managed fallback; the custom-Pion proposal is
+  superseded because it did not solve RTMP, transcoding, LL-HLS or recording.
+- Added `adapter-ovenmedia`. It returns a time-limited native SignedPolicy RTMP
+  key once, publishes a credential-free Bunny/LL-HLS URL and fails closed unless
+  it can reserve a recording before OBS connects. Teardown idempotently stops
+  recording and removes the stream.
+- `LIVE_VIDEO_PROVIDER` defaults to `ovenmedia`; `ivs` and `disabled` remain
+  selectable at the composition root. Strict environment filtering, both Next
+  deployables and the example environment know the new configuration.
+- Added pinned OvenMediaEngine v0.20.5 plus Caddy deployment assets with a
+  720p/480p/360p H.264/AAC ladder, duplicate-stream protection, restricted CORS,
+  durable MP4/XML recording and private REST API.
+- Six adapter tests pass at 94.4% statement, 83.9% branch and 100% line
+  coverage. Compose and XML validation pass. A real ARM64 container booted all
+  modules; authenticated start/stop recording calls both returned HTTP 200.
+  Disposable containers and empty test volumes were removed afterward.
+- Production activation awaits a streaming host, origin DNS and Bunny Pull
+  Zone. The private REST reachability requirement is explicit; port 8081 must
+  not be made public just so Vercel can reach it. See
+  `docs/operations/ovenmedia-live.md`.
+
+## 47. KUR-109 — reader registration and provider activation (2026-09-01)
+
+**Status: IMPLEMENTED AND VERIFIED — Web production redeploy quota-blocked.**
+
+- Public Create account now stays on the reader site, returns successful
+  registration to `/sign-in?registered=1` and signs readers into `/profile`.
+  It no longer sends anonymous readers to the independently deployed Studio.
+- Registration uses the shared pending button: it disables immediately, shows
+  animated dots and prevents repeat submissions. A browser regression proves
+  the public link, pending state and successful destination.
+- Cloudinary credentials are active on Render and authenticated successfully.
+  Resend is active on both Vercel projects; a real message sent successfully
+  through the temporary `Kurasikapa Media <onboarding@resend.dev>` sender while
+  the branded domain awaits verification.
+- Studio deployed successfully with the provider variables. Web cannot promote
+  this source change until Vercel's daily free-deployment quota resets; the
+  existing production deployment therefore still has the old registration
+  route until the next successful Web deployment.

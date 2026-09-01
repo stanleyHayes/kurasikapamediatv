@@ -1,5 +1,7 @@
 import { AnthropicAiAdapter, anthropicModels } from '@kurasikapa/adapter-anthropic'
 import { failClosedIvs, IvsLiveVideo, ivsChannels } from '@kurasikapa/adapter-ivs'
+import { OvenMediaLiveVideo } from '@kurasikapa/adapter-ovenmedia'
+import type { LiveVideoPort } from '@kurasikapa/application'
 import { MongoAuditLog } from '@kurasikapa/adapter-mongo'
 import { InProcessEventBus, cryptoIds, systemClock } from './ambient'
 import { buildContainer, type Container } from './build-container'
@@ -50,7 +52,21 @@ export function container(): Container {
   return instance
 }
 
-function liveVideo(config: ReturnType<typeof env>): IvsLiveVideo {
+export function liveVideo(config: ReturnType<typeof env>): LiveVideoPort {
+  if (config.LIVE_VIDEO_PROVIDER === 'ovenmedia') {
+    return new OvenMediaLiveVideo({
+      apiUrl: config.OVENMEDIA_API_URL,
+      apiToken: config.OVENMEDIA_API_TOKEN,
+      ingestUrl: config.OVENMEDIA_INGEST_URL,
+      playbackUrl: config.OVENMEDIA_PLAYBACK_URL,
+      signingSecret: config.OVENMEDIA_SIGNING_SECRET,
+      keyLifetimeSeconds: config.OVENMEDIA_KEY_LIFETIME_SECONDS,
+      maxBroadcastSeconds: config.OVENMEDIA_MAX_BROADCAST_SECONDS,
+      now: () => systemClock.now(),
+      nextId: () => cryptoIds.next(),
+    })
+  }
+  if (config.LIVE_VIDEO_PROVIDER === 'disabled') return failClosedIvs()
   if (config.AWS_ACCESS_KEY_ID === undefined || config.AWS_SECRET_ACCESS_KEY === undefined) {
     return failClosedIvs()
   }

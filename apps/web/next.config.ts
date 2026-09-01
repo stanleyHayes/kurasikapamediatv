@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
     '@kurasikapa/adapter-push',
     '@kurasikapa/adapter-rss',
     '@kurasikapa/adapter-ivs',
+    '@kurasikapa/adapter-ovenmedia',
   ],
 
   typedRoutes: true,

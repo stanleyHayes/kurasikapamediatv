@@ -170,6 +170,11 @@ and refuses future, cancelled, prerecorded or already-completed slots. The
 public `ListTelevisionGuide` resolves completed replay assets through
 `VideoDeliveryPort`; provider transformation syntax stays in the adapter.
 
+`LiveVideoPort` selects OvenMediaEngine, IVS or a fail-closed disabled adapter
+at the composition root. The self-hosted adapter creates SignedPolicy RTMP
+credentials, reserves recording and exposes only a public LL-HLS URL; provider
+secrets and recording task ids never enter public projections.
+
 `RecordingPromotionPort` starts and polls IVS HLS-to-MP4 packaging without
 leaking EventBridge, S3, MediaConvert or Cloudinary SDK types. A unique
 `RecordingImportRepository` source reference absorbs provider retries and

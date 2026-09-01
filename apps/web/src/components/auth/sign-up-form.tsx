@@ -6,6 +6,7 @@ import { register } from '../../lib/auth-client'
 import { AuthField } from './auth-field'
 import { SocialButtons } from './social-buttons'
 import { TurnstileField } from './turnstile-field'
+import { FormSubmitButton } from '@kurasikapa/ui/form-submit-button'
 
 export interface SignUpFormProps {
   /**
@@ -14,7 +15,7 @@ export interface SignUpFormProps {
    * Same literal union as the sign-in form, for the same reason: a destination
    * taken from a query string would turn this form into an open redirect.
    */
-  readonly redirectTo: '/studio'
+  readonly redirectTo: '/sign-in'
   /** Absolute path for the OAuth round trip, which leaves the app. */
   readonly callbackURL: string
   readonly providers: readonly ('google' | 'facebook' | 'apple')[]
@@ -25,8 +26,9 @@ const FAILED = 'We could not create that account. The email may already be regis
 
 /**
  * Reader self-registration. Mirrors the sign-in form: React 19 form action,
- * no controlled field state, and the same post-success destination — a fresh
- * account is signed in by Better Auth, so it lands where sign-in lands.
+ * no controlled field state. Registration deliberately does not create a
+ * session, so an accepted request returns to sign-in instead of sending an
+ * anonymous reader to a protected page.
  *
  * `minLength` matches Better Auth's default minimum password length, so the
  * browser refuses early instead of round-tripping a guaranteed 400.
@@ -42,7 +44,7 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
       setError(FAILED)
       return
     }
-    window.location.assign(`/${locale}${props.redirectTo}`)
+    window.location.assign(`/${locale}${props.redirectTo}?registered=1`)
   }
 
   return (
@@ -67,12 +69,12 @@ export function SignUpForm(props: SignUpFormProps): React.ReactElement {
             {error}
           </p>
         )}
-        <button
-          type="submit"
-          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-colors"
+        <FormSubmitButton
+          pendingLabel="Creating account"
+          className="bg-primary text-on-primary hover:bg-on-primary-container mt-2 h-13 w-full px-5 text-sm font-bold transition-[background-color,opacity,transform] active:translate-y-px disabled:cursor-wait disabled:opacity-65"
         >
           Create account
-        </button>
+        </FormSubmitButton>
       </form>
       <SocialButtons providers={props.providers} callbackURL={props.callbackURL} />
     </div>

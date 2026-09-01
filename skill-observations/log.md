@@ -533,3 +533,18 @@ isolated data fixture that proves both the write and cleanup commands.
 
 **Principle:** An executable script is verified by its runtime entrypoint, not
 only by the compiler that understands its source.
+
+### Observation 35: Boot infrastructure configuration with the pinned runtime
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Replacing a managed live-video provider with a self-hosted media origin and checked-in XML configuration.
+**Skill:** New skill candidate: self-hosted-media-release
+**Type:** open-source
+**Phase/Area:** Infrastructure verification
+
+**Issue:** XML and Compose validation both passed while the pinned media server rejected two logger-schema details and entered a restart loop. Static syntax checks could not prove the runtime-specific configuration vocabulary.
+
+**Suggested improvement:** Boot the exact pinned container image, assert its stable initialized state, exercise at least one authenticated control-plane lifecycle and remove the disposable resources before treating infrastructure configuration as verified.
+
+**Principle:** Provider configuration is verified by the pinned runtime accepting and exercising it, not by syntax alone.

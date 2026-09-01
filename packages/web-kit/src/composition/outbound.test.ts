@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { DeviceSubscription } from '@kurasikapa/domain'
-import { failClosedEmail, failClosedPush, newsroomAddress } from './outbound'
+import { emailFromAddress, failClosedEmail, failClosedPush, newsroomAddress } from './outbound'
 
 describe('outbound adapters', () => {
   afterEach(() => {
     delete process.env['CONTACT_TO_EMAIL']
+    delete process.env['EMAIL_FROM']
   })
 
   it('refuses mail when Resend is unset', async () => {
@@ -20,6 +21,12 @@ describe('outbound adapters', () => {
   it('honours CONTACT_TO_EMAIL when set', () => {
     process.env['CONTACT_TO_EMAIL'] = 'desk@example.com'
     expect(newsroomAddress()).toBe('desk@example.com')
+  })
+
+  it('uses a verified EMAIL_FROM override when supplied', () => {
+    expect(emailFromAddress()).toBe('Kurasikapa Media <news@kurasikapa.tv>')
+    process.env['EMAIL_FROM'] = 'Kurasikapa News <desk@example.com>'
+    expect(emailFromAddress()).toBe('Kurasikapa News <desk@example.com>')
   })
 
   it('refuses push when VAPID keys are unset', async () => {

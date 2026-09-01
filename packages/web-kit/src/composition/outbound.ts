@@ -30,7 +30,7 @@ export function failClosedSocial(): MetaSocialPublisher {
 export function resendMailer(): ResendMailer {
   return new ResendMailer({
     apiKey: present(process.env['RESEND_API_KEY']),
-    from: 'Kurasikapa Media <news@kurasikapa.tv>',
+    from: emailFromAddress(),
     post: globalThis.fetch.bind(globalThis),
   })
 }
@@ -38,7 +38,7 @@ export function resendMailer(): ResendMailer {
 export function failClosedEmail(): ResendMailer {
   return new ResendMailer({
     apiKey: undefined,
-    from: 'Kurasikapa Media <news@kurasikapa.tv>',
+    from: emailFromAddress(),
     post: globalThis.fetch.bind(globalThis),
   })
 }
@@ -68,6 +68,11 @@ export function vapidPublicKey(): string | undefined {
 /** Newsroom inbox for the contact form. Override via CONTACT_TO_EMAIL. */
 export function newsroomAddress(): string {
   return present(process.env['CONTACT_TO_EMAIL']) ?? 'kurasikapamediatv@yahoo.com'
+}
+
+/** Verified Resend sender identity. The legacy brand address remains the default. */
+export function emailFromAddress(): string {
+  return present(process.env['EMAIL_FROM']) ?? 'Kurasikapa Media <news@kurasikapa.tv>'
 }
 
 export function rssFetcher(): RssFetcher {

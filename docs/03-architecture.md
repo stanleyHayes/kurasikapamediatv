@@ -49,13 +49,15 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 | Social fan-out, scheduled publishing | `services/api` | Retryable queue work, not request-scoped |
 | RSS ingest, sitemap generation, digests | `services/api` | Cron-driven |
 | Semantic indexing, search and recommendations | `services/api` | Voyage embeddings and Atlas Vector Search stay behind application ports; public reads fail soft to lexical/category results |
-| Live TV, VOD, transcode orchestration | `services/api` | Long-lived, Amazon IVS + Cloudinary (R3) |
+| Live TV, VOD, transcode orchestration | `services/api` + `deploy/ovenmedia` | Go owns schedules/replays; OvenMediaEngine owns live media; Bunny delivers LL-HLS; Cloudinary owns VOD |
 | Article narration jobs | `services/api` | Async Polly/S3 generation, editor approval, Cloudinary delivery |
 | Events and summits | `services/api` | Publish windows, imagery, registration and upcoming-event projection stay provider-neutral |
 
-Live channels are provisioned only when an Amazon IVS recording configuration
-is present, so every broadcast is captured to the station's private S3
-destination. Provisioning also requires an operator-confirmed in-band caption
+Live channels use self-hosted OvenMediaEngine by default; Amazon IVS remains an
+explicit managed fallback. OvenMediaEngine receives a time-limited SignedPolicy
+RTMP credential, reserves a local MP4 recording before returning that credential
+and serves a three-rendition LL-HLS playlist through the configured CDN hostname.
+Provisioning also requires an operator-confirmed in-band caption
 source. That readiness mode is stored and projected publicly; the HLS player
 enables its CC control only when the delivered manifest exposes a real caption
 or subtitle track. Legacy broadcasts remain explicitly `unverified` rather
@@ -65,7 +67,8 @@ slots awaiting a replay and requires a ready Cloudinary video plus ready WebVTT
 captions before completing the slot. Public guide reads then project the video
 through `VideoDeliveryPort` into adaptive HLS, poster and caption URLs.
 
-Recording promotion is asynchronous and Go-owned. EventBridge sends a signed
+The existing IVS recording promotion remains available to fallback broadcasts.
+For those broadcasts, EventBridge sends a signed
 IVS `Recording End` event to the API; the application stores a source-session
 idempotency record before MediaConvert packages the discovered private HLS as
 MP4. A cron poll promotes completed output from an allowlisted private S3

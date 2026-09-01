@@ -33,9 +33,10 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Google Cloud | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google sign-in |
 | Meta | Facebook OAuth pair plus Page token, Page ID and Instagram user ID; keep the app ID/secret in Meta's dashboard | Facebook/Instagram sign-in and publishing |
 | Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
-| Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
-| Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
-| AWS | IVS IAM pair/configuration/source bucket, EventBridge secret, MediaConvert role/template/output bucket; separate Polly/S3 IAM pair | Live transmission, recorded-live promotion and article narration |
+| Resend | Verified sending-domain DNS; the API key is configured and `onboarding@resend.dev` is the temporary sender | Branded sender only; transactional delivery is active |
+| Cloudinary | No credential gap; production credentials are configured and authenticated | Licensed client media inventory only |
+| Live origin / Bunny | Linux host, origin DNS, Bunny Pull Zone and CDN hostname, plus generated OME API/signing secrets | Self-hosted live transmission |
+| AWS | Separate Polly/S3 IAM pair for narration; IVS credentials are optional fallback only | Article narration and optional managed live fallback |
 | Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
 | Cloudflare | Turnstile site key and secret | Production CAPTCHA |
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
@@ -68,11 +69,12 @@ uploaded as blank production variables.
 - MongoDB Atlas production cluster, database user and IP/network policy.
 - Render API service URL after `/healthz` passes.
 - Cloudinary cloud name, API key and secret.
-- AWS account, least-privilege IVS IAM user, approved IVS quotas, billing
-  alarms, private IVS recording bucket and
-  `AWS_IVS_RECORDING_CONFIGURATION_ARN`. Add the MediaConvert role/template and
-  private processing bucket, allowlist only that output bucket in Cloudinary,
-  and configure the EventBridge destination secret. Add a separate least-privilege Polly/S3 principal and private London
+- A Linux host with at least 8 modern CPU cores, 16 GB RAM, fast SSD storage and
+  adequate outbound transfer; point an origin hostname at it and deploy
+  `deploy/ovenmedia/compose.yaml`. Create a Bunny Pull Zone using the HTTPS
+  origin, attach the public live hostname and set the six `OVENMEDIA_*` values
+  on Studio. Keep ports 8081 and the recording volume private.
+- Add a separate least-privilege Polly/S3 principal and private London
   staging bucket with a short lifecycle policy for article narration. Never
   provide the AWS root credentials.
 - Resend API key plus a verified sending domain and DNS records. The application
@@ -135,8 +137,8 @@ a ticket, source control or a screen recording.
 | Target | Required production variables | Add when the provider is activated |
 |---|---|---|
 | Vercel Web | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Web `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `CONTACT_TO_EMAIL`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Google/Facebook/Apple OAuth, Resend, Turnstile, GA4 |
-| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` and recording configuration; Meta Page token/IDs |
-| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`; Voyage key/model/dimensions after the Atlas vector index is READY |
+| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `DEFAULT_LOCALE`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL`, `LIVE_VIDEO_PROVIDER=ovenmedia`, all `OVENMEDIA_*` values | Resend, Meta Page token/IDs; IVS values only for fallback |
+| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET`, Cloudinary credential trio | Stripe/Paystack; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`; Voyage key/model/dimensions after the Atlas vector index is READY |
 | GitHub Actions | `CRON_SECRET` | `ENABLE_SOCIAL_CRON=true` only after Meta approval |
 
 For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
@@ -159,13 +161,15 @@ came from a trusted Next server rather than an internet client.
 | Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
 | Anthropic | $50 | $300 | Editorial-assistance spending cap; usage based |
 | Voyage embeddings | $5 | $40 | Multilingual semantic indexing and reader queries; usage based with a conservative launch allowance |
-| AWS IVS/live + MediaConvert + narration | $250 | $2,000 | Live is driven by viewer-hours; each replay adds MediaConvert output minutes and temporary S3 |
+| OvenMediaEngine origin + standby | $125 | $320 | Self-hosted origin, durable recording storage, monitoring and optional standby before CDN traffic |
+| Bunny CDN live delivery | $25 | $1,080 | Usage-driven; roughly 417 GB vs 18 TB at the published Africa rate of $0.06/GB |
+| AWS narration + optional IVS fallback | $10 | $250 | Polly/S3 narration plus contingency for an exceptional managed broadcast |
 | Domain and DNS | $2 | $10 | Annual domain renewal amortised monthly; DNS hosting can remain free |
 | Monitoring and incident alerts | $23 | $140 | Launch logging/uptime allowance vs expanded retention, alerting and paging |
 | OAuth, Turnstile, GA4, Search Console | $0 | $0 | Standard launch usage; provider limits and terms still apply |
 | GitHub Actions and SonarCloud | $0 | $0 | Existing CI allowance and optional free analysis; paid team/analysis plans are outside this estimate |
-| Contingency | $140 | $796 | About 20% for bandwidth, backups, tax and usage variance |
-| **Estimated total** | **$838/month** | **$4,778/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
+| Contingency | $140 | $726 | About 20% for bandwidth, backups, tax and usage variance |
+| **Estimated total** | **$748/month** | **$4,358/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
 
 These figures were rechecked against official price pages on 1 September 2026.
 Render's current Pro workspace is $25/month and compute is additional: the
@@ -174,10 +178,10 @@ The Render line therefore includes both the workspace and continuously running
 compute; bandwidth and tax remain part of contingency.
 The high Atlas figure uses the published M30 base rate of $0.54/hour (about
 $394 over a 730-hour month). The mid figure uses M10 at $0.08/hour (about $58).
-Live cost is the least predictable line: AWS charges input and viewer output
-separately. Standard input is $2/hour; the first 10,000 HD viewer-hours in
-Europe are $0.072/hour, while Ghanaian viewers may be billed through another
-delivery region. Set an AWS Budget alert before the first public broadcast.
+Live cost is driven mainly by CDN bytes. At 2 Mbps, 100 viewers watching for two
+hours transfer about 180 GB; at Bunny's published $0.06/GB Africa rate that is
+about $10.80. One thousand viewers is about 1.8 TB or $108. These are planning
+calculations, not quotes, and exclude origin egress, tax and cache misses.
 Polly narration is billed per synthesized character and S3 holds only temporary
 private output before Cloudinary promotion; set a lifecycle rule even though a
 successful promotion deletes its staging object immediately.
@@ -198,7 +202,9 @@ but the applicable rate and eligibility depend on the legal account country.
 - [MongoDB Atlas pricing](https://www.mongodb.com/pricing)
 - [Cloudinary pricing](https://cloudinary.com/pricing)
 - [Resend pricing](https://resend.com/pricing)
-- [Amazon IVS pricing](https://aws.amazon.com/ivs/pricing/)
+- [OvenMediaEngine](https://github.com/OvenMediaLabs/OvenMediaEngine)
+- [Bunny pricing](https://bunny.net/pricing/)
+- [Amazon IVS pricing](https://aws.amazon.com/ivs/pricing/) — fallback only
 - [Amazon Polly pricing](https://aws.amazon.com/polly/pricing/)
 - [Anthropic API pricing](https://platform.claude.com/docs/en/about-claude/pricing)
 - [Voyage AI pricing](https://docs.voyageai.com/docs/pricing)

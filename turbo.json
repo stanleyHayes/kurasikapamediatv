@@ -23,7 +23,19 @@
         "REVALIDATE_SECRET",
         "CRON_SECRET",
         "API_URL",
-        "CONTACT_TO_EMAIL"
+        "CONTACT_TO_EMAIL",
+        "RESEND_API_KEY",
+        "EMAIL_FROM",
+        "ANTHROPIC_API_KEY",
+        "AWS_REGION",
+        "LIVE_VIDEO_PROVIDER",
+        "OVENMEDIA_API_URL",
+        "OVENMEDIA_API_TOKEN",
+        "OVENMEDIA_INGEST_URL",
+        "OVENMEDIA_PLAYBACK_URL",
+        "OVENMEDIA_SIGNING_SECRET",
+        "OVENMEDIA_KEY_LIFETIME_SECONDS",
+        "OVENMEDIA_MAX_BROADCAST_SECONDS"
       ]
     },
     // `Route` (typedRoutes) is a narrowed union only once Next has written

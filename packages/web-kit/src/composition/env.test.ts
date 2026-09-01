@@ -63,4 +63,16 @@ describe('env', () => {
       'http://localhost:8080',
     )
   })
+
+  it('selects self-hosted live video by default', () => {
+    const result = parse(valid)
+    expect(result.LIVE_VIDEO_PROVIDER).toBe('ovenmedia')
+    expect(result.OVENMEDIA_KEY_LIFETIME_SECONDS).toBe(900)
+    expect(result.OVENMEDIA_MAX_BROADCAST_SECONDS).toBe(14_400)
+  })
+
+  it('accepts an explicit IVS fallback and validates the signing secret', () => {
+    expect(parse({ ...valid, LIVE_VIDEO_PROVIDER: 'ivs' }).LIVE_VIDEO_PROVIDER).toBe('ivs')
+    expect(() => parse({ ...valid, OVENMEDIA_SIGNING_SECRET: 'short' })).toThrow(/OVENMEDIA_SIGNING_SECRET/u)
+  })
 })

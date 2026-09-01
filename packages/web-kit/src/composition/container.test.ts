@@ -1,10 +1,12 @@
 import { FakeAi, FakeLiveVideo } from '@kurasikapa/application/testing'
+import { IvsLiveVideo } from '@kurasikapa/adapter-ivs'
+import { OvenMediaLiveVideo } from '@kurasikapa/adapter-ovenmedia'
 import type { Db } from 'mongodb'
 import { afterEach, describe, expect, it } from 'vitest'
 import { InProcessEventBus } from './ambient'
 import { type Container, buildContainer } from './build-container'
-import { container, resetContainer } from './container'
-import { resetEnv } from './env'
+import { container, liveVideo, resetContainer } from './container'
+import { parse, resetEnv, type Env } from './env'
 import { closeMongo } from './mongo'
 
 // The driver does not connect on construction, so the real graph can be built
@@ -115,5 +117,34 @@ describe('container — the production graph', () => {
 
     expect(c.ai).not.toBeInstanceOf(FakeAi)
     expect(c.events).toBeInstanceOf(InProcessEventBus)
+  })
+})
+
+describe('liveVideo provider selection', () => {
+  const configured = (provider: 'ovenmedia' | 'ivs' | 'disabled'): Env => parse({
+    MONGODB_URI: 'mongodb://localhost:27017/x',
+    BETTER_AUTH_SECRET: 'x'.repeat(32),
+    LIVE_VIDEO_PROVIDER: provider,
+  })
+
+  it('uses the owned origin by default', () => {
+    expect(liveVideo(configured('ovenmedia'))).toBeInstanceOf(OvenMediaLiveVideo)
+  })
+
+  it('keeps IVS and disabled as compiled fail-closed paths', () => {
+    expect(liveVideo(configured('ivs'))).toBeInstanceOf(IvsLiveVideo)
+    expect(liveVideo(configured('disabled'))).toBeInstanceOf(IvsLiveVideo)
+  })
+
+  it('uses configured IVS as the managed fallback', () => {
+    const selected = liveVideo(parse({
+      MONGODB_URI: 'mongodb://localhost:27017/x',
+      BETTER_AUTH_SECRET: 'x'.repeat(32),
+      LIVE_VIDEO_PROVIDER: 'ivs',
+      AWS_REGION: 'eu-west-1',
+      AWS_ACCESS_KEY_ID: 'access',
+      AWS_SECRET_ACCESS_KEY: 'secret',
+    }))
+    expect(selected).toBeInstanceOf(IvsLiveVideo)
   })
 })

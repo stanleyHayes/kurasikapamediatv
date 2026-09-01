@@ -3,6 +3,8 @@ import { SignUpForm } from '@/components/auth/sign-up-form'
 import { AuthShell } from '@/components/auth/auth-shell'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
 import { socialProviders } from '@kurasikapa/web-kit/composition/auth-providers'
+import { env } from '@kurasikapa/web-kit/composition/env'
+import { siteUrl } from '@kurasikapa/web-kit/composition/origins'
 
 /**
  * Reader self-registration. Mirrors the sign-in page: the provider list is
@@ -24,8 +26,8 @@ export default async function SignUpPage({
       {/* Server-supplied destination. Taking it from a query string would turn
           this into an open redirect. */}
       <SignUpForm
-        redirectTo="/studio"
-        callbackURL={`/${locale}/studio`}
+        redirectTo="/sign-in"
+        callbackURL={`${siteUrl(env())}/${locale}/profile`}
         providers={configured}
         captchaSiteKey={process.env['NEXT_PUBLIC_TURNSTILE_SITE_KEY']}
       />

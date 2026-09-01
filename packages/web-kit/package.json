@@ -18,6 +18,7 @@
     "@kurasikapa/adapter-email": "workspace:*",
     "@kurasikapa/adapter-ivs": "workspace:*",
     "@kurasikapa/adapter-mongo": "workspace:*",
+    "@kurasikapa/adapter-ovenmedia": "workspace:*",
     "@kurasikapa/adapter-push": "workspace:*",
     "@kurasikapa/adapter-rss": "workspace:*",
     "@kurasikapa/adapter-social": "workspace:*",

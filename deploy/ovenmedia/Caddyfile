@@ -1,0 +1,9 @@
+{$LIVE_ORIGIN_DOMAIN} {
+  encode zstd gzip
+  reverse_proxy ovenmedia:3333
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options nosniff
+  }
+}
