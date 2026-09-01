@@ -497,3 +497,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Verify an isolated restored target read-only, emit credential-free evidence, require non-empty critical inventory, inspect named indexes and test application-level references before any cutover. Keep provider restoration and application acceptance as separate gates.
 
 **Principle:** Backup success says bytes exist; restore acceptance says the product can safely use them.
+
+### Observation 33: Key optimistic workflow state by entity identity
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Stabilising an editorial Server Action workflow without resetting an in-progress scheduling form during a server-component refresh.
+**Skill:** New skill candidate: server-action-e2e-reliability
+**Type:** open-source
+**Phase/Area:** Optimistic UI and streamed refresh
+
+**Issue:** Remounting workflow controls on every server status change kept local state synchronized but also destroyed adjacent user input during the refresh. Removing the key avoided resets but risked carrying optimistic status into a different entity during client navigation.
+
+**Suggested improvement:** Keep committed optimistic state local while the streamed refresh catches up, but key the stateful workflow boundary by stable entity identity rather than mutable server status. Preserve non-workflow display fields inside that boundary so the refactor does not silently remove context.
+
+**Principle:** Key stateful optimistic interfaces by what the state belongs to, not by each value the state can take.
