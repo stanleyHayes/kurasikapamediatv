@@ -1293,7 +1293,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 28. KUR-89 — automatic IVS recording promotion (2026-08-31)
 
-**Status: IMPLEMENTED; full release verification and provider activation remain.**
+**Status: DEPLOYED; provider activation remains.**
 
 - A signed, size-bounded EventBridge `Recording End` endpoint accepts only one
   IVS channel ARN, the configured private source bucket, a safe `ivs/v1/`
@@ -1314,10 +1314,23 @@ are live. Custom-domain DNS remains an external registrar action.**
 - The five-minute GitHub schedule now processes recording jobs through a
   cron-authenticated Studio BFF. Domain, application, provider, HTTP and real
   Mongo repository tests pass; the new provider adapter is at 85.0% coverage,
-  and `make verify` reports 95.4% domain and 90.2% application coverage.
+  and the final local `make verify` reports 97.1% domain and 90.8%
+  application/HTTP coverage.
 - Activation inputs are intentionally absent from `.env.production`:
   `AWS_IVS_REGION`, `AWS_IVS_RECORDING_BUCKET`,
   `AWS_MEDIACONVERT_OUTPUT_BUCKET`, `AWS_MEDIACONVERT_ROLE_ARN`,
   `AWS_MEDIACONVERT_JOB_TEMPLATE`, `IVS_RECORDING_WEBHOOK_SECRET` and the
   Cloudinary credential trio. The exact provider setup and recovery process is
   in [recording-promotion.md](docs/operations/recording-promotion.md).
+- Release evidence: implementation commits `2ba0f06` through `3b14d62`; CI
+  run `33452498383` passed on its clean rerun, including all 39
+  browser/accessibility journeys, full coverage, real-Mongo integration, Go
+  race/coverage/vulnerability gates, Lighthouse, duplication and dependency
+  audit. Render deploy `dep-dab17he7bikc73flfu2g` is live from exact commit
+  `3b14d62`. Studio deployment `dpl_H8M31jpyNciBdYAgqnhwQndwGuEG` is Ready
+  and attached to `kurasikapa-studio.vercel.app`; its sign-in returns 200 and
+  its unauthenticated recording cron returns 404. The public Vercel alias
+  returns 200 for Home, Live and OG image. API health returns 200, while both
+  unauthenticated recording POST endpoints correctly return 404. The planned
+  custom host `kurasikapa.tv` did not resolve during this smoke, so the Vercel
+  alias remains the verified public endpoint until DNS is supplied.
