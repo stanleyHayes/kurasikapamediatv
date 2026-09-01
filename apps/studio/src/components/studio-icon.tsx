@@ -1,4 +1,4 @@
-export type StudioIconName = 'desk' | 'review' | 'social' | 'rss' | 'comments' | 'people' | 'audit' | 'live' | 'search' | 'menu' | 'close' | 'language' | 'site' | 'collapse' | 'chevron' | 'check'
+export type StudioIconName = 'desk' | 'review' | 'social' | 'rss' | 'comments' | 'people' | 'audit' | 'live' | 'search' | 'menu' | 'close' | 'language' | 'site' | 'collapse' | 'chevron' | 'check' | 'microphone' | 'stop'
 
 const PATHS: Record<StudioIconName, React.ReactNode> = {
   desk: <><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></>,
@@ -15,6 +15,8 @@ const PATHS: Record<StudioIconName, React.ReactNode> = {
   site: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18"/></>,
   collapse: <><path d="M4 4h16v16H4zM9 4v16M15 9l-3 3 3 3"/></>, chevron: <path d="M8 10l4 4 4-4"/>,
   check: <><path d="M5 12l4 4L19 6"/><path d="M4 4h16v16H4z"/></>,
+  microphone: <><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6"/></>,
+  stop: <><rect x="6" y="6" width="12" height="12"/><circle cx="12" cy="12" r="9"/></>,
 }
 
 export function StudioIcon({ name, className = 'size-5' }: { name: StudioIconName; className?: string }): React.ReactElement {

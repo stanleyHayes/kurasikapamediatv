@@ -1,6 +1,6 @@
 # Production deployment handoff
 
-Prepared 31 August 2026. Prices are USD, exclude tax and foreign-exchange fees,
+Prepared 1 September 2026. Prices are USD, exclude tax and foreign-exchange fees,
 and must be rechecked at purchase. “Mid” is a credible launch setup; “high” is
 a growth budget, not an enterprise quote.
 
@@ -27,7 +27,7 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Apple Developer | Services ID, Team ID, Key ID and `.p8` private key | Apple sign-in |
 | Resend | `RESEND_API_KEY` and verified sending-domain DNS | Invitations, password reset, newsletters, alerts and contact mail |
 | Cloudinary | cloud name, API key and API secret | Production uploads, article photography, VOD and podcast assets |
-| AWS | IVS IAM pair/configuration/source bucket, EventBridge secret, MediaConvert role/template/output bucket; separate Polly/S3 IAM pair | Recorded live ingest and article narration |
+| AWS | IVS IAM pair/configuration/source bucket, EventBridge secret, MediaConvert role/template/output bucket; separate Polly/S3 IAM pair | Live transmission, recorded-live promotion and article narration |
 | Paystack / Stripe | live secret keys and webhook signing secret | Real donations, membership payment and reconciliation |
 | Cloudflare | Turnstile site key and secret | Production CAPTCHA |
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
@@ -120,6 +120,21 @@ An unset optional value must be absent, not `KEY=""`; empty URL values fail
 runtime validation. Rotate any credential that has ever been pasted into chat,
 a ticket, source control or a screen recording.
 
+### Exact provider placement
+
+| Target | Required production variables | Add when the provider is activated |
+|---|---|---|
+| Vercel Web | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Web `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `CONTACT_TO_EMAIL`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Google/Facebook/Apple OAuth, Resend, Turnstile, GA4 |
+| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS channel credentials/configuration, Meta publishing |
+| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 credentials |
+| GitHub Actions | `CRON_SECRET` | `ENABLE_SOCIAL_CRON=true` only after Meta approval |
+
+For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
+`https://kurasikapa-web.vercel.app`; `STUDIO_URL` is
+`https://kurasikapa-studio.vercel.app`; Studio's own `APP_URL` omits the
+`/studio` base path. Never upload `AWS_SECRET_ACCESS_KEY`, payment secrets,
+`ANTHROPIC_API_KEY` or server-only webhook secrets as `NEXT_PUBLIC_*` values.
+
 ## Monthly operating budget
 
 | Service | Mid/month | High/month | Assumption |
@@ -133,8 +148,9 @@ a ticket, source control or a screen recording.
 | AWS IVS/live + MediaConvert + narration | $250 | $2,000 | Live is driven by viewer-hours; each replay adds MediaConvert output minutes and temporary S3 |
 | Monitoring/DNS/domain | $25 | $150 | DNS can be free; includes domain amortisation and observability allowance |
 | Contingency | $110 | $526 | About 20% for bandwidth, backups, tax and usage variance |
-| **Estimated total** | **$657/month** | **$4,029/month** | Excludes salaries, production gear, legal work and payment fees |
+| **Estimated total** | **$657/month** | **$4,029/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
 
+These figures were rechecked against official price pages on 1 September 2026.
 The high Atlas figure uses the published M30 base rate of $0.54/hour (about
 $394 over a 730-hour month). The mid figure uses M10 at $0.08/hour (about $58).
 Live cost is the least predictable line: AWS charges input and viewer output

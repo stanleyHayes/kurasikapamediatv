@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded channels; ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automated S3-to-Cloudinary promotion and voice-to-article remain. | **PARTIAL — ACTIVE R3** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded channels; ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is code-complete and awaiting production verification. | **PARTIAL — ACTIVE R3 RELEASE** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
@@ -362,18 +362,19 @@ Cloudinary's adaptive `sp_auto` HLS delivery plus generated first-frame posters;
 the public player shares the tested HLS recovery engine with Live TV and keeps
 caption tracks mandatory. Article-to-audio is implemented as an asynchronous,
 editor-approved English/French workflow using Polly, private S3 staging and
-Cloudinary delivery; Twi fails closed until a reviewed voice exists. Still
-unbuilt: automated promotion of completed IVS recordings from private S3 into
-Cloudinary and voice-to-article. IVS capture itself and the caption-gated replay
-publication path are now implemented.
+Cloudinary delivery; Twi fails closed until a reviewed voice exists. Automatic
+promotion of completed IVS recordings from private S3 into Cloudinary is
+deployed. Voice-to-article now has an editor-owned browser transcription port:
+speech stays local to the rich Markdown editor until the journalist explicitly
+creates a draft. IVS capture and caption-gated replay publication are implemented.
 
 Providers are now settled — [ADR-0010](docs/decisions/adr-0010-media-stack.md):
 **Amazon IVS** for live broadcast, real-time call-in stages and moderated chat;
 **Cloudinary** for images, VOD and podcasts. Mux is superseded, unbuilt.
 
-Remaining public R3 placeholders are limited to automatic IVS recording
-promotion and voice-to-article; approved replay/video/article audio now render
-with the required player, caption or transcript affordance.
+The remaining R3 work is provider activation and production verification of
+voice dictation; approved replay/video/article audio render with the required
+player, caption or transcript affordance.
 
 ### 5.4 R4 — Revenue
 
@@ -468,13 +469,12 @@ Resend (R2), Stripe + Paystack (R4), Meta Graph API and app review (R2).
 
 Ordered by value per unit of risk, not by release number.
 
-1. **Automate IVS recording promotion** — consume the private S3 completion
-   event, promote the selected rendition to Cloudinary and keep publication
-   caption-gated in Studio.
-2. **Voice-to-article** — private transcription proposal with an editor-owned
-   draft boundary; never persist or publish raw AI output automatically.
-3. **Products and classifieds** — finish the remaining R4 transaction and
+1. **Products and classifieds** — finish the remaining R4 transaction and
    inventory surfaces before advertiser self-service.
+2. **Affiliate inventory** — add disclosed tracked placements with campaign
+   ownership and reporting.
+3. **Advertiser self-service** — expose only the campaign capabilities already
+   enforced by the revenue domain.
 
 **Done since this file was first written:** category listing (KUR-26), editorial
 CMS (KUR-27), profile/roles/social queue (KUR-33), cron publish (KUR-34),
@@ -1334,3 +1334,27 @@ are live. Custom-domain DNS remains an external registrar action.**
   unauthenticated recording POST endpoints correctly return 404. The planned
   custom host `kurasikapa.tv` did not resolve during this smoke, so the Vercel
   alias remains the verified public endpoint until DNS is supplied.
+
+## 29. KUR-90 — editor-owned voice-to-article (2026-09-01)
+
+**Status: CODE COMPLETE; full release verification pending.**
+
+- The create-story workspace now exposes explicit start/stop English and French
+  dictation with microphone and stop icons, a live interim transcript and clear
+  microphone/browser failure states.
+- `SpeechToTextPort` isolates the browser recognition API. Final segments append
+  to the existing rich Markdown value in local browser state; interim text is
+  display-only, and no recognised text reaches Mongo until the journalist
+  reviews it and explicitly chooses `Create draft`.
+- Unsupported browsers fail closed while retaining the complete manual rich
+  Markdown workflow. The UI discloses that the browser speech service handles
+  recognition; no new API credential or server-side microphone stream exists.
+- ADR-0014 records the editor-before-persistence decision. The focused Studio
+  suite passes 51 tests with 94.07% statements, 81.63% branches, 94.28%
+  functions and 97.89% lines; Studio TypeScript checking is green.
+- Full lint, type checking, dependency boundaries, duplication threshold, both
+  production builds and Go verification pass. Go reports 97.1% domain and
+  90.8% application/HTTP coverage. Local Testcontainers could not start, so
+  clean CI must supply the real-Mongo evidence before release is called green.
+- Remaining evidence: clean CI, deployed Studio rendering and an authenticated
+  microphone smoke in a supported browser.

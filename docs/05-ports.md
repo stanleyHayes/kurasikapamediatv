@@ -197,6 +197,13 @@ audio into a ready media asset; `AttachArticleNarration` requires
 deliberately refused until a reviewed Twi-capable voice provider exists. The
 public player labels the voice as synthetic and links to the article transcript.
 
+`SpeechToTextPort` is the Studio-side voice-to-article boundary. Its browser
+adapter emits interim and final English/French speech segments into local editor
+state only. `CreateDraft` remains the first persistence boundary, so recognised
+text can be corrected or discarded before it becomes an immutable revision.
+Unsupported browsers fail closed without weakening the normal rich Markdown
+authoring path. See [ADR-0014](decisions/adr-0014-voice-to-article-stays-local-until-accepted.md).
+
 **distribution** — `QueueSocialPost` · `PublishToSocial` · `SendNewsletter` · `SendBreakingAlert` · `IngestRssSource`
 
 `SendBreakingAlert` is live in TypeScript: an editor with `article:publish` mails
