@@ -22,9 +22,13 @@ func (f *EmbeddingFake) Embed(_ context.Context, text string, kind ports.Embeddi
 }
 
 type SemanticStore struct {
-	Records map[shared.ArticleID]ports.SemanticRecord
-	Hits    []ports.SemanticHit
-	Err     error
+	Records       map[shared.ArticleID]ports.SemanticRecord
+	Hits          []ports.SemanticHit
+	Err           error
+	ListErr       error
+	MarkReadyErr  error
+	MarkFailedErr error
+	SimilarErr    error
 }
 
 func NewSemanticStore(records ...ports.SemanticRecord) *SemanticStore {
@@ -61,6 +65,9 @@ func (s *SemanticStore) Deactivate(_ context.Context, id shared.ArticleID) error
 }
 
 func (s *SemanticStore) ListPending(_ context.Context, limit int) ([]ports.SemanticRecord, error) {
+	if s.ListErr != nil {
+		return nil, s.ListErr
+	}
 	if s.Err != nil {
 		return nil, s.Err
 	}
@@ -77,6 +84,9 @@ func (s *SemanticStore) ListPending(_ context.Context, limit int) ([]ports.Seman
 }
 
 func (s *SemanticStore) MarkReady(_ context.Context, id shared.ArticleID, revision shared.RevisionID, vector []float32, model string) error {
+	if s.MarkReadyErr != nil {
+		return s.MarkReadyErr
+	}
 	record := s.Records[id]
 	if record.RevisionID != revision {
 		return errors.New("stale revision")
@@ -87,6 +97,9 @@ func (s *SemanticStore) MarkReady(_ context.Context, id shared.ArticleID, revisi
 }
 
 func (s *SemanticStore) MarkFailed(_ context.Context, id shared.ArticleID, revision shared.RevisionID, reason string) error {
+	if s.MarkFailedErr != nil {
+		return s.MarkFailedErr
+	}
 	record := s.Records[id]
 	if record.RevisionID != revision {
 		return errors.New("stale revision")
@@ -106,6 +119,9 @@ func (s *SemanticStore) ReadyVector(_ context.Context, id shared.ArticleID) ([]f
 }
 
 func (s *SemanticStore) Similar(_ context.Context, _ []float32, _ string, _ shared.ArticleID, limit int) ([]ports.SemanticHit, error) {
+	if s.SimilarErr != nil {
+		return nil, s.SimilarErr
+	}
 	if s.Err != nil {
 		return nil, s.Err
 	}

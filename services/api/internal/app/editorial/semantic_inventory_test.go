@@ -2,6 +2,7 @@ package editorial_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	app "github.com/kurasikapa/api/internal/app/editorial"
@@ -27,5 +28,20 @@ func TestQueueSemanticInventoryBackfillsApprovedPublishedStories(t *testing.T) {
 	again, err := app.NewQueueSemanticInventory(h.deps).Execute(context.Background(), []string{"en"})
 	if err != nil || again.Queued != 0 || again.Current != 1 {
 		t.Fatalf("again=%+v err=%v", again, err)
+	}
+}
+
+func TestQueueSemanticInventoryReturnsRepositoryFailures(t *testing.T) {
+	h := newHarness()
+	h.articles.FailListPublished = errors.New("articles unavailable")
+	if _, err := app.NewQueueSemanticInventory(h.deps).Execute(context.Background(), []string{"en"}); err == nil {
+		t.Fatal("expected list error")
+	}
+
+	live := publishedArt("art_live", "live", "cat_news")
+	h = newHarness(live)
+	h.semantic.Err = errors.New("semantic unavailable")
+	if _, err := app.NewQueueSemanticInventory(h.deps).Execute(context.Background(), []string{"en"}); err == nil {
+		t.Fatal("expected semantic error")
 	}
 }

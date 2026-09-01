@@ -2,6 +2,7 @@ package http_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -57,5 +58,27 @@ func TestSemanticIndexEndpointIsProtectedAndProcessesBackfill(t *testing.T) {
 	}
 	if _, err := semantic.ReadyVector(context.Background(), "art_1"); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSemanticEndpointsReportProviderAndStorageFailures(t *testing.T) {
+	handler, semantic := semanticServer(t)
+	semantic.Err = errors.New("semantic unavailable")
+
+	for _, path := range []string{
+		"/public/en/search?q=fiscal+policy",
+		"/public/en/articles/art_1/related",
+	} {
+		rec := do(handler, httptest.NewRequest(http.MethodGet, path, nil))
+		if rec.Code != http.StatusInternalServerError {
+			t.Fatalf("path=%s status=%d body=%s", path, rec.Code, rec.Body.String())
+		}
+	}
+
+	req := httptest.NewRequest(http.MethodPost, "/internal/process-semantic-index", nil)
+	req.Header.Set("Authorization", "Bearer s3cret-value-of-known-length-0000")
+	rec := do(handler, req)
+	if rec.Code != http.StatusInternalServerError {
+		t.Fatalf("process status=%d body=%s", rec.Code, rec.Body.String())
 	}
 }

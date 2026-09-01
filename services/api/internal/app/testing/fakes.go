@@ -85,6 +85,7 @@ type ArticleStore struct {
 
 	FailSlugTaken     error
 	FailFindBySlug    error
+	FailFindMany      error
 	FailListPublished error
 	FailListAuthored  error
 	FailSave          error
@@ -131,6 +132,9 @@ func (s *ArticleStore) FindBySlug(_ context.Context, slug, locale string) (edito
 
 // FindManyByIDs returns whichever of the given articles exist.
 func (s *ArticleStore) FindManyByIDs(_ context.Context, ids []shared.ArticleID) ([]editorial.Article, error) {
+	if s.FailFindMany != nil {
+		return nil, s.FailFindMany
+	}
 	out := []editorial.Article{}
 	for _, id := range ids {
 		if a, ok := s.items[id]; ok {
@@ -256,7 +260,8 @@ type RevisionStore struct {
 	items []editorial.Revision
 
 	// FailAppend injects a write failure.
-	FailAppend error
+	FailAppend   error
+	FailFindMany error
 }
 
 // NewRevisionStore seeds a store.
@@ -295,6 +300,9 @@ func (s *RevisionStore) FindLatest(_ context.Context, articleID shared.ArticleID
 
 // FindManyByIDs returns whichever of the given revisions exist.
 func (s *RevisionStore) FindManyByIDs(_ context.Context, ids []shared.RevisionID) ([]editorial.Revision, error) {
+	if s.FailFindMany != nil {
+		return nil, s.FailFindMany
+	}
 	wanted := map[shared.RevisionID]struct{}{}
 	for _, id := range ids {
 		wanted[id] = struct{}{}
