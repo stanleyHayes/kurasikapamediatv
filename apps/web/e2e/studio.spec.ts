@@ -8,10 +8,9 @@ import { DRAFT, EDITOR, seed, seedEditor } from './seed'
  * The one suite that spans both deployments.
  *
  * `baseURL` is the public site; the studio answers on its own origin, so its
- * URLs are absolute. That asymmetry is the point — these journeys exist to
- * prove the handover between the two deployments still works: the session
- * cookie reaches the studio, the studio's guard sends an anonymous visitor
- * back to the site, and the site sends an editor forward to the studio.
+ * URLs are absolute. These journeys prove the two independently deployed auth
+ * surfaces share the same server-side identity without making the reader site
+ * responsible for an editor's destination.
  */
 const STUDIO = process.env['STUDIO_URL'] ?? 'http://127.0.0.1:31743/studio'
 
@@ -23,7 +22,7 @@ test.beforeAll(async ({ baseURL }) => {
 /** Signs in through the real form — the same path a newsroom uses. */
 async function signIn(page: Page): Promise<void> {
   await resetSignInAllowance()
-  await page.goto('/en/sign-in')
+  await page.goto(`${STUDIO}/en/sign-in`)
   await page.getByLabel('Email').fill(EDITOR.email)
   await page.getByLabel('Password').fill(EDITOR.password)
   await page.getByRole('button', { name: 'Sign in' }).click()
@@ -40,7 +39,7 @@ test.describe('studio access', () => {
     // Sending them home would leave them guessing how to get back. Sending a
     // signed-in but unauthorised reader to sign-in would be worse — a form
     // that cannot help, since they are already who they are.
-    // Across origins now: the studio bounces them onto the SITE's sign-in.
+    // Across origins now: the studio keeps its own authentication surface.
     await page.goto(`${STUDIO}/en`)
 
     await expect(page).toHaveURL(/\/en\/sign-in$/u)

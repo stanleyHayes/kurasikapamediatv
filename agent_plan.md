@@ -1944,7 +1944,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 47. KUR-109 — reader registration and provider activation (2026-09-01)
 
-**Status: IMPLEMENTED AND VERIFIED — Web production redeploy quota-blocked.**
+**Status: IMPLEMENTED, VERIFIED AND DEPLOYED.**
 
 - Public Create account now stays on the reader site, returns successful
   registration to `/sign-in?registered=1` and signs readers into `/profile`.
@@ -1956,7 +1956,6 @@ are live. Custom-domain DNS remains an external registrar action.**
   Resend is active on both Vercel projects; a real message sent successfully
   through the temporary `Kurasikapa Media <onboarding@resend.dev>` sender while
   the branded domain awaits verification.
-- Studio deployed successfully with the provider variables. Web cannot promote
-  this source change until Vercel's daily free-deployment quota resets; the
-  existing production deployment therefore still has the old registration
-  route until the next successful Web deployment.
+- Studio and Web both deployed successfully with the provider variables. The
+  stable production aliases serve `/studio/en/sign-in` and `/en/sign-up`
+  respectively with HTTP 200.
