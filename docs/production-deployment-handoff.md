@@ -131,7 +131,7 @@ a ticket, source control or a screen recording.
 
 For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
 `https://kurasikapa-web.vercel.app`; `STUDIO_URL` is
-`https://kurasikapa-studio.vercel.app`; Studio's own `APP_URL` omits the
+`https://kurasikapa-studio.vercel.app/studio`; Studio's own `APP_URL` omits the
 `/studio` base path. Never upload `AWS_SECRET_ACCESS_KEY`, payment secrets,
 `ANTHROPIC_API_KEY` or server-only webhook secrets as `NEXT_PUBLIC_*` values.
 
@@ -146,7 +146,8 @@ For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
 | Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
 | Anthropic | $50 | $300 | Editorial-assistance spending cap; usage based |
 | AWS IVS/live + MediaConvert + narration | $250 | $2,000 | Live is driven by viewer-hours; each replay adds MediaConvert output minutes and temporary S3 |
-| Monitoring/DNS/domain | $25 | $150 | DNS can be free; includes domain amortisation and observability allowance |
+| Domain and DNS | $2 | $10 | Annual domain renewal amortised monthly; DNS hosting can remain free |
+| Monitoring and incident alerts | $23 | $140 | Launch logging/uptime allowance vs expanded retention, alerting and paging |
 | Contingency | $110 | $526 | About 20% for bandwidth, backups, tax and usage variance |
 | **Estimated total** | **$657/month** | **$4,029/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
 
