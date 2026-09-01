@@ -1699,3 +1699,20 @@ are live. Custom-domain DNS remains an external registrar action.**
   `main`; CI run `33480840273` is green across Quality gates, Go service,
   secret scan and Lighthouse. After deployment, Render `/healthz` and `/v1`
   both return HTTP 200.
+
+## 40. KUR-102 — WAF and independent penetration-test readiness (2026-09-01)
+
+**Status: BASELINE GREEN / RUNBOOK DONE — provider rules and Strix scan pending credentials.**
+
+- Added `docs/operations/vercel-firewall.md` for separate Web and Studio rule
+  sets, log-first promotion, verified-bot/cron exclusions, rate limits,
+  emergency challenge mode, rollback and exact acceptance evidence. Managed
+  OWASP CRS is recorded honestly as Enterprise-only.
+- Credential-free baselines are green: `pnpm audit --prod --audit-level high`
+  reports no known production dependency vulnerabilities and `govulncheck
+  ./...` reports zero reachable Go vulnerabilities.
+- Docker and Strix 1.5.3 are installed. Exploit validation did not start because
+  `STRIX_LLM`/`LLM_API_KEY` and `STRIX_API_TOKEN` are all absent. Supply either
+  a local model/key pair or a managed token; do not call the resulting scan a
+  full pentest until `run.json` is completed and the report's coverage is
+  reviewed.

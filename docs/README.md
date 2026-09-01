@@ -20,6 +20,8 @@ AI-native publishing platform for a France-registered TV, radio and online media
   and the TS editorial deletion checklist.
 - [Disaster recovery and restore acceptance](operations/disaster-recovery.md) —
   isolated Atlas restore, read-only integrity verifier and evidence gate.
+- [Vercel firewall rollout](operations/vercel-firewall.md) — Web/Studio rule
+  order, log-first promotion, emergency mode and acceptance evidence.
 
 ## APIs
 
