@@ -1583,7 +1583,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 36. KUR-98 — semantic discovery and recommendations (2026-09-01)
 
-**Status: IMPLEMENTED; full gates and production provider activation pending.**
+**Status: CODE DEPLOYED; production provider activation pending.**
 
 - Added a provider-neutral Go embedding port and semantic repository, a Voyage
   `voyage-4` adapter, durable `article_semantic_documents` jobs and Atlas Vector
@@ -1601,7 +1601,16 @@ are live. Custom-domain DNS remains an external registrar action.**
   read article IDs.
 - Added unit, HTTP, provider and Mongo adapter coverage, the Atlas index
   contract in ADR-0015, deployment/environment instructions and a usage-based
-  Voyage budget. Do not call the feature production-active until the Atlas
+  Voyage budget. Full CI run `33472660359` is green across quality gates,
+  real-Mongo Go integration, vulnerability scan, Lighthouse, browser journeys
+  and accessibility. Commits `7eefc26` and `a68ed57` are on `main`; Web
+  deployment `dpl_BaXnHeDmrafM7r46SBGbB3AekuUw` and Studio deployment
+  `dpl_APNKqFLsQst5VkoWkEiaMaK6Jxb2` are Ready. Render serves the new semantic
+  route and intentionally returns
+  `503 semantic_unavailable`; the public search route remains HTTP 200 through
+  lexical fallback, while unauthenticated semantic cron access returns 404.
+  The corrected sitemap now emits `kurasikapa-web.vercel.app`. Do not call the
+  semantic feature production-active until the Atlas
   `article_semantic_vector` index reports `READY`, `VOYAGE_API_KEY` is present on
   Render, the backfill succeeds and the public fallback/semantic paths are both
   smoke-tested.
