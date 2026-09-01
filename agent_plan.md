@@ -1755,7 +1755,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 42. KUR-104 — live launch inventory and API trust boundary (2026-09-01)
 
-**Status: SERVICE AUTH IMPLEMENTED — release verification and client/provider inputs remain.**
+**Status: RELEASE VERIFIED — client/provider launch inputs remain.**
 
 - The production API currently exposes 35 English client-preview articles.
   Their copy is explicitly labelled preview material and the sampled articles
@@ -1809,10 +1809,14 @@ are live. Custom-domain DNS remains an external registrar action.**
   launch gate, not an implementation gap: approved identities, journalism,
   schedules, licensed media, pricing and commercial inventory must replace the
   preview edition before public launch.
+- A follow-up production trust-boundary smoke on 1 September verified that an
+  anonymous write, an actor-header-only write and an actor plus forged bearer
+  write to the staff-profile command all return safe HTTP 403 responses. No
+  attempted request created or changed a profile.
 
 ## 43. KUR-105 — reversible client-preview inventory (2026-09-01)
 
-**Status: RELEASE VERIFIED — production seed execution pending a Render-safe path.**
+**Status: RELEASE VERIFIED — production execution completed by KUR-106.**
 
 - Extracted managed FAQ/help/careers pages and television preview inventory
   from the 294-line demo seeder into a bounded module. The executable seed is
@@ -1836,13 +1840,11 @@ are live. Custom-domain DNS remains an external registrar action.**
   vulnerability checks and secret scanning. Vercel correctly skipped a new
   runtime deployment because this release changes only executable demo tooling
   and the evidence ledger; both existing production deployments remain Ready.
-- Production seeding remains deliberately unclaimed. The valid Atlas URI is
-  held by Render and direct workstation access does not complete; the public
-  API rejects the available preview identities with HTTP 403, as required.
-  Use a reviewed Render-side one-off seed command or a real privileged Studio
-  operator rather than weakening Atlas network policy or the API trust
-  boundary. Real journalists, launch reporting, licensed media and commercial
-  terms remain client-owned inputs and must not be fabricated by this seed.
+- Direct workstation access remains intentionally unavailable and the public
+  API rejects preview identities with HTTP 403, as required. KUR-106 supplied
+  the reviewed Render-side one-off path without weakening Atlas network policy
+  or the API trust boundary. Real journalists, launch reporting, licensed media
+  and commercial terms remain client-owned inputs and are not fabricated.
 
 ## 44. KUR-106 — Render-safe production preview operator (2026-09-01)
 
@@ -1890,7 +1892,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 45. KUR-107 — visible public newsroom navigation (2026-09-01)
 
-**Status: DEPLOYED AND LIVE-VERIFIED — source CI quality gate still running.**
+**Status: DEPLOYED AND RELEASE-VERIFIED.**
 
 - Replaced the desktop-only catch-all navigation with six visible desks: News,
   Regions, Business, Watch, Listen and Ideas. Each desk opens a focused dropdown
@@ -1910,5 +1912,6 @@ are live. Custom-domain DNS remains an external registrar action.**
   `dpl_AvvY1eaf9R4CMY6breZa2BcKEMED` is Ready and promoted to the public alias.
   A 1440px Chromium check opened the live Watch desk and found three rendered
   cards, three SVG icons, the expected titles and the localized descriptions.
-  Source CI run `33495714417` has green Lighthouse, Go and secret-scan jobs;
-  its combined browser/accessibility quality job remains in progress.
+  Source CI run `33495714417` is fully green across Lighthouse, Go, secret
+  scanning and the combined build, coverage, browser/WCAG, duplication and
+  dependency quality gates.

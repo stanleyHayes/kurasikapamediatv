@@ -227,6 +227,10 @@ but the applicable rate and eligibility depend on the legal account country.
 
 ## Verified deployment state — 1 September 2026
 
+- Public Web deployment `dpl_AvvY1eaf9R4CMY6breZa2BcKEMED` is Ready and owns
+  the latest grouped newsroom navigation release. A live 1440px Chromium smoke
+  opened a desk dropdown and verified its icon, title and description cards.
+  Source CI run `33495714417` is fully green across all four jobs.
 - Public Web deployment `dpl_dW3znp27DaArWM14LzQcukADxb9X` is Ready and the
   stable Vercel alias serves `/og-image` as `200 image/png` without redirecting
   through a locale.
