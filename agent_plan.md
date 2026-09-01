@@ -1890,7 +1890,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 45. KUR-107 — visible public newsroom navigation (2026-09-01)
 
-**Status: LOCALLY VERIFIED — production deployment pending.**
+**Status: DEPLOYED AND LIVE-VERIFIED — source CI quality gate still running.**
 
 - Replaced the desktop-only catch-all navigation with six visible desks: News,
   Regions, Business, Watch, Listen and Ideas. Each desk opens a focused dropdown
@@ -1906,3 +1906,9 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Added regression coverage proving there are exactly six useful desktop desks
   and no duplicate mobile destinations. Full `pnpm verify` passes; the existing
   Studio loading-route orphan is still the sole boundary warning.
+- Commits `a96859f` and `5853314` are on `main`. Vercel production deployment
+  `dpl_AvvY1eaf9R4CMY6breZa2BcKEMED` is Ready and promoted to the public alias.
+  A 1440px Chromium check opened the live Watch desk and found three rendered
+  cards, three SVG icons, the expected titles and the localized descriptions.
+  Source CI run `33495714417` has green Lighthouse, Go and secret-scan jobs;
+  its combined browser/accessibility quality job remains in progress.
