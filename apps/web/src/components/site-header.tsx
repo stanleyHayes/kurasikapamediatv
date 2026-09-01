@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react'
 import { Link, usePathname } from '@kurasikapa/web-kit/i18n/navigation'
 import { isNavItemActive, localizedHref } from './site-header-state'
 import { SITE_NAV_GROUPS, SITE_NAV_ITEMS, type SiteNavGroup, type SiteNavItem } from './site-navigation'
+import { SiteNavigationIcon } from './site-navigation-icon'
 
 function Brand(): React.ReactElement {
   return (
@@ -66,10 +67,29 @@ function DeskMenu({ group, pathname }: { group: SiteNavGroup; pathname: string }
           <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" />
         </svg>
       </summary>
-      <ul className="broadcast-shadow border-outline-variant bg-surface-container-lowest absolute left-0 top-12 z-20 grid min-w-56 border p-2 text-on-surface">
-        {group.items.map((item) => <li key={item.paths.en}><NavLink item={item} pathname={pathname} mobile onSelect={() => detailsRef.current?.removeAttribute('open')} /></li>)}
+      <ul className="broadcast-shadow border-outline-variant bg-surface-container-lowest absolute left-0 top-12 z-20 grid w-80 border p-2 text-on-surface">
+        {group.items.map((item) => <DropdownItem key={item.paths.en} item={item} pathname={pathname} onSelect={() => detailsRef.current?.removeAttribute('open')} />)}
       </ul>
     </details>
+  )
+}
+
+function DropdownItem({ item, pathname, onSelect }: { item: SiteNavItem; pathname: string; onSelect: () => void }): React.ReactElement {
+  const t = useTranslations('nav')
+  const locale = useLocale()
+  const href = localizedHref(item.paths, locale)
+  const active = isNavItemActive(pathname, href)
+
+  return (
+    <li>
+      <Link href={href} onClick={onSelect} aria-current={active ? 'page' : undefined} className={`${active ? 'border-secondary bg-primary-container' : 'border-transparent hover:border-outline-variant hover:bg-surface-container-low'} group/item grid grid-cols-[2.75rem_1fr] gap-3 border-l-4 p-3 transition-colors`}>
+        <span className={`${active ? 'bg-secondary text-on-secondary' : 'border-outline-variant bg-surface-container-lowest text-primary group-hover/item:border-primary border'} grid h-11 w-11 place-items-center transition-colors`}><SiteNavigationIcon name={item.icon} /></span>
+        <span className="min-w-0">
+          <span className="block text-sm font-bold leading-tight">{t(item.key)}</span>
+          <span className="mt-1 block text-xs leading-5 text-on-surface-variant">{t(`${item.key}Description`)}</span>
+        </span>
+      </Link>
+    </li>
   )
 }
 

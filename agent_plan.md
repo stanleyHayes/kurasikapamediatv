@@ -1895,6 +1895,9 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Replaced the desktop-only catch-all navigation with six visible desks: News,
   Regions, Business, Watch, Listen and Ideas. Each desk opens a focused dropdown
   while preserving all 19 existing public destinations.
+- Every desktop dropdown destination is an editorial card with a semantic line
+  icon, title and concise English/French description. Active cards use the
+  established green/gold treatment; hover and focus retain clear boundaries.
 - Desktop navigation now appears from the `lg` breakpoint instead of waiting
   until `2xl`; the hamburger remains the compact mobile/tablet navigation.
   Active desk and destination states continue to follow localized routes.
