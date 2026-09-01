@@ -1674,3 +1674,22 @@ are live. Custom-domain DNS remains an external registrar action.**
   The hosted Server Action journey needed a realistic streamed-refresh budget;
   commit `cfb6be0` carries that release-gate correction and CI run
   `33479515249` is fully green across all four jobs.
+
+## 39. KUR-101 — disaster-recovery restore acceptance (2026-09-01)
+
+**Status: IMPLEMENTED LOCALLY — real Atlas backup drill and timed evidence pending.**
+
+- Added a read-only Go restore verifier at `cmd/verify-restore`. It requires a
+  separately named drill URI/database, refuses the exact production target and
+  emits credential-free JSON evidence.
+- The Mongo adapter verifies core editorial/identity collections, inventory
+  counts, correctness/query indexes, category references and approved-revision
+  references without mutating the restored snapshot.
+- Added real-Mongo integration coverage for a healthy restored database and a
+  damaged snapshot with missing collections, indexes and references. CLI
+  configuration tests cover missing inputs and production-target refusal.
+- Added `docs/operations/disaster-recovery.md` with provisional RPO/RTO,
+  ownership, isolated restore procedure, application smoke gate, failure
+  handling and exact remaining production evidence. Provider-side PITR
+  enablement and the first timed restore cannot be claimed until Atlas access
+  is supplied.

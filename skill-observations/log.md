@@ -482,3 +482,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Give every real network transition a hosted-runner budget and make the enclosing test budget at least their sum. Keep domain and application speed assertions in narrow tests; use the browser journey to prove the complete write-and-refresh contract.
 
 **Principle:** A Server Action is complete from the browser's perspective only when its refreshed interface arrives.
+
+### Observation 32: Recovery readiness requires data-shape acceptance, not a ping
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Turning the Kurasikapa backup and disaster-recovery requirement into executable restore evidence.
+**Skill:** New skill candidate: database-restore-acceptance
+**Type:** open-source
+**Phase/Area:** Production operations and disaster recovery
+
+**Issue:** A restored database can answer a ping and still be unusable because correctness indexes were not restored, the wrong database was selected, core collections are empty, or published records reference missing categories and approved revisions.
+
+**Suggested improvement:** Verify an isolated restored target read-only, emit credential-free evidence, require non-empty critical inventory, inspect named indexes and test application-level references before any cutover. Keep provider restoration and application acceptance as separate gates.
+
+**Principle:** Backup success says bytes exist; restore acceptance says the product can safely use them.

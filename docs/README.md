@@ -18,6 +18,8 @@ AI-native publishing platform for a France-registered TV, radio and online media
 - [Deploy the Go API](operations/deploy-api.md) — Render blueprint, `API_URL`
   cut-over, smoke-checks ([scripts/smoke-api.sh](../scripts/smoke-api.sh)),
   and the TS editorial deletion checklist.
+- [Disaster recovery and restore acceptance](operations/disaster-recovery.md) —
+  isolated Atlas restore, read-only integrity verifier and evidence gate.
 
 ## APIs
 

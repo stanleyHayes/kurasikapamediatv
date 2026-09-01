@@ -63,7 +63,8 @@ AI analytics dashboard with engagement insight · SEO Center · heatmaps · read
 AI news anchor · AI podcast generator · AI video generator · AI chatbot ·
 versioned public news API (implemented in KUR-100) ·
 public REST + GraphQL API · mobile reporter app · native iOS + Android · offline publishing ·
-Events/Summits module · WAF, DR drill, full pen-test.
+Events/Summits module · WAF · executable DR restore verifier and runbook
+(implemented; provider drill evidence pending) · full pen-test.
 
 **Exit:** the questionnaire is closed, including section 21 "Future Features".
 
