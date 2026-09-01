@@ -10,11 +10,10 @@ The gitignored `.env.production` is the single updated local handoff file. It
 contains the deployed Render `API_URL`, the correct independent Vercel hosts,
 and every currently known variable consumed by the Web, Studio, Go API and
 enabled provider integrations, including variables intentionally left commented
-until their provider is activated. It contains explicit replacement markers for
-every generated secret and intentionally contains no usable secret. Generate or
-retrieve each value directly in the relevant provider/password manager, then
-upload it to the deployment dashboard without putting it in source control or
-chat.
+until their provider is activated. Because this local file may contain usable
+credentials, never send it through chat, email or a ticket. Generate or retrieve
+each missing value directly in the relevant provider/password manager, then
+upload it to the deployment dashboard without putting it in source control.
 
 The ignored `apps/web/.env.production` and `apps/studio/.env.production` files
 are older developer placeholders and must not be used as deployment inputs.
@@ -149,7 +148,7 @@ came from a trusted Next server rather than an internet client.
 | Service | Mid/month | High/month | Assumption |
 |---|---:|---:|---|
 | Vercel | $20 | $150 | One Pro developer seat can own both projects; high adds another developer seat, traffic and observability allowance |
-| Render API | $25 | $170 | One 1 CPU/2 GB service vs two 2 CPU/4 GB services for availability |
+| Render API | $171 | $609 | Pro workspace plus one 1 CPU/2 GB service vs two 2 CPU/4 GB services for availability, using 730 hours/month |
 | MongoDB Atlas | $58 | $394 | M10 vs M30, before backup/network overage |
 | Cloudinary | $99 | $249 | Plus vs Advanced media plan |
 | Resend | $20 | $90 | Pro 50k vs Scale 100k transactional emails |
@@ -160,10 +159,14 @@ came from a trusted Next server rather than an internet client.
 | Monitoring and incident alerts | $23 | $140 | Launch logging/uptime allowance vs expanded retention, alerting and paging |
 | OAuth, Turnstile, GA4, Search Console | $0 | $0 | Standard launch usage; provider limits and terms still apply |
 | GitHub Actions and SonarCloud | $0 | $0 | Existing CI allowance and optional free analysis; paid team/analysis plans are outside this estimate |
-| Contingency | $111 | $709 | About 20% for bandwidth, backups, tax and usage variance |
-| **Estimated total** | **$663/month** | **$4,252/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
+| Contingency | $140 | $796 | About 20% for bandwidth, backups, tax and usage variance |
+| **Estimated total** | **$838/month** | **$4,778/month** | Planning envelope; excludes salaries, production gear, legal work and payment fees |
 
 These figures were rechecked against official price pages on 1 September 2026.
+Render's current Pro workspace is $25/month and compute is additional: the
+1 CPU/2 GB plan is $0.20/hour, while 2 CPU/4 GB is $0.40/hour per instance.
+The Render line therefore includes both the workspace and continuously running
+compute; bandwidth and tax remain part of contingency.
 The high Atlas figure uses the published M30 base rate of $0.54/hour (about
 $394 over a 730-hour month). The mid figure uses M10 at $0.08/hour (about $58).
 Live cost is the least predictable line: AWS charges input and viewer output
