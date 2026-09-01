@@ -46,6 +46,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	revenueDeps.Products = faketesting.NewProductStore()
 	revenueDeps.ProductOrders = faketesting.NewProductOrderStore()
 	revenueDeps.Classifieds = faketesting.NewClassifiedStore()
+	revenueDeps.AffiliateLinks = faketesting.NewAffiliateLinkStore()
 	staffDeps := appidentity.StaffProfileDeps{Profiles: faketesting.NewStaffProfileStore(), Assets: assets, IDs: &faketesting.SequentialIDs{}}
 	recordingImports := faketesting.NewRecordingImportStore()
 	recordingProvider := &faketesting.RecordingPromotionFake{StartResult: ports.RecordingTranscode{TaskID: "transcode_1", OutputRef: "processed/recording.mp4"}, CheckResult: ports.RecordingProviderResult{Status: ports.RecordingProviderProcessing}}
@@ -117,6 +118,10 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ConfirmClassified:          apprevenue.NewConfirmClassified(revenueDeps),
 		PublishClassified:          apprevenue.NewPublishClassified(revenueDeps),
 		ListClassifieds:            apprevenue.NewListClassifieds(revenueDeps),
+		CreateAffiliateLink:        apprevenue.NewCreateAffiliateLink(revenueDeps),
+		ActivateAffiliateLink:      apprevenue.NewActivateAffiliateLink(revenueDeps),
+		ListAffiliateLinks:         apprevenue.NewListAffiliateLinks(revenueDeps),
+		FollowAffiliateLink:        apprevenue.NewFollowAffiliateLink(revenueDeps),
 		PaymentWebhooks:            faketesting.PaymentWebhookFake{},
 		Roles:                      roles{granted: granted},
 		Clock:                      faketesting.FixedClock{At: now},

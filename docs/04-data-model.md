@@ -77,6 +77,7 @@ erDiagram
 | `products` | publisher-owned shop inventory | slug, SKU, description, accessible image, minor-unit GHS/EUR price, stock and explicit activation |
 | `product_orders` | physical product checkout lifecycle | product, quantity, immutable total, delivery contact, provider references, status and `paidAt` |
 | `classifieds` | paid community notices | public copy, contact, asking price, placement fee, payment/review/publication state and 30-day expiry |
+| `affiliate_links` | disclosed partner recommendations | public copy and imagery, server-held HTTPS destination, activation, commission note and anonymous click count |
 | `page_views` | insight, append-only | `articleId`, `locale`, hashed `visitorHash`, acquisition `channel`, `occurredAt`; TTL after 400 days |
 | `seo_reports` `revenue_snapshots` | insight, append-only | future time-series collections |
 | `audit_logs` | who did what | `actorId`, `action`, `entity`, `before`, `after`, `at` |
@@ -89,8 +90,9 @@ Revenue indexes are named and mandatory: `membership_slug_unique`,
 `active_membership_plans`, `subscription_provider_ref_unique`,
 `reader_entitlement`, `revenue_subscribers_recent`, `donation_provider_ref_unique`,
 `donation_revenue_recent`, `donation_checkout_recent`, product slug/SKU and
-provider-reference indexes, and classified status/expiry and provider-reference
-indexes. Provider references are unique so a retried webhook
+provider-reference indexes, classified status/expiry and provider-reference,
+and affiliate destination uniqueness plus active-category lookup indexes.
+Provider references are unique so a retried webhook
 cannot create a second commercial event.
 
 Every one of these exists because a specific screen or gate needs it.

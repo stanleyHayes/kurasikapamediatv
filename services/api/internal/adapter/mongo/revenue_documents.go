@@ -11,6 +11,7 @@ const (
 	CollProducts        = "products"
 	CollProductOrders   = "product_orders"
 	CollClassifieds     = "classifieds"
+	CollAffiliateLinks  = "affiliate_links"
 )
 
 type moneyDoc struct {
@@ -42,6 +43,16 @@ type classifiedDoc struct {
 	Provider, ProviderRef, PaymentRef, Status                                                     string
 	SubmittedAt                                                                                   time.Time
 	PaidAt, PublishedAt, ExpiresAt                                                                *time.Time
+}
+
+type affiliateLinkDoc struct {
+	ID, Partner, Title, Category, Description, Disclosure string
+	ImageURL, ImageAlt, DestinationURL, CommissionNote    string
+	Active                                                bool
+	ActivatedAt                                           *time.Time
+	CreatedBy                                             string
+	Clicks                                                int64
+	LastClickedAt                                         *time.Time
 }
 
 type adCampaignDoc struct {

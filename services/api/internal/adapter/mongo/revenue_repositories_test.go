@@ -74,7 +74,8 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 	products := adapter.NewProductRepository(h.DB)
 	orders := adapter.NewProductOrderRepository(h.DB)
 	classifieds := adapter.NewClassifiedRepository(h.DB)
-	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes, products.EnsureIndexes, orders.EnsureIndexes, classifieds.EnsureIndexes} {
+	affiliates := adapter.NewAffiliateLinkRepository(h.DB)
+	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes, products.EnsureIndexes, orders.EnsureIndexes, classifieds.EnsureIndexes, affiliates.EnsureIndexes} {
 		if err := ensure(ctx); err != nil {
 			t.Fatal(err)
 		}
@@ -88,6 +89,7 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 		adapter.CollProducts:        {"product_slug_unique", "product_sku_unique", "active_product_inventory"},
 		adapter.CollProductOrders:   {"product_order_provider_ref_unique", "product_orders_recent"},
 		adapter.CollClassifieds:     {"published_classified_expiry", "classified_provider_ref_unique"},
+		adapter.CollAffiliateLinks:  {"affiliate_destination_unique", "active_affiliate_category"},
 	}
 	for collection, expected := range checks {
 		names := indexNames(t, h, collection)
@@ -173,5 +175,33 @@ func TestCommerceRepositoriesRoundTripPublicInventory(t *testing.T) {
 	}
 	if got, err := classifieds.FindByID(ctx, listing.ID()); err != nil || got.State().Status != revenue.ClassifiedPublished {
 		t.Fatal(got, err)
+	}
+}
+
+func TestAffiliateRepositoryPublishesAndCountsAnonymousClicks(t *testing.T) {
+	t.Parallel()
+	h := newHarness(t)
+	ctx := context.Background()
+	links := adapter.NewAffiliateLinkRepository(h.DB)
+	activeAt := testNow.Add(-time.Hour)
+	link := revenue.ReconstituteAffiliateLink(revenue.AffiliateLinkState{ID: "affiliate_1", Partner: "Akwaaba Books", Title: "History collection", Category: "Books", Description: "Selected Ghanaian writing", Disclosure: "We may earn a commission.", ImageURL: "https://cdn.test/books.jpg", ImageAlt: "Ghanaian books", DestinationURL: "https://partner.test/books", CommissionNote: "Ten percent", Active: true, ActivatedAt: &activeAt, CreatedBy: "admin"})
+	if err := links.Save(ctx, link); err != nil {
+		t.Fatal(err)
+	}
+	if rows, err := links.ListActive(ctx, 10); err != nil || len(rows) != 1 {
+		t.Fatal(rows, err)
+	}
+	if err := links.RecordClick(ctx, link.ID(), testNow); err != nil {
+		t.Fatal(err)
+	}
+	got, err := links.FindByID(ctx, link.ID())
+	if err != nil || got.State().Clicks != 1 {
+		t.Fatal(got.State(), err)
+	}
+	if rows, err := links.ListAll(ctx, 10); err != nil || len(rows) != 1 {
+		t.Fatal(rows, err)
+	}
+	if err := links.RecordClick(ctx, "missing", testNow); !errors.Is(err, ports.ErrNotFound) {
+		t.Fatal(err)
 	}
 }

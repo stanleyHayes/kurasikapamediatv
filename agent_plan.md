@@ -54,7 +54,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
-| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products and paid, review-gated classifieds now have end-to-end Go persistence, provider checkout, webhooks, Studio operations and public inventory. Affiliates and advertiser self-service remain. |
+| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service remains. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
@@ -64,7 +64,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded channels; ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is code-complete and awaiting production verification. | **PARTIAL — ACTIVE R3 RELEASE** |
-| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising inventory, activation, budget-aware placement, anonymous events, Studio operations, disclosed public placements and reporting are implemented. Provider credentials/release, products, classifieds, affiliates and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
+| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds and disclosed affiliate inventory are code-complete across Studio and public surfaces. Provider credentials, the quota-delayed public release and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
@@ -381,8 +381,8 @@ player, caption or transcript affordance.
 Membership tiers, domain-level entitlement, donations, Stripe EUR and Paystack
 GHS checkout, signed webhook confirmation, currency-separated KPIs and the
 subscriber ledger are implemented. Ad inventory, delivery, Studio operations
-and public placements are implemented. Products, classifieds, affiliate links
-and the advertiser self-service portal remain.
+and public placements are implemented. Products, paid classifieds and disclosed
+affiliate links are code-complete; the advertiser self-service portal remains.
 
 ### 5.5 R5 — Intelligence & Reach
 
@@ -1394,3 +1394,27 @@ are live. Custom-domain DNS remains an external registrar action.**
   24 hours. The previous public deployment therefore still returns HTTP 404
   for `/en/shop` and `/en/classifieds`. Retry after the quota resets, then run
   route and provider-checkout smoke tests before marking this story deployed.
+
+## 31. KUR-92 — disclosed affiliate inventory (2026-09-01)
+
+**Status: CODE COMPLETE; production release pending.**
+
+- Added permission-gated affiliate inventory with mandatory disclosure,
+  accessible HTTPS imagery and an HTTPS-only destination. Activation is an
+  explicit revenue-manager action.
+- Public inventory intentionally excludes the outbound destination, internal
+  commission note and click totals. A server-side follow command resolves the
+  stored destination and atomically counts the anonymous click, preventing a
+  caller from substituting an unapproved URL.
+- Studio Revenue can create and publish partner recommendations and review
+  aggregate follow counts. The public Partner Picks page shows disclosures at
+  the decision point, has a useful animated empty state and disables all
+  outbound controls while a tracked destination is being resolved.
+- Verification: `pnpm verify` passes lint, type checking, dependency
+  boundaries, 325 Web Kit tests at 80.48% branch coverage, 79 Web tests,
+  duplication and the Go race/coverage/vulnerability gate. Go reports 96.8%
+  domain and 90.5% application/HTTP coverage. A disposable Mongo 8 replica set
+  proved all adapter integration suites, including named affiliate indexes,
+  round-trip persistence and atomic click counting. Studio and Web production
+  builds pass with the production environment; `/en/partners` and `/og-image`
+  are present in the generated Web route manifest.

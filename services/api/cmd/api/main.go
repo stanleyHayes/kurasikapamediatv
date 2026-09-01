@@ -88,6 +88,7 @@ func run(log *slog.Logger) error {
 	products := adaptermongo.NewProductRepository(db)
 	productOrders := adaptermongo.NewProductOrderRepository(db)
 	classifieds := adaptermongo.NewClassifiedRepository(db)
+	affiliateLinks := adaptermongo.NewAffiliateLinkRepository(db)
 	uploads := adaptercloudinary.NewSigner(cfg.CloudinaryCloudName, cfg.CloudinaryAPIKey, cfg.CloudinaryAPISecret, "kurasikapa/media")
 	videoDelivery := adaptercloudinary.NewDelivery()
 	payments := adapterpayments.NewGateway(http.DefaultClient, cfg.PaystackSecretKey, cfg.StripeSecretKey)
@@ -190,6 +191,9 @@ func run(log *slog.Logger) error {
 	if err := classifieds.EnsureIndexes(ctx); err != nil {
 		return err
 	}
+	if err := affiliateLinks.EnsureIndexes(ctx); err != nil {
+		return err
+	}
 
 	deps := appeditorial.Deps{
 		Articles:   articles,
@@ -210,7 +214,8 @@ func run(log *slog.Logger) error {
 		Plans: plans, Subscriptions: subscriptions, Donations: donations,
 		AdCampaigns: adCampaigns, AdEvents: adEvents,
 		Products: products, ProductOrders: productOrders, Classifieds: classifieds,
-		Payments: payments, Clock: clock, IDs: uuidIDs{},
+		AffiliateLinks: affiliateLinks,
+		Payments:       payments, Clock: clock, IDs: uuidIDs{},
 	}
 
 	handler := kurahttp.NewRouter(kurahttp.Deps{
@@ -285,6 +290,10 @@ func run(log *slog.Logger) error {
 		ConfirmClassified:          apprevenue.NewConfirmClassified(revenueDeps),
 		PublishClassified:          apprevenue.NewPublishClassified(revenueDeps),
 		ListClassifieds:            apprevenue.NewListClassifieds(revenueDeps),
+		CreateAffiliateLink:        apprevenue.NewCreateAffiliateLink(revenueDeps),
+		ActivateAffiliateLink:      apprevenue.NewActivateAffiliateLink(revenueDeps),
+		ListAffiliateLinks:         apprevenue.NewListAffiliateLinks(revenueDeps),
+		FollowAffiliateLink:        apprevenue.NewFollowAffiliateLink(revenueDeps),
 		PaymentWebhooks:            paymentWebhooks,
 		Roles:                      roles,
 		Clock:                      clock,

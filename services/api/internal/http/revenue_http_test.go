@@ -89,6 +89,9 @@ func TestRevenueHandlersRejectMalformedAndMissingResources(t *testing.T) {
 		{http.MethodPost, "/revenue/ad-campaigns/missing/activate", `{}`, http.StatusNotFound},
 		{http.MethodPost, "/public/ads/missing/events", `{`, http.StatusBadRequest},
 		{http.MethodPost, "/public/ads/missing/events", `{"kind":"click"}`, http.StatusNotFound},
+		{http.MethodPost, "/revenue/affiliate-links", `{`, http.StatusBadRequest},
+		{http.MethodPost, "/revenue/affiliate-links/missing/activate", `{}`, http.StatusNotFound},
+		{http.MethodPost, "/public/affiliate-links/missing/follow", `{}`, http.StatusNotFound},
 	}
 	for _, tc := range cases {
 		authorized := tc.path != "/public/donations" && tc.path != "/public/ads/missing/events"
@@ -104,6 +107,34 @@ func TestRevenueHandlersRejectMalformedAndMissingResources(t *testing.T) {
 	}
 	if response := request(handler, http.MethodGet, "/public/en/ads/article_inline", "", false); response.Code != http.StatusOK || !bytes.Contains(response.Body.Bytes(), []byte(`"placement":null`)) {
 		t.Fatalf("empty placement: %d %s", response.Code, response.Body.String())
+	}
+}
+
+func TestAffiliateLinkLifecycleDisclosureAndAnonymousFollow(t *testing.T) {
+	handler := revenueServer()
+	body := `{"partner":"Akwaaba Books","title":"Ghanaian history collection","category":"Books","description":"A carefully selected collection from Ghanaian writers.","disclosure":"Kurasikapa may earn a commission from this link.","imageURL":"https://cdn.example.com/books.jpg","imageAlt":"A collection of Ghanaian books","destinationURL":"https://partner.example.com/ghana-books","commissionNote":"Ten percent"}`
+	created := request(handler, http.MethodPost, "/revenue/affiliate-links", body, true)
+	if created.Code != http.StatusCreated {
+		t.Fatal(created.Code, created.Body.String())
+	}
+	if response := request(handler, http.MethodPost, "/public/affiliate-links/id_1/follow", `{}`, false); response.Code != http.StatusConflict {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	activated := request(handler, http.MethodPost, "/revenue/affiliate-links/id_1/activate", `{}`, true)
+	if activated.Code != http.StatusOK {
+		t.Fatal(activated.Code, activated.Body.String())
+	}
+	listed := request(handler, http.MethodGet, "/public/affiliate-links", "", false)
+	if listed.Code != http.StatusOK || !bytes.Contains(listed.Body.Bytes(), []byte(`"disclosure":"Kurasikapa may earn`)) {
+		t.Fatal(listed.Code, listed.Body.String())
+	}
+	followed := request(handler, http.MethodPost, "/public/affiliate-links/id_1/follow", `{}`, false)
+	if followed.Code != http.StatusOK || !bytes.Contains(followed.Body.Bytes(), []byte(`"destinationURL":"https://partner.example.com/ghana-books"`)) {
+		t.Fatal(followed.Code, followed.Body.String())
+	}
+	managed := request(handler, http.MethodGet, "/revenue/affiliate-links", "", true)
+	if managed.Code != http.StatusOK || !bytes.Contains(managed.Body.Bytes(), []byte(`"clicks":0`)) {
+		t.Fatal(managed.Code, managed.Body.String())
 	}
 }
 

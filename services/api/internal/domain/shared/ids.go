@@ -69,6 +69,8 @@ type (
 	ProductOrderID string
 	// ClassifiedID identifies one paid community listing.
 	ClassifiedID string
+	// AffiliateLinkID identifies one disclosed partner recommendation.
+	AffiliateLinkID string
 )
 
 func (id ArticleID) String() string         { return string(id) }
@@ -95,6 +97,7 @@ func (id AdEventID) String() string         { return string(id) }
 func (id ProductID) String() string         { return string(id) }
 func (id ProductOrderID) String() string    { return string(id) }
 func (id ClassifiedID) String() string      { return string(id) }
+func (id AffiliateLinkID) String() string   { return string(id) }
 
 // NewArticleID validates and wraps an article identifier.
 func NewArticleID(raw string) (ArticleID, error) {

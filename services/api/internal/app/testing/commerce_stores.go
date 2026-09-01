@@ -98,3 +98,46 @@ func (s *ClassifiedStore) Save(_ context.Context, value revenue.Classified) erro
 	s.Items[value.ID()] = value
 	return nil
 }
+
+type AffiliateLinkStore struct {
+	Items  map[shared.AffiliateLinkID]revenue.AffiliateLink
+	Clicks int
+}
+
+func NewAffiliateLinkStore() *AffiliateLinkStore {
+	return &AffiliateLinkStore{Items: map[shared.AffiliateLinkID]revenue.AffiliateLink{}}
+}
+func (s *AffiliateLinkStore) FindByID(_ context.Context, id shared.AffiliateLinkID) (revenue.AffiliateLink, error) {
+	value, ok := s.Items[id]
+	if !ok {
+		return revenue.AffiliateLink{}, ports.ErrNotFound
+	}
+	return value, nil
+}
+func (s *AffiliateLinkStore) ListActive(context.Context, int) ([]revenue.AffiliateLink, error) {
+	out := []revenue.AffiliateLink{}
+	for _, value := range s.Items {
+		if value.State().Active {
+			out = append(out, value)
+		}
+	}
+	return out, nil
+}
+func (s *AffiliateLinkStore) ListAll(context.Context, int) ([]revenue.AffiliateLink, error) {
+	out := make([]revenue.AffiliateLink, 0, len(s.Items))
+	for _, value := range s.Items {
+		out = append(out, value)
+	}
+	return out, nil
+}
+func (s *AffiliateLinkStore) Save(_ context.Context, value revenue.AffiliateLink) error {
+	s.Items[value.ID()] = value
+	return nil
+}
+func (s *AffiliateLinkStore) RecordClick(_ context.Context, id shared.AffiliateLinkID, _ time.Time) error {
+	if _, ok := s.Items[id]; !ok {
+		return ports.ErrNotFound
+	}
+	s.Clicks++
+	return nil
+}

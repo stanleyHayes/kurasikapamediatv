@@ -360,6 +360,14 @@ type ClassifiedRepository interface {
 	Save(context.Context, revenue.Classified) error
 }
 
+type AffiliateLinkRepository interface {
+	FindByID(context.Context, shared.AffiliateLinkID) (revenue.AffiliateLink, error)
+	ListActive(context.Context, int) ([]revenue.AffiliateLink, error)
+	ListAll(context.Context, int) ([]revenue.AffiliateLink, error)
+	Save(context.Context, revenue.AffiliateLink) error
+	RecordClick(context.Context, shared.AffiliateLinkID, time.Time) error
+}
+
 type CheckoutRequest struct {
 	Reference string
 	Purpose   string

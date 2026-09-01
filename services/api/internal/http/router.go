@@ -92,6 +92,10 @@ type Deps struct {
 	ConfirmClassified          apprevenue.ConfirmClassified
 	PublishClassified          apprevenue.PublishClassified
 	ListClassifieds            apprevenue.ListClassifieds
+	CreateAffiliateLink        apprevenue.CreateAffiliateLink
+	ActivateAffiliateLink      apprevenue.ActivateAffiliateLink
+	ListAffiliateLinks         apprevenue.ListAffiliateLinks
+	FollowAffiliateLink        apprevenue.FollowAffiliateLink
 	PaymentWebhooks            ports.PaymentWebhookVerifier
 	Roles                      ports.RoleRepository
 	Clock                      ports.Clock
@@ -178,6 +182,11 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /public/classifieds", deps.handleListClassifieds)
 	mux.HandleFunc("GET /revenue/classifieds", deps.handleManageClassifieds)
 	mux.HandleFunc("POST /revenue/classifieds/{id}/publish", deps.handlePublishClassified)
+	mux.HandleFunc("POST /revenue/affiliate-links", deps.handleCreateAffiliateLink)
+	mux.HandleFunc("POST /revenue/affiliate-links/{id}/activate", deps.handleActivateAffiliateLink)
+	mux.HandleFunc("GET /revenue/affiliate-links", deps.handleManageAffiliateLinks)
+	mux.HandleFunc("GET /public/affiliate-links", deps.handleListAffiliateLinks)
+	mux.HandleFunc("POST /public/affiliate-links/{id}/follow", deps.handleFollowAffiliateLink)
 	mux.HandleFunc("POST /webhooks/payments/{provider}", deps.handlePaymentWebhook)
 
 	return withRequestLogging(deps.Log, mux)

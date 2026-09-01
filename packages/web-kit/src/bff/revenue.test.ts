@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { createAndActivateAdCampaign, createAndActivateMembershipPlan, createAndActivateProduct, loadAdPlacement, loadAdReport, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout } from './revenue'
+import { createAndActivateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -136,5 +136,33 @@ describe('revenue BFF', () => {
     await expect(loadProducts(actor)).resolves.toEqual([])
     await expect(loadClassifieds()).resolves.toEqual([])
     await expect(loadClassifieds(actor)).resolves.toEqual([])
+    await expect(loadAffiliateLinks()).resolves.toEqual([])
+  })
+
+  it('publishes, lists and follows disclosed affiliate links', async () => {
+    configure(); const actor = new Actor(userId('admin'), ['administrator'])
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ items: [{ id: 'affiliate_1', partner: 'Akwaaba Books', title: 'History collection', category: 'Books', description: 'Selected books', disclosure: 'We may earn a commission.', imageURL: 'https://cdn.test/books.jpg', imageAlt: 'Ghanaian books', destinationURL: 'https://partner.test/books', commissionNote: 'Ten percent', active: true, clicks: 4 }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'affiliate_2' }), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ id: 'affiliate_2', active: true }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ destinationURL: 'https://partner.test/books' }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(loadAffiliateLinks()).resolves.toEqual([expect.objectContaining({ id: 'affiliate_1', disclosure: 'We may earn a commission.', clicks: 4 })])
+    await expect(createAndActivateAffiliateLink(actor, { title: 'Books' })).resolves.toEqual({ id: 'affiliate_2' })
+    await expect(followAffiliateLink('affiliate_1')).resolves.toBe('https://partner.test/books')
+  })
+
+  it('protects affiliate management and fails closed on unavailable seams', async () => {
+    configure(); const actor = new Actor(userId('admin'), ['administrator'])
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ items: [{ ID: 'legacy', Partner: 'Partner', Title: 'Offer', Category: 'Books', Description: 'Description', Disclosure: 'Disclosure', ImageURL: 'https://cdn.test/a.jpg', ImageAlt: 'Books', DestinationURL: 'https://partner.test', CommissionNote: 'Internal', Active: true, Clicks: 2 }] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ type: 'not_permitted', title: 'Not permitted' }), { status: 403 }))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(loadAffiliateLinks(actor)).resolves.toEqual([expect.objectContaining({ id: 'legacy', active: true, clicks: 2 })])
+    expect(fetcher.mock.calls[0]?.[1]?.headers).toMatchObject({ 'X-Kurasikapa-User': 'admin' })
+    await expect(loadAffiliateLinks(actor)).rejects.toThrow(/Not permitted/u)
+    vi.stubEnv('API_URL', undefined); resetEnv()
+    await expect(followAffiliateLink('legacy')).rejects.toThrow(/API_URL/u)
+    await expect(createAndActivateAffiliateLink(actor, {})).rejects.toThrow(/API_URL/u)
   })
 })

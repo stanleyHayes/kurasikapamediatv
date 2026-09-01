@@ -125,7 +125,14 @@ func problemFor(err error) Problem {
 		errors.Is(err, domainrevenue.ErrInvalidAdURL),
 		errors.Is(err, domainrevenue.ErrInvalidAdRate),
 		errors.Is(err, domainrevenue.ErrIncompleteCampaign),
-		errors.Is(err, domainrevenue.ErrInvalidAdEvent):
+		errors.Is(err, domainrevenue.ErrInvalidAdEvent),
+		errors.Is(err, domainrevenue.ErrAffiliateIdentity),
+		errors.Is(err, domainrevenue.ErrAffiliateCopy),
+		errors.Is(err, domainrevenue.ErrAffiliateURL),
+		errors.Is(err, domainrevenue.ErrProductIdentity),
+		errors.Is(err, domainrevenue.ErrProductCopy),
+		errors.Is(err, domainrevenue.ErrInvalidStock),
+		errors.Is(err, domainrevenue.ErrInvalidQuantity):
 		return Problem{Type: "invalid_input", Title: err.Error(), Status: http.StatusBadRequest}
 
 	case errors.Is(err, editorial.ErrIllegalTransition),
@@ -150,7 +157,8 @@ func problemFor(err error) Problem {
 		errors.Is(err, editorial.ErrNarrationRevisionMismatch),
 		errors.Is(err, domainmedia.ErrNarrationJobTransition),
 		errors.Is(err, appidentity.ErrInvalidStaffPortrait),
-		errors.Is(err, domainrevenue.ErrCampaignEnded):
+		errors.Is(err, domainrevenue.ErrCampaignEnded),
+		errors.Is(err, domainrevenue.ErrAffiliateInactive):
 		// 409: the request is well-formed and the article is simply not in a
 		// state where it can happen. 400 would suggest the caller sent
 		// something malformed and should change the payload.

@@ -247,6 +247,11 @@ placement fees are calculated before the payment adapter is called. A paid
 classified moves to review, not publication; only `revenue:manage` may start
 its bounded 30-day public placement.
 
+`AffiliateLinkRepository` owns disclosed partner inventory and atomic anonymous
+click counting. Public collection responses exclude destination and commission
+terms; `FollowAffiliateLink` resolves the stored HTTPS destination only after
+the active-link guard passes and the click has been counted.
+
 **insight** — `RecordPageView` · `BuildNewsroomReport` · `BuildSeoReport` · `BuildRevenueSnapshot`
 
 `RecordPageView` accepts only a SHA-256 visitor token produced at the web
