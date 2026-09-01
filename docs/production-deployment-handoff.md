@@ -192,6 +192,9 @@ but the applicable rate and eligibility depend on the legal account country.
 - Draft → review → approval → publish updates the public site immediately.
 - Article media, captions, email, push, scheduled publishing and social delivery
   pass smoke tests with real provider accounts.
+- A real live encoder feed cannot provision without caption confirmation; on
+  the public Live page its in-band track enables CC and stays synchronized with
+  speech throughout the operator smoke test.
 - Donation/payment webhooks are verified, idempotent and reconciled in live mode.
 - Sitemap, news sitemap, robots, canonical URLs, OG image and structured data use
   the final public host; Search Console accepts both sitemaps.

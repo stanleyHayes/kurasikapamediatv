@@ -392,3 +392,18 @@ resolved statuses always carry their resolution date
 **Principle:** Secret audits should prove configuration without reproducing secrets.
 
 - 2026-09-01 checkpoint: no new observation; Observation 24 already covers the app-local environment precedence encountered during production-build verification.
+
+### Observation 26: Live accessibility needs an ingest-to-player evidence chain
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Closing a live-broadcast captioning gap across encoder operations, domain state, public projections and the HLS player.
+**Skill:** New skill candidate: accessible-live-media-release
+**Type:** open-source
+**Phase/Area:** Accessibility verification
+
+**Issue:** A caption badge or operator checkbox alone cannot prove a live programme is accessible. The system needs a pre-provisioning ingest commitment, persisted readiness state, a public projection, and viewer controls that react to actual tracks delivered by the stream.
+
+**Suggested improvement:** Treat live-caption readiness as a cross-layer release contract: fail before billable provisioning when captions are not confirmed, preserve legacy records as unverified, surface actual in-band tracks in the player, and include an operator smoke test that confirms the caption control becomes available on the live signal.
+
+**Principle:** Live-media accessibility is only credible when ingest intent, stored state, delivered tracks and viewer controls form one verifiable chain.

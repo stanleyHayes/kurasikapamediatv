@@ -1,61 +1,25 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { attachPlayback } from './playback-engine'
+import { type LivePlayerController, type PlaybackConnector, useLivePlayer } from './use-live-player'
 
-export function LivePlayer({ source, title }: { source: string; title: string }): React.ReactElement {
-  const video = useRef<HTMLVideoElement>(null)
-  const [failed, setFailed] = useState(false)
-  const [playing, setPlaying] = useState(false)
-  const [muted, setMuted] = useState(true)
-  const [retry, setRetry] = useState(0)
-  const [volume, setVolume] = useState(1)
-
-  useEffect(() => {
-    const element = video.current
-    if (element === null) return
-    setFailed(false)
-    return attachPlayback(element, source, () => { setFailed(true) })
-  }, [source, retry])
-
-  const togglePlayback = (): void => {
-    const element = video.current
-    if (element === null) return
-    if (element.paused) void element.play()
-    else element.pause()
-  }
-  const toggleMute = (): void => {
-    const element = video.current
-    if (element === null) return
-    element.muted = !element.muted
-    setMuted(element.muted)
-  }
-  const jumpLive = (): void => {
-    const element = video.current
-    if (element !== null && element.seekable.length > 0) {
-      element.currentTime = element.seekable.end(element.seekable.length - 1)
-    }
-  }
-  const fullscreen = (): void => { void video.current?.requestFullscreen() }
-  const changeVolume = (next: number): void => {
-    const value = Math.max(0, Math.min(1, next))
-    if (video.current !== null) video.current.volume = value
-    setVolume(value)
-  }
-
-  if (failed) return <SignalFailure onRetry={() => { setFailed(false); setRetry((value) => value + 1) }} />
+export function LivePlayer({ source, title, captionMode, connect }: { source: string; title: string; captionMode: 'in_band' | 'unverified'; connect?: PlaybackConnector }): React.ReactElement {
+  const player = useLivePlayer(source, connect)
+  if (player.failed) return <SignalFailure onRetry={player.retry} />
 
   return <div className="relative aspect-video bg-black text-white">
-    <video ref={video} autoPlay muted playsInline onError={() => { setFailed(true) }} onPlay={() => { setPlaying(true) }} onPause={() => { setPlaying(false) }} className="h-full w-full bg-black object-contain" aria-label={title}>Your browser cannot play this live broadcast.</video>
+    <video ref={player.video} autoPlay muted playsInline onError={player.onError} onPlay={player.onPlay} onPause={player.onPause} className="h-full w-full bg-black object-contain" aria-label={title}>Your browser cannot play this live broadcast.</video>
     <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-2 bg-gradient-to-t from-black via-black/80 to-transparent px-4 pb-4 pt-12">
-      <Control label={playing ? 'Pause' : 'Play'} onClick={togglePlayback}>{playing ? 'Ⅱ' : '▶'}</Control>
-      <Control label={muted ? 'Unmute' : 'Mute'} onClick={toggleMute}>{muted ? 'Muted' : 'Sound'}</Control>
-      <div className="flex items-center border border-white/20" role="group" aria-label="Volume"><Control label="Volume down" onClick={() => { changeVolume(volume - 0.2) }}>−</Control><span className="flex w-16 items-end justify-center gap-1 px-2" aria-live="polite" aria-label={`Volume ${String(Math.round(volume * 100))} percent`}>{[0.2, 0.4, 0.6, 0.8, 1].map((level) => <i key={level} aria-hidden className={`w-1 ${volume >= level ? 'bg-secondary' : 'bg-white/20'}`} style={{ height: `${String(5 + level * 10)}px` }} />)}</span><Control label="Volume up" onClick={() => { changeVolume(volume + 0.2) }}>+</Control></div>
-      <button type="button" onClick={jumpLive} className="ml-auto flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-[.12em]"><span className="size-2 animate-pulse bg-secondary" />Live</button>
-      <Control label="Enter fullscreen" onClick={fullscreen}>⛶</Control>
+      <PlaybackControl player={player}/><MuteControl player={player}/><VolumeControl player={player}/><CaptionControl player={player} mode={captionMode}/>
+      <button type="button" onClick={player.jumpLive} className="ml-auto flex items-center gap-2 px-3 py-2 text-xs font-bold uppercase tracking-[.12em]"><span className="size-2 animate-pulse bg-secondary" />Live</button>
+      <Control label="Enter fullscreen" onClick={player.fullscreen}>⛶</Control>
     </div>
   </div>
 }
+
+function PlaybackControl({ player }: { player: LivePlayerController }): React.ReactElement { return <Control label={player.playing ? 'Pause' : 'Play'} onClick={player.togglePlayback}>{player.playing ? 'Ⅱ' : '▶'}</Control> }
+function MuteControl({ player }: { player: LivePlayerController }): React.ReactElement { return <Control label={player.muted ? 'Unmute' : 'Mute'} onClick={player.toggleMute}>{player.muted ? 'Muted' : 'Sound'}</Control> }
+function VolumeControl({ player }: { player: LivePlayerController }): React.ReactElement { return <div className="flex items-center border border-white/20" role="group" aria-label="Volume"><Control label="Volume down" onClick={() => { player.changeVolume(player.volume - 0.2) }}>−</Control><span className="flex w-16 items-end justify-center gap-1 px-2" aria-live="polite" aria-label={`Volume ${String(Math.round(player.volume * 100))} percent`}>{[0.2, 0.4, 0.6, 0.8, 1].map((level) => <i key={level} aria-hidden className={`w-1 ${player.volume >= level ? 'bg-secondary' : 'bg-white/20'}`} style={{ height: `${String(5 + level * 10)}px` }} />)}</span><Control label="Volume up" onClick={() => { player.changeVolume(player.volume + 0.2) }}>+</Control></div> }
+function CaptionControl({ player, mode }: { player: LivePlayerController; mode: 'in_band' | 'unverified' }): React.ReactElement { const label = player.captionsAvailable ? `${player.captionsOn ? 'Hide' : 'Show'} live captions` : mode === 'in_band' ? 'Live captions loading' : 'Live captions unavailable'; return <button type="button" disabled={!player.captionsAvailable} aria-pressed={player.captionsOn && player.captionsAvailable} aria-label={label} onClick={player.toggleCaptions} className="border border-white/25 bg-black/40 px-3 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-50">CC {player.captionsAvailable ? player.captionsOn ? 'On' : 'Off' : '…'}</button> }
 
 function Control({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }): React.ReactElement {
   return <button type="button" aria-label={label} onClick={onClick} className="border border-white/25 bg-black/40 px-3 py-2 text-xs font-bold hover:border-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">{children}</button>

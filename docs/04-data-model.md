@@ -64,7 +64,7 @@ erDiagram
 | `recording_imports` | idempotent private IVS-to-media promotion jobs | unique `sourceRef`, reserved `assetId`, bucket/prefix, MediaConvert task/output refs, status, failure reason and timestamps |
 | `podcasts` / `episodes` | publishable audio series and accessible episodes | locale, slug, artwork; `audioAssetId`, `transcriptAssetId`, `durationSeconds`, ordered chapters, `publishedAt` |
 | `galleries` | ordered photo stories and captioned video reports | kind, locale, slug, items with asset/caption ids, editorial captions, credits, `publishedAt` |
-| `live_streams` | Live TV | `providerStreamId`, `state`, `startedAt`, `viewerPeak` |
+| `broadcasts` | one billable live channel lifecycle per transmission | locale, private `channelArn`, public `playbackUrl`, `captionMode` (`in_band` or legacy `unverified`), state and start/end timestamps; never a stream key |
 | `schedule_slots` | programme transmissions and replay publication | `programmeId`, locale, start/end window, `isLive`, state, immutable `replayAssetId` and required `captionAssetId` |
 | `social_posts` | outbound queue | `articleId`, `platform`, `caption`, `scheduledAt`, `state`, `attempts` |
 | `newsletter_subscribers` | digests | `email`, `locales[]`, `cadence`, `confirmedAt` |

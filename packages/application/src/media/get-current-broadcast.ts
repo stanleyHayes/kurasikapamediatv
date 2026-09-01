@@ -1,4 +1,4 @@
-import type { BroadcastId } from '@kurasikapa/domain'
+import type { BroadcastId, LiveCaptionMode } from '@kurasikapa/domain'
 import type { BroadcastRepository } from '../ports/broadcast-repository'
 import type { UseCase } from '../ports/use-case'
 
@@ -25,6 +25,7 @@ export interface LiveBroadcast {
   readonly title: string
   readonly locale: string
   readonly playbackUrl: string
+  readonly captionMode: LiveCaptionMode
   readonly startedAt: Date | null
 }
 
@@ -52,6 +53,7 @@ export class GetCurrentBroadcast
       title: broadcast.title,
       locale: broadcast.locale,
       playbackUrl: broadcast.playbackUrl,
+      captionMode: broadcast.captionMode,
       startedAt: broadcast.startedAt,
     }
   }

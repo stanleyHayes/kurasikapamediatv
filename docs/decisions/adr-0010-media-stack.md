@@ -42,6 +42,11 @@ something we then own the seams of.
   writes completed broadcasts to a private S3 destination. Missing
   `AWS_IVS_RECORDING_CONFIGURATION_ARN` refuses channel creation rather than
   allowing an unrecorded programme to disappear when the channel ends.
+- **Every new live channel must carry synchronized in-band captions.** Studio
+  requires the transmission operator to confirm the encoder caption source
+  before provisioning. The public player discovers caption/subtitle tracks from
+  the delivered HLS stream and exposes a CC toggle; stored legacy transmissions
+  remain `unverified` until replaced by a newly provisioned accessible signal.
 - **Images, VOD, podcasts, the whole media library → Cloudinary.** It is the
   client's stated choice, it is a genuinely strong asset pipeline, and live is
   not what it is for.

@@ -191,10 +191,11 @@ export {
 export {
   Broadcast,
   type BroadcastProps,
+  type LiveCaptionMode,
   type NewBroadcast,
 } from './media/broadcast'
 export { BROADCAST_STATES, type BroadcastState } from './media/broadcast-state'
-export { AlreadyLive, BroadcastHasEnded, NotLive } from './media/errors'
+export { AlreadyLive, BroadcastHasEnded, LiveCaptionsRequired, NotLive } from './media/errors'
 export {
   EmptyPresenterName,
   Presenter,

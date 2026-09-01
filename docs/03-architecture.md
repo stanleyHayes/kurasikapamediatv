@@ -52,7 +52,11 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 
 Live channels are provisioned only when an Amazon IVS recording configuration
 is present, so every broadcast is captured to the station's private S3
-destination. Recording capture does not make a replay public. After the
+destination. Provisioning also requires an operator-confirmed in-band caption
+source. That readiness mode is stored and projected publicly; the HLS player
+enables its CC control only when the delivered manifest exposes a real caption
+or subtitle track. Legacy broadcasts remain explicitly `unverified` rather
+than inheriting a false accessibility claim. Recording capture does not make a replay public. After the
 recording is verified in the media library, Go lists only ended live schedule
 slots awaiting a replay and requires a ready Cloudinary video plus ready WebVTT
 captions before completing the slot. Public guide reads then project the video

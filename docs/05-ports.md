@@ -148,6 +148,13 @@ export interface UseCase<In, Out> { execute(input: In): Promise<Out> }
 be published without a caption asset; this accessibility rule lives in the
 schedule aggregate, not in a form or route handler.
 
+`StartBroadcast` refuses before calling the billable `LiveVideoPort` unless the
+operator confirms that synchronized captions are embedded in the outgoing
+encoder stream. New broadcast aggregates persist `captionMode: in_band`; reads
+of older documents use `unverified`, never a fabricated compliance claim. The
+public projection exposes only that provider-neutral mode, and the player still
+requires an actual delivered text track before enabling CC controls.
+
 `ListReplayCandidates` is an authenticated newsroom query over ended live slots
 that are still scheduled. `PublishReplay` resolves the selected assets through
 `AssetRepository`, accepts only a ready video and a ready `text/vtt` caption,

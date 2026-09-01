@@ -11,6 +11,7 @@ import { enforceLiveActionPolicy } from '@/live/action-policy'
 const startSchema = z.object({
   title: z.string().trim().min(3).max(120),
   locale: z.enum(['en', 'fr']),
+  captionsConfirmed: z.literal(true),
 })
 
 const endSchema = z.object({ broadcastId: z.string().min(1), locale: z.enum(['en', 'fr']) })

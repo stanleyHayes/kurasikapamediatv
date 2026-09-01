@@ -13,8 +13,9 @@ stale-while-revalidate, so audience size does not become one Mongo query per
 viewer. Status freshness is bounded to roughly 30 seconds during revalidation.
 Launch languages are the routing contract: English and French.
 
-Recordings, VOD publishing, call-in stages and chat are not part of this slice.
-Do not promise that ending a broadcast creates a replay.
+Recording capture and the caption-gated replay workflow are implemented, but
+ending a broadcast does not publish a replay automatically. Call-in stages and
+chat are not part of the current operator path.
 
 ## Before the first broadcast
 
@@ -29,15 +30,22 @@ Do not promise that ending a broadcast creates a replay.
    collections, but Go Live does not race it.
 4. In OBS, set output to 720p as the operating default and use a keyframe
    interval of two seconds. Keep 1080p in the rendition ladder when available.
+5. Configure the English or French live-caption source in the encoder and make
+   sure it is embedded in the outgoing stream. Do not provision the IVS channel
+   until the caption feed is producing synchronized cues.
 
 ## Going on air
 
-1. Open Studio → Go live, select English or French and enter the title.
+1. Open Studio → Go live, select English or French, enter the title and confirm
+   that the encoder's live caption source is active.
 2. Provision the channel. Copy the Server and Stream key immediately; the key
    is deliberately never persisted and cannot be recovered from Studio.
 3. In OBS choose Custom streaming service, paste both values, and start stream.
-4. Open the public Live page in a separate connection and verify picture and
-   sound. IVS can take several seconds to publish the first segments.
+4. Open the public Live page in a separate connection and verify picture, sound
+   and that the CC control becomes available and shows synchronized words. A
+   disabled `CC …` control means the delivered HLS signal has no discoverable
+   caption track: stop the encoder and correct it before continuing. IVS can
+   take several seconds to publish the first segments.
 
 ## Ending and incidents
 

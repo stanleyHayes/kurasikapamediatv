@@ -1,7 +1,9 @@
 import { type Actor, requirePermission } from '../identity/actor'
 import type { BroadcastId, UserId } from '../shared/ids'
 import type { BroadcastState } from './broadcast-state'
-import { AlreadyLive, BroadcastHasEnded, NotLive } from './errors'
+import { AlreadyLive, BroadcastHasEnded, LiveCaptionsRequired, NotLive } from './errors'
+
+export type LiveCaptionMode = 'in_band' | 'unverified'
 
 export interface BroadcastProps {
   readonly id: BroadcastId
@@ -12,6 +14,7 @@ export interface BroadcastProps {
   readonly channelArn: string
   /** The public HLS URL the player loads. Meant to be shared. */
   readonly playbackUrl: string
+  readonly captionMode: LiveCaptionMode
   readonly state: BroadcastState
   readonly scheduledFor: Date
   readonly startedAt: Date | null
@@ -26,6 +29,7 @@ export interface NewBroadcast {
   readonly locale: string
   readonly channelArn: string
   readonly playbackUrl: string
+  readonly captionMode: LiveCaptionMode
   readonly scheduledFor: Date
 }
 
@@ -59,6 +63,7 @@ export class Broadcast {
   /** The only way a Broadcast comes into existence. */
   static schedule(actor: Actor, input: NewBroadcast): Broadcast {
     requirePermission(actor, 'stream:manage')
+    if (input.captionMode !== 'in_band') throw new LiveCaptionsRequired()
 
     return new Broadcast({
       ...input,
@@ -75,6 +80,7 @@ export class Broadcast {
   get state(): BroadcastState { return this.props.state }
   get channelArn(): string { return this.props.channelArn }
   get playbackUrl(): string { return this.props.playbackUrl }
+  get captionMode(): LiveCaptionMode { return this.props.captionMode }
   get scheduledFor(): Date { return this.props.scheduledFor }
   get startedAt(): Date | null { return this.props.startedAt }
   get endedAt(): Date | null { return this.props.endedAt }

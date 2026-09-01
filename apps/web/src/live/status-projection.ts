@@ -6,6 +6,7 @@ export function liveStatusProjection(current: LiveBroadcast | null): null | {
   readonly id: string
   readonly title: string
   readonly playbackUrl: string
+  readonly captionMode: 'in_band' | 'unverified'
   readonly startedAt: string | null
 } {
   if (current === null) return null
@@ -13,6 +14,7 @@ export function liveStatusProjection(current: LiveBroadcast | null): null | {
     id: current.id,
     title: current.title,
     playbackUrl: current.playbackUrl,
+    captionMode: current.captionMode,
     startedAt: current.startedAt?.toISOString() ?? null,
   }
 }

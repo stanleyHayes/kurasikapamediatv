@@ -17,7 +17,7 @@ const CHANNEL_1 = 'arn:aws:ivs:eu-west-3:000000000000:channel/ch_1'
 const PRODUCER = new Actor(userId('usr_producer'), ['video_editor'])
 const EDITOR = new Actor(userId('usr_editor'), ['editor'])
 
-const goLive = { actor: PRODUCER, title: 'Journal de 20h', locale: 'fr' }
+const goLive = { actor: PRODUCER, title: 'Journal de 20h', locale: 'fr', captionsConfirmed: true }
 
 /** Already on air in `locale`, under an id the SequentialIds prefix cannot collide with. */
 const onAir = (locale: string, state: Broadcast['state'] = 'live'): Broadcast =>
@@ -85,6 +85,13 @@ describe('StartBroadcast', () => {
     const { start, live } = wiring()
 
     await expect(start.execute({ ...goLive, actor: EDITOR })).rejects.toThrow(NotPermitted)
+    expect(live.provisioned).toHaveLength(0)
+  })
+
+  it('refuses an uncaptioned broadcast before it provisions anything', async () => {
+    const { start, live } = wiring()
+
+    await expect(start.execute({ ...goLive, captionsConfirmed: false })).rejects.toThrow('captions')
     expect(live.provisioned).toHaveLength(0)
   })
 

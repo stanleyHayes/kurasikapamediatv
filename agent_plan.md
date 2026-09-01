@@ -63,7 +63,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded channels; ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is code-complete and awaiting production verification. | **PARTIAL — ACTIVE R3 RELEASE** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded or operator-unconfirmed uncaptioned channels; public live status preserves caption readiness and the player enables CC only for actual delivered tracks. Ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is code-complete and awaiting production verification. | **PARTIAL — ACTIVE R3 RELEASE** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds and disclosed affiliate inventory are code-complete across Studio and public surfaces. Provider credentials, the quota-delayed public release and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
@@ -1509,3 +1509,27 @@ are live. Custom-domain DNS remains an external registrar action.**
   the fresh Web deployment with `api-deployments-free-per-day` (>100). Retry the
   Web deployment after the 24-hour account quota window before calling the
   `dateModified` correction live.
+
+## 34. KUR-95 — live synchronized-caption release contract (2026-09-01)
+
+**Status: LOCALLY VERIFIED; production release and real encoder smoke active.**
+
+- `StartBroadcast` now refuses before Amazon IVS provisioning unless the
+  operator confirms an active in-band caption source. The domain independently
+  requires `captionMode: in_band`, so a route or future caller cannot bypass the
+  accessibility rule and create a billable uncaptioned channel.
+- Broadcast persistence stores the provider-neutral readiness mode. Existing
+  documents without the field read as `unverified`; they are never silently
+  upgraded into a compliance claim. Public live status projects the mode while
+  continuing to exclude the channel ARN and one-time stream key.
+- Studio's transmission control adds a required caption-source confirmation and
+  an explicit picture, sound and CC monitoring checklist. The public HLS player
+  discovers delivered caption/subtitle tracks, turns the first one on by
+  default, exposes an accessible CC toggle and leaves that control disabled
+  when the encoder has not actually delivered a track.
+- Full repository gates pass: lint, type checks, architecture boundaries, all
+  TypeScript suites and coverage floors, 177 real-Mongo adapter tests, 1.65%
+  duplication, Go race/vulnerability checks, 96.8% Go domain coverage and 90.8%
+  application/HTTP coverage. Web now passes 86 tests at 85.07% branch coverage.
+  Both independent production builds pass. CI, Vercel release evidence and a
+  real encoder caption smoke remain before this section can be marked deployed.

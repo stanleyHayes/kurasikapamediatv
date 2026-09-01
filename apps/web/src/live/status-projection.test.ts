@@ -8,8 +8,8 @@ describe('live status CDN projection', () => {
   })
 
   it('contains playback fields but no provider handle or ingest credential', () => {
-    const projected = liveStatusProjection({ id: broadcastId('bc_1'), title: 'News', locale: 'en', playbackUrl: 'https://play/live.m3u8', startedAt: new Date('2026-08-30T10:00:00Z') })
-    expect(projected).toEqual({ id: 'bc_1', title: 'News', playbackUrl: 'https://play/live.m3u8', startedAt: '2026-08-30T10:00:00.000Z' })
+    const projected = liveStatusProjection({ id: broadcastId('bc_1'), title: 'News', locale: 'en', playbackUrl: 'https://play/live.m3u8', captionMode: 'in_band', startedAt: new Date('2026-08-30T10:00:00Z') })
+    expect(projected).toEqual({ id: 'bc_1', title: 'News', playbackUrl: 'https://play/live.m3u8', captionMode: 'in_band', startedAt: '2026-08-30T10:00:00.000Z' })
     expect(projected).not.toHaveProperty('channelArn')
   })
 })

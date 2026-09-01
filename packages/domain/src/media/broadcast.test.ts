@@ -4,7 +4,7 @@ import { broadcastId, userId } from '../shared/ids'
 import { actorWith } from '../testing/builders'
 import { Broadcast, type NewBroadcast } from './broadcast'
 import { BROADCAST_STATES, type BroadcastState } from './broadcast-state'
-import { AlreadyLive, BroadcastHasEnded, NotLive } from './errors'
+import { AlreadyLive, BroadcastHasEnded, LiveCaptionsRequired, NotLive } from './errors'
 
 const SCHEDULED_FOR = new Date('2026-08-14T19:00:00Z')
 const START = new Date('2026-08-14T19:02:00Z')
@@ -25,6 +25,7 @@ const input: NewBroadcast = {
   locale: 'fr',
   channelArn: 'arn:aws:ivs:eu-west-3:000000000000:channel/abc123',
   playbackUrl: 'https://abc123.eu-west-3.playback.live-video.net/v1/master.m3u8',
+  captionMode: 'in_band',
   scheduledFor: SCHEDULED_FOR,
 }
 
@@ -58,6 +59,11 @@ describe('schedule', () => {
   it('keeps the channel it was provisioned against', () => {
     expect(scheduled().channelArn).toBe(input.channelArn)
     expect(scheduled().playbackUrl).toBe(input.playbackUrl)
+    expect(scheduled().captionMode).toBe('in_band')
+  })
+
+  it('refuses to schedule a live channel without synchronized captions', () => {
+    expect(() => Broadcast.schedule(producer, { ...input, captionMode: 'none' as 'in_band' })).toThrow(LiveCaptionsRequired)
   })
 
   it('admits an administrator', () => {

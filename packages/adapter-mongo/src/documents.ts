@@ -213,6 +213,7 @@ export interface BroadcastDocument {
   locale: string
   channelArn: string
   playbackUrl: string
+  captionMode?: 'in_band' | 'unverified'
   state: BroadcastState
   scheduledFor: Date
   startedAt: Date | null

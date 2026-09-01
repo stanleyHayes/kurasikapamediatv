@@ -8,6 +8,13 @@ export class AlreadyLive extends Error {
   }
 }
 
+export class LiveCaptionsRequired extends Error {
+  constructor() {
+    super('A live broadcast requires synchronized in-band captions')
+    this.name = 'LiveCaptionsRequired'
+  }
+}
+
 /**
  * Ending a broadcast tears its channel down, so an ended one cannot be revived:
  * `channelArn` names a resource that no longer exists. A second attempt at the

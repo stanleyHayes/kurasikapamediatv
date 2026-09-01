@@ -46,6 +46,7 @@ export const aBroadcast = (overrides: Partial<BroadcastProps> = {}): Broadcast =
     locale: 'fr',
     channelArn: 'arn:aws:ivs:eu-west-3:000000000000:channel/abc123',
     playbackUrl: 'https://abc123.eu-west-3.playback.live-video.net/v1/master.m3u8',
+    captionMode: 'in_band',
     state: 'live',
     scheduledFor: new Date('2026-08-14T19:00:00Z'),
     startedAt: BROADCAST_STARTED_AT,

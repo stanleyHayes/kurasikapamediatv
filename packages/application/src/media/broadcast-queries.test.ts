@@ -27,6 +27,7 @@ describe('GetCurrentBroadcast', () => {
       title: 'Journal de 20h',
       locale: 'fr',
       playbackUrl: live.playbackUrl,
+      captionMode: 'in_band',
       startedAt: BROADCAST_STARTED_AT,
     })
   })
@@ -40,7 +41,7 @@ describe('GetCurrentBroadcast', () => {
     const current = await get.execute({ locale: 'fr' })
 
     expect(JSON.stringify(current)).not.toContain('arn:aws:ivs')
-    expect(Object.keys(current ?? {})).toEqual(['id', 'title', 'locale', 'playbackUrl', 'startedAt'])
+    expect(Object.keys(current ?? {})).toEqual(['id', 'title', 'locale', 'playbackUrl', 'captionMode', 'startedAt'])
   })
 
   it('returns null when the locale is off air', async () => {

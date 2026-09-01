@@ -1,6 +1,7 @@
 import {
   type Actor,
   Broadcast,
+  LiveCaptionsRequired,
   type BroadcastId,
   broadcastId,
   requirePermission,
@@ -22,6 +23,7 @@ export interface StartBroadcastInput {
   readonly actor: Actor
   readonly title: string
   readonly locale: string
+  readonly captionsConfirmed: boolean
 }
 
 /**
@@ -55,6 +57,7 @@ export class StartBroadcast implements UseCase<StartBroadcastInput, StartBroadca
     // provision — and bill for — a channel for an actor we were always going to
     // refuse. The domain check remains the rule; this one is a cheap gate.
     requirePermission(input.actor, 'stream:manage')
+    if (!input.captionsConfirmed) throw new LiveCaptionsRequired()
 
     const onAir = await this.deps.broadcasts.currentLive(input.locale)
     if (onAir !== null) throw new AlreadyBroadcasting(input.locale, onAir.id)
@@ -72,6 +75,7 @@ export class StartBroadcast implements UseCase<StartBroadcastInput, StartBroadca
       locale: input.locale,
       channelArn: channel.channelArn,
       playbackUrl: channel.playbackUrl,
+      captionMode: 'in_band',
       scheduledFor: now,
     }).goLive(input.actor, now)
 

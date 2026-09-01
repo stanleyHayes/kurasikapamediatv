@@ -33,6 +33,7 @@ const broadcast = (id: string, patch: Partial<BroadcastProps> = {}): Broadcast =
     locale: 'en',
     channelArn: 'arn:aws:ivs:eu-west-3:000000000000:channel/AbCdEf',
     playbackUrl: 'https://cdn.example.com/en/master.m3u8',
+    captionMode: 'in_band',
     state: 'scheduled',
     scheduledFor: EVENING,
     startedAt: null,
@@ -204,6 +205,7 @@ describe('the stream key', () => {
 
     expect(Object.keys(raw ?? {}).sort()).toEqual([
       '_id',
+      'captionMode',
       'channelArn',
       'createdBy',
       'endedAt',

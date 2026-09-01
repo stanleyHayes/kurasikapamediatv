@@ -94,6 +94,7 @@ const toDomain = (doc: BroadcastDocument): Broadcast =>
     locale: doc.locale,
     channelArn: doc.channelArn,
     playbackUrl: doc.playbackUrl,
+    captionMode: doc.captionMode ?? 'unverified',
     state: doc.state,
     scheduledFor: doc.scheduledFor,
     startedAt: doc.startedAt,
