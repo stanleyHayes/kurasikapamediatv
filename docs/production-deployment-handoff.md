@@ -7,10 +7,11 @@ a growth budget, not an enterprise quote.
 ## Environment audit completed
 
 The gitignored `.env.production` is the single updated local handoff file. It
-now contains the deployed Render `API_URL` plus newly generated, independent
-values for `BETTER_AUTH_SECRET`, `REVALIDATE_SECRET`, `CRON_SECRET` and the
-VAPID public/private key pair. Their values are deliberately not repeated in
-this document or source control.
+contains the deployed Render `API_URL`, the correct independent Vercel hosts,
+and explicit replacement markers for every provider credential or generated
+secret. It intentionally contains no usable secret. Generate or retrieve each
+value directly in the relevant provider/password manager, then upload it to
+the deployment dashboard without putting it in source control or chat.
 
 The ignored `apps/web/.env.production` and `apps/studio/.env.production` files
 are older developer placeholders and must not be used as deployment inputs.
@@ -33,11 +34,12 @@ features can be enabled. Do not upload blank entries to Vercel or Render:
 | Google Analytics | GA4 measurement ID | Consent-gated audience analytics |
 | SonarCloud | organization token, if private analysis is wanted | Hosted code-quality reporting only |
 
-`MONGODB_URI` and `ANTHROPIC_API_KEY` are present locally. Rotate either one if
-it has ever been shared outside the password manager. The legacy two-field
-Apple entries have been removed from the handoff; the four-value Apple setup
-above is the one the code uses. Missing provider values remain commented so
-they cannot accidentally be uploaded as blank production variables.
+The previously stored Atlas, authentication, revalidation, cron, Anthropic and
+VAPID values must be rotated before launch because they have been exposed
+outside the password manager. The legacy two-field Apple entries have been
+removed from the handoff; the four-value Apple setup above is the one the code
+uses. Missing provider values remain commented so they cannot accidentally be
+uploaded as blank production variables.
 
 ## What you need to provide
 
@@ -125,8 +127,8 @@ a ticket, source control or a screen recording.
 | Target | Required production variables | Add when the provider is activated |
 |---|---|---|
 | Vercel Web | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Web `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `CONTACT_TO_EMAIL`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Google/Facebook/Apple OAuth, Resend, Turnstile, GA4 |
-| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS channel credentials/configuration, Meta publishing |
-| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 credentials |
+| Vercel Studio | `MONGODB_URI`, `MONGODB_DB`, `BETTER_AUTH_SECRET`, Studio `APP_URL`, `SITE_URL`, `STUDIO_URL`, `REVALIDATE_SECRET`, `CRON_SECRET`, `API_URL`, `ANTHROPIC_API_KEY`, `CONTACT_TO_EMAIL` | Resend, IVS `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` and recording configuration; Meta publishing |
+| Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET` | Cloudinary; Stripe/Paystack; IVS recording + MediaConvert; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` credentials |
 | GitHub Actions | `CRON_SECRET` | `ENABLE_SOCIAL_CRON=true` only after Meta approval |
 
 For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
