@@ -1337,7 +1337,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 29. KUR-90 — editor-owned voice-to-article (2026-09-01)
 
-**Status: CODE COMPLETE; full release verification pending.**
+**Status: DEPLOYED; live microphone permission smoke remains operator-assisted.**
 
 - The create-story workspace now exposes explicit start/stop English and French
   dictation with microphone and stop icons, a live interim transcript and clear
@@ -1354,7 +1354,14 @@ are live. Custom-domain DNS remains an external registrar action.**
   functions and 97.89% lines; Studio TypeScript checking is green.
 - Full lint, type checking, dependency boundaries, duplication threshold, both
   production builds and Go verification pass. Go reports 97.1% domain and
-  90.8% application/HTTP coverage. Local Testcontainers could not start, so
-  clean CI must supply the real-Mongo evidence before release is called green.
-- Remaining evidence: clean CI, deployed Studio rendering and an authenticated
-  microphone smoke in a supported browser.
+  90.8% application/HTTP coverage.
+- Release evidence: implementation commit `e1c494d`; CI run `33456436368`
+  passed all TypeScript coverage floors, production builds, real-Mongo
+  integration, Go race/coverage/vulnerability gates, Lighthouse, secret scan,
+  39 browser/accessibility journeys, duplication and dependency audit. Vercel
+  deployment `dpl_F76xh5BLahfLiekog6ZsYHFuXkut` is Ready and attached to
+  `kurasikapa-studio.vercel.app`; the stable Studio sign-in and guarded
+  create-story route both return HTTP 200.
+- A live microphone permission check still requires an operator-controlled
+  supported browser. The current Chrome extension connection was unavailable;
+  no permission prompt was accepted or microphone data captured automatically.
