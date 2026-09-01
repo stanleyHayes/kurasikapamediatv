@@ -15,18 +15,19 @@ import (
 var ErrPlanInactive = errors.New("membership plan is not active")
 
 type Deps struct {
-	Plans          ports.MembershipPlanRepository
-	Subscriptions  ports.SubscriptionRepository
-	Donations      ports.DonationRepository
-	AdCampaigns    ports.AdCampaignRepository
-	AdEvents       ports.AdEventRepository
-	Products       ports.ProductRepository
-	ProductOrders  ports.ProductOrderRepository
-	Classifieds    ports.ClassifiedRepository
-	AffiliateLinks ports.AffiliateLinkRepository
-	Payments       ports.PaymentGateway
-	Clock          ports.Clock
-	IDs            ports.IDs
+	Plans               ports.MembershipPlanRepository
+	Subscriptions       ports.SubscriptionRepository
+	Donations           ports.DonationRepository
+	AdCampaigns         ports.AdCampaignRepository
+	AdEvents            ports.AdEventRepository
+	Products            ports.ProductRepository
+	ProductOrders       ports.ProductOrderRepository
+	Classifieds         ports.ClassifiedRepository
+	AffiliateLinks      ports.AffiliateLinkRepository
+	AdvertiserProposals ports.AdvertiserProposalRepository
+	Payments            ports.PaymentGateway
+	Clock               ports.Clock
+	IDs                 ports.IDs
 }
 
 type CreateMembershipPlan struct{ deps Deps }

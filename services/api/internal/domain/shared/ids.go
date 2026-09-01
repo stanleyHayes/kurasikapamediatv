@@ -71,33 +71,36 @@ type (
 	ClassifiedID string
 	// AffiliateLinkID identifies one disclosed partner recommendation.
 	AffiliateLinkID string
+	// AdvertiserProposalID identifies one advertiser-owned review request.
+	AdvertiserProposalID string
 )
 
-func (id ArticleID) String() string         { return string(id) }
-func (id FamilyID) String() string          { return string(id) }
-func (id RevisionID) String() string        { return string(id) }
-func (id CategoryID) String() string        { return string(id) }
-func (id TagID) String() string             { return string(id) }
-func (id UserID) String() string            { return string(id) }
-func (id StaffProfileID) String() string    { return string(id) }
-func (id AssetID) String() string           { return string(id) }
-func (id PresenterID) String() string       { return string(id) }
-func (id ProgrammeID) String() string       { return string(id) }
-func (id ScheduleSlotID) String() string    { return string(id) }
-func (id PodcastID) String() string         { return string(id) }
-func (id EpisodeID) String() string         { return string(id) }
-func (id GalleryID) String() string         { return string(id) }
-func (id NarrationJobID) String() string    { return string(id) }
-func (id RecordingImportID) String() string { return string(id) }
-func (id MembershipPlanID) String() string  { return string(id) }
-func (id SubscriptionID) String() string    { return string(id) }
-func (id DonationID) String() string        { return string(id) }
-func (id AdCampaignID) String() string      { return string(id) }
-func (id AdEventID) String() string         { return string(id) }
-func (id ProductID) String() string         { return string(id) }
-func (id ProductOrderID) String() string    { return string(id) }
-func (id ClassifiedID) String() string      { return string(id) }
-func (id AffiliateLinkID) String() string   { return string(id) }
+func (id ArticleID) String() string            { return string(id) }
+func (id FamilyID) String() string             { return string(id) }
+func (id RevisionID) String() string           { return string(id) }
+func (id CategoryID) String() string           { return string(id) }
+func (id TagID) String() string                { return string(id) }
+func (id UserID) String() string               { return string(id) }
+func (id StaffProfileID) String() string       { return string(id) }
+func (id AssetID) String() string              { return string(id) }
+func (id PresenterID) String() string          { return string(id) }
+func (id ProgrammeID) String() string          { return string(id) }
+func (id ScheduleSlotID) String() string       { return string(id) }
+func (id PodcastID) String() string            { return string(id) }
+func (id EpisodeID) String() string            { return string(id) }
+func (id GalleryID) String() string            { return string(id) }
+func (id NarrationJobID) String() string       { return string(id) }
+func (id RecordingImportID) String() string    { return string(id) }
+func (id MembershipPlanID) String() string     { return string(id) }
+func (id SubscriptionID) String() string       { return string(id) }
+func (id DonationID) String() string           { return string(id) }
+func (id AdCampaignID) String() string         { return string(id) }
+func (id AdEventID) String() string            { return string(id) }
+func (id ProductID) String() string            { return string(id) }
+func (id ProductOrderID) String() string       { return string(id) }
+func (id ClassifiedID) String() string         { return string(id) }
+func (id AffiliateLinkID) String() string      { return string(id) }
+func (id AdvertiserProposalID) String() string { return string(id) }
 
 // NewArticleID validates and wraps an article identifier.
 func NewArticleID(raw string) (ArticleID, error) {

@@ -368,6 +368,14 @@ type AffiliateLinkRepository interface {
 	RecordClick(context.Context, shared.AffiliateLinkID, time.Time) error
 }
 
+type AdvertiserProposalRepository interface {
+	FindByID(context.Context, shared.AdvertiserProposalID) (revenue.AdvertiserProposal, error)
+	ListForOwner(context.Context, shared.UserID, int) ([]revenue.AdvertiserProposal, error)
+	ListSubmitted(context.Context, int) ([]revenue.AdvertiserProposal, error)
+	Save(context.Context, revenue.AdvertiserProposal) error
+	ApproveWithCampaign(context.Context, revenue.AdvertiserProposal, revenue.AdCampaign) error
+}
+
 type CheckoutRequest struct {
 	Reference string
 	Purpose   string

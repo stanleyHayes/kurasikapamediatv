@@ -20,6 +20,7 @@ const (
 
 var (
 	ErrInvalidAdSlot      = errors.New("ad slot is not supported")
+	ErrInvalidAdLocale    = errors.New("campaign locale must be en, fr or *")
 	ErrInvalidAdWindow    = errors.New("campaign end must follow its start")
 	ErrInvalidAdURL       = errors.New("creative and landing URLs must use HTTPS")
 	ErrInvalidAdRate      = errors.New("CPM must be positive and no greater than budget")
@@ -52,33 +53,41 @@ func NewAdCampaign(actor identity.Actor, state AdCampaignState) (AdCampaign, err
 	if state.ID == "" {
 		return AdCampaign{}, shared.ErrEmptyID
 	}
-	state.Name, state.Advertiser, state.AltText = strings.TrimSpace(state.Name), strings.TrimSpace(state.Advertiser), strings.TrimSpace(state.AltText)
-	if state.Name == "" || state.Advertiser == "" || state.AltText == "" {
-		return AdCampaign{}, ErrIncompleteCampaign
-	}
-	if !knownSlot(state.Slot) {
-		return AdCampaign{}, ErrInvalidAdSlot
-	}
-	if state.Locale != "en" && state.Locale != "fr" && state.Locale != "*" {
-		return AdCampaign{}, errors.New("campaign locale must be en, fr or *")
-	}
-	if !secureURL(state.CreativeURL) || !secureURL(state.LandingURL) {
-		return AdCampaign{}, ErrInvalidAdURL
-	}
-	if err := validateMoney(state.Budget); err != nil {
+	state, err := validateAdCampaign(state)
+	if err != nil {
 		return AdCampaign{}, err
 	}
+	state.Active, state.ActivatedAt, state.CreatedBy = false, nil, actor.ID()
+	return AdCampaign{state: state}, nil
+}
+
+func validateAdCampaign(state AdCampaignState) (AdCampaignState, error) {
+	state.Name, state.Advertiser, state.AltText = strings.TrimSpace(state.Name), strings.TrimSpace(state.Advertiser), strings.TrimSpace(state.AltText)
+	if state.Name == "" || state.Advertiser == "" || state.AltText == "" {
+		return AdCampaignState{}, ErrIncompleteCampaign
+	}
+	if !knownSlot(state.Slot) {
+		return AdCampaignState{}, ErrInvalidAdSlot
+	}
+	if state.Locale != "en" && state.Locale != "fr" && state.Locale != "*" {
+		return AdCampaignState{}, ErrInvalidAdLocale
+	}
+	if !secureURL(state.CreativeURL) || !secureURL(state.LandingURL) {
+		return AdCampaignState{}, ErrInvalidAdURL
+	}
+	if err := validateMoney(state.Budget); err != nil {
+		return AdCampaignState{}, err
+	}
 	if state.CPMMinor <= 0 || state.CPMMinor > state.Budget.Minor {
-		return AdCampaign{}, ErrInvalidAdRate
+		return AdCampaignState{}, ErrInvalidAdRate
 	}
 	if !state.EndsAt.After(state.StartsAt) {
-		return AdCampaign{}, ErrInvalidAdWindow
+		return AdCampaignState{}, ErrInvalidAdWindow
 	}
 	if state.Priority < 1 || state.Priority > 100 {
 		state.Priority = 50
 	}
-	state.Active, state.ActivatedAt, state.CreatedBy = false, nil, actor.ID()
-	return AdCampaign{state: state}, nil
+	return state, nil
 }
 
 func ReconstituteAdCampaign(state AdCampaignState) AdCampaign { return AdCampaign{state: state} }

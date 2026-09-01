@@ -3,15 +3,16 @@ package mongo
 import "time"
 
 const (
-	CollMembershipPlans = "membership_plans"
-	CollSubscriptions   = "subscriptions"
-	CollDonations       = "donations"
-	CollAdCampaigns     = "ad_campaigns"
-	CollAdEvents        = "ad_events"
-	CollProducts        = "products"
-	CollProductOrders   = "product_orders"
-	CollClassifieds     = "classifieds"
-	CollAffiliateLinks  = "affiliate_links"
+	CollMembershipPlans     = "membership_plans"
+	CollSubscriptions       = "subscriptions"
+	CollDonations           = "donations"
+	CollAdCampaigns         = "ad_campaigns"
+	CollAdEvents            = "ad_events"
+	CollProducts            = "products"
+	CollProductOrders       = "product_orders"
+	CollClassifieds         = "classifieds"
+	CollAffiliateLinks      = "affiliate_links"
+	CollAdvertiserProposals = "advertiser_proposals"
 )
 
 type moneyDoc struct {
@@ -79,6 +80,20 @@ type adEventDoc struct {
 	CampaignID string    `bson:"campaignId"`
 	Kind       string    `bson:"kind"`
 	OccurredAt time.Time `bson:"occurredAt"`
+}
+
+type advertiserProposalDoc struct {
+	ID           string        `bson:"_id"`
+	OwnerID      string        `bson:"ownerId"`
+	ContactName  string        `bson:"contactName"`
+	ContactEmail string        `bson:"contactEmail"`
+	Campaign     adCampaignDoc `bson:"campaign"`
+	Status       string        `bson:"status"`
+	SubmittedAt  time.Time     `bson:"submittedAt"`
+	ReviewedAt   *time.Time    `bson:"reviewedAt"`
+	ReviewedBy   string        `bson:"reviewedBy"`
+	CampaignID   string        `bson:"campaignId"`
+	ReviewNote   string        `bson:"reviewNote"`
 }
 
 type membershipPlanDoc struct {

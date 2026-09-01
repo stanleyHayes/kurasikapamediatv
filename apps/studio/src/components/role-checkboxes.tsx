@@ -11,7 +11,7 @@ const ROLE_DESCRIPTIONS: Readonly<Record<Role, string>> = {
   photographer: 'Upload and manage newsroom photography.',
   video_editor: 'Upload video and operate live broadcasts.',
   social_media_manager: 'Prepare and publish social distribution.',
-  advertiser: 'View their own advertising campaigns.',
+  advertiser: 'Submit and track their own campaign proposals.',
   subscriber: 'Reader account with no Studio permissions.',
   guest: 'Basic account with no Studio permissions.',
 }

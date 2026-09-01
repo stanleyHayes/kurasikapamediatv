@@ -54,7 +54,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
-| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service remains. |
+| Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
@@ -1435,3 +1435,26 @@ are live. Custom-domain DNS remains an external registrar action.**
   but public DNS does not resolve either hostname yet. The deliberate
   `kurasikapa-web.vercel.app` and `kurasikapa-studio.vercel.app` aliases remain
   the verified production entry points until registrar DNS is configured.
+
+## 32. KUR-93 — advertiser self-service and approval queue (2026-09-01)
+
+**Status: CODE-COMPLETE; production release verification in progress.**
+
+- Added an invitation-gated public advertiser workspace with its own password,
+  MFA and forgot-password journey. Advertisers submit complete campaign
+  creative, placement, schedule and budget requests and can see only their own
+  history and review notes.
+- Added a permission-gated Studio proposal queue. Revenue managers inspect the
+  creative and destination, approve once to activate inventory, or return a
+  proposal with a required explanatory note. Advertisers cannot approve their
+  own requests.
+- Added the Go domain lifecycle, application use cases, owner/manager repository
+  queries, HTTP/BFF routes and Mongo persistence. Approval commits the proposal
+  transition and new campaign in one transaction; optimistic status filters
+  prevent repeat approval and duplicate campaigns.
+- Verification before release: `pnpm verify` passes lint, type checking,
+  boundaries, all coverage suites, duplication and Go race/vulnerability gates.
+  Go reports 96.8% domain and 90.8% application/HTTP coverage. A disposable
+  Mongo 8 replica set passes all adapter integration tests, including approval
+  rollback and named proposal indexes. Both production builds pass and expose
+  the advertiser portal and Studio Revenue routes.

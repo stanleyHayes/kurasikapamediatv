@@ -226,7 +226,7 @@ cadence+locale+period so a second tick does not double-mail.
 **audience** — `BookmarkArticle` · `RecordRead` · `PostComment` · `ModerateComment` ·
 `SubscribeNewsletter` · `ConfirmNewsletter` · `UnsubscribeNewsletter`
 
-**revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `BuildRevenueReport` · `ServePlacement` · `CreateProduct` · `StartProductOrder` · `SubmitClassified` · `PublishClassified`
+**revenue** — `StartSubscription` · `CancelSubscription` · `RecordDonation` · `CheckEntitlement` · `BuildRevenueReport` · `ServePlacement` · `SubmitAdvertiserProposal` · `ReviewAdvertiserProposal` · `CreateProduct` · `StartProductOrder` · `SubmitClassified` · `PublishClassified`
 
 `StartSubscription` and `RecordDonation` now create provider checkout sessions
 through `PaymentGateway` and persist pending records only after the provider
@@ -251,6 +251,11 @@ its bounded 30-day public placement.
 click counting. Public collection responses exclude destination and commission
 terms; `FollowAffiliateLink` resolves the stored HTTPS destination only after
 the active-link guard passes and the click has been counted.
+
+`AdvertiserProposalRepository` exposes owner-scoped history and a private
+submitted queue. Advertisers may submit but cannot activate inventory. Revenue
+managers approve or reject once; approval stores the proposal transition and
+the resulting active campaign in one transaction.
 
 **insight** — `RecordPageView` · `BuildNewsroomReport` · `BuildSeoReport` · `BuildRevenueSnapshot`
 

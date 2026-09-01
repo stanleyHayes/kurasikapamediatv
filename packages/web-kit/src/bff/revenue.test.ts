@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { createAndActivateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout } from './revenue'
+import { approveAdvertiserProposal, createAndActivateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -164,5 +164,24 @@ describe('revenue BFF', () => {
     vi.stubEnv('API_URL', undefined); resetEnv()
     await expect(followAffiliateLink('legacy')).rejects.toThrow(/API_URL/u)
     await expect(createAndActivateAffiliateLink(actor, {})).rejects.toThrow(/API_URL/u)
+  })
+
+  it('supports advertiser-owned proposals and the protected review queue', async () => {
+    configure(); const advertiser = new Actor(userId('advertiser'), ['advertiser']); const admin = new Actor(userId('admin'), ['administrator'])
+    const payload = { id: 'proposal_1', ownerId: 'advertiser', contactName: 'Ama', contactEmail: 'ama@example.com', status: 'submitted', submittedAt: '2026-09-01T10:00:00Z', reviewedAt: null, campaignId: '', reviewNote: '', campaign: { name: 'Launch', advertiser: 'Acme', locale: '*', slot: 'live_companion', creativeURL: 'https://cdn.test/ad.jpg', altText: 'Solar systems', landingURL: 'https://example.com', budget: { minor: 10000, currency: 'GHS' }, cpmMinor: 1000, priority: 80, startsAt: '2026-09-02T10:00:00Z', endsAt: '2026-10-02T10:00:00Z' } }
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify(payload), { status: 201 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ items: [payload] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ items: [payload] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...payload, status: 'approved', campaignId: 'campaign_1' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...payload, status: 'rejected', reviewNote: 'Revise timing.' }), { status: 200 }))
+    vi.stubGlobal('fetch', fetcher)
+    await expect(submitAdvertiserProposal(advertiser, payload)).resolves.toMatchObject({ id: 'proposal_1', campaign: { slot: 'live_companion', locale: '*' } })
+    await expect(loadAdvertiserProposals(advertiser)).resolves.toHaveLength(1)
+    await expect(loadAdvertiserProposals(admin, true)).resolves.toHaveLength(1)
+    await expect(approveAdvertiserProposal(admin, 'proposal_1')).resolves.toMatchObject({ status: 'approved', campaignId: 'campaign_1' })
+    await expect(rejectAdvertiserProposal(admin, 'proposal_1', 'Revise timing.')).resolves.toMatchObject({ status: 'rejected', reviewNote: 'Revise timing.' })
+    expect(fetcher.mock.calls[0]?.[1]?.headers).toMatchObject({ 'X-Kurasikapa-User': 'advertiser' })
+    expect(fetcher.mock.calls[4]?.[1]?.body).toBe('{"note":"Revise timing."}')
   })
 })

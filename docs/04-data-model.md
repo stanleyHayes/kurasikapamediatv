@@ -71,6 +71,7 @@ erDiagram
 | `rss_sources` | syndication in | `url`, `lastFetchedAt`, `etag` |
 | `bookmarks` `reading_history` `comments` | reader activity | `readerId`, `articleId` |
 | `ad_campaigns` `placements` | ad serving | `advertiserId`, `slot`, `targeting`, `budget`, `impressions` |
+| `advertiser_proposals` | private self-service advertising intake | owner/contact, complete campaign request, review status/note, reviewer and activated campaign id |
 | `membership_plans` | recurring support offers | slug, interval, minor-unit GHS/EUR price, benefits, explicit activation |
 | `subscriptions` | reader entitlement lifecycle | `planId`, `readerId`, checkout email, price, provider references, status, `paidThrough`, cancellation |
 | `donations` | one-time support | amount, provider references, optional supporter message/privacy, status and `paidAt` |
@@ -91,7 +92,10 @@ Revenue indexes are named and mandatory: `membership_slug_unique`,
 `reader_entitlement`, `revenue_subscribers_recent`, `donation_provider_ref_unique`,
 `donation_revenue_recent`, `donation_checkout_recent`, product slug/SKU and
 provider-reference indexes, classified status/expiry and provider-reference,
-and affiliate destination uniqueness plus active-category lookup indexes.
+affiliate destination uniqueness plus active-category lookup indexes, and
+advertiser-proposal owner/history plus submitted-review-queue indexes. Proposal
+approval atomically creates the active campaign and closes the submitted
+proposal, so a retry cannot create an orphan or duplicate campaign.
 Provider references are unique so a retried webhook
 cannot create a second commercial event.
 

@@ -75,21 +75,23 @@ func TestRevenueIndexesAreNamedAndProviderReferencesUnique(t *testing.T) {
 	orders := adapter.NewProductOrderRepository(h.DB)
 	classifieds := adapter.NewClassifiedRepository(h.DB)
 	affiliates := adapter.NewAffiliateLinkRepository(h.DB)
-	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes, products.EnsureIndexes, orders.EnsureIndexes, classifieds.EnsureIndexes, affiliates.EnsureIndexes} {
+	proposals := adapter.NewAdvertiserProposalRepository(h.DB)
+	for _, ensure := range []func(context.Context) error{plans.EnsureIndexes, subscriptions.EnsureIndexes, donations.EnsureIndexes, adCampaigns.EnsureIndexes, adEvents.EnsureIndexes, products.EnsureIndexes, orders.EnsureIndexes, classifieds.EnsureIndexes, affiliates.EnsureIndexes, proposals.EnsureIndexes} {
 		if err := ensure(ctx); err != nil {
 			t.Fatal(err)
 		}
 	}
 	checks := map[string][]string{
-		adapter.CollMembershipPlans: {"membership_slug_unique", "active_membership_plans"},
-		adapter.CollSubscriptions:   {"subscription_provider_ref_unique", "reader_entitlement", "revenue_subscribers_recent"},
-		adapter.CollDonations:       {"donation_provider_ref_unique", "donation_revenue_recent", "donation_checkout_recent"},
-		adapter.CollAdCampaigns:     {"eligible_ad_campaigns"},
-		adapter.CollAdEvents:        {"campaign_event_counts"},
-		adapter.CollProducts:        {"product_slug_unique", "product_sku_unique", "active_product_inventory"},
-		adapter.CollProductOrders:   {"product_order_provider_ref_unique", "product_orders_recent"},
-		adapter.CollClassifieds:     {"published_classified_expiry", "classified_provider_ref_unique"},
-		adapter.CollAffiliateLinks:  {"affiliate_destination_unique", "active_affiliate_category"},
+		adapter.CollMembershipPlans:     {"membership_slug_unique", "active_membership_plans"},
+		adapter.CollSubscriptions:       {"subscription_provider_ref_unique", "reader_entitlement", "revenue_subscribers_recent"},
+		adapter.CollDonations:           {"donation_provider_ref_unique", "donation_revenue_recent", "donation_checkout_recent"},
+		adapter.CollAdCampaigns:         {"eligible_ad_campaigns"},
+		adapter.CollAdEvents:            {"campaign_event_counts"},
+		adapter.CollProducts:            {"product_slug_unique", "product_sku_unique", "active_product_inventory"},
+		adapter.CollProductOrders:       {"product_order_provider_ref_unique", "product_orders_recent"},
+		adapter.CollClassifieds:         {"published_classified_expiry", "classified_provider_ref_unique"},
+		adapter.CollAffiliateLinks:      {"affiliate_destination_unique", "active_affiliate_category"},
+		adapter.CollAdvertiserProposals: {"advertiser_proposals_owner", "advertiser_proposal_queue"},
 	}
 	for collection, expected := range checks {
 		names := indexNames(t, h, collection)
