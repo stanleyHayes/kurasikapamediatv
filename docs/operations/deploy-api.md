@@ -15,6 +15,21 @@ unset `API_URL` keeps the TypeScript path.
    - `MONGODB_DB` — `kurasikapa` (default; only override for a different DB).
    - `CRON_SECRET` — a random bearer token for the cron guard. Leave unset to
      refuse every scheduled request.
+   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and
+     `CLOUDINARY_API_SECRET` — required for verified media uploads and for
+     promoting narration and recorded-live output.
+   - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` — credentials for a
+     least-privilege API workload principal. Do not use AWS root credentials.
+   - `AWS_POLLY_REGION` and `AWS_POLLY_OUTPUT_BUCKET` — narration region and
+     private staging bucket.
+   - `AWS_IVS_REGION`, `AWS_IVS_RECORDING_BUCKET`,
+     `AWS_MEDIACONVERT_OUTPUT_BUCKET`, `AWS_MEDIACONVERT_ROLE_ARN`,
+     `AWS_MEDIACONVERT_JOB_TEMPLATE` and `IVS_RECORDING_WEBHOOK_SECRET` —
+     recorded-live intake and promotion. Configure this complete group; a
+     partial group cannot deliver a replay candidate.
+   - `PAYSTACK_SECRET_KEY`, `STRIPE_SECRET_KEY` and
+     `STRIPE_WEBHOOK_SECRET` — live payment credentials, only after provider
+     approval and webhook registration.
    - `VOYAGE_API_KEY` — Voyage embedding key, enabled only after the Atlas
      vector index below reports `READY`.
    - `VOYAGE_MODEL` — optional; defaults to `voyage-4`.
@@ -25,6 +40,10 @@ unset `API_URL` keeps the TypeScript path.
    Mongo indexes it depends on (`articles`, `categories`, `article_revisions`)
    and refuses to serve if the unique ones cannot be built — a first deploy
     against an empty Atlas database is self-provisioning.
+
+The Blueprint declares every one of these keys so a fresh service exposes the
+full contract in Render. Keys marked `sync: false` still require an operator to
+enter their values; the declaration does not create or copy a credential.
 
 ### Create the semantic vector index
 

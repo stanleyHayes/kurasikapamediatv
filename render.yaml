@@ -24,6 +24,26 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_POLLY_REGION
+        value: eu-west-2
+      - key: AWS_POLLY_OUTPUT_BUCKET
+        sync: false
+      - key: AWS_IVS_REGION
+        value: eu-west-1
+      - key: AWS_IVS_RECORDING_BUCKET
+        sync: false
+      - key: AWS_MEDIACONVERT_OUTPUT_BUCKET
+        sync: false
+      - key: AWS_MEDIACONVERT_ROLE_ARN
+        sync: false
+      - key: AWS_MEDIACONVERT_JOB_TEMPLATE
+        sync: false
+      - key: IVS_RECORDING_WEBHOOK_SECRET
+        sync: false
       - key: PAYSTACK_SECRET_KEY
         sync: false
       - key: STRIPE_SECRET_KEY

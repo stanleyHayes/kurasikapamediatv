@@ -1775,3 +1775,11 @@ are live. Custom-domain DNS remains an external registrar action.**
   module uses the shared header constructor. `pnpm verify` and
   `make -C services/api verify` pass, with Go domain coverage 96.8%, application
   coverage 91.0% and HTTP coverage 90.8%.
+- Closed a deployment-contract omission found during the production env audit:
+  `render.yaml` now declares the complete Cloudinary, AWS Polly/S3, IVS
+  recording, MediaConvert, payment and Voyage variable set consumed by the Go
+  composition root. Secret entries remain `sync: false`; defaults are limited
+  to the two reviewed AWS regions and Voyage model dimensions. The API deploy
+  runbook now explains provider grouping and least-privilege ownership, and the
+  env example no longer incorrectly describes the public Render service as a
+  private backend.
