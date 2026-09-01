@@ -78,3 +78,28 @@ it separately reports imported/module advisories that are not called by this
 service. CI also runs secret scanning, dependency audit, security-header tests,
 real authorisation journeys and Lighthouse. Provider firewall publication and
 the Strix exploit scan remain separate launch evidence.
+
+## Live provider state — 1 September 2026
+
+Both production projects now run the first observation-only rules. No request
+is denied or challenged by these rules while the newsroom establishes a clean
+traffic baseline.
+
+- Web: `Log common exploit probes` plus `Observe authentication bursts` at 20
+  requests per 60 seconds by IP, with the exceeded action set to **Log**.
+- Studio: `Log common exploit probes` plus `Observe Studio AI bursts` at 20
+  requests per 60 seconds by IP, with the exceeded action set to **Log**.
+- The probe rule covers `.env`, `.git`, WordPress and phpMyAdmin paths. It stays
+  in Log until provider traffic has been reviewed for false positives.
+- Vercel accepted and published those four rules. It refused a second
+  rate-limit rule on each project with `Rate limiting is not available for this
+  plan (401)`. The broader public-write and Studio-shell limits therefore remain
+  enforced by the application's actor/IP limiters until the project plan makes
+  additional firewall rate-limit rules available.
+- Post-publication smoke checks returned HTTP 200 for the public home page, the
+  Web-rewritten Studio sign-in and direct Studio sign-in. This proves the
+  observation rules did not disrupt the two launch entry points.
+
+Promotion to Deny/429, bot-rule activation, a ten-minute traffic export and an
+independent Strix report remain acceptance evidence; do not describe this
+observation baseline as a completed production pentest.
