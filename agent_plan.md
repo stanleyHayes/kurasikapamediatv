@@ -1747,3 +1747,25 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Live smoke evidence: Web `/` redirects to `/en`; direct Studio `/` redirects
   locally to `/studio/en/sign-in`; direct Studio sign-in and Web
   `/studio/en/sign-in` both return HTTP 200 with the Kurasikapa Studio title.
+
+## 42. KUR-104 — live launch inventory and API trust boundary (2026-09-01)
+
+**Status: INVENTORY VERIFIED — client/provider inputs and service authentication remain.**
+
+- The production API currently exposes 35 English client-preview articles.
+  Their copy is explicitly labelled preview material and the sampled articles
+  have no hero image, so this is demo density rather than launch journalism.
+- Production returns zero public team profiles, presenters, programmes,
+  replays, podcasts, galleries, events, membership plans, products,
+  classifieds and affiliate links; the home leaderboard resolves no ad. These
+  are real inventory gaps, not missing screens. Do not invent journalist
+  identities, programme rights or commercial prices to make the counters move.
+- Anonymous, random and the published demo-author identifiers all receive HTTP
+  403 from staff media, review, revenue and SEO endpoints, proving those tested
+  identities have no privileged role. However, the public Render service still
+  treats `X-Kurasikapa-User` as a trusted BFF assertion without a service
+  signature. A published staff profile exposes its user id, so role lookup alone
+  does not authenticate the caller. Before real profiles make that identifier
+  public, require a server-only shared assertion between Next and Go (with
+  constant-time verification), preserve public endpoints, and add forged-header
+  integration coverage. This is the next unblocked production-security slice.
