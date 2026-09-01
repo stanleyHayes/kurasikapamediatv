@@ -13,10 +13,10 @@ APP_PROFILE := coverage-app.out
 DOMAIN_FLOOR := 95.0
 APP_FLOOR := 90.0
 
-.PHONY: verify verify-all fmt vet lint test cover cover-app integration clean
+.PHONY: verify verify-all fmt vet lint test test-cmd cover cover-app integration clean
 
 ## verify is the fast gate: no database required.
-verify: fmt vet lint cover cover-app
+verify: fmt vet lint test-cmd cover cover-app
 
 ## verify-all adds the integration suite. This is what CI runs.
 verify-all: verify integration
@@ -40,6 +40,11 @@ lint:
 
 test:
 	$(GO) test -race ./...
+
+## Command packages are composition roots and operational tools. They sit
+## outside the ring coverage profiles, so execute their guards explicitly.
+test-cmd:
+	$(GO) test -race ./cmd/...
 
 ## cover enforces the floor on the domain ring specifically.
 ##

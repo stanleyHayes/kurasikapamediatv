@@ -22,6 +22,8 @@ AI-native publishing platform for a France-registered TV, radio and online media
   isolated Atlas restore, read-only integrity verifier and evidence gate.
 - [Vercel firewall rollout](operations/vercel-firewall.md) — Web/Studio rule
   order, log-first promotion, emergency mode and acceptance evidence.
+- [Production preview inventory](operations/preview-inventory.md) — guarded
+  Render one-off seed/clear commands and acceptance evidence.
 
 ## APIs
 

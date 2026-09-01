@@ -1843,3 +1843,33 @@ are live. Custom-domain DNS remains an external registrar action.**
   operator rather than weakening Atlas network policy or the API trust
   boundary. Real journalists, launch reporting, licensed media and commercial
   terms remain client-owned inputs and must not be fabricated by this seed.
+
+## 44. KUR-106 — Render-safe production preview operator (2026-09-01)
+
+**Status: LOCALLY VERIFIED — Render deploy and one-off production run pending.**
+
+- Added a private `/preview-inventory` Go binary to the API image. It accepts
+  only `seed` or `clear`, requires the exact preview confirmation token and
+  inherits MongoDB configuration only when Render launches an explicit one-off
+  job. No route, browser action or long-lived process exposes this capability.
+- The normal distroless image now uses `CMD ["/api"]` instead of an entrypoint,
+  allowing Render to replace the command for an isolated job. A production
+  Docker build proved the image has no entrypoint, defaults to `/api` and runs
+  `/preview-inventory` when overridden.
+- The operator owns only managed preview content: three FAQ/help/careers pages,
+  three clearly labelled presenter profiles, three programmes and three future
+  schedule slots. Every record carries the preview tag; matching non-preview
+  records are skipped, and clear deletes tagged records only from the four
+  named collections.
+- Two real-Mongo rehearsals passed. An empty database created and removed all
+  12 records. A database with an operator-owned FAQ preserved that page, wrote
+  and removed the remaining 11 records, and left zero tagged television data.
+- Tightened `make verify` to run every `cmd/...` test under the race detector;
+  this also closes the previous gap for the restore verifier CLI. Full
+  `pnpm verify` is green with 96.8% domain, 91.0% application and 90.8% HTTP
+  coverage. The existing Studio loading-route orphan remains the sole boundary
+  warning.
+- Added `docs/operations/preview-inventory.md` with the exact Render job,
+  acceptance, cleanup and rollback procedure. Production mutation remains
+  unclaimed until the new API artifact is deployed, the one-off job succeeds
+  and public television inventory is verified.

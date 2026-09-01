@@ -17,6 +17,7 @@ COPY . ./
 
 # Build a static binary. CGO is disabled so the scratch image can run it.
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /api ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /preview-inventory ./cmd/preview-inventory
 
 # Runtime stage
 FROM gcr.io/distroless/static-debian12:nonroot
@@ -24,6 +25,7 @@ FROM gcr.io/distroless/static-debian12:nonroot
 WORKDIR /
 
 COPY --from=builder /api /api
+COPY --from=builder /preview-inventory /preview-inventory
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # The service listens on $PORT (default 8080).
@@ -31,4 +33,4 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["/api"]
+CMD ["/api"]
