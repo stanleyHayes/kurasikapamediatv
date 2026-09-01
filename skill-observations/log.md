@@ -375,3 +375,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Before compiling a release candidate, enumerate the framework's environment-file precedence, identify ignored local overrides, validate the effective non-secret key sources, and run the build with the same authoritative environment shape used by hosting.
 
 **Principle:** Production build evidence is trustworthy only when the highest-precedence environment source is known and intentional.
+
+### Observation 25: Environment audits must inspect names without emitting values
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Auditing a gitignored production environment that contained live-looking credentials.
+**Skill:** New skill candidate: production-environment-handoff
+**Type:** open-source
+**Phase/Area:** Secret-safe environment validation
+
+**Issue:** Reading a production dotenv file verbatim during an audit can expose the very credentials the audit is meant to protect.
+
+**Suggested improvement:** Start with variable names, value-presence flags and redacted fingerprints; read individual non-secret values only when necessary. If a credential is emitted outside its password manager, stop, sanitize the handoff and require rotation before deployment.
+
+**Principle:** Secret audits should prove configuration without reproducing secrets.
