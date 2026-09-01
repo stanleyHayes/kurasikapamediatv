@@ -1846,7 +1846,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 44. KUR-106 — Render-safe production preview operator (2026-09-01)
 
-**Status: LOCALLY VERIFIED — Render deploy and one-off production run pending.**
+**Status: DEPLOYED AND PRODUCTION-SEEDED — real launch inventory remains client input.**
 
 - Added a private `/preview-inventory` Go binary to the API image. It accepts
   only `seed` or `clear`, requires the exact preview confirmation token and
@@ -1870,6 +1870,36 @@ are live. Custom-domain DNS remains an external registrar action.**
   coverage. The existing Studio loading-route orphan remains the sole boundary
   warning.
 - Added `docs/operations/preview-inventory.md` with the exact Render job,
-  acceptance, cleanup and rollback procedure. Production mutation remains
-  unclaimed until the new API artifact is deployed, the one-off job succeeds
-  and public television inventory is verified.
+  acceptance, cleanup and rollback procedure.
+- Source commit `a5783fd` is on `main`. CI run `33493090960` is fully green:
+  Go verification/integration/vulnerability checks, secret scanning,
+  Lighthouse, lint, typecheck, boundaries, coverage floors, builds, 40
+  browser/WCAG journeys, duplication and dependency audit all passed.
+- Render deployment `dep-dab9p4dg1s2s73e9vikg` promoted exact commit
+  `a5783fdbcdacc7306fef3ff011caf12d34e94d02` to live on service
+  `srv-daa6qvh42hec739n0gkg`; `/healthz` returned `{"status":"ok"}`.
+- Render one-off job `job-dab9prm7bikc73bitrdg` succeeded with the guarded
+  seed command. Its production log records `seeded 12 managed preview records`.
+  The public television API then returned three presenters, three programmes,
+  three upcoming slots and zero replays. `/en/live`, `/en/faq`, `/en/help` and
+  `/en/careers` all return HTTP 200 with the seeded content rendered.
+- The preview inventory is intentionally still present for the client demo and
+  remains exactly reversible with the documented guarded clear job. Named
+  journalists, original launch stories, licensed media and commercial terms
+  remain client-owned inputs and have not been fabricated.
+
+## 45. KUR-107 — visible public newsroom navigation (2026-09-01)
+
+**Status: LOCALLY VERIFIED — production deployment pending.**
+
+- Replaced the desktop-only catch-all navigation with six visible desks: News,
+  Regions, Business, Watch, Listen and Ideas. Each desk opens a focused dropdown
+  while preserving all 19 existing public destinations.
+- Desktop navigation now appears from the `lg` breakpoint instead of waiting
+  until `2xl`; the hamburger remains the compact mobile/tablet navigation.
+  Active desk and destination states continue to follow localized routes.
+- Added English and French desk labels and a single typed navigation inventory,
+  preventing desktop and mobile menus from drifting apart.
+- Added regression coverage proving there are exactly six useful desktop desks
+  and no duplicate mobile destinations. Full `pnpm verify` passes; the existing
+  Studio loading-route orphan is still the sole boundary warning.

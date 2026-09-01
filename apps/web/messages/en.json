@@ -35,6 +35,12 @@
     "openMenu": "Open menu",
     "primary": "Primary",
     "sections": "Sections",
+    "deskNews": "News",
+    "deskRegions": "Regions",
+    "deskMarkets": "Business",
+    "deskWatch": "Watch",
+    "deskListen": "Listen",
+    "deskIdeas": "Ideas",
     "live": "Live",
     "podcasts": "Podcasts"
   },
