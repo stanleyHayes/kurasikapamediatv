@@ -20,6 +20,11 @@ are older developer placeholders and must not be used as deployment inputs.
 Either remove them locally or inject the audited root file into local production
 builds; provider dashboards remain the source of truth for deployed values.
 
+The audit also corrected `AWS_REGION` to `eu-west-1`. Studio uses this variable
+to create IVS channels, so it must match the Ireland recording configuration and
+private recording bucket used by the Render promotion pipeline. A mixed-region
+setup fails when Studio tries to attach the recording configuration.
+
 The following provider-issued values are still required before their matching
 features can be enabled. Do not upload blank entries to Vercel or Render:
 

@@ -23,6 +23,7 @@ import type { ActionResult } from '@kurasikapa/web-kit/actions/result'
 import { useRouter } from '@kurasikapa/web-kit/i18n/navigation'
 import { ScheduleControl } from './schedule-control'
 import { ActionButton, ReasonedAction } from './workflow-buttons'
+import { StatusBadge } from './status-badge'
 
 /**
  * The workflow's next steps, rendered where an editor is already looking at
@@ -40,6 +41,7 @@ import { ActionButton, ReasonedAction } from './workflow-buttons'
  */
 export interface TransitionControlsProps {
   readonly articleId: string
+  readonly locale: string
   readonly status: ArticleStatus
   readonly roles: readonly Role[]
   /** True when the viewer is the article's author — see above. */
@@ -73,14 +75,15 @@ function mayActOn(
   return owned || permissions.has('article:edit_any')
 }
 
-type Run = (action: () => Promise<ActionResult<unknown>>) => void
+type Run = (transition: Transition, action: () => Promise<ActionResult<unknown>>) => void
 
 export function TransitionControls(props: TransitionControlsProps): React.ReactElement | null {
   const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState(props.status)
   const [pending, start] = useTransition()
   const router = useRouter()
 
-  const run: Run = (action) => {
+  const run: Run = (transition, action) => {
     setError(null)
 
     start(async () => {
@@ -91,31 +94,49 @@ export function TransitionControls(props: TransitionControlsProps): React.ReactE
         return
       }
 
+      // Server Actions return the committed transition before the refreshed
+      // RSC tree arrives. Reflect that truth immediately so the newsroom can
+      // continue even when a loaded runner or slow network delays refresh.
+      setStatus(ruleFor(transition).to)
       // The transition wrote new state; refresh so the badge, these controls
       // and the revision history all agree on where the article now is.
       router.refresh()
     })
   }
 
-  const available = legalTransitions(props.status, props.roles, props.owned)
-  if (available.length === 0) return null
+  const available = legalTransitions(status, props.roles, props.owned)
 
   return (
-    <section className="border-outline-variant bg-surface-container-low mb-[var(--space-md)] border-l-4 border-l-primary p-5">
-      <h2 className="font-display text-on-surface mb-3 text-lg font-semibold">Workflow</h2>
-
-      <div className="flex flex-wrap items-center gap-3">
-        {available.map((transition) => (
-          <Control key={transition} transition={transition} props={props} pending={pending} run={run} />
-        ))}
+    <div>
+      <div className="mb-[var(--space-md)] flex items-center gap-3">
+        <StatusBadge status={status} />
+        <span className="text-on-surface-variant text-label-bold uppercase">{props.locale}</span>
       </div>
+      {available.length > 0 && (
+        <section className="border-outline-variant bg-surface-container-low mb-[var(--space-md)] border-l-4 border-l-primary p-5">
+          <h2 className="font-display text-on-surface mb-3 text-lg font-semibold">Workflow</h2>
 
-      {error !== null && (
-        <p role="alert" className="text-error mt-3 text-sm">
-          {error}
-        </p>
+          <div className="flex flex-wrap items-center gap-3">
+            {available.map((transition) => (
+              <Control
+                key={transition}
+                transition={transition}
+                props={props}
+                pending={pending}
+                run={run}
+                onSuccess={(completed) => { setStatus(ruleFor(completed).to) }}
+              />
+            ))}
+          </div>
+
+          {error !== null && (
+            <p role="alert" className="text-error mt-3 text-sm">
+              {error}
+            </p>
+          )}
+        </section>
       )}
-    </section>
+    </div>
   )
 }
 
@@ -124,11 +145,13 @@ function Control({
   props,
   pending,
   run,
+  onSuccess,
 }: {
   transition: Transition
   props: TransitionControlsProps
   pending: boolean
   run: Run
+  onSuccess: (transition: Transition) => void
 }): React.ReactElement | null {
   const articleId = props.articleId
 
@@ -144,12 +167,12 @@ function Control({
           placeholder="Note for the author"
           pending={pending}
           onConfirm={(note) => {
-            run(() => rejectArticleAction({ articleId, note }))
+            run('reject', () => rejectArticleAction({ articleId, note }))
           }}
         />
       )
     case 'schedule':
-      return <ScheduleControl articleId={articleId} />
+      return <ScheduleControl articleId={articleId} onSuccess={() => { onSuccess('schedule') }} />
     case 'publish':
       return <ActionButton label="Publish now" pending={pending} onClick={publishing(articleId, run)} />
     case 'unpublish':
@@ -159,7 +182,7 @@ function Control({
           placeholder="Reason for the audit log"
           pending={pending}
           onConfirm={(reason) => {
-            run(() => unpublishArticleAction({ articleId, reason }))
+            run('unpublish', () => unpublishArticleAction({ articleId, reason }))
           }}
         />
       )
@@ -168,13 +191,13 @@ function Control({
 
 function submitting(articleId: string, run: Run): () => void {
   return () => {
-    run(() => submitForReviewAction({ articleId }))
+    run('submit', () => submitForReviewAction({ articleId }))
   }
 }
 
 function publishing(articleId: string, run: Run): () => void {
   return () => {
-    run(() => publishArticleAction({ articleId }))
+    run('publish', () => publishArticleAction({ articleId }))
   }
 }
 
@@ -192,7 +215,7 @@ function approveControl(
       label="Approve"
       pending={pending}
       onClick={() => {
-        run(() => approveArticleAction({ articleId: props.articleId, revisionId }))
+        run('approve', () => approveArticleAction({ articleId: props.articleId, revisionId }))
       }}
     />
   )

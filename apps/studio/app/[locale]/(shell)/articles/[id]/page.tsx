@@ -4,7 +4,6 @@ import { Suspense } from 'react'
 import { loadStudioDraft } from '@kurasikapa/web-kit/bff/load-studio'
 import { BreakingAlertButton } from '@/components/breaking-alert-button'
 import { EditorWorkspace } from '@/components/editor-workspace'
-import { StatusBadge } from '@/components/status-badge'
 import { TransitionControls } from '@/components/transition-controls'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
 import { ArticleNotFound } from '@kurasikapa/application'
@@ -42,18 +41,15 @@ async function EditorBody({ params }: Params): Promise<React.ReactElement> {
   const narrationJob = env().API_URL === undefined ? null : await loadLatestArticleNarration(actor, draft.id)
   return (
     <>
-      <div className="mb-[var(--space-md)] flex items-center gap-3">
-        <StatusBadge status={draft.status} />
-        <span className="text-on-surface-variant text-label-bold uppercase">{draft.locale}</span>
-      </div>
-
       {/*
         `owned` is derived, not loaded: the studio read model carries no
         authorId, and anyone on this page without `article:edit_any` got here
         through `assertReadableBy` — which only the author passes.
       */}
       <TransitionControls
+        key={draft.id}
         articleId={draft.id}
+        locale={draft.locale}
         status={draft.status}
         roles={actor.roles}
         owned={!actor.can('article:edit_any')}

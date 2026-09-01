@@ -17,7 +17,13 @@ import { BrandedDateTime } from './branded-date-time'
  * back as `schedule_in_past`, which is why the error stays on screen rather
  * than being cleared by the refresh.
  */
-export function ScheduleControl({ articleId }: { articleId: string }): React.ReactElement {
+export function ScheduleControl({
+  articleId,
+  onSuccess,
+}: {
+  articleId: string
+  onSuccess: () => void
+}): React.ReactElement {
   const [at, setAt] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [pending, start] = useTransition()
@@ -39,6 +45,7 @@ export function ScheduleControl({ articleId }: { articleId: string }): React.Rea
         return
       }
 
+      onSuccess()
       router.refresh()
     })
   }

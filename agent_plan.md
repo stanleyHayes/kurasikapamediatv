@@ -63,11 +63,11 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Real production journalism | The complete create/review/approve/publish workflow and 11-category inventory are live. Editors can now attach a ready media-library image with required alt text, credit, caption and stable CDN delivery; public cards, article pages, social metadata and structured data consume it. Production still contains client-preview data rather than real reporting, so approved copy, reporter identities and photography are required before this can close. | **IMPLEMENTED — BLOCKED ON CLIENT CONTENT** |
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
-| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded or operator-unconfirmed uncaptioned channels; public live status preserves caption readiness and the player enables CC only for actual delivered tracks. Ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is code-complete and awaiting production verification. | **PARTIAL — ACTIVE R3 RELEASE** |
-| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds and disclosed affiliate inventory are code-complete across Studio and public surfaces. Provider credentials, the quota-delayed public release and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
-| Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party pipeline and dedicated Studio analytics route provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance, newsletter growth, active reading time and a privacy-safe story-depth attention heatmap. Revenue/campaign reporting is available in Studio Revenue. | **KUR-99 IMPLEMENTED — RELEASE VERIFICATION ACTIVE** |
+| Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded or operator-unconfirmed uncaptioned channels; public live status preserves caption readiness and the player enables CC only for actual delivered tracks. Ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is implemented. Real uploads, narration and live recording still need Cloudinary/AWS activation and licensed client inventory. | **IMPLEMENTED/DEPLOYED — PROVIDER AND INVENTORY BLOCKED** |
+| Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds, disclosed affiliate inventory and advertiser self-service are deployed across Studio and public surfaces. Live settlement and real campaign delivery require payment-provider credentials, approved pricing and commercial inventory. | **IMPLEMENTED/DEPLOYED — PROVIDER AND COMMERCIAL INPUT BLOCKED** |
+| Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party pipeline and dedicated Studio analytics route provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance, newsletter growth, active reading time and a privacy-safe story-depth attention heatmap. Revenue/campaign reporting is available in Studio Revenue. | **IMPLEMENTED/DEPLOYED — REAL TRAFFIC WILL POPULATE IT** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
-| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. The deployed SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data now uses the approved public revision for `dateModified`, pending a fresh Web release after the Vercel quota window. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **SEO CENTER DEPLOYED / WEB RELEASE QUOTA BLOCKED / SEARCH CONSOLE ACCESS BLOCKED** |
+| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` and root `/og-image` are deployed. The SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data uses the approved public revision for `dateModified`. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED — SEARCH CONSOLE ACCESS BLOCKED** |
 | Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
 
 Implementation rule for this delivery: original reporting is the primary content
@@ -249,9 +249,9 @@ brand variants. All **21 base desktop screens** are extracted into
 | `kurasikapa_media_podcast_library` | `/podcasts` | ✅ accessible series/episode library, chapters, transcripts and RSS feed (KUR-76; deployed) |
 | `kurasikapa_media_live_tv_gallery` | `/live` + `/galleries` | ✅ live/schedule/replay plus photo and caption-gated video galleries deployed (KUR-77) |
 | `kurasikapa_media_events_summits` | `/events` + `/studio/events` | ✅ KUR-96 — editor-published webinars, conferences and summits with verified imagery, speakers, registration, calendar actions and Event structured data. |
-| `kurasikapa_admin_media_library` | `/studio/media` | ◑ signed direct upload and inventory implemented; production credentials/release and article attachment remain (R3) |
-| `kurasikapa_media_membership_donations` | `/support` | ◑ memberships and one-time contributions implemented; provider credentials and release remain (KUR-80) |
-| `support_membership_kurasikapa_media_tv` | `/support` | ◑ public GHS/EUR support journey implemented with honest empty state and provider handoff (KUR-80) |
+| `kurasikapa_admin_media_library` | `/studio/media` | ✅ signed direct upload, inventory and article attachment implemented and deployed; real provider operations await Cloudinary credentials (R3) |
+| `kurasikapa_media_membership_donations` | `/support` | ✅ memberships and one-time contribution surfaces deployed; live settlement awaits provider credentials and approved pricing (KUR-80) |
+| `support_membership_kurasikapa_media_tv` | `/support` | ✅ public GHS/EUR support journey deployed with an honest empty state and fail-closed provider handoff (KUR-80) |
 | `monetization_dashboard_kurasikapa_admin` | `/studio/revenue` | ✅ KUR-80–KUR-93 — memberships, donations, subscribers, commerce, affiliates, advertiser proposals, campaigns and currency-separated reporting share one commercial operations desk. |
 | `kurasikapa_admin_subscriptions_revenue` | `/studio/revenue` | ✅ tier management, confirmed-payment KPIs, currency-separated visualisations and subscriber ledger implemented (KUR-80/KUR-81); provider credentials/release remain |
 | `kurasikapa_admin_analytics_hub` | `/studio/analytics` | ✅ first-party audience KPIs, traffic/acquisition/retention and content/newsletter visualisations deployed; revenue intelligence is now available in `/studio/revenue` |
@@ -279,7 +279,7 @@ the wiring is missing.
 
 ---
 
-## 5. NOT built
+## 5. Delivery status and remaining gaps
 
 ### 5.1 R1 remainder — needed to actually close R1
 
@@ -295,7 +295,7 @@ the wiring is missing.
 | ~~**CAPTCHA**~~ | **DONE.** Cloudflare Turnstile, env-gated. Unset keys leave sign-in alone (Playwright still works). |
 | ~~**Google Analytics**~~ | **DONE.** First-party consent remains available independently; gtag loads only after consent and only when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is valid. Search Console still needs the client property. |
 | **Scheduling actually firing** | Article cron live (KUR-34). Social cron live and fail-closed until Meta credentials exist. |
-| ~~**Remaining designed screens**~~ | **DONE** for every route that exists — all ten built routes match their supplied designs (§3.7). `/team` stays ◑ until the client supplies names/roles/bios/portraits; the R3–R5 screens have no routes yet. |
+| ~~**Remaining designed screens**~~ | **DONE** for every supplied route (§3.7). `/team` stays ◑ until the client supplies names/roles/bios/portraits; R3–R5 routes are now implemented and listed below. |
 | ~~**Error tracking**~~ | **DONE.** Locale + global error boundaries; failures go to stderr via `reportError`. A Sentry DSN is still a hosting choice — the boundary no longer swallows. Backups remain Atlas/ops, not code. |
 | **RSS out** | **DONE.** `/{locale}/feed.xml` from the published list. RSS ingest is live (KUR-55) as drafts via Next cron. |
 
@@ -345,11 +345,11 @@ recorded replays require captions. The Go API exposes authenticated programming
 commands and a public guide, and both Next.js applications prefer that BFF path
 when `API_URL` is set.
 
-The shared Studio media library now creates pending assets in Go, signs direct
+The shared Studio media library creates pending assets in Go, signs direct
 Cloudinary browser uploads, verifies signed receipts server-side and persists
 ready assets in Mongo. It covers image, video, audio, caption, transcript and
 document files, requires image alt text, and fails closed without provider
-credentials. Production promotion and credentials remain active.
+credentials. Production provider activation remains external.
 
 Podcast publishing is now implemented end to end: Studio creates and explicitly
 publishes series and episodes, publication requires ready audio and transcript
@@ -707,7 +707,12 @@ was then built and verified.
   - The sign-in/sign-up cross-links were distinguishable by colour alone
     (`link-in-text-block`, WCAG 2.2 AA); both are underlined.
 
-### Still open / next (categorized)
+### Still open / next (historical 2026-08-13 snapshot — superseded)
+
+This subsection records what was open at that date. It is not the current
+backlog: KUR-70 through KUR-104 implemented and deployed the API, R3 media,
+R4 revenue and R5 intelligence work named below. Use the reconciliation table
+in §1 and the latest ticket entries at the end of this ledger for current state.
 
 **(a) Blocked on client / credentials**
 - Flip the social send path (Facebook + Instagram Graph posts). Prerequisite:
@@ -1783,3 +1788,13 @@ are live. Custom-domain DNS remains an external registrar action.**
   runbook now explains provider grouping and least-privilege ownership, and the
   env example no longer incorrectly describes the public Render service as a
   private backend.
+- CI run `33484961324` exposed a loaded-runner race in the core editorial E2E:
+  the server had committed submit/approve, but the status badge and next
+  controls waited for a second RSC refresh and could remain stale for the
+  test's full 45-second observation window. Workflow controls now apply the
+  domain transition's committed target immediately after a successful Server
+  Action, while retaining the server refresh for the full editor payload.
+  Schedule inputs are no longer remounted underneath an editor during that
+  refresh. The focused journey and complete 40-journey production-build suite
+  pass against a freshly cleared isolated Mongo database; `pnpm verify` is
+  green. Replacement CI release evidence is pending.
