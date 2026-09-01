@@ -1797,4 +1797,15 @@ are live. Custom-domain DNS remains an external registrar action.**
   Schedule inputs are no longer remounted underneath an editor during that
   refresh. The focused journey and complete 40-journey production-build suite
   pass against a freshly cleared isolated Mongo database; `pnpm verify` is
-  green. Replacement CI release evidence is pending.
+  green. Replacement CI run `33488510399` passed all Quality gates, Lighthouse,
+  Go service and secret-scan jobs. Web deployment
+  `dpl_dW3znp27DaArWM14LzQcukADxb9X` and Studio deployment
+  `dpl_FwNQxDRZoAj1JQNFyu12kF7KEzUk` are Ready; the stable Web, news sitemap,
+  root OG image, Studio sign-in and API health endpoints all return HTTP 200.
+- A fresh production inventory audit finds 24 explicitly client-preview English
+  articles and zero published team profiles, television programmes/presenters,
+  podcasts, galleries, events, membership plans, products, classifieds or
+  affiliate placements. That is evidence of the remaining client/provider
+  launch gate, not an implementation gap: approved identities, journalism,
+  schedules, licensed media, pricing and commercial inventory must replace the
+  preview edition before public launch.

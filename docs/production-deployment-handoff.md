@@ -227,10 +227,11 @@ but the applicable rate and eligibility depend on the legal account country.
 
 ## Verified deployment state — 1 September 2026
 
-- Public Web deployment `dpl_CreKjs4YCFhLkTDct1mTpFZCqNpt` is Ready and the
+- Public Web deployment `dpl_dW3znp27DaArWM14LzQcukADxb9X` is Ready and the
   stable Vercel alias serves `/og-image` as `200 image/png` without redirecting
   through a locale.
-- Studio sign-in and the public Team route return HTTP 200; the Render API
+- Studio deployment `dpl_FwNQxDRZoAj1JQNFyu12kF7KEzUk`, sign-in and the public
+  Team route return HTTP 200; the Render API
   `/healthz` endpoint reports healthy.
 - A fresh unauthenticated check on 1 September returned HTTP 307 from the Web
   bare host (the expected locale redirect), HTTP 200 from Studio sign-in and
