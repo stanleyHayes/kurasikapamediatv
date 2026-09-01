@@ -1,4 +1,5 @@
 import { readArticleView, type ArticleView } from './article-view'
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -21,10 +22,7 @@ export async function createDraftViaApi(input: {
 }): Promise<ArticleView> {
   const response = await fetch(joinUrl(input.baseUrl, '/articles'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Kurasikapa-User': input.userId,
-    },
+    headers: actorHeaders(input.userId, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({
       locale: input.locale,
       title: input.title,

@@ -328,6 +328,7 @@ func run(log *slog.Logger) error {
 		Clock:                       clock,
 		Log:                         log,
 		CronSecret:                  cfg.CronSecret,
+		ActorSecret:                 cfg.CronSecret,
 		IVSWebhookSecret:            cfg.IVSWebhookSecret,
 	})
 

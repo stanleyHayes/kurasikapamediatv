@@ -115,6 +115,7 @@ type Deps struct {
 	Clock                       ports.Clock
 	Log                         *slog.Logger
 	CronSecret                  string
+	ActorSecret                 string
 	IVSWebhookSecret            string
 }
 
@@ -225,16 +226,19 @@ func NewRouter(deps Deps) http.Handler {
 }
 
 /*
-Authentication is NOT performed here.
-
 Next.js owns the Better Auth session cookie — a session must be set by the
 origin the browser talks to — so it verifies the session and forwards the user
 id on `X-Kurasikapa-User`. This service then resolves that id to an Actor
-through its OWN role store and lets the domain decide.
+through its OWN role store and lets the domain decide. Because the API is
+internet-reachable, the bearer assertion also proves the caller is Next.
 */
 const userHeader = "X-Kurasikapa-User"
 
 func (d Deps) actorFrom(r *http.Request) (identity.Actor, error) {
+	if d.ActorSecret != "" && !validBearer(r, d.ActorSecret) {
+		return identity.Actor{}, identity.ErrNotPermitted
+	}
+
 	id := r.Header.Get(userHeader)
 	if id == "" {
 		return identity.Actor{}, identity.ErrNotPermitted
@@ -320,7 +324,11 @@ func withRequestLogging(log *slog.Logger, next http.Handler) http.Handler {
 }
 
 func (d Deps) requireCron(r *http.Request) bool {
-	if d.CronSecret == "" {
+	return validBearer(r, d.CronSecret)
+}
+
+func validBearer(r *http.Request, secret string) bool {
+	if secret == "" {
 		return false
 	}
 
@@ -329,8 +337,8 @@ func (d Deps) requireCron(r *http.Request) bool {
 		return false
 	}
 
-	return len(presented) == len(d.CronSecret) &&
-		subtle.ConstantTimeCompare([]byte(presented), []byte(d.CronSecret)) == 1
+	return len(presented) == len(secret) &&
+		subtle.ConstantTimeCompare([]byte(presented), []byte(secret)) == 1
 }
 
 func systemActor() identity.Actor {

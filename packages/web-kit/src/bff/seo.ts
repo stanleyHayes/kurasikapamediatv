@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -70,7 +71,7 @@ export async function loadSEOReport(actor: Actor): Promise<SEOReportView> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for SEO readiness reporting')
   const response = await fetch(joinUrl(apiUrl, '/insight/seo-report'), {
-    headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store',
+    headers: actorHeaders(actor.id), cache: 'no-store',
   })
   if (!response.ok) throw await problemFromResponse(response)
   return report(await response.json())

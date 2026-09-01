@@ -1,3 +1,4 @@
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -16,10 +17,7 @@ export async function updateDraftViaApi(input: {
 }): Promise<UpdateDraftView> {
   const response = await fetch(joinUrl(input.baseUrl, `/articles/${input.articleId}`), {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Kurasikapa-User': input.userId,
-    },
+    headers: actorHeaders(input.userId, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ title: input.title, body: input.body }),
   })
 

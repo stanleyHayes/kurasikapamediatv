@@ -1,3 +1,4 @@
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { readArticleView, type ArticleView } from './article-view'
 import { joinUrl } from './url'
@@ -10,7 +11,7 @@ export async function publishViaApi(input: {
 }): Promise<ArticleView> {
   const response = await fetch(joinUrl(input.baseUrl, `/articles/${input.articleId}/publish`), {
     method: 'POST',
-    headers: { 'X-Kurasikapa-User': input.userId },
+    headers: actorHeaders(input.userId),
   })
 
   if (!response.ok) {

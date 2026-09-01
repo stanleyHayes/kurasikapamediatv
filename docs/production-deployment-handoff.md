@@ -140,6 +140,9 @@ For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
 `https://kurasikapa-studio.vercel.app/studio`; Studio's own `APP_URL` omits the
 `/studio` base path. Never upload `AWS_SECRET_ACCESS_KEY`, payment secrets,
 `ANTHROPIC_API_KEY` or server-only webhook secrets as `NEXT_PUBLIC_*` values.
+`CRON_SECRET` must be identical on Web, Studio and Render: in addition to cron
+authentication, it now proves that privileged `X-Kurasikapa-User` assertions
+came from a trusted Next server rather than an internet client.
 
 ## Monthly operating budget
 

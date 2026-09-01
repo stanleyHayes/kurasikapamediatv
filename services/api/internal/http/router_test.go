@@ -131,6 +131,37 @@ func TestRolesComeFromOurStoreNotTheRequest(t *testing.T) {
 	}
 }
 
+func TestActorAssertionRequiresTheCallingService(t *testing.T) {
+	t.Parallel()
+
+	app := appeditorial.Deps{
+		Articles: faketesting.NewArticleStore(), Revisions: faketesting.NewRevisionStore(),
+		Categories: faketesting.NewCategoryStore(), Clock: faketesting.FixedClock{At: now},
+		IDs: &faketesting.SequentialIDs{}, Events: &faketesting.RecordingEventBus{},
+	}
+	deps := httpDeps(app, map[shared.UserID][]identity.Role{"usr_author": {identity.RoleAuthor}})
+	deps.ActorSecret = "service-assertion-secret-of-known-length"
+	handler := kurahttp.NewRouter(deps)
+
+	for name, bearer := range map[string]string{
+		"missing": "", "wrong": "Bearer attacker-controlled-value-000000",
+	} {
+		t.Run(name, func(t *testing.T) {
+			req := draftRequest("usr_author")
+			req.Header.Set("Authorization", bearer)
+			if rec := do(handler, req); rec.Code != http.StatusForbidden {
+				t.Errorf("status = %d, want 403", rec.Code)
+			}
+		})
+	}
+
+	req := draftRequest("usr_author")
+	req.Header.Set("Authorization", "Bearer service-assertion-secret-of-known-length")
+	if rec := do(handler, req); rec.Code != http.StatusCreated {
+		t.Errorf("status = %d, want 201; body = %s", rec.Code, rec.Body.String())
+	}
+}
+
 func TestAuthorMayCreateADraft(t *testing.T) {
 	t.Parallel()
 

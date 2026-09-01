@@ -1,5 +1,6 @@
 import type { DraftView } from '../read-model/studio-view'
 import type { ArticleHeroView, ArticleNarrationView } from '../read-model/article-view'
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -100,7 +101,7 @@ export async function apiGet(input: {
   readonly path: string
 }): Promise<unknown> {
   const response = await fetch(joinUrl(input.baseUrl, input.path), {
-    headers: { 'X-Kurasikapa-User': input.userId },
+    headers: actorHeaders(input.userId),
   })
   if (!response.ok) throw await problemFromResponse(response)
   return response.json() as Promise<unknown>
@@ -113,7 +114,7 @@ export async function apiPost(input: {
 }): Promise<unknown> {
   const response = await fetch(joinUrl(input.baseUrl, input.path), {
     method: 'POST',
-    headers: { 'X-Kurasikapa-User': input.userId },
+    headers: actorHeaders(input.userId),
   })
   if (!response.ok) throw await problemFromResponse(response)
   return response.json() as Promise<unknown>

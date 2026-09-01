@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { fetchPublic } from './public'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
@@ -72,7 +73,7 @@ async function post(actor: Actor, path: string, body?: unknown): Promise<Record<
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for this television command')
   const response = await fetch(joinUrl(apiUrl, path), {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Kurasikapa-User': actor.id },
+    method: 'POST', headers: actorHeaders(actor.id, { 'Content-Type': 'application/json' }),
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   })
   if (!response.ok) throw await problemFromResponse(response)
@@ -110,7 +111,7 @@ export async function publishReplay(actor: Actor, slotId: string, input: unknown
 async function get(actor: Actor, path: string): Promise<Record<string, unknown>> {
 	const apiUrl = env().API_URL
 	if (apiUrl === undefined) throw new Error('API_URL is required for this television query')
-	const response = await fetch(joinUrl(apiUrl, path), { headers: { 'X-Kurasikapa-User': actor.id } })
+	const response = await fetch(joinUrl(apiUrl, path), { headers: actorHeaders(actor.id) })
 	if (!response.ok) throw await problemFromResponse(response)
 	return record(await response.json())
 }

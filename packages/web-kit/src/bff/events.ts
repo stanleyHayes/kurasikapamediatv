@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { fetchPublic } from './public'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
@@ -38,7 +39,7 @@ export async function loadEvents(locale: string): Promise<readonly EventView[]> 
 export async function createAndPublishEvent(actor: Actor, input: unknown): Promise<{ readonly id: string }> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for event publishing')
-  const headers = { 'Content-Type': 'application/json', 'X-Kurasikapa-User': actor.id }
+  const headers = actorHeaders(actor.id, { 'Content-Type': 'application/json' })
   const created = await fetch(joinUrl(apiUrl, '/media/events'), { method: 'POST', headers, body: JSON.stringify(input) })
   if (!created.ok) throw await problemFromResponse(created)
   const id = text(record(await created.json())['id'])

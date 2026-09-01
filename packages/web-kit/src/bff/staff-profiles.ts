@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { ApiProblem, problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -59,7 +60,7 @@ export async function loadStaffProfileByUser(locale: string, userId: string): Pr
 export async function saveAndPublishStaffProfile(actor: Actor, userId: string, input: unknown): Promise<{ readonly id: string }> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for staff profile management')
-  const headers = { 'Content-Type': 'application/json', 'X-Kurasikapa-User': actor.id }
+  const headers = actorHeaders(actor.id, { 'Content-Type': 'application/json' })
   const saved = await fetch(joinUrl(apiUrl, `/staff/profiles/${encodeURIComponent(userId)}`), { method: 'PUT', headers, body: JSON.stringify(input) })
   if (!saved.ok) throw await problemFromResponse(saved)
   const id = text(record(await saved.json())['id'])

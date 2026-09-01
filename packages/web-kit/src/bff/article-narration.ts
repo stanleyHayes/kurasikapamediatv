@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { ApiProblem, problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -47,7 +48,7 @@ async function api(actor: Actor, path: string, method: 'GET' | 'POST'): Promise<
   const baseUrl = env().API_URL
   if (baseUrl === undefined) throw new Error('API_URL is required for article narration')
   const response = await fetch(joinUrl(baseUrl, path), {
-    method, headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store',
+    method, headers: actorHeaders(actor.id), cache: 'no-store',
   })
   if (!response.ok) throw await problemFromResponse(response)
   return response.json() as Promise<unknown>

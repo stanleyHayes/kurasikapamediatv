@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { fetchPublic } from './public'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
@@ -39,7 +40,7 @@ export async function loadPodcasts(locale: string): Promise<readonly PodcastView
 async function post(actor: Actor, path: string, body?: unknown): Promise<Record<string, unknown>> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for podcast publishing')
-  const response = await fetch(joinUrl(apiUrl, path), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Kurasikapa-User': actor.id }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
+  const response = await fetch(joinUrl(apiUrl, path), { method: 'POST', headers: actorHeaders(actor.id, { 'Content-Type': 'application/json' }), ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
   if (!response.ok) throw await problemFromResponse(response)
   return record(await response.json())
 }

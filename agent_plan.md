@@ -1750,7 +1750,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 42. KUR-104 — live launch inventory and API trust boundary (2026-09-01)
 
-**Status: INVENTORY VERIFIED — client/provider inputs and service authentication remain.**
+**Status: SERVICE AUTH IMPLEMENTED — release verification and client/provider inputs remain.**
 
 - The production API currently exposes 35 English client-preview articles.
   Their copy is explicitly labelled preview material and the sampled articles
@@ -1762,10 +1762,16 @@ are live. Custom-domain DNS remains an external registrar action.**
   identities, programme rights or commercial prices to make the counters move.
 - Anonymous, random and the published demo-author identifiers all receive HTTP
   403 from staff media, review, revenue and SEO endpoints, proving those tested
-  identities have no privileged role. However, the public Render service still
-  treats `X-Kurasikapa-User` as a trusted BFF assertion without a service
-  signature. A published staff profile exposes its user id, so role lookup alone
-  does not authenticate the caller. Before real profiles make that identifier
-  public, require a server-only shared assertion between Next and Go (with
-  constant-time verification), preserve public endpoints, and add forged-header
-  integration coverage. This is the next unblocked production-security slice.
+  identities have no privileged role. The audit also found that the public
+  Render service accepted `X-Kurasikapa-User` without authenticating the BFF;
+  publishing a staff profile would expose the identifier needed to attempt a
+  forged role lookup.
+- Implemented that trust boundary without adding another deployment secret:
+  privileged BFF calls now pair the actor id with the existing server-only
+  `CRON_SECRET` bearer, and the production Go composition verifies it in
+  constant time before role lookup. Public API, article, television, podcast,
+  gallery, event and commerce reads remain unsigned. Missing and forged service
+  assertions are covered with HTTP 403 integration cases; every privileged BFF
+  module uses the shared header constructor. `pnpm verify` and
+  `make -C services/api verify` pass, with Go domain coverage 96.8%, application
+  coverage 91.0% and HTTP coverage 90.8%.

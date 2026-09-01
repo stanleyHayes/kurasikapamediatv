@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { fetchPublic } from './public'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
@@ -85,8 +86,9 @@ export async function loadMembershipPlans(locale: string): Promise<readonly Memb
 async function post(path: string, body: unknown, actor?: Actor): Promise<CheckoutView> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for payment checkout')
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (actor !== undefined) headers['X-Kurasikapa-User'] = actor.id
+  const headers = actor === undefined
+    ? { 'Content-Type': 'application/json' }
+    : actorHeaders(actor.id, { 'Content-Type': 'application/json' })
   const response = await fetch(joinUrl(apiUrl, path), { method: 'POST', headers, body: JSON.stringify(body) })
   if (!response.ok) throw await problemFromResponse(response)
   return checkout(await response.json())
@@ -95,9 +97,9 @@ async function post(path: string, body: unknown, actor?: Actor): Promise<Checkou
 async function adminPost(actor: Actor, path: string, body?: unknown): Promise<Record<string, unknown>> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for revenue management')
-  const response = await fetch(joinUrl(apiUrl, path), { method: 'POST', headers: {
-    'Content-Type': 'application/json', 'X-Kurasikapa-User': actor.id,
-  }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
+  const response = await fetch(joinUrl(apiUrl, path), { method: 'POST',
+    headers: actorHeaders(actor.id, { 'Content-Type': 'application/json' }),
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
   if (!response.ok) throw await problemFromResponse(response)
   return record(await response.json())
 }
@@ -112,7 +114,7 @@ export async function createAndActivateMembershipPlan(actor: Actor, input: unkno
 export async function loadRevenueReport(actor: Actor, days: 7 | 30 | 90): Promise<RevenueReportView> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) return report({ days, currencies: [], trend: [], subscribers: [] })
-  const response = await fetch(joinUrl(apiUrl, `/revenue/report?days=${String(days)}`), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
+  const response = await fetch(joinUrl(apiUrl, `/revenue/report?days=${String(days)}`), { headers: actorHeaders(actor.id), cache: 'no-store' })
   if (!response.ok) throw await problemFromResponse(response)
   return report(await response.json())
 }
@@ -127,7 +129,7 @@ export async function createAndActivateAdCampaign(actor: Actor, input: unknown):
 export async function loadAdReport(actor: Actor): Promise<readonly AdCampaignView[]> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) return []
-  const response = await fetch(joinUrl(apiUrl, '/revenue/ad-report'), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
+  const response = await fetch(joinUrl(apiUrl, '/revenue/ad-report'), { headers: actorHeaders(actor.id), cache: 'no-store' })
   if (!response.ok) throw await problemFromResponse(response)
   const body = record(await response.json())
   return Array.isArray(body['campaigns']) ? body['campaigns'].map(adCampaign) : []
@@ -160,7 +162,7 @@ export async function startDonationCheckout(input: { readonly amount: MoneyView;
 async function loadCollection<T>(path: string, project: (value: unknown) => T, actor?: Actor): Promise<readonly T[]> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) return []
-  const response = actor === undefined ? await fetch(joinUrl(apiUrl, path), { cache: 'no-store' }) : await fetch(joinUrl(apiUrl, path), { headers: { 'X-Kurasikapa-User': actor.id }, cache: 'no-store' })
+  const response = actor === undefined ? await fetch(joinUrl(apiUrl, path), { cache: 'no-store' }) : await fetch(joinUrl(apiUrl, path), { headers: actorHeaders(actor.id), cache: 'no-store' })
   if (!response.ok) throw await problemFromResponse(response)
   const body = record(await response.json())
   return Array.isArray(body['items']) ? body['items'].map(project) : []

@@ -1,3 +1,4 @@
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -22,10 +23,7 @@ export async function transitionViaApi(input: {
 }): Promise<TransitionView> {
   const init: RequestInit = {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Kurasikapa-User': input.userId,
-    },
+    headers: actorHeaders(input.userId, { 'Content-Type': 'application/json' }),
   }
   const payload = bodyFor(input)
   if (payload !== undefined) {

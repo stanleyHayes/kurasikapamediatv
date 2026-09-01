@@ -1,5 +1,6 @@
 import type { Actor } from '@kurasikapa/domain'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { fetchPublic } from './public'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
@@ -29,7 +30,7 @@ export async function loadGalleries(locale: string): Promise<readonly GalleryVie
 export async function createAndPublishGallery(actor: Actor, input: unknown): Promise<{ readonly id: string }> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for gallery publishing')
-  const headers = { 'Content-Type': 'application/json', 'X-Kurasikapa-User': actor.id }
+  const headers = actorHeaders(actor.id, { 'Content-Type': 'application/json' })
   const created = await fetch(joinUrl(apiUrl, '/media/galleries'), { method: 'POST', headers, body: JSON.stringify(input) })
   if (!created.ok) throw await problemFromResponse(created)
   const id = text(record(await created.json())['id'])

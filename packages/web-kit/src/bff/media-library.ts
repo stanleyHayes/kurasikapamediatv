@@ -1,6 +1,7 @@
 import type { Actor } from '@kurasikapa/domain'
 import type { ArticleHeroView } from '../read-model/article-view'
 import { env } from '../composition/env'
+import { actorHeaders } from './actor-headers'
 import { problemFromResponse } from './problem'
 import { joinUrl } from './url'
 
@@ -30,9 +31,8 @@ function ticket(raw: unknown): MediaUploadTicket {
 async function api(actor: Actor, path: string, init: RequestInit): Promise<unknown> {
   const apiUrl = env().API_URL
   if (apiUrl === undefined) throw new Error('API_URL is required for the production media library')
-  const headers = new Headers(init.headers)
-  headers.set('Content-Type', 'application/json')
-  headers.set('X-Kurasikapa-User', actor.id)
+  const headers = new Headers(actorHeaders(actor.id, { 'Content-Type': 'application/json' }))
+  for (const [key, value] of new Headers(init.headers)) headers.set(key, value)
   const response = await fetch(joinUrl(apiUrl, path), { ...init, headers })
   if (!response.ok) throw await problemFromResponse(response)
   return response.json() as Promise<unknown>
