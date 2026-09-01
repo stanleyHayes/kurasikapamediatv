@@ -467,3 +467,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Route every external content surface through the canonical public visibility use case, then let the transport add only versioned envelopes, pagination links, caching, CORS and documentation. Test unpublished records at the shared use-case seam and the external route.
 
 **Principle:** Version the delivery contract, not a second implementation of publication truth.
+
+### Observation 31: Server Action journeys must budget for the streamed refresh
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Stabilising the Studio draft-to-scheduled production journey after an otherwise-green public API release failed intermittently in CI.
+**Skill:** New skill candidate: server-action-e2e-reliability
+**Type:** open-source
+**Phase/Area:** Release verification
+
+**Issue:** The workflow passed six consecutive local production-build runs, while shared GitHub runners timed out at different transitions after 15–30 seconds. Each click stays disabled while a Next.js Server Action writes to MongoDB and returns a refreshed React server-component tree; the original assertions budgeted for the write, not the complete streamed response. The enclosing 60-second ceiling also competed with three per-transition ceilings.
+
+**Suggested improvement:** Give every real network transition a hosted-runner budget and make the enclosing test budget at least their sum. Keep domain and application speed assertions in narrow tests; use the browser journey to prove the complete write-and-refresh contract.
+
+**Principle:** A Server Action is complete from the browser's perspective only when its refreshed interface arrives.

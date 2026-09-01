@@ -118,7 +118,13 @@ test.describe('signed in', () => {
 
 test.describe('workflow transitions', () => {
   test('an editor moves a draft through review and approval to scheduled', async ({ page }) => {
-    test.setTimeout(60_000)
+    // A Server Action response includes the refreshed Studio server-component
+    // tree. On a loaded CI runner that means Mongo reads, session validation
+    // and React streaming all complete before the browser sees the new badge.
+    // The product keeps its immediate disabled/working state throughout; this
+    // journey gives each real network transition enough room to finish rather
+    // than treating shared-runner scheduling latency as a failed newsroom rule.
+    test.setTimeout(180_000)
     // Re-seeded here rather than only in the file's beforeAll: a CI retry must
     // find the draft a draft again, not whatever the failed attempt left behind.
     // The revision is what an approval approves — without one the Approve
@@ -130,16 +136,16 @@ test.describe('workflow transitions', () => {
     await page.goto(`${STUDIO}/en/articles/${DRAFT._id}`)
 
     await page.getByRole('button', { name: 'Submit for review' }).click()
-    await expect(page.getByText('In review')).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByText('In review')).toBeVisible({ timeout: 45_000 })
 
     await page.getByRole('button', { name: 'Approve' }).click()
-    await expect(page.getByText('Approved', { exact: true })).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByText('Approved', { exact: true })).toBeVisible({ timeout: 45_000 })
 
     const [date, time] = inOneDay().split('T') as [string, string]
     await page.getByLabel('Date').fill(date)
     await page.getByLabel('Time').fill(time)
     await page.getByRole('button', { name: 'Schedule' }).click()
-    await expect(page.getByText('Scheduled', { exact: true })).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByText('Scheduled', { exact: true })).toBeVisible({ timeout: 45_000 })
   })
 })
 
