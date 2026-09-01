@@ -1366,7 +1366,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 30. KUR-91 — products and paid classifieds (2026-09-01)
 
-**Status: API + Studio DEPLOYED; public Web release blocked by Vercel daily quota.**
+**Status: DEPLOYED; live provider-checkout credential smoke remains.**
 
 - Added revenue-domain product, product-order and classified lifecycles. A
   product requires accessible HTTPS imagery, valid GHS/EUR pricing and stock
@@ -1392,12 +1392,18 @@ are live. Custom-domain DNS remains an external registrar action.**
   `prj_PdORywgPcFJ2DGAmQpP8bXtztouo`, but Vercel rejected it with
   `api-deployments-free-per-day` after the account exceeded 100 deployments in
   24 hours. The previous public deployment therefore still returns HTTP 404
-  for `/en/shop` and `/en/classifieds`. Retry after the quota resets, then run
-  route and provider-checkout smoke tests before marking this story deployed.
+  for `/en/shop` and `/en/classifieds` at that point; the recovery evidence
+  below supersedes that temporary release state.
+- Quota recovery evidence: Web deployment
+  `dpl_364SDvbEqvHMkizmZbeiTePbvrZ4` reached Ready. The stable public alias now
+  returns HTTP 200 for `/en/shop` and `/en/classifieds`; `/og-image` also
+  returns HTTP 200. A real provider checkout remains intentionally unsubmitted
+  until live Paystack/Stripe credentials and a controlled test purchase are
+  approved.
 
 ## 31. KUR-92 — disclosed affiliate inventory (2026-09-01)
 
-**Status: CODE COMPLETE; production release pending.**
+**Status: DEPLOYED.**
 
 - Added permission-gated affiliate inventory with mandatory disclosure,
   accessible HTTPS imagery and an HTTPS-only destination. Activation is an
@@ -1418,3 +1424,14 @@ are live. Custom-domain DNS remains an external registrar action.**
   round-trip persistence and atomic click counting. Studio and Web production
   builds pass with the production environment; `/en/partners` and `/og-image`
   are present in the generated Web route manifest.
+- Release evidence: implementation commits `b0233e9` and `92711b3`; CI run
+  `33461189495` passed Quality gates, Go service, Secret scan and Lighthouse,
+  including real-Mongo integration and browser accessibility journeys. Web
+  deployment `dpl_364SDvbEqvHMkizmZbeiTePbvrZ4` and Studio deployment
+  `dpl_EZ9adFURWVRJGAL3n9fuPyzhtmGW` are Ready. The stable aliases return HTTP
+  200 for `/en/partners` and `/studio/en/revenue`; the Render health and
+  `/public/affiliate-links` endpoints also return HTTP 200.
+- Vercel lists `kurasikapa.tv` and `studio.kurasikapa.tv` as project aliases,
+  but public DNS does not resolve either hostname yet. The deliberate
+  `kurasikapa-web.vercel.app` and `kurasikapa-studio.vercel.app` aliases remain
+  the verified production entry points until registrar DNS is configured.
