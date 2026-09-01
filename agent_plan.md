@@ -1962,7 +1962,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 48. KUR-110 — concise public footer directory (2026-09-01)
 
-**Status: IMPLEMENTED AND LOCALLY VERIFIED.**
+**Status: DEPLOYED AND RELEASE-VERIFIED.**
 
 - Replaced the overloaded Reporting/Kurasikapa/Information columns with five
   purpose-based groups: Newsroom, Watch & listen, About, Marketplace, and Help
@@ -1971,11 +1971,12 @@ are live. Custom-domain DNS remains an external registrar action.**
   competes with the logo and mission copy. The directory resolves from two
   mobile columns through three tablet columns to five desktop columns.
 - Added regression coverage for group length, duplicate destinations and key
-  live/legal/assistant routes. Focused tests, lint and Web typecheck pass.
+  live/legal/assistant routes. CI run `33507318720` passed every gate and the
+  stable Web deployment serves the regrouped shell.
 
 ## 49. KUR-111 — grounded Ask Kurasikapa assistant (2026-09-01)
 
-**Status: IMPLEMENTED AND LOCALLY VERIFIED.**
+**Status: DEPLOYED AND RELEASE-VERIFIED.**
 
 - Added bilingual `/ask`, a source-first newsroom assistant that accepts plain
   language questions, uses semantic discovery when configured and retains the
@@ -1985,6 +1986,9 @@ are live. Custom-domain DNS remains an external registrar action.**
   a useful recovery path instead of inventing coverage.
 - The form uses the shared disabled pending control with animated dots, and the
   assistant is reachable from the newly grouped footer.
+- CI run `33507318720` passed build, coverage, E2E, WCAG and Lighthouse. The
+  stable production alias returns HTTP 200 for `/en/ask`, `/fr/ask` and a real
+  query, while `/sitemap.xml` advertises the assistant in both locales.
 
 ## 50. Discovery programme status reconciliation (2026-09-01)
 
