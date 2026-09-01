@@ -19,6 +19,11 @@ AI-native publishing platform for a France-registered TV, radio and online media
   cut-over, smoke-checks ([scripts/smoke-api.sh](../scripts/smoke-api.sh)),
   and the TS editorial deletion checklist.
 
+## APIs
+
+- [Public news API v1](api/public-v1.md) — discovery, pagination, delivery,
+  attribution and compatibility contract for syndication and reader clients.
+
 ## Source inputs
 
 These documents are derived from, and must stay consistent with:

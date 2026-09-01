@@ -452,3 +452,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Own consent independently of analytics vendors. Start privacy-safe first-party measurement from the stored consent state, and load each optional provider only when both consent and that provider's configuration are present.
 
 **Principle:** Optional analytics providers are downstream consumers of consent, not prerequisites for offering or recording first-party consent.
+
+### Observation 30: Public APIs must reuse canonical publication visibility
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Adding a versioned syndication API beside the existing public website and internal BFF routes.
+**Skill:** New skill candidate: public-content-api-release
+**Type:** open-source
+**Phase/Area:** API architecture and editorial safety
+
+**Issue:** A public API built from a new repository query can drift from the website's publication rules and expose drafts, scheduled records, stale revisions or workflow-only fields even when its HTTP contract looks correct.
+
+**Suggested improvement:** Route every external content surface through the canonical public visibility use case, then let the transport add only versioned envelopes, pagination links, caching, CORS and documentation. Test unpublished records at the shared use-case seam and the external route.
+
+**Principle:** Version the delivery contract, not a second implementation of publication truth.

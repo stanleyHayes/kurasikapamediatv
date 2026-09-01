@@ -44,6 +44,7 @@ revalidated from the BFF seam; CMS writes and cron endpoints call the Go API.
 | Editorial CMS, auth, RBAC, drafts | `apps/web` | Renders UI; rules enforced by `services/api` |
 | Interactive AI (rewrite, headline, SEO) | `apps/web` | RSC streams to the editor, sub-30s |
 | Published-inventory SEO audit | `services/api` | Go joins public articles, approved revisions and published staff profiles; Studio only renders the report |
+| Versioned public news API | `services/api` | Go reuses the published-article use cases; transport adds only the stable v1 envelope, CORS, cache policy and OpenAPI contract |
 | CMS writes, publish, schedule, transitions | `services/api` | Authorisation lives in the domain |
 | Social fan-out, scheduled publishing | `services/api` | Retryable queue work, not request-scoped |
 | RSS ingest, sitemap generation, digests | `services/api` | Cron-driven |

@@ -55,7 +55,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
 | Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention, newsletter and privacy-safe story-attention analytics are implemented. The Go-owned SEO readiness report and Studio SEO Center are deployed. KUR-98 adds semantic search, related reporting and reader-profile recommendations with safe fallbacks; production activation awaits a READY Atlas vector index and Voyage key. Search Console registration remains operator-owned. |
 | Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
-| Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
+| Remaining discovery scope | **IN PROGRESS** | Public news API v1 is implemented in KUR-100. Additional languages, integrations, security/DR evidence, other future surfaces and final launch verification remain. |
 
 ### Production-readiness audit reconciliation — 2026-08-31
 
@@ -398,8 +398,8 @@ content/author/category rankings, newsletter growth and a dedicated Studio
 analytics hub with a privacy-safe attention heatmap. Revenue/campaign reporting
 is available in Studio Revenue. The evidence-backed SEO Center and semantic
 recommendations are deployed, while semantic provider activation awaits Voyage
-and Atlas setup. AI news anchor, AI podcast/video generation, chatbot, public
-APIs and native apps remain.
+and Atlas setup. The read-only public news API v1 is implemented in KUR-100;
+AI news anchor, AI podcast/video generation, chatbot and native apps remain.
 
 ---
 
@@ -1648,3 +1648,21 @@ are live. Custom-domain DNS remains an external registrar action.**
   HTTP 200, `/og-image` returns HTTP 200 as `image/png`, malformed engagement
   input is rejected with HTTP 400, and the stable Studio sign-in returns HTTP
   200. The test-only follow-up commit did not require a new Vercel build.
+
+## 38. KUR-100 — versioned public news API (2026-09-01)
+
+**Status: IMPLEMENTED; full verification and production release active.**
+
+- Added a Go-owned, read-only `/v1` API that reuses the existing published
+  article use cases, so drafts, scheduled stories and unapproved revisions
+  cannot enter the external contract through a transport-only query.
+- Added cursor-paginated article listings and article detail by locale and
+  slug. Pages default to 12 and remain bounded to 50; response envelopes carry
+  an explicit API version, opaque next cursor and self/next link relations.
+- Added read-only wildcard CORS, public cache and stale-while-revalidate
+  directives, `nosniff`, explicit preflight handling, a discovery document and
+  a served OpenAPI 3.1 contract. Unknown and unpublished stories retain the
+  shared safe problem response.
+- Added the consumer and compatibility guide at `docs/api/public-v1.md` and
+  updated architecture, product and roadmap ownership. Do not mark deployed
+  until full Go/repository gates, Render deployment and live API smokes pass.

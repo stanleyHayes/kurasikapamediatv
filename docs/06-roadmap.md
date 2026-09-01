@@ -61,6 +61,7 @@ AdSense · classifieds · affiliate links · advertiser self-serve portal · rev
 
 AI analytics dashboard with engagement insight · SEO Center · heatmaps · reader-behaviour reports ·
 AI news anchor · AI podcast generator · AI video generator · AI chatbot ·
+versioned public news API (implemented in KUR-100) ·
 public REST + GraphQL API · mobile reporter app · native iOS + Android · offline publishing ·
 Events/Summits module · WAF, DR drill, full pen-test.
 

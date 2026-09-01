@@ -92,7 +92,7 @@ X, LinkedIn, Threads, TikTok, Telegram, WhatsApp Channel, YouTube Community and 
 | 18 Security | SSL, 2FA, CAPTCHA, role permissions, audit logs, backup, DR, WAF | R1 except WAF/DR → R5 |
 | 19 Performance | CDN, image optimisation, lazy loading, caching, PWA offline, mobile-first | R1 except PWA → R2 |
 | 20 Integrations | GA, Search Console, Cloudinary, YouTube, Mailchimp/Brevo/Resend, Stripe, Paystack, Flutterwave, Maps, RSS, widgets | R1–R4 by dependency |
-| 21 Future | Native apps, AI anchor, AI podcast/video generator, AI voice, chatbot, reporter app, offline publishing, public API | R5 |
+| 21 Future | Native apps, AI anchor, AI podcast/video generator, AI voice, chatbot, reporter app, offline publishing, public API | R5 — public news API v1 implemented; remaining surfaces continue in R5 |
 
 ## 8. Non-functional requirements
 

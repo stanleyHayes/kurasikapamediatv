@@ -125,6 +125,12 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		writeJSON(w, deps.Log, http.StatusOK, map[string]string{"status": "ok"})
 	})
+	mux.HandleFunc("GET /v1", deps.handlePublicAPIRoot)
+	mux.HandleFunc("GET /v1/openapi.json", deps.handlePublicAPISpec)
+	mux.HandleFunc("GET /v1/{locale}/articles", deps.handlePublicAPIList)
+	mux.HandleFunc("GET /v1/{locale}/articles/{slug}", deps.handlePublicAPIArticle)
+	mux.HandleFunc("OPTIONS /v1/{locale}/articles", handlePublicAPIPreflight)
+	mux.HandleFunc("OPTIONS /v1/{locale}/articles/{slug}", handlePublicAPIPreflight)
 
 	mux.HandleFunc("POST /articles", deps.handleCreateDraft)
 	mux.HandleFunc("GET /me/articles", deps.handleListAuthored)
