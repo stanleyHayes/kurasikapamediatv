@@ -1412,8 +1412,8 @@ are live. Custom-domain DNS remains an external registrar action.**
   outbound controls while a tracked destination is being resolved.
 - Verification: `pnpm verify` passes lint, type checking, dependency
   boundaries, 325 Web Kit tests at 80.48% branch coverage, 79 Web tests,
-  duplication and the Go race/coverage/vulnerability gate. Go reports 96.8%
-  domain and 90.5% application/HTTP coverage. A disposable Mongo 8 replica set
+  duplication and the Go race/coverage/vulnerability gate. A cache-cleared Go
+  run reports 96.8% domain and 90.8% application/HTTP coverage. A disposable Mongo 8 replica set
   proved all adapter integration suites, including named affiliate indexes,
   round-trip persistence and atomic click counting. Studio and Web production
   builds pass with the production environment; `/en/partners` and `/og-image`

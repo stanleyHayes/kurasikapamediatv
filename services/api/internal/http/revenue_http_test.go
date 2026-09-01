@@ -108,6 +108,15 @@ func TestRevenueHandlersRejectMalformedAndMissingResources(t *testing.T) {
 	if response := request(handler, http.MethodGet, "/public/en/ads/article_inline", "", false); response.Code != http.StatusOK || !bytes.Contains(response.Body.Bytes(), []byte(`"placement":null`)) {
 		t.Fatalf("empty placement: %d %s", response.Code, response.Body.String())
 	}
+	for _, tc := range []struct{ method, path, body string }{
+		{http.MethodPost, "/revenue/affiliate-links", `{}`},
+		{http.MethodPost, "/revenue/affiliate-links/missing/activate", `{}`},
+		{http.MethodGet, "/revenue/affiliate-links", ""},
+	} {
+		if response := request(handler, tc.method, tc.path, tc.body, false); response.Code != http.StatusForbidden {
+			t.Errorf("unsigned %s: %d %s", tc.path, response.Code, response.Body.String())
+		}
+	}
 }
 
 func TestAffiliateLinkLifecycleDisclosureAndAnonymousFollow(t *testing.T) {
