@@ -1438,7 +1438,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 32. KUR-93 — advertiser self-service and approval queue (2026-09-01)
 
-**Status: CODE-COMPLETE; production release verification in progress.**
+**Status: API DEPLOYED; Web and Studio release blocked by Vercel daily quota.**
 
 - Added an invitation-gated public advertiser workspace with its own password,
   MFA and forgot-password journey. Advertisers submit complete campaign
@@ -1458,3 +1458,15 @@ are live. Custom-domain DNS remains an external registrar action.**
   Mongo 8 replica set passes all adapter integration tests, including approval
   rollback and named proposal indexes. Both production builds pass and expose
   the advertiser portal and Studio Revenue routes.
+- Release evidence: implementation commit `499a933` and replica-set CI repair
+  `e601e99`; CI run `33463801312` passed Quality gates, Go service, Secret scan
+  and Lighthouse, including every browser/accessibility journey and the real
+  transactional Mongo suite. Render deploy `dep-dab3nr15efls73fq9hl0` is live
+  from `499a933`; `/healthz` returns 200 and the unauthenticated proposal route
+  correctly returns 403.
+- Vercel refused the explicit Studio production release after upload with
+  `api-deployments-free-per-day` because this account exceeded 100 deployments
+  in 24 hours. The current public alias therefore still returns 404 for the new
+  advertiser portal, while the existing Studio Revenue and `/og-image` routes
+  return 200. Retry both independent Vercel releases after the quota window;
+  do not describe KUR-93 as fully deployed until those exact builds are Ready.
