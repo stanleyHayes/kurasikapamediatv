@@ -1677,7 +1677,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 39. KUR-101 — disaster-recovery restore acceptance (2026-09-01)
 
-**Status: IMPLEMENTED LOCALLY — real Atlas backup drill and timed evidence pending.**
+**Status: IMPLEMENTED AND RELEASE-VERIFIED — real Atlas backup drill and timed evidence pending.**
 
 - Added a read-only Go restore verifier at `cmd/verify-restore`. It requires a
   separately named drill URI/database, refuses the exact production target and
@@ -1693,3 +1693,9 @@ are live. Custom-domain DNS remains an external registrar action.**
   handling and exact remaining production evidence. Provider-side PITR
   enablement and the first timed restore cannot be claimed until Atlas access
   is supplied.
+- A controlled replica-set fixture passed the CLI with five restored core
+  collections, one article/revision/user and zero issues. `make verify`, full
+  `pnpm verify` and the real-Mongo adapter suite pass. Commit `02d8c97` is on
+  `main`; CI run `33480840273` is green across Quality gates, Go service,
+  secret scan and Lighthouse. After deployment, Render `/healthz` and `/v1`
+  both return HTTP 200.
