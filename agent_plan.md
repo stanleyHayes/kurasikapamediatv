@@ -1573,7 +1573,10 @@ are live. Custom-domain DNS remains an external registrar action.**
   Events routes return HTTP 200, the Render API public feed returns HTTP 200,
   and the sitemap includes both locale event routes. CI run `33470135791` is
   green across quality gates, Go, secret scan and Lighthouse.
-- The production `APP_URL`, `SITE_URL` and `STUDIO_URL` values were corrected on
+- The production `APP_URL`, `SITE_URL` and `STUDIO_URL` values are corrected on
   both Vercel projects to the working `kurasikapa-web.vercel.app` and
-  `kurasikapa-studio.vercel.app/studio` aliases. This removes unreachable
-  `kurasikapa.tv` canonicals until the client configures that domain's DNS.
+  `kurasikapa-studio.vercel.app/studio` aliases. Vercel rejected the required
+  redeploy with its hard free-plan limit of more than 100 deployments per day,
+  so the currently served sitemap still carries `kurasikapa.tv` until the next
+  allowed deployment applies the staged environment. Do not treat the canonical
+  correction as live before that deployment and a fresh sitemap check pass.
