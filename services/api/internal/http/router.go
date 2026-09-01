@@ -11,6 +11,7 @@ import (
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appidentity "github.com/kurasikapa/api/internal/app/identity"
+	appinsight "github.com/kurasikapa/api/internal/app/insight"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
@@ -50,6 +51,7 @@ type Deps struct {
 	PublishStaffProfile         appidentity.PublishStaffProfile
 	ListStaffProfiles           appidentity.ListStaffProfiles
 	GetStaffProfile             appidentity.GetStaffProfile
+	BuildSEOReport              appinsight.BuildSEOReport
 	CreatePresenter             appmedia.CreatePresenter
 	PublishPresenter            appmedia.PublishPresenter
 	CreateProgramme             appmedia.CreateProgramme
@@ -147,6 +149,7 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /public/{locale}/team", deps.handleListStaffProfiles)
 	mux.HandleFunc("GET /public/{locale}/team/by-user/{userId}", deps.handleStaffProfileByUser)
 	mux.HandleFunc("GET /public/{locale}/team/{slug}", deps.handleStaffProfileBySlug)
+	mux.HandleFunc("GET /insight/seo-report", deps.handleSEOReport)
 	mux.HandleFunc("GET /public/{locale}/television", deps.handleTelevisionGuide)
 	mux.HandleFunc("POST /television/presenters", deps.handleCreatePresenter)
 	mux.HandleFunc("POST /television/presenters/{id}/publish", deps.handlePublishPresenter)

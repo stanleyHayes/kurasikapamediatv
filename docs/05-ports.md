@@ -267,6 +267,16 @@ readers, acquisition/search share, top story/category/author performance and
 newsletter growth from append-only production data. Page views expire after
 400 days under the documented GDPR retention policy.
 
+`BuildSeoReport` requires `analytics:read` and audits the complete English and
+French published inventory through existing article, approved-revision and
+staff-profile ports. It classifies each story once as ready, warning or
+critical and returns individual fixes for missing approved copy, lead imagery,
+published author profiles, low-resolution imagery and newsroom-defined thin
+copy. The 50,000-pixel image floor follows Google's publisher guidance; the
+300-word depth check is explicitly a newsroom standard, not a claimed ranking
+factor. Search Console rankings and Core Web Vitals remain absent until those
+providers supply real data.
+
 ### Shape of a use case
 
 Dependencies arrive as **one `Deps` object**, not as positional constructor parameters. Two reasons: the `max-params: 4` gate is real and several use cases legitimately need five collaborators, and a named object makes the composition root readable at the call site.

@@ -23,7 +23,7 @@ export interface ArticleIdentity {
  * engines act on it.
  */
 export function newsArticleJsonLd(
-  article: ArticleView & { readonly authorName?: string | null },
+	article: ArticleView & { readonly authorName?: string | null; readonly modifiedAt?: string | null },
   publisher: Publisher,
   canonical: string,
   identity?: ArticleIdentity,
@@ -49,7 +49,7 @@ export function newsArticleJsonLd(
   // for a draft would be a lie told to a crawler.
   if (article.publishedAt !== null) {
     json['datePublished'] = article.publishedAt
-    json['dateModified'] = article.publishedAt
+		json['dateModified'] = article.modifiedAt ?? article.publishedAt
   }
 
   if (typeof article.authorName === 'string' && article.authorName !== '') {

@@ -95,6 +95,9 @@ func TestGetPublishedArticle(t *testing.T) {
 		if got.Body == nil || *got.Body != "Approved text." {
 			t.Errorf("body = %v", got.Body)
 		}
+		if got.ModifiedAt == nil || !got.ModifiedAt.Equal(now) {
+			t.Errorf("modifiedAt = %v", got.ModifiedAt)
+		}
 	})
 }
 

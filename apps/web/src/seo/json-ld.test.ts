@@ -43,6 +43,11 @@ describe('newsArticleJsonLd', () => {
     )
   })
 
+	it('uses the approved revision timestamp as the modification date', () => {
+		const json = newsArticleJsonLd({ ...article, modifiedAt: '2026-08-09T11:00:00.000Z' }, publisher, canonical)
+		expect(json['dateModified']).toBe('2026-08-09T11:00:00.000Z')
+	})
+
   it('omits the date entirely rather than inventing one', () => {
     // A publish date on an unpublished article is a lie told to a crawler,
     // and crawlers act on it.

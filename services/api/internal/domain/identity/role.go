@@ -45,6 +45,7 @@ const (
 	PermRoleAssign       Permission = "role:assign"
 	PermProfileManage    Permission = "profile:manage"
 	PermAuditRead        Permission = "audit:read"
+	PermAnalyticsRead    Permission = "analytics:read"
 )
 
 // allPermissions is the full set, in declaration order.
@@ -53,7 +54,7 @@ var allPermissions = []Permission{
 	PermArticleApprove, PermArticlePublish, PermArticleUnpublish,
 	PermAssetUploadImage, PermAssetUploadVideo, PermStreamManage,
 	PermSocialPublish, PermCampaignViewOwn, PermRevenueManage, PermRevenueRead,
-	PermRoleAssign, PermProfileManage, PermAuditRead,
+	PermRoleAssign, PermProfileManage, PermAuditRead, PermAnalyticsRead,
 }
 
 // AllPermissions returns a copy of every permission.
@@ -70,6 +71,7 @@ func AllPermissions() []Permission {
 var editorPermissions = []Permission{
 	PermArticleDraft, PermArticleEditOwn, PermArticleEditAny, PermArticleSubmit,
 	PermArticleApprove, PermArticlePublish, PermArticleUnpublish, PermAssetUploadImage,
+	PermAnalyticsRead,
 }
 
 // rolePermissions maps each role to what it confers.

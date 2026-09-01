@@ -53,7 +53,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
-| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed; Search Console operations, semantic search and personalised recommendations remain. |
+| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed. A Go-owned SEO readiness report and Studio SEO Center are code-complete; production release evidence remains. Search Console operations, semantic search and personalised recommendations remain. |
 | Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
@@ -67,7 +67,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds and disclosed affiliate inventory are code-complete across Studio and public surfaces. Provider credentials, the quota-delayed public release and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
-| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED / SEARCH CONSOLE ACCESS BLOCKED** |
+| News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. The new SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data now uses the approved public revision for `dateModified`. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **SEO CENTER CODE COMPLETE / RELEASE ACTIVE / SEARCH CONSOLE ACCESS BLOCKED** |
 | Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
 
 Implementation rule for this delivery: original reporting is the primary content
@@ -390,7 +390,8 @@ The first-party insight foundation is now implemented locally: append-only,
 consent-aware article views, 400-day retention, acquisition/search attribution,
 traffic and unique/returning-reader trends, content/author/category rankings,
 newsletter growth and a dedicated Studio analytics hub. Revenue/campaign
-reporting waits on R4. SEO Center, semantic recommendations, heatmaps, AI news
+reporting waits on R4. The evidence-backed SEO Center is code-complete and
+awaiting release verification. Semantic recommendations, heatmaps, AI news
 anchor, AI podcast/video generation, chatbot, public APIs and native apps remain.
 
 ---
@@ -1470,3 +1471,34 @@ are live. Custom-domain DNS remains an external registrar action.**
   advertiser portal, while the existing Studio Revenue and `/og-image` routes
   return 200. Retry both independent Vercel releases after the quota window;
   do not describe KUR-93 as fully deployed until those exact builds are Ready.
+
+## 33. KUR-94 — published-inventory SEO Center (2026-09-01)
+
+**Status: CODE COMPLETE; full gates and production release active.**
+
+- Added Go `BuildSEOReport` behind existing article, revision and staff-profile
+  ports. It requires the now cross-language-consistent `analytics:read`
+  permission, paginates all EN/FR published inventory and audits the approved
+  public revision rather than a later unapproved newsroom draft.
+- Readiness is partitioned into ready, warning and critical stories. Findings
+  cover missing approved copy, missing hero photography, absent published
+  author profiles, images below Google's 50,000-pixel recommendation and a
+  clearly labelled 300-word newsroom depth check. No Search Console ranking,
+  Core Web Vitals or other provider data is manufactured.
+- Added authenticated `GET /insight/seo-report`, a defensive Web Kit BFF, and
+  `/studio/{locale}/seo`. Studio presents sourced KPIs, a circular readiness
+  score, bilingual stacked bars, filters, useful empty/success states and direct
+  links to repair each affected story.
+- Corrected public `NewsArticle.dateModified` to use the timestamp of the
+  approved revision returned by Go/TypeScript publication reads. The original
+  publication date remains stable, and unapproved corrections do not leak into
+  search metadata.
+- Verification: Go application/domain/HTTP suites pass; Web Kit passes
+  329 tests at 80.75% branch coverage; Web passes 81 tests at 87.85% branch
+  coverage; Studio passes 51 tests at 81.63% branch coverage. `pnpm verify`
+  passes all TypeScript/Go lint, type, boundary, test, coverage and duplication
+  gates. Both independent Next.js production builds pass; Web was deliberately
+  verified through the configured remote `API_URL` so prerendering matched the
+  production composition rather than the stopped local Mongo development
+  fallback. CI and live route evidence remain required before this section may
+  be marked deployed.

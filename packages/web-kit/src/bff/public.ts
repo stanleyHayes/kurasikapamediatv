@@ -18,6 +18,7 @@ export interface PublicArticleDto {
 export interface PublishedDto {
   readonly article: PublicArticleDto
   readonly body: string | null
+	readonly modifiedAt?: string | null
 }
 
 export interface ListedPublicDto {

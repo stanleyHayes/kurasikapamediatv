@@ -15,6 +15,7 @@ const TITLES = [
   { href: '/pages', title: 'Public pages', description: 'Publish organisation and legal information.' },
   { href: '/people', title: 'People & access', description: 'Manage newsroom roles and responsibility.' }, { href: '/audit', title: 'Audit trail', description: 'Trace every material editorial action.' },
   { href: '/analytics', title: 'Newsroom analytics', description: 'Understand audience, acquisition and growth.' },
+  { href: '/seo', title: 'SEO Center', description: 'Improve search readiness across published journalism.' },
   { href: '/articles', title: 'Story editor', description: 'Shape, review and publish the report.' }, { href: '/', title: 'Editorial desk', description: 'Your live newsroom at a glance.' },
 ] as const
 

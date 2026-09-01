@@ -390,3 +390,5 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Start with variable names, value-presence flags and redacted fingerprints; read individual non-secret values only when necessary. If a credential is emitted outside its password manager, stop, sanitize the handoff and require rotation before deployment.
 
 **Principle:** Secret audits should prove configuration without reproducing secrets.
+
+- 2026-09-01 checkpoint: no new observation; Observation 24 already covers the app-local environment precedence encountered during production-build verification.

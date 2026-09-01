@@ -44,8 +44,9 @@ func publicFrom(a editorial.Article) PublicArticle {
 
 // PublishedView is one live article plus the APPROVED text.
 type PublishedView struct {
-	Article PublicArticle `json:"article"`
-	Body    *string       `json:"body"`
+	Article    PublicArticle `json:"article"`
+	Body       *string       `json:"body"`
+	ModifiedAt *time.Time    `json:"modifiedAt"`
 }
 
 // GetPublishedArticle is the reader-facing lookup.
@@ -76,19 +77,23 @@ func (uc GetPublishedArticle) Execute(ctx context.Context, in GetPublishedInput)
 		return PublishedView{}, ports.ErrNotFound
 	}
 
-	body, err := approvedBody(ctx, uc.deps.Revisions, article)
+	revision, err := approvedRevision(ctx, uc.deps.Revisions, article)
 	if err != nil {
 		return PublishedView{}, err
 	}
-
-	return PublishedView{Article: publicFrom(article), Body: body}, nil
+	view := PublishedView{Article: publicFrom(article)}
+	if revision != nil {
+		body, modified := revision.Body(), revision.CreatedAt()
+		view.Body, view.ModifiedAt = &body, &modified
+	}
+	return view, nil
 }
 
-func approvedBody(
+func approvedRevision(
 	ctx context.Context,
 	revisions ports.RevisionRepository,
 	article editorial.Article,
-) (*string, error) {
+) (*editorial.Revision, error) {
 	id, ok := article.ApprovedRevisionID()
 	if !ok {
 		return nil, nil
@@ -100,9 +105,7 @@ func approvedBody(
 	if err != nil {
 		return nil, err
 	}
-	text := rev.Body()
-
-	return &text, nil
+	return &rev, nil
 }
 
 func visibleOnly(items []editorial.Article) []editorial.Article {

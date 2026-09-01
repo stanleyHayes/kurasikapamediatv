@@ -18,6 +18,8 @@ export interface PublishedArticle {
    * any stored revision.
    */
   readonly body: string | null
+	/** Timestamp of the approved public revision, never an unapproved edit. */
+	readonly modifiedAt: Date | null
 }
 
 export interface GetPublishedArticleInput {
@@ -46,6 +48,6 @@ export class GetPublishedArticle
     const approvedId = article.snapshot().approvedRevisionId
     const approved = approvedId === null ? null : await this.deps.revisions.findById(approvedId)
 
-    return { article, body: approved?.body ?? null }
+    return { article, body: approved?.body ?? null, modifiedAt: approved?.createdAt ?? null }
   }
 }

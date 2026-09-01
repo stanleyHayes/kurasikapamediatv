@@ -26,6 +26,7 @@ const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
   ] },
   { heading: 'Administration', items: [
     { href: '/analytics', label: 'Analytics', description: 'Audience and growth intelligence', icon: 'audit' },
+    { href: '/seo', label: 'SEO Center', description: 'Search readiness and story fixes', icon: 'search' },
     { href: '/revenue', label: 'Revenue', description: 'Memberships, support and income', icon: 'audit' },
     { href: '/people', label: 'People & access', description: 'Roles and permissions', icon: 'people' },
     { href: '/audit', label: 'Audit trail', description: 'Immutable activity log', icon: 'audit' },

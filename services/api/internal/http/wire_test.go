@@ -8,6 +8,7 @@ import (
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appidentity "github.com/kurasikapa/api/internal/app/identity"
+	appinsight "github.com/kurasikapa/api/internal/app/insight"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
@@ -48,7 +49,8 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 	revenueDeps.Classifieds = faketesting.NewClassifiedStore()
 	revenueDeps.AffiliateLinks = faketesting.NewAffiliateLinkStore()
 	revenueDeps.AdvertiserProposals = faketesting.NewAdvertiserProposalStore(revenueDeps.AdCampaigns.(*faketesting.AdCampaignStore))
-	staffDeps := appidentity.StaffProfileDeps{Profiles: faketesting.NewStaffProfileStore(), Assets: assets, IDs: &faketesting.SequentialIDs{}}
+	profiles := faketesting.NewStaffProfileStore()
+	staffDeps := appidentity.StaffProfileDeps{Profiles: profiles, Assets: assets, IDs: &faketesting.SequentialIDs{}}
 	recordingImports := faketesting.NewRecordingImportStore()
 	recordingProvider := &faketesting.RecordingPromotionFake{StartResult: ports.RecordingTranscode{TaskID: "transcode_1", OutputRef: "processed/recording.mp4"}, CheckResult: ports.RecordingProviderResult{Status: ports.RecordingProviderProcessing}}
 	return kurahttp.Deps{
@@ -75,6 +77,7 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		PublishStaffProfile:         appidentity.NewPublishStaffProfile(staffDeps),
 		ListStaffProfiles:           appidentity.NewListStaffProfiles(staffDeps),
 		GetStaffProfile:             appidentity.NewGetStaffProfile(staffDeps),
+		BuildSEOReport:              appinsight.NewBuildSEOReport(appinsight.Deps{Articles: app.Articles, Revisions: app.Revisions, Profiles: profiles, Clock: app.Clock}, []string{"en", "fr"}),
 		CreatePresenter:             appmedia.NewCreatePresenter(mediaDeps),
 		PublishPresenter:            appmedia.NewPublishPresenter(mediaDeps),
 		CreateProgramme:             appmedia.NewCreateProgramme(mediaDeps),

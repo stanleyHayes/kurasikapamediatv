@@ -19,6 +19,7 @@ func TestRolePermissions(t *testing.T) {
 	}{
 		{"an editor may approve", identity.RoleEditor, identity.PermArticleApprove, true},
 		{"an editor may edit any article", identity.RoleEditor, identity.PermArticleEditAny, true},
+		{"an editor may read newsroom analytics", identity.RoleEditor, identity.PermAnalyticsRead, true},
 		{"an editor may not assign roles", identity.RoleEditor, identity.PermRoleAssign, false},
 		{"an author may draft", identity.RoleAuthor, identity.PermArticleDraft, true},
 		{"an author may not approve", identity.RoleAuthor, identity.PermArticleApprove, false},

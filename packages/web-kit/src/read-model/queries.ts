@@ -43,7 +43,7 @@ export async function cachedArticle(
     const authorName = await container().resolvePublicByline.execute({
       userId: loaded.article.authorId,
     })
-    return { ...toArticleView(loaded.article), body: loaded.body, authorId: loaded.article.authorId, authorName }
+		return { ...toArticleView(loaded.article), body: loaded.body, modifiedAt: loaded.modifiedAt?.toISOString() ?? null, authorId: loaded.article.authorId, authorName }
   })
   if (found === null) return null
 

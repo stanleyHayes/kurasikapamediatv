@@ -31,6 +31,7 @@ describe('load public path', () => {
               publishedAt: '2026-08-09T12:00:00Z',
             },
             body: 'Approved text.',
+			modifiedAt: '2026-08-10T09:00:00Z',
           }),
           { status: 200 },
         ),
@@ -45,7 +46,7 @@ describe('load public path', () => {
     )
 
     expect(viaTypeScript).not.toHaveBeenCalled()
-    expect(found).toMatchObject({ id: 'art_1', body: 'Approved text.', authorName: null })
+		expect(found).toMatchObject({ id: 'art_1', body: 'Approved text.', modifiedAt: '2026-08-10T09:00:00Z', authorName: null })
   })
 
   it('rethrows a non-404 API problem', async () => {

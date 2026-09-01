@@ -26,6 +26,7 @@ import (
 	adapterrecording "github.com/kurasikapa/api/internal/adapter/recording"
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appidentity "github.com/kurasikapa/api/internal/app/identity"
+	appinsight "github.com/kurasikapa/api/internal/app/insight"
 	appmedia "github.com/kurasikapa/api/internal/app/media"
 	"github.com/kurasikapa/api/internal/app/ports"
 	apprevenue "github.com/kurasikapa/api/internal/app/revenue"
@@ -252,6 +253,7 @@ func run(log *slog.Logger) error {
 		PublishStaffProfile:         appidentity.NewPublishStaffProfile(staffDeps),
 		ListStaffProfiles:           appidentity.NewListStaffProfiles(staffDeps),
 		GetStaffProfile:             appidentity.NewGetStaffProfile(staffDeps),
+		BuildSEOReport:              appinsight.NewBuildSEOReport(appinsight.Deps{Articles: articles, Revisions: revisions, Profiles: staffProfiles, Clock: clock}, []string{"en", "fr"}),
 		CreatePresenter:             appmedia.NewCreatePresenter(mediaDeps),
 		PublishPresenter:            appmedia.NewPublishPresenter(mediaDeps),
 		CreateProgramme:             appmedia.NewCreateProgramme(mediaDeps),
