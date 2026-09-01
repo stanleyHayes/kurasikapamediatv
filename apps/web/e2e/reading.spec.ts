@@ -24,11 +24,18 @@ test.describe('reading', () => {
     await expect(page.getByRole('heading', { name: PUBLISHED.title, level: 1 })).toBeVisible()
   })
 
-  test('a consenting reader records one privacy-safe article view', async ({ page }) => {
+  test('a consenting reader records privacy-safe view and attention signals', async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem('kurasikapa-analytics-consent', 'granted'))
     const recorded = page.waitForResponse((response) => response.url().endsWith('/api/analytics/page-view'))
+    const engaged = page.waitForResponse((response) => response.url().endsWith('/api/analytics/engagement'))
     await page.goto(`/en/articles/${PUBLISHED.slug}`)
     expect((await recorded).status()).toBe(204)
+    expect((await engaged).status()).toBe(204)
+  })
+
+  test('first-party consent remains available without a GA provider id', async ({ page }) => {
+    await page.goto('/en')
+    await expect(page.getByRole('dialog', { name: 'Analytics cookies' })).toBeVisible()
   })
 
   test('the article carries NewsArticle structured data', async ({ page }) => {

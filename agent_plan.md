@@ -53,7 +53,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 |---|---|---|
 | Demo-ready editorial surface | **DONE** | Polished empty/loading states, removable realistic content, rendered desktop/mobile review, full verification and production deployment completed on 2026-08-31. |
 | Television and multimedia | **IN PROGRESS** | Programme schedule, presenters, live enhancements, replay/video, podcasts, galleries, media library, captions and transcripts. |
-| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention and newsletter analytics are deployed. The Go-owned SEO readiness report and Studio SEO Center are deployed. KUR-98 adds semantic search, related reporting and reader-profile recommendations with safe fallbacks; production activation awaits a READY Atlas vector index and Voyage key. Search Console registration remains operator-owned. |
+| Growth and intelligence | **IN PROGRESS** | News sitemap plus first-party traffic, acquisition, retention, newsletter and privacy-safe story-attention analytics are implemented. The Go-owned SEO readiness report and Studio SEO Center are deployed. KUR-98 adds semantic search, related reporting and reader-profile recommendations with safe fallbacks; production activation awaits a READY Atlas vector index and Voyage key. Search Console registration remains operator-owned. |
 | Revenue | **IN PROGRESS** | Memberships, donations, checkout, confirmation, KPIs and the subscriber ledger are implemented. Advertising has tested campaign, activation, placement, budget, event and report APIs plus Studio operations and disclosed public placements. Products, paid review-gated classifieds and disclosed affiliate inventory now have end-to-end persistence, Studio operations and public surfaces. Advertiser self-service is implemented and awaits release verification. |
 | Remaining discovery scope | **QUEUED** | Additional languages, integrations, security/DR evidence, public API/future surfaces and final launch verification. |
 
@@ -65,7 +65,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Television identity | The Live page and broadcast control room now have presenter/programme directories, scheduled transmissions, calendar reminders and caption-gated replay rails. The production Go API owns the matching media aggregates, repository ports, indexed Mongo persistence, authenticated Studio commands and public guide endpoint; both deployables prefer this BFF seam when `API_URL` is set. Full repository verification and production smoke checks pass; real schedule, presenter and licensed replay inventory are still client inputs. | **DEPLOYED — BLOCKED ON CLIENT PROGRAMMING** |
 | Multimedia system | Live broadcast plus television schedule/replay metadata exist. A Go-owned media library covers signed image, video, audio, caption, transcript and document intake. Podcast and photo/video gallery publishing are implemented. Verified image attachment and editor-approved article narration run through Go domain/application/API/Mongo and render publicly. Uploaded video reports receive adaptive Cloudinary HLS playback and generated posters while retaining mandatory captions. IVS now refuses unrecorded or operator-unconfirmed uncaptioned channels; public live status preserves caption readiness and the player enables CC only for actual delivered tracks. Ended live slots have a private replay queue and only ready video plus WebVTT captions can publish into the adaptive public player. Automatic IVS recording promotion is deployed. Browser-local English/French voice-to-article dictation is code-complete and awaiting production verification. | **PARTIAL — ACTIVE R3 RELEASE** |
 | Monetisation | Membership tiers, recurring subscriptions, donations, entitlement, checkout, signed webhooks, Studio management, public support, multi-currency KPIs and a subscriber ledger are implemented. Advertising, products, paid classifieds and disclosed affiliate inventory are code-complete across Studio and public surfaces. Provider credentials, the quota-delayed public release and advertiser self-service remain. | **PARTIAL — ACTIVE R4** |
-| Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party page-view pipeline and dedicated Studio analytics route now provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance and newsletter growth in production. Revenue/campaign reporting waits on R4. | **DEPLOYED — REVENUE METRICS MOVE WITH R4** |
+| Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party pipeline and dedicated Studio analytics route provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance, newsletter growth, active reading time and a privacy-safe story-depth attention heatmap. Revenue/campaign reporting is available in Studio Revenue. | **KUR-99 IMPLEMENTED — RELEASE VERIFICATION ACTIVE** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` is deployed and returns HTTP 200. The deployed SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data now uses the approved public revision for `dateModified`, pending a fresh Web release after the Vercel quota window. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **SEO CENTER DEPLOYED / WEB RELEASE QUOTA BLOCKED / SEARCH CONSOLE ACCESS BLOCKED** |
 | Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
@@ -293,7 +293,7 @@ the wiring is missing.
 | ~~Rate limiting~~ | **DONE — KUR-39.** AI endpoints limited via a shared MongoDB counter (fails closed). Auth limited by Better Auth's own limiter, moved to database storage — its in-memory default is per-instance and limits nothing on serverless. Search limited too (fails open — it is the least valuable thing to protect and the most visible to break). |
 | ~~**2FA**~~ | **DONE.** Better Auth `twoFactor` plugin; verify page at `/[locale]/two-factor`; enable UI on the profile Security card. |
 | ~~**CAPTCHA**~~ | **DONE.** Cloudflare Turnstile, env-gated. Unset keys leave sign-in alone (Playwright still works). |
-| ~~**Google Analytics**~~ | **DONE.** gtag loads only after the consent banner; unset `NEXT_PUBLIC_GA_MEASUREMENT_ID` renders nothing. Search Console still needs the client property. |
+| ~~**Google Analytics**~~ | **DONE.** First-party consent remains available independently; gtag loads only after consent and only when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is valid. Search Console still needs the client property. |
 | **Scheduling actually firing** | Article cron live (KUR-34). Social cron live and fail-closed until Meta credentials exist. |
 | ~~**Remaining designed screens**~~ | **DONE** for every route that exists — all ten built routes match their supplied designs (§3.7). `/team` stays ◑ until the client supplies names/roles/bios/portraits; the R3–R5 screens have no routes yet. |
 | ~~**Error tracking**~~ | **DONE.** Locale + global error boundaries; failures go to stderr via `reportError`. A Sentry DSN is still a hosting choice — the boundary no longer swallows. Backups remain Atlas/ops, not code. |
@@ -313,8 +313,9 @@ unset Resend fails closed. **PWA offline reading is live (KUR-51):** installable
 manifest, production service worker, network-first cache of visited articles /
 sections / home. Studio, auth, profile and RSC flights stay on the network.
 Remaining open: Facebook + Instagram **send** (adapter + cron wired; Meta app review
-and tokens still blocked), semantic related / recommended (needs
-`EmbeddingPort` — **declared, no adapter**, and Atlas Vector Search).
+and tokens still blocked). Semantic related/recommended and reader-profile
+recommendations are implemented in KUR-98; provider activation awaits Voyage
+credentials and a READY Atlas Vector Search index.
 **AI social captions are live (KUR-60):** `ProposeSocialCaption` loads the
 approved body and returns a caption + hashtags proposal into the compose
 form — nothing is queued until an editor schedules. **Category-based related is live (KUR-57):** same-section siblings on the
@@ -390,13 +391,15 @@ require provider credentials and real commercial inventory.
 
 ### 5.5 R5 — Intelligence & Reach
 
-The first-party insight foundation is now implemented locally: append-only,
-consent-aware article views, 400-day retention, acquisition/search attribution,
-traffic and unique/returning-reader trends, content/author/category rankings,
-newsletter growth and a dedicated Studio analytics hub. Revenue/campaign
-reporting waits on R4. The evidence-backed SEO Center is code-complete and
-awaiting release verification. Semantic recommendations, heatmaps, AI news
-anchor, AI podcast/video generation, chatbot, public APIs and native apps remain.
+The first-party insight foundation now includes append-only consented article
+views and reading-depth/active-time milestones, 400-day retention,
+acquisition/search attribution, traffic and unique/returning-reader trends,
+content/author/category rankings, newsletter growth and a dedicated Studio
+analytics hub with a privacy-safe attention heatmap. Revenue/campaign reporting
+is available in Studio Revenue. The evidence-backed SEO Center and semantic
+recommendations are deployed, while semantic provider activation awaits Voyage
+and Atlas setup. AI news anchor, AI podcast/video generation, chatbot, public
+APIs and native apps remain.
 
 ---
 
@@ -1614,3 +1617,25 @@ are live. Custom-domain DNS remains an external registrar action.**
   `article_semantic_vector` index reports `READY`, `VOYAGE_API_KEY` is present on
   Render, the backfill succeeds and the public fallback/semantic paths are both
   smoke-tested.
+
+## 37. KUR-99 — consented story-attention heatmap (2026-09-01)
+
+**Status: IMPLEMENTED; full gates and production release verification active.**
+
+- Added a domain-validated, append-only article-attention event with only four
+  reading-depth milestones and bounded active seconds. The browser supplies a
+  random UUID, the server hashes it before the use case, and neither pointer
+  coordinates, text selections nor raw identity cross the boundary.
+- Added `article_engagements` persistence, 400-day TTL and story/depth indexes.
+  Studio analytics aggregates distinct consenting readers into a 25/50/75/100
+  attention funnel and calculates average active reading time without joining
+  personal account data.
+- Added a responsive depth-grid heatmap, sourced KPI and useful animated empty
+  state to `/studio/{locale}/analytics`. The public article beacon records each
+  reached milestone and sends a final active-time update on page hide.
+- Corrected the analytics consent root so first-party consent is still offered
+  when GA4 is not configured; only Google's script depends on a valid
+  measurement ID. Updated the public cookies disclosure and data-model record.
+- Domain/application tests and the real-Mongo adapter aggregation test are
+  present. Do not mark deployed until the full repository gates, production
+  builds, public engagement endpoint and Studio analytics surface pass.

@@ -64,7 +64,7 @@ Consequence: locale is modelled at the article level with independent publish st
 
 ## 5. Constraints
 
-- **GDPR** — EU data residency (Atlas EU region), consent for analytics and marketing, right to erasure across reader activity collections, 400-day retention cap on page views.
+- **GDPR** — EU data residency (Atlas EU region), consent for analytics and marketing, right to erasure across reader activity collections, 400-day retention cap on page views and privacy-safe article-attention milestones.
 - **Accessibility** — WCAG 2.2 AA. Non-negotiable for a public-service-oriented media brand and increasingly a legal requirement in the EU.
 - **Editorial integrity** — no AI-generated content publishes without a named human approver. Recorded in the audit log.
 - **Process** — the Neurodyne 12-phase SDLC governs delivery, with client approval gates at Phases 2, 8 and 11.

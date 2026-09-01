@@ -222,3 +222,4 @@ export {
 
 export { AuditEntry, type AuditEntryProps } from './insight/audit-entry'
 export { PageView, ACQUISITION_CHANNELS, type AcquisitionChannel, type PageViewProps } from './insight/page-view'
+export { ArticleEngagement, READING_DEPTHS, type ArticleEngagementProps, type ReadingDepth } from './insight/article-engagement'

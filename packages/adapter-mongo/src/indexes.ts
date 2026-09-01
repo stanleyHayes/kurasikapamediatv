@@ -8,6 +8,7 @@ import {
   LIKES,
   READINGS,
   PAGE_VIEWS,
+  ARTICLE_ENGAGEMENTS,
   COMMENTS,
   NEWSLETTER_SUBSCRIBERS,
   BREAKING_ALERTS,
@@ -26,6 +27,7 @@ import {
   type LikeDocument,
   type ReadingDocument,
   type PageViewDocument,
+  type ArticleEngagementDocument,
   type CommentDocument,
   type NewsletterDocument,
   type BreakingAlertDocument,
@@ -144,6 +146,7 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
     { key: { articleId: 1, occurredAt: -1 }, name: 'insight_story_views' },
     { key: { visitorHash: 1, occurredAt: -1 }, name: 'insight_reader_retention' },
   ])
+  await ensureEngagementIndexes(db)
   await db.collection<CommentDocument>(COMMENTS).createIndexes([
     { key: { articleId: 1, state: 1, createdAt: -1, _id: -1 }, name: 'article_visible_recent' },
     { key: { state: 1, createdAt: 1, _id: 1 }, name: 'pending_oldest' },
@@ -190,6 +193,14 @@ async function ensureAudienceIndexes(db: Db): Promise<void> {
     .createIndex({ email: 1 }, { unique: true, name: 'credentials_email_unique' })
 
   await ensureAudienceIndexesPart2(db)
+}
+
+async function ensureEngagementIndexes(db: Db): Promise<void> {
+  await db.collection<ArticleEngagementDocument>(ARTICLE_ENGAGEMENTS).createIndexes([
+    { key: { occurredAt: -1 }, name: 'engagement_recent' },
+    { key: { occurredAt: 1 }, name: 'engagement_retention', expireAfterSeconds: 34_560_000 },
+    { key: { articleId: 1, visitorHash: 1, scrollDepth: 1, occurredAt: -1 }, name: 'engagement_story_depth' },
+  ])
 }
 
 /**

@@ -227,7 +227,7 @@ const EN: Readonly<Record<PageKey, StandingPage>> = {
     sections: [
       {
         paragraphs: [
-          'We use a small number of cookies. Those required to sign in and keep you signed in are essential and cannot be turned off. Any analytics or marketing cookies are set only with your consent, which you may withdraw at any time.',
+          'We use a small number of cookies and browser-storage entries. Those required to sign in and keep you signed in are essential and cannot be turned off. With your consent, first-party analytics records a random hashed visitor token, article views, acquisition source, reading-depth milestones and active reading seconds. It does not collect pointer coordinates, text selections or a raw identity. Google Analytics loads only when configured. You may refuse or withdraw analytics consent at any time.',
         ],
       },
     ],

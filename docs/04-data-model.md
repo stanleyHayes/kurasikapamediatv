@@ -82,6 +82,7 @@ erDiagram
 | `classifieds` | paid community notices | public copy, contact, asking price, placement fee, payment/review/publication state and 30-day expiry |
 | `affiliate_links` | disclosed partner recommendations | public copy and imagery, server-held HTTPS destination, activation, commission note and anonymous click count |
 | `page_views` | insight, append-only | `articleId`, `locale`, hashed `visitorHash`, acquisition `channel`, `occurredAt`; TTL after 400 days |
+| `article_engagements` | consented, append-only attention milestones | `articleId`, `locale`, hashed `visitorHash`, 25/50/75/100 `scrollDepth`, bounded `activeSeconds`, `occurredAt`; no pointer coordinates; TTL after 400 days |
 | `seo_reports` `revenue_snapshots` | insight, append-only | future time-series collections |
 | `audit_logs` | who did what | `actorId`, `action`, `entity`, `before`, `after`, `at` |
 
@@ -142,6 +143,8 @@ db.page_views.createIndex({ visitorHash: 1, occurredAt: -1 })
 
 // TTL — GDPR retention
 db.page_views.createIndex({ occurredAt: 1 }, { expireAfterSeconds: 34560000 }) // 400 days
+db.article_engagements.createIndex({ articleId: 1, visitorHash: 1, scrollDepth: 1, occurredAt: -1 })
+db.article_engagements.createIndex({ occurredAt: 1 }, { expireAfterSeconds: 34560000 }) // 400 days
 db.sessions.createIndex({ expires: 1 }, { expireAfterSeconds: 0 })
 ```
 

@@ -113,6 +113,16 @@ export interface PageViewDocument {
   occurredAt: Date
 }
 
+export interface ArticleEngagementDocument {
+  _id: string
+  articleId: string
+  locale: string
+  visitorHash: string
+  scrollDepth: number
+  activeSeconds: number
+  occurredAt: Date
+}
+
 export interface LikeDocument {
   /** `${readerId}:${articleId}` — a reader cannot like the same article twice. */
   _id: string
@@ -229,6 +239,7 @@ export const BOOKMARKS = 'bookmarks'
 export const LIKES = 'likes'
 export const READINGS = 'readings'
 export const PAGE_VIEWS = 'page_views'
+export const ARTICLE_ENGAGEMENTS = 'article_engagements'
 export const COMMENTS = 'comments'
 export const NEWSLETTER_SUBSCRIBERS = 'newsletter_subscribers'
 export const BREAKING_ALERTS = 'breaking_alerts'

@@ -53,6 +53,7 @@ import type {
   ReadAuditLog,
   RecordReading,
   RecordPageView,
+  RecordArticleEngagement,
   RegisterRssSource,
   RejectArticle,
   RemoveSavedArticle,
@@ -116,6 +117,7 @@ export interface Container {
   readonly countLikes: CountLikes
   readonly recordReading: RecordReading
   readonly recordPageView: RecordPageView
+  readonly recordArticleEngagement: RecordArticleEngagement
   readonly buildNewsroomReport: BuildNewsroomReport
   readonly listReadingHistory: ListReadingHistory
   readonly countReadings: CountReadings

@@ -1,29 +1,42 @@
-import type { InsightRepository, NewsroomReport, RankedMetric, StoryMetric, TrendPoint } from '@kurasikapa/application'
-import type { PageView } from '@kurasikapa/domain'
+import type { InsightRepository, NewsroomReport, RankedMetric, ReadingDepthMetric, StoryMetric, TrendPoint } from '@kurasikapa/application'
+import { READING_DEPTHS, type ArticleEngagement, type PageView } from '@kurasikapa/domain'
 import type { Collection, Db, Document } from 'mongodb'
-import { ARTICLES, CATEGORIES, LEGACY_USERS, NEWSLETTER_SUBSCRIBERS, PAGE_VIEWS, type PageViewDocument } from './documents'
+import { ARTICLE_ENGAGEMENTS, ARTICLES, CATEGORIES, LEGACY_USERS, NEWSLETTER_SUBSCRIBERS, PAGE_VIEWS, type ArticleEngagementDocument, type PageViewDocument } from './documents'
 
 interface CountRow { readonly _id: string; readonly value: number }
 interface TrendRow { readonly _id: string; readonly views: number; readonly visitors: readonly string[] }
 
 export class MongoInsightRepository implements InsightRepository {
   private readonly views: Collection<PageViewDocument>
-  constructor(private readonly db: Db) { this.views = db.collection<PageViewDocument>(PAGE_VIEWS) }
+  private readonly engagements: Collection<ArticleEngagementDocument>
+  constructor(private readonly db: Db) {
+    this.views = db.collection<PageViewDocument>(PAGE_VIEWS)
+    this.engagements = db.collection<ArticleEngagementDocument>(ARTICLE_ENGAGEMENTS)
+  }
 
   async append(view: PageView): Promise<void> {
     const row = view.snapshot()
     await this.views.insertOne({ _id: row.id, articleId: row.articleId, locale: row.locale, visitorHash: row.visitorHash, channel: row.channel, occurredAt: row.occurredAt })
   }
 
+  async appendEngagement(engagement: ArticleEngagement): Promise<void> {
+    const row = engagement.snapshot()
+    await this.engagements.insertOne({
+      _id: row.id, articleId: row.articleId, locale: row.locale,
+      visitorHash: row.visitorHash, scrollDepth: row.scrollDepth,
+      activeSeconds: row.activeSeconds, occurredAt: row.occurredAt,
+    })
+  }
+
   async report(days: number, to: Date): Promise<NewsroomReport> {
     const from = new Date(to.getTime() - days * 86_400_000)
     const range = { occurredAt: { $gte: from, $lte: to } }
-    const [summary, traffic, acquisition, topStories, topCategories, topAuthors, newsletter] = await Promise.all([
+    const [summary, traffic, acquisition, topStories, topCategories, topAuthors, newsletter, engagement] = await Promise.all([
       this.summary(range), this.traffic(range), this.rank('channel', range), this.storyRank(range),
       this.articleDimensionRank('categoryId', CATEGORIES, range),
-      this.articleDimensionRank('authorId', LEGACY_USERS, range), this.newsletter(from, to),
+      this.articleDimensionRank('authorId', LEGACY_USERS, range), this.newsletter(from, to), this.engagement(range),
     ])
-    return { ...summary, traffic, acquisition, topStories, topCategories, topAuthors, ...newsletter }
+    return { ...summary, traffic, acquisition, topStories, topCategories, topAuthors, ...newsletter, ...engagement }
   }
 
   private async summary(range: Document): Promise<Pick<NewsroomReport, 'views' | 'uniqueReaders' | 'returningReaders' | 'searchViews'>> {
@@ -81,5 +94,25 @@ export class MongoInsightRepository implements InsightRepository {
       ]).toArray(),
     ])
     return { newsletterSubscribers: total, newsletterGrowth: trend.reduce((sum, row) => sum + row.value, 0), newsletterTrend: trend.map((row) => ({ label: row._id, value: row.value })) }
+  }
+
+  private async engagement(range: Document): Promise<Pick<NewsroomReport, 'averageActiveSeconds' | 'readingDepth'>> {
+    const rows = await this.engagements.aggregate<{ _id: number; readers: readonly string[] }>([
+      { $match: range },
+      { $group: { _id: '$scrollDepth', readers: { $addToSet: '$visitorHash' } } },
+      { $sort: { _id: 1 } },
+    ]).toArray()
+    const active = await this.engagements.aggregate<{ value: number }>([
+      { $match: range },
+      { $group: { _id: { visitor: '$visitorHash', article: '$articleId' }, seconds: { $max: '$activeSeconds' } } },
+      { $group: { _id: null, value: { $avg: '$seconds' } } },
+    ]).next()
+    const base = rows.find((row) => row._id === 25)?.readers.length ?? 0
+    const readersByDepth = new Map(rows.map((row) => [row._id, row.readers.length]))
+    const readingDepth: ReadingDepthMetric[] = base === 0 ? [] : READING_DEPTHS.map((depth) => {
+      const readers = readersByDepth.get(depth) ?? 0
+      return { depth, readers, retention: Math.round(readers / base * 100) }
+    })
+    return { averageActiveSeconds: Math.round(active?.value ?? 0), readingDepth }
   }
 }

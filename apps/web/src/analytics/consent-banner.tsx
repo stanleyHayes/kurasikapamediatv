@@ -24,7 +24,7 @@ export function ConsentBanner({
       className="border-outline-variant bg-surface-container-high fixed right-4 bottom-4 left-4 z-50 mx-auto max-w-lg rounded-xl border p-4 shadow-lg md:left-auto"
     >
       <p className="text-on-surface text-sm">
-        We measure readership with privacy-safe first-party analytics and Google
+        We measure readership with privacy-safe first-party analytics and, when configured, Google
         Analytics only if you agree. Essential sign-in cookies are always on.
         You can refuse — the site still works.
       </p>

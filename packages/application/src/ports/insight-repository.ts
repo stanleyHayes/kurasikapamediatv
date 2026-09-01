@@ -1,8 +1,9 @@
-import type { PageView } from '@kurasikapa/domain'
+import type { ArticleEngagement, PageView } from '@kurasikapa/domain'
 
 export interface TrendPoint { readonly label: string; readonly views: number; readonly uniqueReaders: number }
 export interface RankedMetric { readonly label: string; readonly value: number }
 export interface StoryMetric extends RankedMetric { readonly id: string }
+export interface ReadingDepthMetric { readonly depth: 25 | 50 | 75 | 100; readonly readers: number; readonly retention: number }
 
 export interface NewsroomReport {
   readonly views: number
@@ -17,9 +18,12 @@ export interface NewsroomReport {
   readonly topCategories: readonly RankedMetric[]
   readonly topAuthors: readonly RankedMetric[]
   readonly newsletterTrend: readonly RankedMetric[]
+  readonly averageActiveSeconds: number
+  readonly readingDepth: readonly ReadingDepthMetric[]
 }
 
 export interface InsightRepository {
   append(view: PageView): Promise<void>
+  appendEngagement(engagement: ArticleEngagement): Promise<void>
   report(days: number, to: Date): Promise<NewsroomReport>
 }

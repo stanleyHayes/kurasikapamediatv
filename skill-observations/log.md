@@ -437,3 +437,18 @@ resolved statuses always carry their resolution date
 **Suggested improvement:** Generate the deployment map from actual runtime access, separate provider-console prerequisites from environment variables, and name the exact host scope for every key. Keep one authoritative local checklist and treat hosting dashboards as the secret store.
 
 **Principle:** A production environment file should be the smallest complete runtime contract, not a transcription of every provider dashboard.
+
+### Observation 29: Optional analytics providers must not gate first-party consent
+
+**Status:** OPEN
+**Date:** 2026-09-01
+**Session context:** Adding consented article-depth and active-reading analytics while Google Analytics remained optional.
+**Skill:** New skill candidate: consented-first-party-analytics
+**Type:** open-source
+**Phase/Area:** Analytics architecture and privacy
+
+**Issue:** The consent prompt was conditioned on a Google Analytics measurement ID, which silently disabled first-party analytics whenever the optional third-party provider was not configured.
+
+**Suggested improvement:** Own consent independently of analytics vendors. Start privacy-safe first-party measurement from the stored consent state, and load each optional provider only when both consent and that provider's configuration are present.
+
+**Principle:** Optional analytics providers are downstream consumers of consent, not prerequisites for offering or recording first-party consent.

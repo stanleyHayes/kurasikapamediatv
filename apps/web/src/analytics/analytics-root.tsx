@@ -8,7 +8,8 @@ import { isGaMeasurementId } from './measurement-id'
 
 /**
  * Public + studio: GDPR does not stop at the paywall of the CMS.
- * When the measurement id is unset, neither the banner nor gtag render.
+ * First-party measurement and its consent choice do not depend on GA being
+ * configured. An unset measurement id suppresses only Google's script.
  */
 export function AnalyticsRoot({ measurementId }: { measurementId: string }): React.ReactElement | null {
   const [consent, setConsent] = useState<AnalyticsConsent | null | 'pending'>('pending')
@@ -17,11 +18,11 @@ export function AnalyticsRoot({ measurementId }: { measurementId: string }): Rea
     setConsent(readConsent(window.localStorage))
   }, [])
 
-  if (!isGaMeasurementId(measurementId) || consent === 'pending') return null
+  if (consent === 'pending') return null
 
   return (
     <>
-      {consent === 'granted' ? <GoogleAnalytics measurementId={measurementId} /> : null}
+      {consent === 'granted' && isGaMeasurementId(measurementId) ? <GoogleAnalytics measurementId={measurementId} /> : null}
       {consent === null ? <ConsentBanner onChoose={setConsent} /> : null}
     </>
   )
