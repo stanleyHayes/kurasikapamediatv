@@ -1366,7 +1366,7 @@ are live. Custom-domain DNS remains an external registrar action.**
 
 ## 30. KUR-91 — products and paid classifieds (2026-09-01)
 
-**Status: CODE COMPLETE; release verification active.**
+**Status: API + Studio DEPLOYED; public Web release blocked by Vercel daily quota.**
 
 - Added revenue-domain product, product-order and classified lifecycles. A
   product requires accessible HTTPS imagery, valid GHS/EUR pricing and stock
@@ -1382,5 +1382,15 @@ are live. Custom-domain DNS remains an external registrar action.**
 - Domain tests now cover 99.1% of the revenue package; total Go domain coverage
   is 96.8%. Application/HTTP coverage meets the 90.0% floor, and the Web Kit
   suite passes 323 tests at 80.07% branch coverage.
-- Production deployment and live payment-provider smoke evidence are still
-  required before this item can move to deployed.
+- Release evidence: implementation commits `f317bb3` and `01dfdbf`; CI run
+  `33459049572` passed Quality gates, Go service, Secret scan and Lighthouse.
+  The production API health check and both read-only commerce endpoints
+  (`/public/products`, `/public/classifieds`) return HTTP 200. Studio deployment
+  `dpl_64GEy4A4HyMd2wo5bYUKqT8qXUb9` is Ready, and `/studio/en/revenue` returns
+  HTTP 200 from `kurasikapa-studio.vercel.app`.
+- The independent public Web deployment was attempted against project
+  `prj_PdORywgPcFJ2DGAmQpP8bXtztouo`, but Vercel rejected it with
+  `api-deployments-free-per-day` after the account exceeded 100 deployments in
+  24 hours. The previous public deployment therefore still returns HTTP 404
+  for `/en/shop` and `/en/classifieds`. Retry after the quota resets, then run
+  route and provider-checkout smoke tests before marking this story deployed.
