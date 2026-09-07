@@ -23,7 +23,7 @@ export function GET(request: Request): ImageResponse {
           </div>
           <div style={{ display: 'flex', fontSize: title.length > 82 ? 45 : 55, lineHeight: 1.04, letterSpacing: -2.2, fontWeight: 900, maxWidth: 760 }}>{title}</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '3px solid #10251a', paddingTop: 18, fontSize: 18, fontWeight: 700 }}>
-            <span>kurasikapa.tv</span><span>Television · News · Community</span>
+            <span>kurasikapamediatv.com</span><span>Television · News · Community</span>
           </div>
         </div>
       </div>

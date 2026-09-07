@@ -35,6 +35,23 @@ const nextConfig: NextConfig = {
 
   typedRoutes: true,
 
+  // Keep one indexable hostname. Preserve the full path and query string when
+  // a reader follows a legacy or automatically completed www URL.
+  //
+  // Next's config contract types this as async; there is nothing to await —
+  // the same exemption apps/studio/next.config.ts takes for `headers`.
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.kurasikapamediatv.com' }],
+        destination: 'https://kurasikapamediatv.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
+
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [{ protocol: 'https', hostname: 'res.cloudinary.com' }],

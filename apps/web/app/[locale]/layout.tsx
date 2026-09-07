@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { AnalyticsRoot } from '@/analytics/analytics-root'
+import { asScriptContent, organisationJsonLd } from '@/seo/json-ld'
 import { env } from '@kurasikapa/web-kit/composition/env'
 import { routing } from '@kurasikapa/web-kit/i18n/routing'
 import '../globals.css'
@@ -40,13 +41,21 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(env().APP_URL),
+    applicationName: 'Kurasikapa Media TV',
     title: { default: 'Kurasikapa Media TV', template: '%s · Kurasikapa Media TV' },
     description:
       'Television and digital journalism that educates, motivates and informs — from Kurasikapa Media TV.',
     alternates: {
       canonical: `/${locale}`,
-      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+      languages: {
+        ...Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+        'x-default': '/en',
+      },
     },
+    publisher: 'Kurasikapa Media TV',
+    creator: 'Kurasikapa Media TV',
+    category: 'news',
+    robots: { index: true, follow: true },
     openGraph: { type: 'website', siteName: 'Kurasikapa Media TV', locale, images: [{ url: '/og-image', width: 1200, height: 630, alt: 'Kurasikapa Media TV' }] },
     twitter: { card: 'summary_large_image', images: ['/og-image'] },
     appleWebApp: { capable: true, title: 'Kurasikapa', statusBarStyle: 'black-translucent' },
@@ -70,6 +79,14 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={outfit.variable}>
       <body className="bg-surface text-on-surface min-h-screen font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: asScriptContent(
+              organisationJsonLd({ name: 'Kurasikapa Media TV', url: env().APP_URL }),
+            ),
+          }}
+        />
         {/* Chrome lives in the (site) group, not here — the studio is a
             full-screen admin shell and must not inherit the masthead. */}
         <NextIntlClientProvider>

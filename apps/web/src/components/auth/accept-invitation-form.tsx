@@ -19,7 +19,7 @@ export function AcceptInvitationForm({ token }: { token: string }): React.ReactE
       setComplete(true); setMessage(`Account ready for ${result.data.email}. You can now sign in to Studio.`)
     })
   }
-  if (complete) return <div className="border-l-4 border-secondary bg-secondary-container p-5"><p className="font-semibold">{message}</p><a href="https://kurasikapa-studio.vercel.app/studio/en/sign-in" className="mt-4 inline-block font-bold text-primary underline">Open Studio sign in</a></div>
+  if (complete) return <div className="border-l-4 border-secondary bg-secondary-container p-5"><p className="font-semibold">{message}</p><a href="https://studio.kurasikapamediatv.com/studio/en/sign-in" className="mt-4 inline-block font-bold text-primary underline">Open Studio sign in</a></div>
   return <form action={submit} className="space-y-5"><AuthField label="New password" name="password" type="password" placeholder="Create a strong password" autoComplete="new-password" icon="lock" minLength={8} /><AuthField label="Confirm password" name="confirm" type="password" placeholder="Repeat your password" autoComplete="new-password" icon="lock" minLength={8} /><button disabled={pending || token === ''} className="h-12 w-full bg-primary font-bold text-on-primary disabled:opacity-40">{pending ? 'Activating…' : 'Accept invitation'}</button>{message !== null && <p role="alert" className="text-sm text-error">{message}</p>}</form>
 }
 

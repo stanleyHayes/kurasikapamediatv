@@ -58,11 +58,11 @@ uploaded as blank production variables.
 - Owner/admin access to GitHub, both Vercel projects, Render, MongoDB Atlas,
   Cloudinary, AWS, Resend, Cloudflare, Google, Meta, Paystack, Stripe and Voyage.
 - A billing card and billing contact for every paid provider.
-- The final public domain. Until its DNS resolves, the public host is
-  `kurasikapa-web.vercel.app` and Studio is
-  `kurasikapa-studio.vercel.app/studio`.
-- DNS access when the domain is purchased. Preferred final shape:
-  `www.<domain>` or `<domain>` for readers and `studio.<domain>/studio` for staff.
+- The purchased production domain is `kurasikapamediatv.com`. Readers use the
+  apex; `www` permanently redirects to it. Staff use
+  `studio.kurasikapamediatv.com/studio`.
+- Keep Vercel DNS access available for certificate renewal and future provider
+  verification records.
 
 ### Credentials and provider approvals
 
@@ -77,9 +77,9 @@ uploaded as blank production variables.
 - Add a separate least-privilege Polly/S3 principal and private London
   staging bucket with a short lifecycle policy for article narration. Never
   provide the AWS root credentials.
-- Resend API key plus a verified sending domain and DNS records. The application
-  currently sends as `news@kurasikapa.tv`; this must change if another domain is
-  selected.
+- Resend API key plus verified DNS for `kurasikapamediatv.com`. The configured
+  sender is `news@kurasikapamediatv.com`; do not enable it until Resend reports
+  the domain as verified.
 - Paystack Ghana live secret and completed business/KYC settlement setup.
 - Stripe live secret and webhook signing secret if international Stripe payment
   support is required. Confirm Stripe account eligibility for the operating
@@ -123,10 +123,10 @@ uploaded as blank production variables.
 
 Use `.env.production` as the key checklist, but store secrets in provider
 dashboards—not Git. The same file cannot supply `APP_URL` to two independent
-projects: use the public URL in the Web project and
-`https://kurasikapa-studio.vercel.app` in Studio. `SITE_URL`, `STUDIO_URL`,
-database/auth/revalidation secrets and the API URL are shared. Do not set
-`COOKIE_DOMAIN` while the two apps use unrelated `vercel.app` hosts.
+projects: use `https://kurasikapamediatv.com` in Web and
+`https://studio.kurasikapamediatv.com` in Studio. Both use the same `SITE_URL`,
+`STUDIO_URL`, `.kurasikapamediatv.com` cookie domain, database/auth/revalidation
+secrets and API URL.
 
 An unset optional value must be absent, not `KEY=""`; empty URL values fail
 runtime validation. Rotate any credential that has ever been pasted into chat,
@@ -141,10 +141,10 @@ a ticket, source control or a screen recording.
 | Render API | `MONGODB_URI`, `MONGODB_DB`, `CRON_SECRET`, Cloudinary credential trio | Stripe/Paystack; separate Polly/S3 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`; Voyage key/model/dimensions after the Atlas vector index is READY |
 | GitHub Actions | `CRON_SECRET` | `ENABLE_SOCIAL_CRON=true` only after Meta approval |
 
-For independent `vercel.app` hosts, leave `COOKIE_DOMAIN` absent. `SITE_URL` is
-`https://kurasikapa-web.vercel.app`; `STUDIO_URL` is
-`https://kurasikapa-studio.vercel.app/studio`; Studio's own `APP_URL` omits the
-`/studio` base path. Never upload `AWS_SECRET_ACCESS_KEY`, payment secrets,
+For production, `SITE_URL` is `https://kurasikapamediatv.com`, `STUDIO_URL` is
+`https://studio.kurasikapamediatv.com/studio`, and `COOKIE_DOMAIN` is
+`.kurasikapamediatv.com` on both Vercel projects. Studio's own `APP_URL` omits
+the `/studio` base path. Never upload `AWS_SECRET_ACCESS_KEY`, payment secrets,
 `ANTHROPIC_API_KEY` or server-only webhook secrets as `NEXT_PUBLIC_*` values.
 `CRON_SECRET` must be identical on Web, Studio and Render: in addition to cron
 authentication, it now proves that privileged `X-Kurasikapa-User` assertions
@@ -251,8 +251,10 @@ but the applicable rate and eligibility depend on the legal account country.
 - The API's public newsroom-profile endpoint is deployed and returns HTTP 200.
   The empty profile list is expected until approved journalist identities and
   portraits are supplied and published from Studio.
-- `kurasikapa.tv` is attached to the Web project but does not currently resolve
-  in DNS. Do not use it in launch announcements until DNS and TLS checks pass.
+- `kurasikapamediatv.com` and `studio.kurasikapamediatv.com` are attached to
+  their Vercel projects. The final acceptance record must confirm apex, `www`
+  redirect, Studio TLS, canonical metadata, robots and both sitemaps after the
+  domain-cutover deployment.
 - Vercel currently builds with Node 24.x while the repository requests Node
   26+. The build succeeds, but the Web and Studio project settings should move
   to Node 26 when Vercel offers it, or the repository engine should be aligned

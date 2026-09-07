@@ -24,7 +24,7 @@
 | E2E | 25 Playwright journeys + 4 axe WCAG 2.2 AA checks, all passing |
 | Gates | `lint` 0 · `typecheck` 0 · `boundaries` 0 · `jscpd` 0.22% · `next build` 0 · `go vet`/`gofmt`/`go test -race` 0 |
 | Deployables | **Three:** `apps/web` (public), `apps/studio` (CMS, basePath `/studio`), `services/api` (Go). See [ADR-0011](docs/decisions/adr-0011-studio-is-its-own-deployment.md). |
-| Deployed | **Web + Studio on Vercel; Go API on Render.** Studio is canonical at `kurasikapa-studio.vercel.app/studio`; the API is health-checked independently and reached through `API_URL`. |
+| Deployed | **Web + Studio on Vercel; Go API on Render.** Production domains are `kurasikapamediatv.com` and `studio.kurasikapamediatv.com/studio`; the API is health-checked independently and reached through `API_URL`. |
 
 Run `pnpm verify` before claiming any task is done. It runs the gates in CI order.
 
@@ -42,6 +42,7 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 | Full gates, production deploy and live workflow smoke tests | **DONE** | Lint, typecheck, boundaries, all TS suites, duplication and Go verification passed. Both Vercel projects reached Ready; live Studio sign-in/create-story and public Careers/invitation routes responded successfully. |
 | Client-demo presentation pass | **DONE** | Shared animated empty-state frame covers public collections, search, reader libraries, comments and Studio queues; Studio has a dedicated newsroom splash and the login logo no longer sits on a white plate. Production now contains 35 EN/FR stories, 11 sections, comments, FAQ, Help and Careers records, all ownership-tagged for a one-command selective clear. `pnpm verify` passed; both Vercel projects are Ready and the live FAQ and independent Studio login smokes return 200. |
 | Editorial authoring and spatial UI consistency | **DONE** | New-story intake opens the canonical Markdown-backed rich editor immediately, the last native select is replaced by the branded picker, route loading is a composed newsroom transition, and shared signal/card grids have isometric depth with reduced-motion fallback. `pnpm verify` passed; both Vercel projects reached Ready; authenticated desktop/mobile Studio and public grid surfaces were rendered in production. |
+| Production domain cutover | **IN PROGRESS** | Purchased `kurasikapamediatv.com` is attached in Vercel. Source, SEO, deployment URLs, cross-subdomain auth and the operator handoff are being cut over; completion requires a green deployment plus live apex/www/Studio/TLS/canonical/sitemap/auth checks. |
 
 ### Discovery completion programme
 
@@ -68,7 +69,7 @@ Work remains release-shaped so each slice can ship and be verified independently
 | Newsroom intelligence | Operational workflow KPIs remain. A consent-aware, append-only first-party pipeline and dedicated Studio analytics route provide views, unique/returning readers, traffic trends, acquisition/search share, top story/category/author performance, newsletter growth, active reading time and a privacy-safe story-depth attention heatmap. Revenue/campaign reporting is available in Studio Revenue. | **IMPLEMENTED/DEPLOYED — REAL TRAFFIC WILL POPULATE IT** |
 | Institutional credibility | Dates, publisher/contact pages and `NewsArticle` structure exist. Studio now publishes locale-specific newsroom profiles from invited users and verified media-library portraits; public Team cards, individual author pages, linked bylines and Person/author structured data consume them. No identities are invented, so launch still requires approved names, biographies, portraits and public links from the client. | **IMPLEMENTED — BLOCKED ON CLIENT IDENTITIES** |
 | News SEO operations | Standard sitemap, robots, RSS, canonicals and `NewsArticle` JSON-LD exist. The rolling two-day `/news-sitemap.xml` and root `/og-image` are deployed. The SEO Center audits every published story for approved copy, high-resolution imagery and a published author profile; structured data uses the approved public revision for `dateModified`. Search Console ownership/submission and indexing monitoring still require access to the publisher account. | **DEPLOYED — SEARCH CONSOLE ACCESS BLOCKED** |
-| Deployment naming | `kurasikapa-web.vercel.app` is attached and `APP_URL` resolves generated sitemap and robots URLs to `https://kurasikapa.tv`; the old long project URL is no longer the only public address. | **DONE** |
+| Deployment naming | `kurasikapamediatv.com` is the canonical reader host, `www` redirects to the apex, and Studio uses `studio.kurasikapamediatv.com/studio`. | **IN PROGRESS — LIVE ACCEPTANCE PENDING** |
 
 Implementation rule for this delivery: original reporting is the primary content
 workflow. RSS sources are an optional monitoring and draft-intake tool, never a

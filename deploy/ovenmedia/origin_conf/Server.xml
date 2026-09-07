@@ -25,7 +25,7 @@
     <Host><Names><Name>*</Name></Names></Host>
     <API>
       <AccessToken>${env:OME_API_TOKEN}</AccessToken>
-      <CrossDomains><Url>https://studio.kurasikapa.tv</Url></CrossDomains>
+      <CrossDomains><Url>https://studio.kurasikapamediatv.com</Url></CrossDomains>
     </API>
   </Managers>
   <VirtualHosts>
@@ -63,7 +63,7 @@
           </OutputProfiles>
           <Providers><RTMP><BlockDuplicateStreamName>true</BlockDuplicateStreamName></RTMP></Providers>
           <Publishers>
-            <LLHLS><ChunkDuration>0.5</ChunkDuration><SegmentDuration>6</SegmentDuration><SegmentCount>10</SegmentCount><CrossDomains><Url>https://kurasikapa.tv</Url><Url>https://www.kurasikapa.tv</Url></CrossDomains></LLHLS>
+            <LLHLS><ChunkDuration>0.5</ChunkDuration><SegmentDuration>6</SegmentDuration><SegmentCount>10</SegmentCount><CrossDomains><Url>https://kurasikapamediatv.com</Url><Url>https://www.kurasikapamediatv.com</Url></CrossDomains></LLHLS>
             <FILE><RootPath>/var/lib/kurasikapa/recordings</RootPath><FilePath>/${Stream}/${StartTime:YYYYMMDDhhmmss}_${EndTime:YYYYMMDDhhmmss}.mp4</FilePath><InfoPath>/${Stream}/${StartTime:YYYYMMDDhhmmss}.xml</InfoPath></FILE>
           </Publishers>
         </Application>

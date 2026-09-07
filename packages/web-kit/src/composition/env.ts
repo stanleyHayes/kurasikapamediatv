@@ -52,11 +52,11 @@ const schema = z.object({
   STUDIO_URL: z.url().optional(),
 
   /**
-   * Parent domain for the session cookie, e.g. `.kurasikapa.tv`.
+   * Parent domain for the production session cookie.
    *
    * Required ONLY for split-origin deployment. The site issues the session and
-   * the studio reads it; a host-scoped cookie set on `kurasikapa.tv` is never
-   * sent to `studio.kurasikapa.tv`, so without this an editor signs in
+   * the studio reads it; a host-scoped cookie set on `kurasikapamediatv.com` is never
+   * sent to `studio.kurasikapamediatv.com`, so without this an editor signs in
    * successfully and the studio still bounces them back to sign in — a loop.
    *
    * Unset in the same-origin shape, where a host cookie already reaches both.

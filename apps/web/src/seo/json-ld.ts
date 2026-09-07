@@ -62,8 +62,10 @@ export function newsArticleJsonLd(
 export const organisationJsonLd = (publisher: Publisher): Record<string, unknown> => ({
   '@context': 'https://schema.org',
   '@type': 'NewsMediaOrganization',
+  '@id': `${publisher.url}#publisher`,
   name: publisher.name,
   url: publisher.url,
+  logo: `${publisher.url}/icon.svg`,
 })
 
 /**

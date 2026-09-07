@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import type { ArticleView } from '@kurasikapa/web-kit/read-model/article-view'
 import { asScriptContent, newsArticleJsonLd, organisationJsonLd } from './json-ld'
 
-const publisher = { name: 'Kurasikapa Media TV', url: 'https://kurasikapa.tv' }
-const canonical = 'https://kurasikapa.tv/en/articles/budget-2026'
+const publisher = { name: 'Kurasikapa Media TV', url: 'https://kurasikapamediatv.com' }
+const canonical = 'https://kurasikapamediatv.com/en/articles/budget-2026'
 
 const article: ArticleView = {
   id: 'art_1',
@@ -78,7 +78,7 @@ describe('newsArticleJsonLd', () => {
   })
 
   it('includes the same social image when one is supplied', () => {
-    const image = 'https://kurasikapa.tv/og-image?title=Budget%202026'
+    const image = 'https://kurasikapamediatv.com/og-image?title=Budget%202026'
     expect(newsArticleJsonLd(article, publisher, canonical, { image })['image']).toEqual([image])
   })
 })
@@ -106,7 +106,9 @@ describe('organisationJsonLd', () => {
   it('describes the publisher for the site root', () => {
     expect(organisationJsonLd(publisher)).toMatchObject({
       '@type': 'NewsMediaOrganization',
+      '@id': 'https://kurasikapamediatv.com#publisher',
       name: 'Kurasikapa Media TV',
+      logo: 'https://kurasikapamediatv.com/icon.svg',
     })
   })
 })

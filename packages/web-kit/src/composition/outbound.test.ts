@@ -24,7 +24,7 @@ describe('outbound adapters', () => {
   })
 
   it('uses a verified EMAIL_FROM override when supplied', () => {
-    expect(emailFromAddress()).toBe('Kurasikapa Media <news@kurasikapa.tv>')
+    expect(emailFromAddress()).toBe('Kurasikapa Media <news@kurasikapamediatv.com>')
     process.env['EMAIL_FROM'] = 'Kurasikapa News <desk@example.com>'
     expect(emailFromAddress()).toBe('Kurasikapa News <desk@example.com>')
   })

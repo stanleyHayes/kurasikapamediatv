@@ -13,7 +13,7 @@ https://kurasikapa-media-api.onrender.com/v1
 ```
 
 `GET /v1` is the discovery document. `GET /v1/openapi.json` is the canonical
-OpenAPI 3.1 contract. A future `api.kurasikapa.tv` alias may replace the host;
+OpenAPI 3.1 contract. A future `api.kurasikapamediatv.com` alias may replace the host;
 the versioned paths will remain unchanged.
 
 ## Resources

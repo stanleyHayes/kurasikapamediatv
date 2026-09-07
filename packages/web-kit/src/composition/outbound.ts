@@ -47,7 +47,7 @@ export function webPush(): WebPushSender {
   return new WebPushSender({
     publicKey: present(process.env['VAPID_PUBLIC_KEY']),
     privateKey: present(process.env['VAPID_PRIVATE_KEY']),
-    subject: 'mailto:news@kurasikapa.tv',
+    subject: 'mailto:news@kurasikapamediatv.com',
     post: globalThis.fetch.bind(globalThis),
   })
 }
@@ -56,7 +56,7 @@ export function failClosedPush(): WebPushSender {
   return new WebPushSender({
     publicKey: undefined,
     privateKey: undefined,
-    subject: 'mailto:news@kurasikapa.tv',
+    subject: 'mailto:news@kurasikapamediatv.com',
     post: globalThis.fetch.bind(globalThis),
   })
 }
@@ -72,7 +72,7 @@ export function newsroomAddress(): string {
 
 /** Verified Resend sender identity. The legacy brand address remains the default. */
 export function emailFromAddress(): string {
-  return present(process.env['EMAIL_FROM']) ?? 'Kurasikapa Media <news@kurasikapa.tv>'
+  return present(process.env['EMAIL_FROM']) ?? 'Kurasikapa Media <news@kurasikapamediatv.com>'
 }
 
 export function rssFetcher(): RssFetcher {

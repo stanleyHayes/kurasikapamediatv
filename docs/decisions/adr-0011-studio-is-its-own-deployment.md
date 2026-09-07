@@ -88,14 +88,14 @@ The studio is rewritten onto `/studio` of the public domain. Set nothing:
 
 ### 2. Split origin
 
-The studio answers on its own host, e.g. `studio.kurasikapa.tv`.
+The studio answers on its own host, `studio.kurasikapamediatv.com`.
 
 | Variable | Public site | Studio |
 |---|---|---|
-| `APP_URL` | `https://kurasikapa.tv` | `https://studio.kurasikapa.tv` |
-| `SITE_URL` | `https://kurasikapa.tv` | `https://kurasikapa.tv` |
-| `STUDIO_URL` | `https://studio.kurasikapa.tv/studio` | same |
-| `COOKIE_DOMAIN` | `.kurasikapa.tv` | `.kurasikapa.tv` |
+| `APP_URL` | `https://kurasikapamediatv.com` | `https://studio.kurasikapamediatv.com` |
+| `SITE_URL` | `https://kurasikapamediatv.com` | `https://kurasikapamediatv.com` |
+| `STUDIO_URL` | `https://studio.kurasikapamediatv.com/studio` | same |
+| `COOKIE_DOMAIN` | `.kurasikapamediatv.com` | `.kurasikapamediatv.com` |
 
 `COOKIE_DOMAIN` is **required** here. Without it the site issues a host-scoped
 session cookie that is never sent to the studio subdomain, so an editor signs in
@@ -108,7 +108,7 @@ accepts the cross-origin OAuth return.
 ### 3. Independent Vercel host
 
 Before a custom Studio subdomain exists, the CMS may run at a provider host
-such as `kurasikapa-studio.vercel.app`. That host and `kurasikapa.tv` do not
+such as `kurasikapa-studio.vercel.app`. That host and the public domain do not
 share a registrable domain, so no valid `COOKIE_DOMAIN` can make a site cookie
 available to both.
 
@@ -120,8 +120,8 @@ the deployment.
 
 | Variable | Public site | Studio |
 |---|---|---|
-| `APP_URL` | `https://kurasikapa.tv` | `https://kurasikapa-studio.vercel.app` |
-| `SITE_URL` | `https://kurasikapa.tv` | `https://kurasikapa.tv` |
+| `APP_URL` | `https://kurasikapamediatv.com` | `https://kurasikapa-studio.vercel.app` |
+| `SITE_URL` | `https://kurasikapamediatv.com` | `https://kurasikapamediatv.com` |
 | `STUDIO_URL` | `https://kurasikapa-studio.vercel.app/studio` | same |
 | `COOKIE_DOMAIN` | unset | unset |
 
