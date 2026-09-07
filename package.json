@@ -21,7 +21,8 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "go:verify": "make -C services/api verify",
     "go:test": "make -C services/api test",
-    "go:integration": "make -C services/api integration"
+    "go:integration": "make -C services/api integration",
+    "reset-password": "node scripts/reset-password.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -30,6 +31,7 @@
     "dependency-cruiser": "18.1.0",
     "eslint": "10.8.0",
     "jscpd": "5.0.14",
+    "mongodb": "6.21.0",
     "turbo": "2.10.8",
     "typescript": "5.9.3",
     "typescript-eslint": "8.65.0",

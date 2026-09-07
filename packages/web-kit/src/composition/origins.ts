@@ -28,7 +28,27 @@ type Origins = Pick<Env, 'APP_URL' | 'SITE_URL' | 'STUDIO_URL'>
  * time, so this cannot read it. Changing one means changing the other, which
  * is what ADR-0011 records.
  */
-const STUDIO_BASE_PATH = '/studio'
+export const STUDIO_BASE_PATH = '/studio'
+
+/**
+ * A studio path as the BROWSER should ask for it — root-relative, no origin.
+ *
+ * `studioUrl` answers "where does the other deployment live", and is right for
+ * a link that crosses from the public site into the studio. It is WRONG for
+ * the studio's own pages, because the studio is reachable at two origins: its
+ * own host, and the public domain, which rewrites `/studio/:path*` onto it
+ * (apps/web/vercel.json). A page served through the rewrite that fetches
+ * `studioUrl(...)` is making a CROSS-ORIGIN request, which the CSP's
+ * `connect-src 'self'` blocks and which would not carry the session cookie
+ * even if it were allowed.
+ *
+ * Root-relative keeps the request on whatever origin the reader actually
+ * arrived at, so both shapes work. The base path has to be written in by hand:
+ * Next rewrites `<Link>` hrefs for `basePath`, but never a `fetch` URL.
+ */
+export function studioPath(path: string): string {
+  return `${STUDIO_BASE_PATH}${path}`
+}
 
 const trimSlash = (url: string): string => url.replace(/\/+$/u, '')
 

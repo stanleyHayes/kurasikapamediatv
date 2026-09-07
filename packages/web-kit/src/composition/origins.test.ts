@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cookieScope, signInUrl, siteUrl, studioUrl, trustedOrigins } from './origins'
+import { cookieScope, signInUrl, siteUrl, studioPath, studioUrl, trustedOrigins } from './origins'
 
 const sameOrigin = {
   APP_URL: 'https://kurasikapa.tv',
@@ -44,6 +44,21 @@ describe('origins', () => {
     // proxies serve and others 404 — the worst kind of environment-dependent bug.
     expect(studioUrl(trailing)).toBe('https://kurasikapa.tv/studio')
     expect(siteUrl(trailing)).toBe('https://kurasikapa.tv')
+  })
+
+  describe('studioPath', () => {
+    it('carries the base path but no origin, so the request stays same-origin', () => {
+      // The studio answers at two origins: its own host, and the public domain,
+      // which rewrites /studio/:path* onto it. An absolute URL is cross-origin
+      // for whichever one the reader did not use — blocked by connect-src
+      // 'self', and cookie-less even if it were allowed.
+      expect(studioPath('/api/session')).toBe('/studio/api/session')
+      expect(studioPath('/en/sign-in')).toBe('/studio/en/sign-in')
+    })
+
+    it('agrees with studioUrl about where the studio is mounted', () => {
+      expect(studioUrl(sameOrigin)).toBe(`https://kurasikapa.tv${studioPath('')}`)
+    })
   })
 
   describe('signInUrl', () => {

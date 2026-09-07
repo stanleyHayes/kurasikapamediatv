@@ -144,4 +144,18 @@ export default tseslint.config(
       'no-restricted-properties': 'off',
     },
   },
+
+  // Operator-run scripts. `no-console` exists so that application code reports
+  // through the logger rather than into a serverless void; a command-line tool
+  // has no logger and its stdout IS the interface the operator reads. Nothing
+  // here ships in a deployment — `pnpm boundaries` does not even cruise this
+  // directory, which is deliberate: scripts/ is where tooling that steps
+  // outside the hexagon is allowed to live, and being outside the graph is
+  // what keeps it from being imported by something that ships.
+  {
+    files: ['scripts/**/*.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
 )

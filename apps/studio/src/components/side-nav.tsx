@@ -31,6 +31,7 @@ const GROUPS: readonly { heading: string; items: readonly NavItem[] }[] = [
     { href: '/revenue', label: 'Revenue', description: 'Memberships, support and income', icon: 'audit' },
     { href: '/people', label: 'People & access', description: 'Roles and permissions', icon: 'people' },
     { href: '/audit', label: 'Audit trail', description: 'Immutable activity log', icon: 'audit' },
+    { href: '/account', label: 'Your account', description: 'Password and sign-in security', icon: 'people' },
   ] },
 ]
 const ITEMS = GROUPS.flatMap((group) => group.items)

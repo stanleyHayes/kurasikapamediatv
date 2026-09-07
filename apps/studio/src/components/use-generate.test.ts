@@ -77,7 +77,7 @@ describe('useGenerate', () => {
 
     expect(onUseBody).not.toHaveBeenCalled()
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/ai/draft',
+      '/studio/api/ai/draft',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ prompt: 'Cedi rally', locale: 'en' }),
@@ -174,7 +174,7 @@ describe('useGenerate', () => {
     })
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/ai/bullets',
+      '/studio/api/ai/bullets',
       expect.objectContaining({
         body: JSON.stringify({ bullets: ['rate cut', 'inflation'], locale: 'fr' }),
       }),

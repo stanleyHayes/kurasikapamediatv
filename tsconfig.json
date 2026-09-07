@@ -17,7 +17,8 @@
     "packages/*/src/**/*.tsx",
     "packages/*/vitest.config.ts",
     "packages/config/*.ts",
-    "apps/*/src/**/*.ts"
+    "apps/*/src/**/*.ts",
+    "scripts/**/*.ts"
   ],
   "exclude": ["node_modules", "**/dist", "**/.next", "stitch_kurasikapa_ai_media_platform"]
 }

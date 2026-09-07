@@ -70,7 +70,7 @@ describe('useRewrite', () => {
 
     expect(onUseBody).not.toHaveBeenCalled()
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/ai/rewrite',
+      '/studio/api/ai/rewrite',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
@@ -105,7 +105,7 @@ describe('useRewrite', () => {
     })
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/ai/tone',
+      '/studio/api/ai/tone',
       expect.objectContaining({
         body: JSON.stringify({
           title: PROPS.title,

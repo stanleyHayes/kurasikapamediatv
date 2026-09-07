@@ -20,6 +20,9 @@ import {
   NotLive,
   NotOwnArticle,
   NotPermitted,
+  PasswordContainsIdentity,
+  PasswordTooLong,
+  PasswordTooShort,
   ScheduleInPast,
   UnknownRole,
 } from '@kurasikapa/domain'
@@ -36,6 +39,7 @@ import {
   EmailDeliveryFailed,
   EmptyContactMessage,
   LiveVideoUnavailable,
+  PasswordChangeRejected,
   RevisionNotFound,
   RevisionNotOfArticle,
   SlugTaken,
@@ -105,6 +109,13 @@ const KNOWN: readonly [new (...args: never[]) => Error, string][] = [
   [AlreadyLive, 'already_live'],
   [NotLive, 'not_live'],
   [BroadcastHasEnded, 'broadcast_has_ended'],
+  // Password rotation. All four are the account holder's own mistake and must
+  // reach the form as a sentence, not a 500 — `PasswordChangeRejected` covers
+  // "your current password is wrong", the other three are the policy talking.
+  [PasswordChangeRejected, 'password_rejected'],
+  [PasswordTooShort, 'password_rejected'],
+  [PasswordTooLong, 'password_rejected'],
+  [PasswordContainsIdentity, 'password_rejected'],
 ]
 
 export function toActionError(error: unknown): ActionError {

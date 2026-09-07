@@ -1,3 +1,4 @@
+import { studioPath } from '@kurasikapa/web-kit/composition/origins'
 import { readTextStream } from './read-text-stream'
 
 /**
@@ -5,6 +6,11 @@ import { readTextStream } from './read-text-stream'
  *
  * Errors from the route (401, 429, 400) become Error messages the panel can
  * show. A network failure does the same. The caller owns abort via `signal`.
+ *
+ * The path carries the studio's base path explicitly. Next prefixes `<Link>`
+ * hrefs with `basePath`, but never a `fetch` URL, so a bare `/api/ai/...`
+ * leaves the studio's namespace and 404s on a deployment that only answers
+ * under `/studio`.
  */
 export async function streamAiTask(
   task: 'draft' | 'bullets' | 'rewrite' | 'tone',
@@ -12,7 +18,7 @@ export async function streamAiTask(
   onChunk: (text: string) => void,
   signal?: AbortSignal,
 ): Promise<string> {
-  const response = await fetch(`/api/ai/${task}`, {
+  const response = await fetch(studioPath(`/api/ai/${task}`), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

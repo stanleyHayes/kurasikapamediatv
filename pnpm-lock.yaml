@@ -33,6 +33,9 @@ importers:
       jscpd:
         specifier: 5.0.14
         version: 5.0.14
+      mongodb:
+        specifier: 6.21.0
+        version: 6.21.0
       turbo:
         specifier: 2.10.8
         version: 2.10.8
