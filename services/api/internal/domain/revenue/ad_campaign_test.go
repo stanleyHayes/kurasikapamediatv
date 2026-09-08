@@ -118,3 +118,94 @@ func TestAdCampaignActivationRejectsUnauthorizedAndEndedCampaigns(t *testing.T) 
 		t.Fatal(err)
 	}
 }
+
+/*
+ * Campaigns were create-and-activate only: no way to correct a budget, a CPM,
+ * a slot or a creative once saved. A placeholder figure was therefore
+ * permanent, and the only remedy was editing Mongo by hand.
+ */
+func TestAdCampaignUpdate(t *testing.T) {
+	start := time.Date(2026, 9, 9, 0, 0, 0, 0, time.UTC)
+	original := revenue.AdCampaignState{
+		ID: "adc_1", Name: "Benmar launch", Advertiser: "Benmar Cassava Foods",
+		Locale: "*", Slot: revenue.SlotHomeLeaderboard,
+		CreativeURL: "https://cdn.test/benmar.jpg", AltText: "Cassava flour carton",
+		LandingURL: "https://www.tiktok.com/@benmar", Budget: revenue.Money{Minor: 10_000, Currency: revenue.CurrencyEUR},
+		CPMMinor: 200, Priority: 50, StartsAt: start, EndsAt: start.Add(90 * 24 * time.Hour),
+	}
+	manager := identity.NewActor("admin", []identity.Role{identity.RoleAdministrator})
+	outsider := identity.NewActor("reader", []identity.Role{identity.RoleGuest})
+	campaign, err := revenue.NewAdCampaign(manager, original)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("refuses an actor without revenue:manage", func(t *testing.T) {
+		if _, updateErr := campaign.Update(outsider, original); !errors.Is(updateErr, identity.ErrNotPermitted) {
+			t.Fatalf("got %v, want ErrNotPermitted", updateErr)
+		}
+	})
+
+	t.Run("corrects the commercial terms", func(t *testing.T) {
+		next := original
+		next.Budget = revenue.Money{Minor: 250_000, Currency: revenue.CurrencyEUR}
+		next.CPMMinor = 3_500
+		updated, updateErr := campaign.Update(manager, next)
+		if updateErr != nil {
+			t.Fatal(updateErr)
+		}
+		state := updated.State()
+		if state.Budget.Minor != 250_000 || state.CPMMinor != 3_500 {
+			t.Fatalf("terms = %+v", state)
+		}
+	})
+
+	t.Run("re-validates, so an edit cannot save what create would refuse", func(t *testing.T) {
+		next := original
+		next.CPMMinor = next.Budget.Minor + 1 // CPM above budget
+		if _, updateErr := campaign.Update(manager, next); !errors.Is(updateErr, revenue.ErrInvalidAdRate) {
+			t.Fatalf("got %v, want ErrInvalidAdRate", updateErr)
+		}
+		insecure := original
+		insecure.LandingURL = "http://example.org"
+		if _, updateErr := campaign.Update(manager, insecure); !errors.Is(updateErr, revenue.ErrInvalidAdURL) {
+			t.Fatalf("got %v, want ErrInvalidAdURL", updateErr)
+		}
+	})
+
+	/*
+	 * An edit must not be a back door to going live. Activation has its own
+	 * use case and its own already-ended check; letting a PATCH body set
+	 * `active` would route around both.
+	 */
+	t.Run("never lets an edit change identity or activation", func(t *testing.T) {
+		next := original
+		now := start
+		next.ID, next.CreatedBy = "hijacked", "someone-else"
+		next.Active, next.ActivatedAt = true, &now
+		updated, updateErr := campaign.Update(manager, next)
+		if updateErr != nil {
+			t.Fatal(updateErr)
+		}
+		state := updated.State()
+		if state.ID != "adc_1" || state.Active || state.ActivatedAt != nil {
+			t.Fatalf("identity or activation moved: %+v", state)
+		}
+	})
+
+	t.Run("an already-active campaign keeps running while its terms are corrected", func(t *testing.T) {
+		live, activateErr := campaign.Activate(manager, start)
+		if activateErr != nil {
+			t.Fatal(activateErr)
+		}
+		next := original
+		next.Budget = revenue.Money{Minor: 500_000, Currency: revenue.CurrencyEUR}
+		updated, updateErr := live.Update(manager, next)
+		if updateErr != nil {
+			t.Fatal(updateErr)
+		}
+		if !updated.State().Active || updated.State().Budget.Minor != 500_000 {
+			t.Fatalf("state = %+v", updated.State())
+		}
+	})
+}

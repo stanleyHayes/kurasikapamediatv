@@ -18,6 +18,16 @@ export interface RevenueReportView { readonly days: number; readonly generatedAt
 export type AdSlotView = 'home_leaderboard' | 'article_inline' | 'live_companion'
 export interface AdPlacementView { readonly id: string; readonly advertiser: string; readonly creativeUrl: string; readonly altText: string; readonly landingUrl: string }
 export interface AdCampaignView { readonly id: string; readonly name: string; readonly advertiser: string; readonly slot: AdSlotView; readonly active: boolean; readonly budget: MoneyView; readonly impressions: number; readonly clicks: number; readonly estimatedSpendMinor: number; readonly ctr: number; readonly startsAt: string; readonly endsAt: string }
+/** The full editable state of a campaign, as the Ads screen needs it. */
+export interface AdCampaignDetailView {
+  readonly id: string; readonly name: string; readonly advertiser: string
+  readonly locale: 'en' | 'fr' | '*'; readonly slot: AdSlotView
+  readonly creativeUrl: string; readonly altText: string; readonly landingUrl: string
+  readonly budget: MoneyView; readonly cpmMinor: number; readonly priority: number
+  readonly startsAt: string; readonly endsAt: string
+  readonly active: boolean; readonly activatedAt: string | null
+}
+
 export interface ProductView { readonly id: string; readonly name: string; readonly slug: string; readonly sku: string; readonly description: string; readonly imageURL: string; readonly imageAlt: string; readonly price: MoneyView; readonly stock: number; readonly active: boolean }
 export interface ClassifiedView { readonly id: string; readonly title: string; readonly category: string; readonly description: string; readonly location: string; readonly contactName: string; readonly contactEmail: string; readonly contactPhone: string; readonly imageURL: string; readonly askingPrice: MoneyView; readonly placementFee: MoneyView; readonly status: string; readonly submittedAt: string; readonly expiresAt: string | null }
 export interface AffiliateLinkView { readonly id: string; readonly partner: string; readonly title: string; readonly category: string; readonly description: string; readonly disclosure: string; readonly imageURL: string; readonly imageAlt: string; readonly destinationURL: string; readonly commissionNote: string; readonly active: boolean; readonly clicks: number }
@@ -117,6 +127,60 @@ export async function loadRevenueReport(actor: Actor, days: 7 | 30 | 90): Promis
   const response = await fetch(joinUrl(apiUrl, `/revenue/report?days=${String(days)}`), { headers: actorHeaders(actor.id), cache: 'no-store' })
   if (!response.ok) throw await problemFromResponse(response)
   return report(await response.json())
+}
+
+function campaignDetail(raw: unknown): AdCampaignDetailView {
+  const row = record(raw)
+  const money = record(row['budget'])
+  const locale = text(row['locale'])
+  const activatedAt = text(row['activatedAt'])
+
+  return {
+    id: text(row['id']), name: text(row['name']), advertiser: text(row['advertiser']),
+    locale: locale === 'en' || locale === 'fr' ? locale : '*',
+    slot: adSlot(row['slot']),
+    creativeUrl: text(row['creativeUrl']), altText: text(row['altText']), landingUrl: text(row['landingUrl']),
+    budget: { minor: Number(money['minor'] ?? 0), currency: money['currency'] === 'EUR' ? 'EUR' : 'GHS' },
+    cpmMinor: Number(row['cpmMinor'] ?? 0), priority: Number(row['priority'] ?? 50),
+    startsAt: text(row['startsAt']), endsAt: text(row['endsAt']),
+    active: row['active'] === true, activatedAt: activatedAt === '' ? null : activatedAt,
+  }
+}
+
+/** Every campaign, active or not. The Ads screen's index. */
+export async function loadAdCampaigns(actor: Actor): Promise<readonly AdCampaignDetailView[]> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return []
+  const response = await fetch(joinUrl(apiUrl, '/revenue/ad-campaigns'), { headers: actorHeaders(actor.id), cache: 'no-store' })
+  if (!response.ok) throw await problemFromResponse(response)
+  const body = record(await response.json())
+
+  return Array.isArray(body['items']) ? body['items'].map(campaignDetail) : []
+}
+
+export async function loadAdCampaign(actor: Actor, id: string): Promise<AdCampaignDetailView | null> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return null
+  const response = await fetch(joinUrl(apiUrl, `/revenue/ad-campaigns/${encodeURIComponent(id)}`), { headers: actorHeaders(actor.id), cache: 'no-store' })
+  if (response.status === 404) return null
+  if (!response.ok) throw await problemFromResponse(response)
+
+  return campaignDetail(record(await response.json()))
+}
+
+/** Corrects a campaign's terms. Its activation state is untouched. */
+export async function updateAdCampaign(actor: Actor, id: string, input: unknown): Promise<void> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) throw new Error('API_URL is required for advertising')
+  const response = await fetch(joinUrl(apiUrl, `/revenue/ad-campaigns/${encodeURIComponent(id)}`), {
+    method: 'PATCH', headers: actorHeaders(actor.id, { 'Content-Type': 'application/json' }), body: JSON.stringify(input),
+  })
+  if (!response.ok) throw await problemFromResponse(response)
+}
+
+/** Puts a campaign live. Separate from saving, so terms can be fixed first. */
+export async function activateAdCampaign(actor: Actor, id: string): Promise<void> {
+  await adminPost(actor, `/revenue/ad-campaigns/${encodeURIComponent(id)}/activate`)
 }
 
 export async function createAndActivateAdCampaign(actor: Actor, input: unknown): Promise<{ readonly id: string }> {

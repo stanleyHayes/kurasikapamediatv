@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { approveAdvertiserProposal, createAndActivateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
+import { activateAdCampaign, approveAdvertiserProposal, createAndActivateAdCampaign, loadAdCampaign, loadAdCampaigns, updateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -183,5 +183,76 @@ describe('revenue BFF', () => {
     await expect(rejectAdvertiserProposal(admin, 'proposal_1', 'Revise timing.')).resolves.toMatchObject({ status: 'rejected', reviewNote: 'Revise timing.' })
     expect(fetcher.mock.calls[0]?.[1]?.headers).toMatchObject({ 'X-Kurasikapa-User': 'advertiser' })
     expect(fetcher.mock.calls[4]?.[1]?.body).toBe('{"note":"Revise timing."}')
+  })
+
+  /*
+   * Campaign management. These exist because a campaign used to be
+   * create-and-activate only: whatever budget went in first was permanent, and
+   * the studio could never see the campaign again to correct it.
+   */
+  describe('managing campaigns', () => {
+    const admin = new Actor(userId('admin'), ['administrator'])
+
+    it('lists every campaign, live or not, with its terms in minor units', async () => {
+      configure()
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ items: [
+        { id: 'a1', name: 'Benmar launch', advertiser: 'Benmar', locale: '*', slot: 'home_leaderboard',
+          budget: { minor: 10000, currency: 'EUR' }, cpmMinor: 200, priority: 50, active: false, activatedAt: '' },
+        { id: 'a2', advertiser: 'Acme', slot: 'article_inline', budget: { minor: 5000, currency: 'GHS' }, active: true, activatedAt: '2026-09-01T00:00:00Z' },
+      ] }), { status: 200 })))
+      const items = await loadAdCampaigns(admin)
+      expect(items.map((c) => [c.id, c.active, c.budget.minor, c.budget.currency])).toEqual([
+        ['a1', false, 10000, 'EUR'], ['a2', true, 5000, 'GHS'],
+      ])
+      // An absent activatedAt becomes null, not the empty string.
+      expect(items[0]?.activatedAt).toBeNull()
+      expect(items[1]?.activatedAt).toBe('2026-09-01T00:00:00Z')
+    })
+
+    it('reads one campaign, and returns null when there is none', async () => {
+      configure()
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'a1', advertiser: 'Benmar', slot: 'home_leaderboard', budget: { minor: 10000, currency: 'EUR' } }), { status: 200 })))
+      await expect(loadAdCampaign(admin, 'a1')).resolves.toMatchObject({ id: 'a1', advertiser: 'Benmar' })
+
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 404 })))
+      await expect(loadAdCampaign(admin, 'missing')).resolves.toBeNull()
+    })
+
+    it('PATCHes the terms and never touches activation', async () => {
+      configure()
+      const fetcher = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }))
+      vi.stubGlobal('fetch', fetcher)
+      await updateAdCampaign(admin, 'a1', { budget: { minor: 250000, currency: 'EUR' } })
+      expect(fetcher).toHaveBeenCalledWith(
+        expect.stringContaining('/revenue/ad-campaigns/a1'),
+        expect.objectContaining({ method: 'PATCH' }),
+      )
+      // Activation is not in the payload: it has its own endpoint and its own
+      // already-ended check, which an edit must not route around.
+      expect(JSON.stringify(fetcher.mock.calls[0])).not.toContain('"active"')
+    })
+
+    it('activates as a separate call, so terms can be fixed first', async () => {
+      configure()
+      const fetcher = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }))
+      vi.stubGlobal('fetch', fetcher)
+      await activateAdCampaign(admin, 'a1')
+      expect(fetcher.mock.calls[0]?.[0]).toContain('/revenue/ad-campaigns/a1/activate')
+    })
+
+    it('surfaces a refusal rather than reporting success', async () => {
+      configure()
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ title: 'CPM cannot exceed budget' }), { status: 422 })))
+      await expect(updateAdCampaign(admin, 'a1', {})).rejects.toThrow()
+    })
+
+    it('is honest when the API seam is unset', async () => {
+      // undefined, not '': an empty API_URL is a configuration error the env
+      // schema rejects outright, which is a different case from having no seam.
+      configure(); vi.stubEnv('API_URL', undefined); resetEnv()
+      await expect(loadAdCampaigns(admin)).resolves.toEqual([])
+      await expect(loadAdCampaign(admin, 'a1')).resolves.toBeNull()
+      await expect(updateAdCampaign(admin, 'a1', {})).rejects.toThrow(/API_URL/u)
+    })
   })
 })

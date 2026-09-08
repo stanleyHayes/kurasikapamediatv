@@ -21,6 +21,52 @@ func (u CreateAdCampaign) Execute(ctx context.Context, actor identity.Actor, inp
 	return campaign, u.deps.AdCampaigns.Save(ctx, campaign)
 }
 
+/*
+ * Every campaign, active or not, for the studio's ads screen.
+ *
+ * ListEligible answers "what may serve this slot right now"; this answers
+ * "what does this newsroom have". Without it the studio could create a
+ * campaign and never see it again.
+ */
+type ListAdCampaigns struct{ deps Deps }
+
+func NewListAdCampaigns(deps Deps) ListAdCampaigns { return ListAdCampaigns{deps: deps} }
+func (u ListAdCampaigns) Execute(ctx context.Context, actor identity.Actor) ([]domainrevenue.AdCampaign, error) {
+	if err := actor.Require(identity.PermRevenueRead); err != nil {
+		return nil, err
+	}
+	return u.deps.AdCampaigns.ListAll(ctx, 250)
+}
+
+type GetAdCampaign struct{ deps Deps }
+
+func NewGetAdCampaign(deps Deps) GetAdCampaign { return GetAdCampaign{deps: deps} }
+func (u GetAdCampaign) Execute(ctx context.Context, actor identity.Actor, id shared.AdCampaignID) (domainrevenue.AdCampaign, error) {
+	if err := actor.Require(identity.PermRevenueRead); err != nil {
+		return domainrevenue.AdCampaign{}, err
+	}
+	return u.deps.AdCampaigns.FindByID(ctx, id)
+}
+
+/*
+ * Corrects a campaign's terms — the reason a placeholder budget is now a
+ * starting point rather than a permanent mistake.
+ */
+type UpdateAdCampaign struct{ deps Deps }
+
+func NewUpdateAdCampaign(deps Deps) UpdateAdCampaign { return UpdateAdCampaign{deps: deps} }
+func (u UpdateAdCampaign) Execute(ctx context.Context, actor identity.Actor, id shared.AdCampaignID, next domainrevenue.AdCampaignState) (domainrevenue.AdCampaign, error) {
+	campaign, err := u.deps.AdCampaigns.FindByID(ctx, id)
+	if err != nil {
+		return domainrevenue.AdCampaign{}, err
+	}
+	campaign, err = campaign.Update(actor, next)
+	if err != nil {
+		return domainrevenue.AdCampaign{}, err
+	}
+	return campaign, u.deps.AdCampaigns.Save(ctx, campaign)
+}
+
 type ActivateAdCampaign struct{ deps Deps }
 
 func NewActivateAdCampaign(deps Deps) ActivateAdCampaign { return ActivateAdCampaign{deps: deps} }

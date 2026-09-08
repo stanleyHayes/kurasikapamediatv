@@ -93,6 +93,38 @@ func validateAdCampaign(state AdCampaignState) (AdCampaignState, error) {
 func ReconstituteAdCampaign(state AdCampaignState) AdCampaign { return AdCampaign{state: state} }
 func (c AdCampaign) ID() shared.AdCampaignID                  { return c.state.ID }
 func (c AdCampaign) State() AdCampaignState                   { return c.state }
+/*
+ * Corrects an existing campaign's terms.
+ *
+ * Identity and activation come from the STORED campaign, never the request:
+ * id, createdBy, active and activatedAt are all restored over whatever was
+ * submitted. Activate has its own already-ended check, and letting a PATCH
+ * body set `active` would route straight around it.
+ *
+ * The whole state is re-validated, so an edit cannot save a campaign that
+ * NewAdCampaign would have refused — a CPM above budget, an http:// landing
+ * URL, a missing alt text.
+ *
+ * An active campaign keeps running while its terms are corrected. Serving is
+ * decided per request from the current state, so a raised budget simply takes
+ * effect; there is no need to take the placement down to change a number.
+ */
+func (c AdCampaign) Update(actor identity.Actor, next AdCampaignState) (AdCampaign, error) {
+	if err := actor.Require(identity.PermRevenueManage); err != nil {
+		return AdCampaign{}, err
+	}
+
+	next.ID, next.CreatedBy = c.state.ID, c.state.CreatedBy
+	next.Active, next.ActivatedAt = c.state.Active, c.state.ActivatedAt
+
+	validated, err := validateAdCampaign(next)
+	if err != nil {
+		return AdCampaign{}, err
+	}
+
+	return AdCampaign{state: validated}, nil
+}
+
 func (c AdCampaign) Activate(actor identity.Actor, at time.Time) (AdCampaign, error) {
 	if err := actor.Require(identity.PermRevenueManage); err != nil {
 		return AdCampaign{}, err

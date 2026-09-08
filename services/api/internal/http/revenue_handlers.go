@@ -157,6 +157,57 @@ func (d Deps) handleCreateAdCampaign(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, d.Log, http.StatusCreated, campaign.State())
 }
 
+func (d Deps) handleListAdCampaigns(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	campaigns, err := d.ListAdCampaigns.Execute(r.Context(), actor)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	items := make([]revenue.AdCampaignState, len(campaigns))
+	for i, campaign := range campaigns {
+		items[i] = campaign.State()
+	}
+	writeJSON(w, d.Log, http.StatusOK, map[string]any{"items": items})
+}
+
+func (d Deps) handleGetAdCampaign(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	campaign, err := d.GetAdCampaign.Execute(r.Context(), actor, shared.AdCampaignID(r.PathValue("id")))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+}
+
+func (d Deps) handleUpdateAdCampaign(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	var input revenue.AdCampaignState
+	if err = decode(r, &input); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	campaign, err := d.UpdateAdCampaign.Execute(r.Context(), actor, shared.AdCampaignID(r.PathValue("id")), input)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+}
+
 func (d Deps) handleActivateAdCampaign(w http.ResponseWriter, r *http.Request) {
 	actor, err := d.actorFrom(r)
 	if err != nil {
