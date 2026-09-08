@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import { StudioShell } from '@/components/studio-shell'
 import { currentActor } from '@kurasikapa/web-kit/composition/actor'
 import { env } from '@kurasikapa/web-kit/composition/env'
-import { siteUrl, studioUrl } from '@kurasikapa/web-kit/composition/origins'
+import { siteUrl, studioPath } from '@kurasikapa/web-kit/composition/origins'
 import { externalRoute } from '@/external-route'
 
 /**
@@ -60,7 +60,10 @@ async function Guarded({
   // Both destinations are absolute. The signed-out path now stays on this
   // deployment because a provider-owned Vercel host cannot share cookies with
   // the public site's domain; unauthorised readers still return to the site.
-  if (actor === null) redirect(externalRoute(`${studioUrl(env())}/${locale}/sign-in`))
+  // Relative: the studio's own sign-in, so the reader stays on the host that
+  // is about to be handed their cookie. The permission bounce below IS
+  // cross-app, so it keeps the absolute siteUrl.
+  if (actor === null) redirect(externalRoute(studioPath(`/${locale}/sign-in`)))
   if (!actor.can('article:draft')) redirect(externalRoute(`${siteUrl(env())}/${locale}`))
 
   return (

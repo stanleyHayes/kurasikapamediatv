@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import type { EventView } from '@kurasikapa/web-kit/bff/events'
 import { formatInZone } from '@kurasikapa/web-kit/time/zoned'
-import { StatusChip, TYPE_LABELS, cityOf } from './event-fields'
+import { StatusChip, TYPE_LABELS, cityOf } from './event-labels'
 
 /**
  * The index. Rows link out; nothing is edited or published here.

@@ -6,10 +6,10 @@ import type { EventView } from '@kurasikapa/web-kit/bff/events'
 import type { MediaAssetView } from '@kurasikapa/web-kit/bff/media-library'
 import { isoToZonedWallClock, zonedWallClockToISO } from '@kurasikapa/web-kit/time/zoned'
 import { createEventAction, updateEventAction } from '@/actions/events'
+import { Choice, Dots, Field, ImageChoice, TextArea, ZoneChoice } from './event-fields'
 import {
-  BLANK_EVENT, Choice, Dots, EVENT_MODE_ITEMS, EVENT_TYPE_ITEMS, Field, ImageChoice,
-  TextArea, ZoneChoice, cityOf, formValue, slugify,
-} from './event-fields'
+  BLANK_EVENT, EVENT_MODE_ITEMS, EVENT_TYPE_ITEMS, cityOf, formValue, slugify,
+} from './event-labels'
 
 type Kind = EventView['type']; type Mode = EventView['mode']
 

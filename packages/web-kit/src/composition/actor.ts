@@ -7,7 +7,7 @@ import { authGraph } from './auth-graph'
 import { container } from './container'
 import { env } from './env'
 import { accessCookieName } from './session-cookies'
-import { studioUrl } from './origins'
+import { studioPath } from './origins'
 
 /**
  * The bridge between authentication and authorisation.
@@ -71,7 +71,27 @@ export class NotSignedIn extends Error {
 export async function requireActor(studioLocale?: string): Promise<Actor> {
   const actor = await currentActor()
   if (actor === null && studioLocale !== undefined) {
-    redirect(`${studioUrl(env())}/${studioLocale}/sign-in` as Route)
+    /*
+     * Relative, NOT studioUrl(env()). The studio is redirecting to its OWN
+     * sign-in page, so it must stay on the origin the reader actually reached
+     * — which is where the session cookie will be written.
+     *
+     * With an absolute URL, a STUDIO_URL pointing at the raw Vercel
+     * deployment host bounces the reader off studio.kurasikapamediatv.com and
+     * onto kurasikapa-studio.vercel.app. The cookie is host-scoped, so it does
+     * not follow, and they land signed-out on a URL they were never given.
+     *
+     * studioUrl stays right for the OTHER direction: a link from the public
+     * site into the studio genuinely does cross origins.
+     */
+    /*
+     * The cast is required by the apps and looks redundant here: both Next
+     * apps build with `typedRoutes`, so `redirect` takes a Route, but this
+     * package's own tsconfig does not, so the linter sees a plain string on
+     * both sides. Removing it breaks `pnpm typecheck` for web and studio.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    redirect(studioPath(`/${studioLocale}/sign-in`) as Route)
   }
   if (actor === null) throw new NotSignedIn()
 

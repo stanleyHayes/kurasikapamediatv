@@ -7,7 +7,7 @@ import { loadStudioEvent } from '@kurasikapa/web-kit/bff/events'
 import { loadMediaAssets } from '@kurasikapa/web-kit/bff/media-library'
 import { EventForm } from '@/components/event-form'
 import { EventLifecycle } from '@/components/event-lifecycle'
-import { StatusChip } from '@/components/event-fields'
+import { StatusChip } from '@/components/event-labels'
 
 /** One event: its edit form, with the publication controls beside it. */
 export default async function EventPage({ params }: { params: Promise<{ locale: string; id: string }> }): Promise<React.ReactElement> {
