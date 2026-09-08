@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetEnv } from '../composition/env'
-import { createEvent, deleteEvent, loadEvents, loadStudioEvents, publishEvent, unpublishEvent } from './events'
+import { createEvent, deleteEvent, loadEvent, loadEvents, loadStudioEvent, loadStudioEvents, publishEvent, unpublishEvent } from './events'
 
 describe('events BFF', () => {
   beforeEach(() => { vi.restoreAllMocks(); process.env['MONGODB_URI'] = 'mongodb://test'; process.env['BETTER_AUTH_SECRET'] = 'x'.repeat(32); process.env['API_URL'] = 'https://api.test'; resetEnv() })
@@ -82,10 +82,50 @@ describe('events BFF', () => {
     await expect(deleteEvent({ id: 'editor' } as never, 'event_1')).rejects.toThrow()
   })
 
+  describe('loadStudioEvent — one event for the edit screen', () => {
+    it('returns the event, drafts included', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify(
+        { id: 'e1', type: 'cultural', published: false, title: 'Kente', imageAssetId: 'a1' }), { status: 200 })))
+      const found = await loadStudioEvent({ id: 'editor' } as never, 'e1')
+      expect(found?.title).toBe('Kente')
+      expect(found?.published).toBe(false)
+      expect(found?.imageAssetId).toBe('a1')
+    })
+
+    it('returns null on 404 so the page can call notFound()', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 404 })))
+      await expect(loadStudioEvent({ id: 'editor' } as never, 'missing')).resolves.toBeNull()
+    })
+
+    it('throws on any other failure rather than pretending the event is missing', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 500 })))
+      await expect(loadStudioEvent({ id: 'editor' } as never, 'e1')).rejects.toThrow()
+    })
+  })
+
+  describe('loadEvent — the public detail page', () => {
+    it('returns the published event', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'e1', title: 'Kente' }), { status: 200 })))
+      await expect(loadEvent('fr', 'kente')).resolves.toMatchObject({ id: 'e1', title: 'Kente' })
+    })
+
+    it('returns null for a draft or a miss, so the page 404s rather than erroring', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('404')))
+      await expect(loadEvent('fr', 'draft-slug')).resolves.toBeNull()
+    })
+
+    it('returns null when the payload is not an event', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 200 })))
+      await expect(loadEvent('fr', 'weird')).resolves.toBeNull()
+    })
+  })
+
   it('fails honestly without the API seam', async () => {
     delete process.env['API_URL']; resetEnv()
     await expect(loadEvents('en')).resolves.toEqual([])
     await expect(createEvent({ id: 'editor' } as never, {})).rejects.toThrow('API_URL is required')
     await expect(loadStudioEvents({ id: 'editor' } as never, 'en')).resolves.toEqual([])
+    await expect(loadStudioEvent({ id: 'editor' } as never, 'e1')).resolves.toBeNull()
+    await expect(loadEvent('en', 'kente')).resolves.toBeNull()
   })
 })

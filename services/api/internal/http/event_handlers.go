@@ -111,6 +111,21 @@ func (d Deps) handleUnpublishEvent(w http.ResponseWriter, r *http.Request) {
 
 // The studio's own listing. Drafts are included, so this is authenticated and
 // deliberately not exposed under /public.
+// One event for the studio, draft or published.
+func (d Deps) handleStudioEvent(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	item, err := d.GetEvent.Execute(r.Context(), actor, shared.EventID(r.PathValue("id")))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, eventView(item))
+}
+
 func (d Deps) handleStudioEvents(w http.ResponseWriter, r *http.Request) {
 	actor, err := d.actorFrom(r)
 	if err != nil {

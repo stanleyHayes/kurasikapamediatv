@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { countryForTimeZone, isoToZonedWallClock, isSupportedTimeZone, zonedWallClockToISO } from './zoned'
+import { countryForTimeZone, formatInZone, isoToZonedWallClock, isSupportedTimeZone, zonedWallClockToISO } from './zoned'
 
 describe('zonedWallClockToISO', () => {
   /*
@@ -83,6 +83,16 @@ describe('isoToZonedWallClock', () => {
   it('returns an empty string for an unusable input, so a form renders blank', () => {
     expect(isoToZonedWallClock('', 'Europe/Paris')).toBe('')
     expect(isoToZonedWallClock('not-a-date', 'Europe/Paris')).toBe('')
+  })
+})
+
+describe('formatInZone', () => {
+  it('writes the time as a reader in that zone sees it, in their own language', () => {
+    const iso = '2026-09-12T17:00:00.000Z'
+    expect(formatInZone(iso, 'Europe/Paris', 'fr')).toContain('19:00')
+    expect(formatInZone(iso, 'Europe/Paris', 'en')).toContain('19:00')
+    // Same instant, a different clock in Accra.
+    expect(formatInZone(iso, 'Africa/Accra', 'en')).toContain('17:00')
   })
 })
 

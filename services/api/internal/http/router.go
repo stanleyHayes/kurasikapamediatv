@@ -82,6 +82,7 @@ type Deps struct {
 	DeleteEvent                 appmedia.DeleteEvent
 	GetPublishedEvent           appmedia.GetPublishedEvent
 	ListEvents                  appmedia.ListEvents
+	GetEvent                    appmedia.GetEvent
 	ListUpcomingEvents          appmedia.ListUpcomingEvents
 	CreateMembershipPlan        apprevenue.CreateMembershipPlan
 	ActivateMembershipPlan      apprevenue.ActivateMembershipPlan
@@ -198,6 +199,7 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("DELETE /media/events/{id}", deps.handleDeleteEvent)
 	// Studio listing: drafts included, so it is NOT under /public.
 	mux.HandleFunc("GET /media/events", deps.handleStudioEvents)
+	mux.HandleFunc("GET /media/events/{id}", deps.handleStudioEvent)
 	mux.HandleFunc("GET /public/{locale}/events", deps.handleUpcomingEvents)
 	mux.HandleFunc("GET /public/{locale}/events/{slug}", deps.handlePublicEvent)
 	mux.HandleFunc("POST /revenue/membership-plans", deps.handleCreateMembershipPlan)

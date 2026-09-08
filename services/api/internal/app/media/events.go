@@ -151,6 +151,34 @@ type EventListing struct {
 }
 
 /*
+ * One event by id, drafts included, for the studio's edit screen.
+ *
+ * Permission-gated like ListEvents: an unpublished listing is not public, and
+ * the public detail route (GetPublishedEvent) deliberately cannot reach it.
+ */
+type GetEvent struct{ deps Deps }
+
+func NewGetEvent(deps Deps) GetEvent { return GetEvent{deps: deps} }
+func (u GetEvent) Execute(ctx context.Context, actor identity.Actor, id shared.EventID) (EventListing, error) {
+	if err := actor.Require(identity.PermArticleDraft); err != nil {
+		return EventListing{}, err
+	}
+	event, err := u.deps.Events.FindByID(ctx, id)
+	if err != nil {
+		return EventListing{}, err
+	}
+	item := EventListing{Event: event}
+	if imageID := event.State().ImageAssetID; imageID != nil {
+		image, findErr := u.deps.Assets.FindByID(ctx, *imageID)
+		if findErr != nil {
+			return EventListing{}, findErr
+		}
+		item.Image = &image
+	}
+	return item, nil
+}
+
+/*
  * Everything the newsroom has, drafts included.
  *
  * Separate from ListUpcomingEvents because the two answer different questions:

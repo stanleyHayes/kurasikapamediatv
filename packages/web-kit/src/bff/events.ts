@@ -115,6 +115,19 @@ export async function deleteEvent(actor: Actor, id: string): Promise<void> {
 export async function publishEvent(actor: Actor, id: string): Promise<void> { return transition(actor, id, 'publish') }
 export async function unpublishEvent(actor: Actor, id: string): Promise<void> { return transition(actor, id, 'unpublish') }
 
+/** One event for the studio, draft or published. Null when there is none. */
+export async function loadStudioEvent(actor: Actor, id: string): Promise<EventView | null> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) return null
+  const response = await fetch(joinUrl(apiUrl, `/media/events/${encodeURIComponent(id)}`), {
+    headers: actorHeaders(actor.id), cache: 'no-store',
+  })
+  if (response.status === 404) return null
+  if (!response.ok) throw await problemFromResponse(response)
+
+  return event(record(await response.json()))
+}
+
 /** Everything the newsroom has for a locale, drafts included. Studio only. */
 export async function loadStudioEvents(actor: Actor, locale: string): Promise<readonly EventView[]> {
   const apiUrl = env().API_URL

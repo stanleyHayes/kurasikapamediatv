@@ -295,6 +295,7 @@ func run(log *slog.Logger) error {
 		DeleteEvent:                 appmedia.NewDeleteEvent(mediaDeps),
 		GetPublishedEvent:           appmedia.NewGetPublishedEvent(mediaDeps),
 		ListEvents:                  appmedia.NewListEvents(mediaDeps),
+		GetEvent:                    appmedia.NewGetEvent(mediaDeps),
 		ListUpcomingEvents:          appmedia.NewListUpcomingEvents(mediaDeps),
 		CreateMembershipPlan:        apprevenue.NewCreateMembershipPlan(revenueDeps),
 		ActivateMembershipPlan:      apprevenue.NewActivateMembershipPlan(revenueDeps),
