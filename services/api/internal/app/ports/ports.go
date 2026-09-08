@@ -347,6 +347,8 @@ type AdCampaignRepository interface {
 	ListEligible(context.Context, revenue.AdSlot, string, time.Time, int) ([]revenue.AdCampaign, error)
 	ListAll(context.Context, int) ([]revenue.AdCampaign, error)
 	Save(context.Context, revenue.AdCampaign) error
+	// Removes the campaign row. Its ad_events are append-only and stay.
+	Delete(context.Context, shared.AdCampaignID) error
 }
 
 type AdEventRepository interface {

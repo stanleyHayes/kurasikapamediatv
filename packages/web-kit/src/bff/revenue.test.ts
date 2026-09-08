@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { activateAdCampaign, approveAdvertiserProposal, deactivateAdCampaign, createAndActivateAdCampaign, loadAdCampaign, loadAdCampaigns, updateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
+import { activateAdCampaign, approveAdvertiserProposal, deactivateAdCampaign, deleteAdCampaign, createAndActivateAdCampaign, loadAdCampaign, loadAdCampaigns, updateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -252,6 +252,23 @@ describe('revenue BFF', () => {
       expect(fetcher.mock.calls[1]?.[0]).toContain('/revenue/ad-campaigns/a1/activate')
     })
 
+    it('deletes a campaign', async () => {
+      configure()
+      const fetcher = vi.fn().mockImplementation(() => Promise.resolve(new Response(null, { status: 204 })))
+      vi.stubGlobal('fetch', fetcher)
+      await deleteAdCampaign(admin, 'a1')
+      expect(fetcher).toHaveBeenCalledWith(
+        expect.stringContaining('/revenue/ad-campaigns/a1'),
+        expect.objectContaining({ method: 'DELETE' }),
+      )
+    })
+
+    it('surfaces the API refusing to delete a serving campaign', async () => {
+      configure()
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ title: 'pause a campaign before deleting it' }), { status: 409 })))
+      await expect(deleteAdCampaign(admin, 'a1')).rejects.toThrow()
+    })
+
     it('surfaces a refusal rather than reporting success', async () => {
       configure()
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ title: 'CPM cannot exceed budget' }), { status: 422 })))
@@ -265,6 +282,7 @@ describe('revenue BFF', () => {
       await expect(loadAdCampaigns(admin)).resolves.toEqual([])
       await expect(loadAdCampaign(admin, 'a1')).resolves.toBeNull()
       await expect(updateAdCampaign(admin, 'a1', {})).rejects.toThrow(/API_URL/u)
+      await expect(deleteAdCampaign(admin, 'a1')).rejects.toThrow(/API_URL/u)
     })
   })
 })

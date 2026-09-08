@@ -183,6 +183,21 @@ export async function activateAdCampaign(actor: Actor, id: string): Promise<void
   await adminPost(actor, `/revenue/ad-campaigns/${encodeURIComponent(id)}/activate`)
 }
 
+/**
+ * Removes a campaign for good. The API refuses this while it is serving.
+ *
+ * Its ad_events rows are append-only and survive, but the campaign's line in
+ * the advertising report goes with it.
+ */
+export async function deleteAdCampaign(actor: Actor, id: string): Promise<void> {
+  const apiUrl = env().API_URL
+  if (apiUrl === undefined) throw new Error('API_URL is required for advertising')
+  const response = await fetch(joinUrl(apiUrl, `/revenue/ad-campaigns/${encodeURIComponent(id)}`), {
+    method: 'DELETE', headers: actorHeaders(actor.id),
+  })
+  if (!response.ok) throw await problemFromResponse(response)
+}
+
 /** Takes a live placement off the site. It can be activated again later. */
 export async function deactivateAdCampaign(actor: Actor, id: string): Promise<void> {
   await adminPost(actor, `/revenue/ad-campaigns/${encodeURIComponent(id)}/deactivate`)

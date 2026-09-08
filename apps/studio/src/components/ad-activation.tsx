@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import type { Route } from 'next'
 import type { AdCampaignDetailView } from '@kurasikapa/web-kit/bff/revenue'
-import { activateAdCampaignAction, deactivateAdCampaignAction } from '@/actions/revenue'
+import { activateAdCampaignAction, deactivateAdCampaignAction, deleteAdCampaignAction } from '@/actions/revenue'
 
 /**
  * Going live, and coming back off.
@@ -13,7 +14,7 @@ import { activateAdCampaignAction, deactivateAdCampaignAction } from '@/actions/
  * while live are counted against the budget and stay counted, which is why the
  * numbers are worth getting right before the first activation.
  */
-export function AdActivation({ campaign }: { campaign: AdCampaignDetailView }): React.ReactElement {
+export function AdActivation({ campaign, locale }: { campaign: AdCampaignDetailView; locale: string }): React.ReactElement {
   const router = useRouter()
   const [message, setMessage] = useState<string | null>(null)
   const [pending, start] = useTransition()
@@ -29,6 +30,25 @@ export function AdActivation({ campaign }: { campaign: AdCampaignDetailView }): 
   const everRan = campaign.activatedAt !== null
   const ranFrom = (campaign.activatedAt ?? '').slice(0, 10)
 
+  /*
+   * Only offered while paused — the API refuses to delete a serving campaign,
+   * so the button would be a guaranteed error. The confirm names what is
+   * actually lost: BuildAdReport walks campaigns, so a deleted one takes its
+   * impressions, clicks and spend out of the report.
+   */
+  const remove = (): void => {
+    const cost = everRan
+      ? ' Its impressions, clicks and spend disappear from the advertising report.'
+      : ''
+    if (!window.confirm(`Delete “${campaign.name}” permanently?${cost} This cannot be undone.`)) return
+    start(async () => {
+      const result = await deleteAdCampaignAction({ id: campaign.id })
+      if (!result.ok) { setMessage(result.error.message); return }
+      router.push(`/${locale}/ads` as Route)
+      router.refresh()
+    })
+  }
+
   return (
     <aside className="border border-outline-variant bg-surface-container-lowest p-6">
       <h2 className="font-display text-xl font-bold">Publication</h2>
@@ -43,6 +63,12 @@ export function AdActivation({ campaign }: { campaign: AdCampaignDetailView }): 
       <button type="button" disabled={pending} onClick={() => { move(campaign.active ? 'pause' : 'activate') }} className={`mt-5 w-full px-4 py-3 text-xs font-bold disabled:cursor-wait disabled:opacity-50 ${campaign.active ? 'border border-outline hover:border-error hover:text-error' : 'bg-primary text-on-primary'}`}>
         {pending ? 'Working…' : campaign.active ? 'Pause this ad' : everRan ? 'Resume this ad' : 'Publish this ad'}
       </button>
+
+      {!campaign.active && (
+        <button type="button" disabled={pending} onClick={remove} className="mt-2 w-full border border-outline px-4 py-3 text-xs font-bold text-on-surface-variant hover:border-error hover:text-error disabled:cursor-wait disabled:opacity-50">
+          Delete permanently
+        </button>
+      )}
 
       <p className="mt-4 border-l-4 border-secondary bg-secondary-container/30 p-3 text-xs">
         Pausing is reversible and keeps the campaign’s terms. Spend is not: impressions served while live remain counted, and the campaign stops on its own once the budget is reached or {campaign.endsAt.slice(0, 10)} passes.

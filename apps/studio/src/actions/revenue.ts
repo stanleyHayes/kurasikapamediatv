@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { attempt, type ActionResult } from '@kurasikapa/web-kit/actions/result'
 import { parseInput } from '@kurasikapa/web-kit/actions/schemas'
 import { requireActor } from '@kurasikapa/web-kit/composition/actor'
-import { activateAdCampaign, approveAdvertiserProposal, deactivateAdCampaign, createAndActivateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, rejectAdvertiserProposal, publishClassified, updateAdCampaign } from '@kurasikapa/web-kit/bff/revenue'
+import { activateAdCampaign, approveAdvertiserProposal, deactivateAdCampaign, deleteAdCampaign, createAndActivateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, rejectAdvertiserProposal, publishClassified, updateAdCampaign } from '@kurasikapa/web-kit/bff/revenue'
 
 const schema = z.object({ name: z.string().trim().min(2).max(80), slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u), description: z.string().trim().min(20).max(500), interval: z.enum(['monthly', 'yearly']), currency: z.enum(['GHS', 'EUR']), amountMinor: z.number().int().min(500).max(10_000_000), benefits: z.array(z.string().trim().min(2).max(120)).min(1).max(8) })
 const adSchema = z.object({ name: z.string().trim().min(2).max(100), advertiser: z.string().trim().min(2).max(100), locale: z.enum(['en', 'fr', '*']), slot: z.enum(['home_leaderboard', 'article_inline', 'live_companion']), creativeURL: z.url().startsWith('https://'), altText: z.string().trim().min(5).max(180), landingURL: z.url().startsWith('https://'), currency: z.enum(['GHS', 'EUR']), budgetMinor: z.number().int().min(100), cpmMinor: z.number().int().min(1), priority: z.number().int().min(1).max(100), startsAt: z.iso.datetime(), endsAt: z.iso.datetime() }).refine((value) => value.endsAt > value.startsAt, { message: 'The campaign end must follow its start.', path: ['endsAt'] }).refine((value) => value.cpmMinor <= value.budgetMinor, { message: 'CPM cannot exceed the campaign budget.', path: ['cpmMinor'] })
@@ -67,6 +67,15 @@ export async function activateAdCampaignAction(input: unknown): Promise<ActionRe
 export async function deactivateAdCampaignAction(input: unknown): Promise<ActionResult<undefined>> {
   return attempt(async () => {
     await deactivateAdCampaign(await requireActor(), campaignRefSchema.parse(input).id)
+
+    return undefined
+  })
+}
+
+/** Removes a campaign. The API refuses while it is still serving. */
+export async function deleteAdCampaignAction(input: unknown): Promise<ActionResult<undefined>> {
+  return attempt(async () => {
+    await deleteAdCampaign(await requireActor(), campaignRefSchema.parse(input).id)
 
     return undefined
   })

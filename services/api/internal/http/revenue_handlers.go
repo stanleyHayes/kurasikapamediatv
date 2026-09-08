@@ -236,6 +236,19 @@ func (d Deps) handleDeactivateAdCampaign(w http.ResponseWriter, r *http.Request)
 	writeJSON(w, d.Log, http.StatusOK, campaign.State())
 }
 
+func (d Deps) handleDeleteAdCampaign(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	if err = d.DeleteAdCampaign.Execute(r.Context(), actor, shared.AdCampaignID(r.PathValue("id"))); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (d Deps) handleResolveAdPlacement(w http.ResponseWriter, r *http.Request) {
 	campaign, err := d.ResolveAdPlacement.Execute(r.Context(), revenue.AdSlot(r.PathValue("slot")), r.PathValue("locale"))
 	if err != nil {

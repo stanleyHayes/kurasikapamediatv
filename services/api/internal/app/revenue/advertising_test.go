@@ -64,6 +64,14 @@ func (s *campaignStore) Save(_ context.Context, value domainrevenue.AdCampaign) 
 	return nil
 }
 
+func (s *campaignStore) Delete(_ context.Context, id shared.AdCampaignID) error {
+	if s.err != nil {
+		return s.err
+	}
+	delete(s.rows, id)
+	return nil
+}
+
 type eventStore struct {
 	rows []domainrevenue.AdEvent
 	err  error
@@ -171,5 +179,50 @@ func TestAdvertisingPropagatesRepositoryFailures(t *testing.T) {
 	}
 	if _, err := apprevenue.NewBuildAdReport(d).Execute(context.Background(), admin()); !errors.Is(err, failure) {
 		t.Fatal(err)
+	}
+}
+
+func TestDeleteAdCampaignRequiresPausingFirst(t *testing.T) {
+	d, campaigns, events := advertisingDeps()
+	ctx := context.Background()
+
+	campaign, err := apprevenue.NewCreateAdCampaign(d).Execute(ctx, admin(), adInput())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = apprevenue.NewActivateAdCampaign(d).Execute(ctx, admin(), campaign.ID()); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = apprevenue.NewRecordAdEvent(d).Execute(ctx, campaign.ID(), domainrevenue.AdImpression); err != nil {
+		t.Fatal(err)
+	}
+
+	// Serving, so it cannot be deleted out from under readers.
+	if err = apprevenue.NewDeleteAdCampaign(d).Execute(ctx, admin(), campaign.ID()); !errors.Is(err, domainrevenue.ErrCampaignStillActive) {
+		t.Fatalf("delete while live = %v, want ErrCampaignStillActive", err)
+	}
+
+	if _, err = apprevenue.NewDeactivateAdCampaign(d).Execute(ctx, admin(), campaign.ID()); err != nil {
+		t.Fatal(err)
+	}
+	if err = apprevenue.NewDeleteAdCampaign(d).Execute(ctx, admin(), campaign.ID()); err != nil {
+		t.Fatalf("delete after pausing = %v", err)
+	}
+	if len(campaigns.rows) != 0 {
+		t.Fatalf("campaign rows = %d, want 0", len(campaigns.rows))
+	}
+
+	/*
+	 * The trade-off, pinned. ad_events is append-only, so the impression
+	 * survives the delete — but BuildAdReport walks campaigns, so it no longer
+	 * appears anywhere in the report. Deleting a campaign that ran loses its
+	 * reporting history even though the raw events remain.
+	 */
+	if len(events.rows) != 1 {
+		t.Fatalf("ad_events = %d, want 1 (append-only, untouched by the delete)", len(events.rows))
+	}
+	report, err := apprevenue.NewBuildAdReport(d).Execute(ctx, admin())
+	if err != nil || len(report) != 0 {
+		t.Fatalf("report = %+v, %v — the deleted campaign's spend history is gone", report, err)
 	}
 }

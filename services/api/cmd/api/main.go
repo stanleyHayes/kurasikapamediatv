@@ -311,6 +311,7 @@ func run(log *slog.Logger) error {
 		GetAdCampaign:               apprevenue.NewGetAdCampaign(revenueDeps),
 		UpdateAdCampaign:            apprevenue.NewUpdateAdCampaign(revenueDeps),
 		DeactivateAdCampaign:        apprevenue.NewDeactivateAdCampaign(revenueDeps),
+		DeleteAdCampaign:            apprevenue.NewDeleteAdCampaign(revenueDeps),
 		ActivateAdCampaign:          apprevenue.NewActivateAdCampaign(revenueDeps),
 		ResolveAdPlacement:          apprevenue.NewResolveAdPlacement(revenueDeps),
 		RecordAdEvent:               apprevenue.NewRecordAdEvent(revenueDeps),

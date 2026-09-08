@@ -101,6 +101,28 @@ func (u DeactivateAdCampaign) Execute(ctx context.Context, actor identity.Actor,
 	return campaign, u.deps.AdCampaigns.Save(ctx, campaign)
 }
 
+/*
+ * Removes a campaign for good.
+ *
+ * The domain refuses this while it is serving, so the flow is always pause
+ * then delete. Its ad_events rows are append-only and are deliberately left
+ * behind; what is lost is the campaign's row in the advertising report, since
+ * BuildAdReport walks campaigns.
+ */
+type DeleteAdCampaign struct{ deps Deps }
+
+func NewDeleteAdCampaign(deps Deps) DeleteAdCampaign { return DeleteAdCampaign{deps: deps} }
+func (u DeleteAdCampaign) Execute(ctx context.Context, actor identity.Actor, id shared.AdCampaignID) error {
+	campaign, err := u.deps.AdCampaigns.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err = campaign.AssertRemovable(actor); err != nil {
+		return err
+	}
+	return u.deps.AdCampaigns.Delete(ctx, id)
+}
+
 type ResolveAdPlacement struct{ deps Deps }
 
 func NewResolveAdPlacement(deps Deps) ResolveAdPlacement { return ResolveAdPlacement{deps: deps} }

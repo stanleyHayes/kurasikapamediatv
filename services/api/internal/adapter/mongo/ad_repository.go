@@ -56,6 +56,13 @@ func (r *AdCampaignRepository) Save(ctx context.Context, value revenue.AdCampaig
 	_, err := r.collection.ReplaceOne(ctx, bson.M{"_id": doc.ID}, doc, options.Replace().SetUpsert(true))
 	return err
 }
+// Deletes the campaign only. ad_events is append-only and is left intact —
+// the record that impressions were served does not stop being true.
+func (r *AdCampaignRepository) Delete(ctx context.Context, id shared.AdCampaignID) error {
+	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id.String()})
+	return err
+}
+
 func (r *AdCampaignRepository) EnsureIndexes(ctx context.Context) error {
 	_, err := r.collection.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{{Key: "active", Value: 1}, {Key: "slot", Value: 1}, {Key: "locale", Value: 1}, {Key: "startsAt", Value: 1}, {Key: "endsAt", Value: 1}, {Key: "priority", Value: -1}}, Options: options.Index().SetName("eligible_ad_campaigns")})
 	return err

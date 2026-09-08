@@ -26,7 +26,7 @@ export default async function AdPage({ params }: { params: Promise<{ locale: str
       </header>
       <div className="grid gap-7 xl:grid-cols-[minmax(0,1.3fr)_minmax(18rem,.7fr)]">
         <AdCampaignForm campaign={campaign} />
-        <AdActivation campaign={campaign} />
+        <AdActivation campaign={campaign} locale={locale} />
       </div>
     </div>
   )

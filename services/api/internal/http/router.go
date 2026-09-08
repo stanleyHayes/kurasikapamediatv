@@ -98,6 +98,7 @@ type Deps struct {
 	GetAdCampaign               apprevenue.GetAdCampaign
 	UpdateAdCampaign            apprevenue.UpdateAdCampaign
 	DeactivateAdCampaign        apprevenue.DeactivateAdCampaign
+	DeleteAdCampaign            apprevenue.DeleteAdCampaign
 	ActivateAdCampaign          apprevenue.ActivateAdCampaign
 	ResolveAdPlacement          apprevenue.ResolveAdPlacement
 	RecordAdEvent               apprevenue.RecordAdEvent
@@ -217,6 +218,7 @@ func NewRouter(deps Deps) http.Handler {
 	mux.HandleFunc("GET /revenue/ad-campaigns", deps.handleListAdCampaigns)
 	mux.HandleFunc("GET /revenue/ad-campaigns/{id}", deps.handleGetAdCampaign)
 	mux.HandleFunc("PATCH /revenue/ad-campaigns/{id}", deps.handleUpdateAdCampaign)
+	mux.HandleFunc("DELETE /revenue/ad-campaigns/{id}", deps.handleDeleteAdCampaign)
 	mux.HandleFunc("POST /revenue/ad-campaigns/{id}/activate", deps.handleActivateAdCampaign)
 	mux.HandleFunc("POST /revenue/ad-campaigns/{id}/deactivate", deps.handleDeactivateAdCampaign)
 	mux.HandleFunc("GET /revenue/ad-report", deps.handleAdReport)

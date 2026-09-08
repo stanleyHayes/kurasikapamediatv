@@ -19,13 +19,14 @@ const (
 )
 
 var (
-	ErrInvalidAdSlot      = errors.New("ad slot is not supported")
-	ErrInvalidAdLocale    = errors.New("campaign locale must be en, fr or *")
-	ErrInvalidAdWindow    = errors.New("campaign end must follow its start")
-	ErrInvalidAdURL       = errors.New("creative and landing URLs must use HTTPS")
-	ErrInvalidAdRate      = errors.New("CPM must be positive and no greater than budget")
-	ErrIncompleteCampaign = errors.New("campaign requires name, advertiser and accessible creative text")
-	ErrCampaignEnded      = errors.New("an ended campaign cannot be activated")
+	ErrInvalidAdSlot       = errors.New("ad slot is not supported")
+	ErrInvalidAdLocale     = errors.New("campaign locale must be en, fr or *")
+	ErrInvalidAdWindow     = errors.New("campaign end must follow its start")
+	ErrInvalidAdURL        = errors.New("creative and landing URLs must use HTTPS")
+	ErrInvalidAdRate       = errors.New("CPM must be positive and no greater than budget")
+	ErrIncompleteCampaign  = errors.New("campaign requires name, advertiser and accessible creative text")
+	ErrCampaignEnded       = errors.New("an ended campaign cannot be activated")
+	ErrCampaignStillActive = errors.New("pause a campaign before deleting it")
 )
 
 type AdCampaignState struct {
@@ -93,6 +94,7 @@ func validateAdCampaign(state AdCampaignState) (AdCampaignState, error) {
 func ReconstituteAdCampaign(state AdCampaignState) AdCampaign { return AdCampaign{state: state} }
 func (c AdCampaign) ID() shared.AdCampaignID                  { return c.state.ID }
 func (c AdCampaign) State() AdCampaignState                   { return c.state }
+
 /*
  * Corrects an existing campaign's terms.
  *
@@ -135,6 +137,7 @@ func (c AdCampaign) Activate(actor identity.Actor, at time.Time) (AdCampaign, er
 	c.state.Active, c.state.ActivatedAt = true, &at
 	return c, nil
 }
+
 /*
  * Takes a live campaign off the site, without erasing that it ran.
  *
@@ -153,6 +156,29 @@ func (c AdCampaign) Deactivate(actor identity.Actor) (AdCampaign, error) {
 	c.state.Active = false
 
 	return c, nil
+}
+
+/*
+ * Whether this campaign may be removed for good.
+ *
+ * Refused while it is serving: pausing is reversible and deleting is not, so
+ * taking a live placement away is always pause-then-delete rather than one
+ * irreversible click.
+ *
+ * Worth knowing before you do: BuildAdReport walks campaigns, so removing one
+ * takes its impressions, clicks and estimated spend out of the advertising
+ * report. The ad_events rows themselves survive — nothing deletes those — but
+ * nothing reaches them afterwards either.
+ */
+func (c AdCampaign) AssertRemovable(actor identity.Actor) error {
+	if err := actor.Require(identity.PermRevenueManage); err != nil {
+		return err
+	}
+	if c.state.Active {
+		return ErrCampaignStillActive
+	}
+
+	return nil
 }
 
 func (c AdCampaign) Eligible(slot AdSlot, locale string, at time.Time, impressions int64) bool {

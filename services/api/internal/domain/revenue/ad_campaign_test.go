@@ -262,3 +262,45 @@ func TestAdCampaignDeactivate(t *testing.T) {
 		t.Fatalf("resume = %+v, %v", resumed.State(), err)
 	}
 }
+
+/*
+ * Removal. Guarded harder than pausing, because it is not just the placement
+ * that goes: BuildAdReport walks campaigns, so deleting one erases its
+ * impressions, clicks and estimated spend from the advertising report. The
+ * ad_events rows survive — nothing deletes those — but nothing can reach them
+ * either.
+ */
+func TestAdCampaignRemoval(t *testing.T) {
+	manager := identity.NewActor("admin", []identity.Role{identity.RoleAdministrator})
+	outsider := identity.NewActor("reader", []identity.Role{identity.RoleGuest})
+
+	campaign, err := revenue.NewAdCampaign(manager, campaignState())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = campaign.AssertRemovable(outsider); !errors.Is(err, identity.ErrNotPermitted) {
+		t.Fatalf("guest = %v, want ErrNotPermitted", err)
+	}
+	if err = campaign.AssertRemovable(manager); err != nil {
+		t.Fatalf("an unpublished campaign must be removable: %v", err)
+	}
+
+	live, err := campaign.Activate(manager, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A serving placement cannot be deleted out from under readers. Pause
+	// first — which is reversible — then decide.
+	if err = live.AssertRemovable(manager); !errors.Is(err, revenue.ErrCampaignStillActive) {
+		t.Fatalf("live = %v, want ErrCampaignStillActive", err)
+	}
+
+	paused, err := live.Deactivate(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = paused.AssertRemovable(manager); err != nil {
+		t.Fatalf("after pausing = %v, want removable", err)
+	}
+}

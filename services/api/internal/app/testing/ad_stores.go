@@ -50,6 +50,11 @@ func (s *AdCampaignStore) Save(_ context.Context, value revenue.AdCampaign) erro
 	return nil
 }
 
+func (s *AdCampaignStore) Delete(_ context.Context, id shared.AdCampaignID) error {
+	delete(s.Items, id)
+	return nil
+}
+
 type AdEventStore struct{ Items []revenue.AdEvent }
 
 func (s *AdEventStore) CountForCampaign(_ context.Context, id shared.AdCampaignID, kind revenue.AdEventKind) (int64, error) {
