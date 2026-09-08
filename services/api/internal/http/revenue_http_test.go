@@ -2,7 +2,9 @@ package http_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
+	"sort"
 	"testing"
 
 	"github.com/kurasikapa/api/internal/app/ports"
@@ -290,4 +292,68 @@ func TestCommerceHandlersRejectMalformedUnauthorizedAndMissingResources(t *testi
 			t.Errorf("%s: got %d want %d: %s", tc.path, response.Code, tc.want, response.Body.String())
 		}
 	}
+}
+
+/*
+ * Pins the campaign wire shape.
+ *
+ * AdCampaignState has no JSON tags — the domain should not know about
+ * transport — so encoding it directly emits Go field names: {"ID", "Name",
+ * "Active"}. Every other view here is camelCase, and the Studio ads list read
+ * `id` off the PascalCase payload, got an empty string, and rendered links to
+ * /ads/ with no id. This fails if anyone marshals the raw struct again.
+ */
+func TestAdCampaignJSONIsCamelCase(t *testing.T) {
+	handler := revenueServer()
+	body := `{"name":"Benmar launch","advertiser":"Benmar Cassava Foods","locale":"*","slot":"home_leaderboard","creativeURL":"https://cdn.test/a.jpg","altText":"Cassava flour carton","landingURL":"https://example.com/shop","budget":{"minor":10000,"currency":"EUR"},"cpmMinor":200,"priority":50,"startsAt":"2126-01-01T00:00:00Z","endsAt":"2126-04-01T00:00:00Z"}`
+	created := request(handler, http.MethodPost, "/revenue/ad-campaigns", body, true)
+	if created.Code != http.StatusCreated {
+		t.Fatalf("create: %d %s", created.Code, created.Body.String())
+	}
+
+	var view map[string]any
+	if err := json.Unmarshal(created.Body.Bytes(), &view); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"id", "name", "advertiser", "slot", "creativeUrl", "landingUrl", "budget", "cpmMinor", "active"} {
+		if _, ok := view[key]; !ok {
+			t.Fatalf("missing %q — got keys %v", key, keysOf(view))
+		}
+	}
+	// The Go field names must NOT leak through.
+	for _, key := range []string{"ID", "Name", "Active", "CreativeURL", "CPMMinor"} {
+		if _, ok := view[key]; ok {
+			t.Fatalf("raw Go field %q leaked into the payload", key)
+		}
+	}
+	// The id has to be usable: it is what the studio builds its links from.
+	if id, _ := view["id"].(string); id == "" {
+		t.Fatal("id is empty — every studio link would point at /ads/")
+	}
+
+	listed := request(handler, http.MethodGet, "/revenue/ad-campaigns", "", true)
+	if listed.Code != http.StatusOK {
+		t.Fatalf("list: %d %s", listed.Code, listed.Body.String())
+	}
+	var page struct {
+		Items []map[string]any `json:"items"`
+	}
+	if err := json.Unmarshal(listed.Body.Bytes(), &page); err != nil {
+		t.Fatal(err)
+	}
+	if len(page.Items) != 1 {
+		t.Fatalf("items = %d, want 1", len(page.Items))
+	}
+	if id, _ := page.Items[0]["id"].(string); id == "" {
+		t.Fatal("listed campaign has no id")
+	}
+}
+
+func keysOf(view map[string]any) []string {
+	out := make([]string, 0, len(view))
+	for key := range view {
+		out = append(out, key)
+	}
+	sort.Strings(out)
+	return out
 }

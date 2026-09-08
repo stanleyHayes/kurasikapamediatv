@@ -154,7 +154,30 @@ func (d Deps) handleCreateAdCampaign(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, d.Log, err)
 		return
 	}
-	writeJSON(w, d.Log, http.StatusCreated, campaign.State())
+	writeJSON(w, d.Log, http.StatusCreated, adCampaignView(campaign.State()))
+}
+
+/*
+ * The wire shape for a campaign, written out rather than marshalled from the
+ * domain struct.
+ *
+ * revenue.AdCampaignState carries no JSON tags — deliberately, since the
+ * domain should not know about transport — so encoding it directly emits Go
+ * field names: {"ID": …, "Name": …, "Active": …}. Every other view in this
+ * service is camelCase, and a client reading `id` off that gets an empty
+ * string, which is exactly how the Studio ads list ended up linking to
+ * /ads/ with no id at all.
+ */
+func adCampaignView(s revenue.AdCampaignState) map[string]any {
+	return map[string]any{
+		"id": s.ID.String(), "name": s.Name, "advertiser": s.Advertiser,
+		"locale": s.Locale, "slot": s.Slot,
+		"creativeUrl": s.CreativeURL, "altText": s.AltText, "landingUrl": s.LandingURL,
+		"budget":   map[string]any{"minor": s.Budget.Minor, "currency": s.Budget.Currency},
+		"cpmMinor": s.CPMMinor, "priority": s.Priority,
+		"startsAt": s.StartsAt, "endsAt": s.EndsAt,
+		"active": s.Active, "activatedAt": s.ActivatedAt,
+	}
 }
 
 func (d Deps) handleListAdCampaigns(w http.ResponseWriter, r *http.Request) {
@@ -168,9 +191,9 @@ func (d Deps) handleListAdCampaigns(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, d.Log, err)
 		return
 	}
-	items := make([]revenue.AdCampaignState, len(campaigns))
+	items := make([]map[string]any, len(campaigns))
 	for i, campaign := range campaigns {
-		items[i] = campaign.State()
+		items[i] = adCampaignView(campaign.State())
 	}
 	writeJSON(w, d.Log, http.StatusOK, map[string]any{"items": items})
 }
@@ -186,7 +209,7 @@ func (d Deps) handleGetAdCampaign(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, d.Log, err)
 		return
 	}
-	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+	writeJSON(w, d.Log, http.StatusOK, adCampaignView(campaign.State()))
 }
 
 func (d Deps) handleUpdateAdCampaign(w http.ResponseWriter, r *http.Request) {
@@ -205,7 +228,7 @@ func (d Deps) handleUpdateAdCampaign(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, d.Log, err)
 		return
 	}
-	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+	writeJSON(w, d.Log, http.StatusOK, adCampaignView(campaign.State()))
 }
 
 func (d Deps) handleActivateAdCampaign(w http.ResponseWriter, r *http.Request) {
@@ -219,7 +242,7 @@ func (d Deps) handleActivateAdCampaign(w http.ResponseWriter, r *http.Request) {
 		writeProblem(w, d.Log, err)
 		return
 	}
-	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+	writeJSON(w, d.Log, http.StatusOK, adCampaignView(campaign.State()))
 }
 
 func (d Deps) handleDeactivateAdCampaign(w http.ResponseWriter, r *http.Request) {
@@ -233,7 +256,7 @@ func (d Deps) handleDeactivateAdCampaign(w http.ResponseWriter, r *http.Request)
 		writeProblem(w, d.Log, err)
 		return
 	}
-	writeJSON(w, d.Log, http.StatusOK, campaign.State())
+	writeJSON(w, d.Log, http.StatusOK, adCampaignView(campaign.State()))
 }
 
 func (d Deps) handleDeleteAdCampaign(w http.ResponseWriter, r *http.Request) {

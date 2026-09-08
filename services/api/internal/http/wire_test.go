@@ -5,6 +5,8 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"reflect"
+	"testing"
 
 	appeditorial "github.com/kurasikapa/api/internal/app/editorial"
 	appidentity "github.com/kurasikapa/api/internal/app/identity"
@@ -110,6 +112,12 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		ListGalleryLibrary:          appmedia.NewListGalleryLibrary(mediaDeps, faketesting.VideoDeliveryFake{Delivery: ports.VideoDelivery{PlaybackURL: "https://cdn.test/report.m3u8", PosterURL: "https://cdn.test/poster.jpg", MIMEType: "application/vnd.apple.mpegurl"}}),
 		CreateEvent:                 appmedia.NewCreateEvent(mediaDeps),
 		PublishEvent:                appmedia.NewPublishEvent(mediaDeps),
+		UnpublishEvent:              appmedia.NewUnpublishEvent(mediaDeps),
+		UpdateEvent:                 appmedia.NewUpdateEvent(mediaDeps),
+		DeleteEvent:                 appmedia.NewDeleteEvent(mediaDeps),
+		ListEvents:                  appmedia.NewListEvents(mediaDeps),
+		GetEvent:                    appmedia.NewGetEvent(mediaDeps),
+		GetPublishedEvent:           appmedia.NewGetPublishedEvent(mediaDeps),
 		ListUpcomingEvents:          appmedia.NewListUpcomingEvents(mediaDeps),
 		ReceiveRecording:            appmedia.NewReceiveRecording(mediaDeps, recordingImports, recordingProvider),
 		ProcessRecordings:           appmedia.NewProcessRecordings(mediaDeps, recordingImports, recordingProvider),
@@ -124,6 +132,11 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 		BuildRevenueReport:          apprevenue.NewBuildRevenueReport(revenueDeps),
 		CreateAdCampaign:            apprevenue.NewCreateAdCampaign(revenueDeps),
 		ActivateAdCampaign:          apprevenue.NewActivateAdCampaign(revenueDeps),
+		DeactivateAdCampaign:        apprevenue.NewDeactivateAdCampaign(revenueDeps),
+		ListAdCampaigns:             apprevenue.NewListAdCampaigns(revenueDeps),
+		GetAdCampaign:               apprevenue.NewGetAdCampaign(revenueDeps),
+		UpdateAdCampaign:            apprevenue.NewUpdateAdCampaign(revenueDeps),
+		DeleteAdCampaign:            apprevenue.NewDeleteAdCampaign(revenueDeps),
 		ResolveAdPlacement:          apprevenue.NewResolveAdPlacement(revenueDeps),
 		RecordAdEvent:               apprevenue.NewRecordAdEvent(revenueDeps),
 		BuildAdReport:               apprevenue.NewBuildAdReport(revenueDeps),
@@ -156,4 +169,43 @@ func httpDeps(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) 
 
 func routed(app appeditorial.Deps, granted map[shared.UserID][]identity.Role) http.Handler {
 	return kurahttp.NewRouter(httpDeps(app, granted))
+}
+
+/*
+ * Every use case on Deps must actually be wired in the shared harness.
+ *
+ * A missing field is the zero value, and a zero use case carries a nil Deps —
+ * so the route it backs compiles, serves, and panics on the first request.
+ * Two rounds of new endpoints were added to main.go and not here, and nothing
+ * noticed until a handler segfaulted mid-test.
+ *
+ * Reflection rather than a hand-kept list, because a hand-kept list has the
+ * same failure mode as the thing it is checking.
+ */
+func TestEveryDependencyIsWired(t *testing.T) {
+	/*
+	 * Wired per-test instead, because they need fakes this harness has no
+	 * opinion about — see article_narration_http_test.go, which assigns each
+	 * of these onto its own copy of Deps.
+	 */
+	perTest := map[string]bool{
+		"RequestArticleNarration": true, "GetLatestNarration": true,
+		"AttachArticleNarration": true, "ProcessNarrationJobs": true,
+	}
+
+	deps := reflect.ValueOf(httpDeps(emptyEditorial(), map[shared.UserID][]identity.Role{}))
+	for i := range deps.NumField() {
+		field, name := deps.Field(i), deps.Type().Field(i).Name
+		// Strings and bools are configuration, not use cases: ActorSecret is
+		// empty on purpose here, and the router reads it as "no bearer needed".
+		if !field.CanInterface() || field.Kind() == reflect.String || field.Kind() == reflect.Bool {
+			continue
+		}
+		if perTest[name] {
+			continue
+		}
+		if field.IsZero() {
+			t.Errorf("Deps.%s is not wired — the routes it backs would panic on first use", name)
+		}
+	}
 }
