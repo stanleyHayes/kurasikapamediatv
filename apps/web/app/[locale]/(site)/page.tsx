@@ -3,9 +3,11 @@ import { Suspense } from 'react'
 import { BriefingCard } from '@/components/home/briefing-card'
 import { Hero } from '@/components/home/hero'
 import { Trending } from '@/components/home/trending'
+import { UpcomingEvents } from '@/components/home/upcoming-events'
 import { EditorialEmptyState } from '@/components/editorial-empty-state'
 import { AdPlacement } from '@/components/advertising/ad-placement'
 import { Link } from '@kurasikapa/web-kit/i18n/navigation'
+import { loadEvents, type EventView } from '@kurasikapa/web-kit/bff/events'
 import { homeRails, type HomeRails } from '@kurasikapa/web-kit/read-model/home-rails'
 import { cachedLatest, cachedMostRead } from '@kurasikapa/web-kit/read-model/queries'
 
@@ -28,53 +30,66 @@ export default async function HomePage({
 }
 
 async function Front({ locale }: { locale: string }): Promise<React.ReactElement> {
-  const [{ items }, mostRead] = await Promise.all([
+  const [{ items }, mostRead, events] = await Promise.all([
     cachedLatest(locale, RAIL_SIZE),
     cachedMostRead(locale, RAIL_SIZE),
+    loadEvents(locale),
   ])
-  if (items.length === 0) {
-    return <EditorialEmptyState surface="home" />
-  }
 
-  return <HomeLayout {...homeRails(items, mostRead)} locale={locale} />
+  return <HomeLayout {...homeRails(items, mostRead)} events={events} locale={locale} />
 }
 
-function HomeLayout({ lead, briefing, trending, locale }: HomeRails & { readonly locale: string }): React.ReactElement {
+/*
+ * The empty state replaces the ARTICLE rails, not the page.
+ *
+ * It used to return early from Front, so a newsroom with no published stories
+ * rendered nothing else at all — no advertising, and no events. A published
+ * event and a live placement both disappeared behind "the first edition is
+ * taking shape", which is the one moment they matter most.
+ */
+function HomeLayout({ lead, briefing, trending, events, locale }: HomeRails & {
+  readonly events: readonly EventView[]
+  readonly locale: string
+}): React.ReactElement {
   return (
     <>
       {lead !== undefined && <Hero article={lead} />}
 
       <Suspense fallback={null}><AdPlacement locale={locale} slot="home_leaderboard" /></Suspense>
 
-      <section className="mx-auto max-w-[var(--container-page)] px-4 py-[var(--space-xl)] md:px-8">
-        <div className="grid grid-cols-1 gap-[var(--space-lg)] lg:grid-cols-12">
-          <div className="flex flex-col gap-8 lg:col-span-8">
-            <div className="reveal flex items-end justify-between gap-4 border-b-4 border-on-surface pb-5">
-              <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
-                The briefing
-              </h2>
-              <Link
-                href="/search"
-                className="editorial-link eyebrow text-primary-ink hover:text-secondary-ink transition-colors"
-              >
-                View all
-              </Link>
+      {lead === undefined ? <EditorialEmptyState surface="home" /> : (
+        <section className="mx-auto max-w-[var(--container-page)] px-4 py-[var(--space-xl)] md:px-8">
+          <div className="grid grid-cols-1 gap-[var(--space-lg)] lg:grid-cols-12">
+            <div className="flex flex-col gap-8 lg:col-span-8">
+              <div className="reveal flex items-end justify-between gap-4 border-b-4 border-on-surface pb-5">
+                <h2 className="font-display text-on-surface text-[length:var(--text-headline-md)] font-semibold">
+                  The briefing
+                </h2>
+                <Link
+                  href="/search"
+                  className="editorial-link eyebrow text-primary-ink hover:text-secondary-ink transition-colors"
+                >
+                  View all
+                </Link>
+              </div>
+
+              <div className="depth-grid grid grid-cols-1 gap-x-[var(--space-md)] gap-y-10 md:grid-cols-2">
+                {briefing.map((article, index) => (
+                  <BriefingCard key={article.id} article={article} index={index} />
+                ))}
+              </div>
             </div>
 
-            <div className="depth-grid grid grid-cols-1 gap-x-[var(--space-md)] gap-y-10 md:grid-cols-2">
-              {briefing.map((article, index) => (
-                <BriefingCard key={article.id} article={article} index={index} />
-              ))}
-            </div>
+            {trending.length > 0 && (
+              <div className="lg:col-span-4">
+                <Trending articles={trending} />
+              </div>
+            )}
           </div>
+        </section>
+      )}
 
-          {trending.length > 0 && (
-            <div className="lg:col-span-4">
-              <Trending articles={trending} />
-            </div>
-          )}
-        </div>
-      </section>
+      <UpcomingEvents events={events} locale={locale} />
 
       <div className="mx-auto max-w-[var(--container-page)] px-6 py-8">
         <div className="bg-outline-variant h-px w-full" />
