@@ -209,3 +209,56 @@ func TestAdCampaignUpdate(t *testing.T) {
 		}
 	})
 }
+
+/*
+ * Pausing. Activation used to be one-way: a campaign ran to its end date or
+ * until its budget was spent, and pulling a placement early meant editing the
+ * database by hand.
+ */
+func TestAdCampaignDeactivate(t *testing.T) {
+	manager := identity.NewActor("admin", []identity.Role{identity.RoleAdministrator})
+	outsider := identity.NewActor("reader", []identity.Role{identity.RoleGuest})
+	state := campaignState()
+
+	campaign, err := revenue.NewAdCampaign(manager, state)
+	if err != nil {
+		t.Fatal(err)
+	}
+	live, err := campaign.Activate(manager, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	serving := at.Add(time.Hour)
+	if !live.Eligible(state.Slot, "en", serving, 0) {
+		t.Fatal("an activated campaign should serve")
+	}
+
+	if _, deactivateErr := live.Deactivate(outsider); !errors.Is(deactivateErr, identity.ErrNotPermitted) {
+		t.Fatalf("guest = %v, want ErrNotPermitted", deactivateErr)
+	}
+
+	paused, err := live.Deactivate(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Eligibility reads Active, so serving stops on the very next request.
+	if paused.State().Active || paused.Eligible(state.Slot, "en", serving, 0) {
+		t.Fatalf("a paused campaign must not serve: %+v", paused.State())
+	}
+	// ActivatedAt survives: it records that this WAS live, which is what an
+	// advertiser asking "when did my ad run?" is owed.
+	if paused.State().ActivatedAt == nil {
+		t.Fatal("ActivatedAt must be kept as the record of a past run")
+	}
+
+	// Pausing twice is not an error — the end state is what was asked for.
+	if _, twiceErr := paused.Deactivate(manager); twiceErr != nil {
+		t.Fatalf("deactivating twice = %v", twiceErr)
+	}
+
+	// And it can go back out again while the window is still open.
+	resumed, err := paused.Activate(manager, serving)
+	if err != nil || !resumed.Eligible(state.Slot, "en", serving, 0) {
+		t.Fatalf("resume = %+v, %v", resumed.State(), err)
+	}
+}

@@ -183,6 +183,11 @@ export async function activateAdCampaign(actor: Actor, id: string): Promise<void
   await adminPost(actor, `/revenue/ad-campaigns/${encodeURIComponent(id)}/activate`)
 }
 
+/** Takes a live placement off the site. It can be activated again later. */
+export async function deactivateAdCampaign(actor: Actor, id: string): Promise<void> {
+  await adminPost(actor, `/revenue/ad-campaigns/${encodeURIComponent(id)}/deactivate`)
+}
+
 export async function createAndActivateAdCampaign(actor: Actor, input: unknown): Promise<{ readonly id: string }> {
   const created = await adminPost(actor, '/revenue/ad-campaigns', input)
   const id = text(created['id'] ?? created['ID'])

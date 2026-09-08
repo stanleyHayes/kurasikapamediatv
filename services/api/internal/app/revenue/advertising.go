@@ -82,6 +82,25 @@ func (u ActivateAdCampaign) Execute(ctx context.Context, actor identity.Actor, i
 	return campaign, u.deps.AdCampaigns.Save(ctx, campaign)
 }
 
+/*
+ * Pulls a live placement. The counterpart to ActivateAdCampaign, and the
+ * reason going live is no longer a one-way door.
+ */
+type DeactivateAdCampaign struct{ deps Deps }
+
+func NewDeactivateAdCampaign(deps Deps) DeactivateAdCampaign { return DeactivateAdCampaign{deps: deps} }
+func (u DeactivateAdCampaign) Execute(ctx context.Context, actor identity.Actor, id shared.AdCampaignID) (domainrevenue.AdCampaign, error) {
+	campaign, err := u.deps.AdCampaigns.FindByID(ctx, id)
+	if err != nil {
+		return domainrevenue.AdCampaign{}, err
+	}
+	campaign, err = campaign.Deactivate(actor)
+	if err != nil {
+		return domainrevenue.AdCampaign{}, err
+	}
+	return campaign, u.deps.AdCampaigns.Save(ctx, campaign)
+}
+
 type ResolveAdPlacement struct{ deps Deps }
 
 func NewResolveAdPlacement(deps Deps) ResolveAdPlacement { return ResolveAdPlacement{deps: deps} }

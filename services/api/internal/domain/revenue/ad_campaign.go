@@ -135,6 +135,26 @@ func (c AdCampaign) Activate(actor identity.Actor, at time.Time) (AdCampaign, er
 	c.state.Active, c.state.ActivatedAt = true, &at
 	return c, nil
 }
+/*
+ * Takes a live campaign off the site, without erasing that it ran.
+ *
+ * `Eligible` reads `Active`, so serving stops on the very next request rather
+ * than at some later sweep. ActivatedAt is deliberately KEPT: an advertiser
+ * asking when their placement ran is owed an answer, and Activate simply
+ * overwrites it if the campaign is resumed.
+ *
+ * Pausing an already-paused campaign is not an error. The caller asked for a
+ * state, and that state is what they get.
+ */
+func (c AdCampaign) Deactivate(actor identity.Actor) (AdCampaign, error) {
+	if err := actor.Require(identity.PermRevenueManage); err != nil {
+		return AdCampaign{}, err
+	}
+	c.state.Active = false
+
+	return c, nil
+}
+
 func (c AdCampaign) Eligible(slot AdSlot, locale string, at time.Time, impressions int64) bool {
 	return c.state.Active && c.state.Slot == slot && (c.state.Locale == "*" || c.state.Locale == locale) && !at.Before(c.state.StartsAt) && at.Before(c.state.EndsAt) && c.EstimatedSpend(impressions) < c.state.Budget.Minor
 }

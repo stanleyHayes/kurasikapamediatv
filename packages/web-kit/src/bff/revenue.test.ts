@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Actor, userId } from '@kurasikapa/domain'
-import { activateAdCampaign, approveAdvertiserProposal, createAndActivateAdCampaign, loadAdCampaign, loadAdCampaigns, updateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
+import { activateAdCampaign, approveAdvertiserProposal, deactivateAdCampaign, createAndActivateAdCampaign, loadAdCampaign, loadAdCampaigns, updateAdCampaign, createAndActivateAffiliateLink, createAndActivateMembershipPlan, createAndActivateProduct, followAffiliateLink, loadAdPlacement, loadAdReport, loadAdvertiserProposals, loadAffiliateLinks, loadClassifieds, loadMembershipPlans, loadProducts, loadRevenueReport, publishClassified, recordAdEvent, rejectAdvertiserProposal, startClassifiedCheckout, startDonationCheckout, startMembershipCheckout, startProductCheckout, submitAdvertiserProposal } from './revenue'
 import { resetEnv } from '../composition/env'
 
 function configure(): void {
@@ -238,6 +238,18 @@ describe('revenue BFF', () => {
       vi.stubGlobal('fetch', fetcher)
       await activateAdCampaign(admin, 'a1')
       expect(fetcher.mock.calls[0]?.[0]).toContain('/revenue/ad-campaigns/a1/activate')
+    })
+
+    it('pauses a live placement, and can put it back', async () => {
+      configure()
+      // A fresh Response per call: a body can only be read once, and both
+      // calls here read one.
+      const fetcher = vi.fn().mockImplementation(() => Promise.resolve(new Response('{}', { status: 200 })))
+      vi.stubGlobal('fetch', fetcher)
+      await deactivateAdCampaign(admin, 'a1')
+      expect(fetcher.mock.calls[0]?.[0]).toContain('/revenue/ad-campaigns/a1/deactivate')
+      await activateAdCampaign(admin, 'a1')
+      expect(fetcher.mock.calls[1]?.[0]).toContain('/revenue/ad-campaigns/a1/activate')
     })
 
     it('surfaces a refusal rather than reporting success', async () => {
