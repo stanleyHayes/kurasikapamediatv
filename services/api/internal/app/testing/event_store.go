@@ -34,6 +34,19 @@ func (s *EventStore) FindByID(_ context.Context, id shared.EventID) (media.Event
 	return item, nil
 }
 
+func (s *EventStore) FindBySlug(_ context.Context, locale, slug string) (media.Event, error) {
+	if s.Err != nil {
+		return media.Event{}, s.Err
+	}
+	for _, item := range s.Items {
+		state := item.State()
+		if state.Locale == locale && state.Slug == slug {
+			return item, nil
+		}
+	}
+	return media.Event{}, ports.ErrNotFound
+}
+
 func (s *EventStore) ListUpcoming(_ context.Context, locale string, now time.Time, limit int) ([]media.Event, error) {
 	if s.Err != nil {
 		return nil, s.Err
@@ -50,6 +63,32 @@ func (s *EventStore) ListUpcoming(_ context.Context, locale string, now time.Tim
 		out = out[:limit]
 	}
 	return out, nil
+}
+
+func (s *EventStore) ListAll(_ context.Context, locale string, limit int) ([]media.Event, error) {
+	if s.Err != nil {
+		return nil, s.Err
+	}
+	out := make([]media.Event, 0, len(s.Items))
+	for _, item := range s.Items {
+		if item.State().Locale == locale {
+			out = append(out, item)
+		}
+	}
+	// Soonest first, matching the adapter, so a test cannot pass on map order.
+	sort.Slice(out, func(i, j int) bool { return out[i].State().StartsAt.Before(out[j].State().StartsAt) })
+	if len(out) > limit {
+		out = out[:limit]
+	}
+	return out, nil
+}
+
+func (s *EventStore) Delete(_ context.Context, id shared.EventID) error {
+	if s.Err != nil {
+		return s.Err
+	}
+	delete(s.Items, id)
+	return nil
 }
 
 func (s *EventStore) Save(_ context.Context, item media.Event) error {

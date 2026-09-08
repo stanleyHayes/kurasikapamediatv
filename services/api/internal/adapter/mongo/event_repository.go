@@ -30,6 +30,18 @@ func (r *EventRepository) FindByID(ctx context.Context, id shared.EventID) (medi
 	return eventFromDoc(doc), nil
 }
 
+// Served by the unique event_locale_slug index.
+func (r *EventRepository) FindBySlug(ctx context.Context, locale, slug string) (media.Event, error) {
+	var doc eventDoc
+	if err := r.collection.FindOne(ctx, bson.M{"locale": locale, "slug": slug}).Decode(&doc); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return media.Event{}, ports.ErrNotFound
+		}
+		return media.Event{}, err
+	}
+	return eventFromDoc(doc), nil
+}
+
 func (r *EventRepository) ListUpcoming(ctx context.Context, locale string, now time.Time, limit int) ([]media.Event, error) {
 	filter := bson.M{"locale": locale, "published": true, "endsAt": bson.M{"$gt": now}}
 	cursor, err := r.collection.Find(ctx, filter, options.Find().SetSort(bson.D{{Key: "startsAt", Value: 1}, {Key: "_id", Value: 1}}).SetLimit(int64(limit)))
@@ -48,9 +60,36 @@ func (r *EventRepository) ListUpcoming(ctx context.Context, locale string, now t
 	return out, nil
 }
 
+// Everything for a locale, drafts and past events included. The studio needs
+// to see what it has not published yet; the public listing never calls this.
+func (r *EventRepository) ListAll(ctx context.Context, locale string, limit int) ([]media.Event, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{"locale": locale},
+		options.Find().SetSort(bson.D{{Key: "startsAt", Value: 1}, {Key: "_id", Value: 1}}).SetLimit(int64(limit)))
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = cursor.Close(ctx) }()
+	var docs []eventDoc
+	if err = cursor.All(ctx, &docs); err != nil {
+		return nil, err
+	}
+	out := make([]media.Event, len(docs))
+	for i, doc := range docs {
+		out[i] = eventFromDoc(doc)
+	}
+	return out, nil
+}
+
 func (r *EventRepository) Save(ctx context.Context, event media.Event) error {
 	doc := eventToDoc(event)
 	_, err := r.collection.ReplaceOne(ctx, bson.M{"_id": doc.ID}, doc, options.Replace().SetUpsert(true))
+	return err
+}
+
+// Removes the row outright, freeing its (locale, slug) for reuse. The app
+// layer refuses this while the event is published.
+func (r *EventRepository) Delete(ctx context.Context, id shared.EventID) error {
+	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id.String()})
 	return err
 }
 

@@ -92,3 +92,32 @@ func ptrAsset(id shared.AssetID) *shared.AssetID { return &id }
 func eventEditor() identity.Actor {
 	return identity.NewActor("editor", []identity.Role{identity.RoleEditor})
 }
+
+func TestDeleteEventRequiresUnpublishingFirst(t *testing.T) {
+	d, _, _, _ := deps()
+	d.Events, d.Assets = fakes.NewEventStore(), fakes.NewAssetStore()
+	ctx := context.Background()
+
+	event, err := appmedia.NewCreateEvent(d).Execute(ctx, eventEditor(), eventInput(d.Clock.Now(), nil))
+	if err != nil {
+		t.Fatal(err)
+	}
+	published, err := appmedia.NewPublishEvent(d).Execute(ctx, eventEditor(), event.ID())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = appmedia.NewDeleteEvent(d).Execute(ctx, eventEditor(), published.ID()); !errors.Is(err, domainmedia.ErrEventStillPublished) {
+		t.Fatalf("delete while published = %v, want ErrEventStillPublished", err)
+	}
+
+	if _, err = appmedia.NewUnpublishEvent(d).Execute(ctx, eventEditor(), event.ID()); err != nil {
+		t.Fatal(err)
+	}
+	if err = appmedia.NewDeleteEvent(d).Execute(ctx, eventEditor(), event.ID()); err != nil {
+		t.Fatalf("delete after unpublish = %v", err)
+	}
+	// Gone, so its (locale, slug) is free for a corrected listing.
+	if _, err = d.Events.FindByID(ctx, event.ID()); !errors.Is(err, ports.ErrNotFound) {
+		t.Fatalf("find after delete = %v, want ErrNotFound", err)
+	}
+}

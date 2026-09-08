@@ -53,6 +53,86 @@ func (d Deps) handlePublishEvent(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, d.Log, http.StatusOK, eventView(appmedia.EventListing{Event: event}))
 }
 
+func (d Deps) handleDeleteEvent(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	if err = d.DeleteEvent.Execute(r.Context(), actor, shared.EventID(r.PathValue("id"))); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (d Deps) handleUpdateEvent(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	var input eventRequest
+	if err = decode(r, &input); err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	event, err := d.UpdateEvent.Execute(r.Context(), actor, shared.EventID(r.PathValue("id")), domainmedia.EventState{Type: input.Type, Mode: input.Mode, Title: input.Title, Slug: input.Slug, Locale: input.Locale, Summary: input.Summary, Timezone: input.Timezone, Venue: input.Venue, City: input.City, RegistrationURL: input.RegistrationURL, StartsAt: input.StartsAt, EndsAt: input.EndsAt, ImageAssetID: input.ImageAssetID, Speakers: input.Speakers, Featured: input.Featured})
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, eventView(appmedia.EventListing{Event: event}))
+}
+
+// One published event by slug. Anonymous, and a draft here is a 404.
+func (d Deps) handlePublicEvent(w http.ResponseWriter, r *http.Request) {
+	item, err := d.GetPublishedEvent.Execute(r.Context(), r.PathValue("locale"), r.PathValue("slug"))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, eventView(item))
+}
+
+func (d Deps) handleUnpublishEvent(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	event, err := d.UnpublishEvent.Execute(r.Context(), actor, shared.EventID(r.PathValue("id")))
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	writeJSON(w, d.Log, http.StatusOK, eventView(appmedia.EventListing{Event: event}))
+}
+
+// The studio's own listing. Drafts are included, so this is authenticated and
+// deliberately not exposed under /public.
+func (d Deps) handleStudioEvents(w http.ResponseWriter, r *http.Request) {
+	actor, err := d.actorFrom(r)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	locale := r.URL.Query().Get("locale")
+	if locale == "" {
+		locale = "en"
+	}
+	items, err := d.ListEvents.Execute(r.Context(), actor, locale, 200)
+	if err != nil {
+		writeProblem(w, d.Log, err)
+		return
+	}
+	views := make([]map[string]any, len(items))
+	for i, item := range items {
+		views[i] = eventView(item)
+	}
+	writeJSON(w, d.Log, http.StatusOK, map[string]any{"items": views})
+}
+
 func (d Deps) handleUpcomingEvents(w http.ResponseWriter, r *http.Request) {
 	items, err := d.ListUpcomingEvents.Execute(r.Context(), r.PathValue("locale"), 50)
 	if err != nil {
@@ -69,6 +149,11 @@ func (d Deps) handleUpcomingEvents(w http.ResponseWriter, r *http.Request) {
 func eventView(item appmedia.EventListing) map[string]any {
 	s := item.Event.State()
 	view := map[string]any{"id": s.ID.String(), "type": s.Type, "mode": s.Mode, "title": s.Title, "slug": s.Slug, "locale": s.Locale, "summary": s.Summary, "timezone": s.Timezone, "venue": s.Venue, "city": s.City, "registrationUrl": s.RegistrationURL, "startsAt": s.StartsAt, "endsAt": s.EndsAt, "speakers": s.Speakers, "featured": s.Featured, "published": s.Published, "publishedAt": s.PublishedAt}
+	// The id, not just the rendered image: without it an edit form cannot
+	// preselect the current picture, and saving would silently clear it.
+	if s.ImageAssetID != nil {
+		view["imageAssetId"] = s.ImageAssetID.String()
+	}
 	if item.Image != nil {
 		view["image"] = map[string]any{"url": item.Image.State().SecureURL, "altText": item.Image.State().AltText}
 	}

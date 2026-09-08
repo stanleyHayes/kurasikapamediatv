@@ -283,8 +283,14 @@ type GalleryRepository interface {
 
 type EventRepository interface {
 	FindByID(context.Context, shared.EventID) (media.Event, error)
+	// FindBySlug backs the public detail page, which is addressed by slug.
+	FindBySlug(context.Context, string, string) (media.Event, error)
 	ListUpcoming(context.Context, string, time.Time, int) ([]media.Event, error)
+	// ListAll includes drafts and events already past. It backs the studio's
+	// own listing, which has to show what ListUpcoming deliberately hides.
+	ListAll(context.Context, string, int) ([]media.Event, error)
 	Save(context.Context, media.Event) error
+	Delete(context.Context, shared.EventID) error
 }
 
 type UploadRequest struct {
