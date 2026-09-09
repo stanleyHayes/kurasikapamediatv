@@ -30,6 +30,14 @@ Run `pnpm verify` before claiming any task is done. It runs the gates in CI orde
 
 ### Current delivery — newsroom and operations uplift
 
+Favicon repair (2026-09-09): added ICO copies of the existing SVG mark to both
+apps and a Studio origin-root redirect to `/studio/favicon.ico`. Both serve
+`200 image/x-icon` locally; Studio's origin-root probe redirects with 308 and
+the downloaded bytes match the assets. `pnpm verify` passed lint, typecheck,
+boundaries, TypeScript tests and duplication, then stopped on existing Go
+formatting in `services/api/internal/adapter/mongo/ad_repository.go`.
+Production deployment and confirmation of the reported 403 remain pending.
+
 | Workstream | State | Acceptance evidence |
 |---|---|---|
 | Independent Studio auth, recovery, branded login and navigation shell | **DONE** | Studio production auth and password recovery verified; nested shell loading prevents sidebar navigation from replacing the whole app shell. |

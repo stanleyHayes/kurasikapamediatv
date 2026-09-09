@@ -21,6 +21,17 @@ const nextConfig: NextConfig = {
    */
   basePath: '/studio',
 
+  // Browsers may probe the origin root even though Studio has a basePath.
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async redirects() {
+    return [{
+      source: '/favicon.ico',
+      destination: '/studio/favicon.ico',
+      basePath: false,
+      permanent: true,
+    }]
+  },
+
   // Partial Prerendering, same as the public app. The studio is mostly a
   // static shell around request-scoped holes, which is exactly what this models.
   cacheComponents: true,
